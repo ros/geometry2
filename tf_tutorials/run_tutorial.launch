@@ -1,0 +1,6 @@
+<launch>
+<node pkg="tf_tutorials" type="space_shuttle_tracker"/>
+<node pkg="tf_tutorials" type="earth_tracker"/>
+<node pkg="tf" type="transform_sender" args="1000 0 0 0 0 0 hawaii earth 1000"/>
+<node pkg="tf" type="transform_sender" args="-1000 0 0 0 0 0 canaveral earth 1000"/>
+</launch>

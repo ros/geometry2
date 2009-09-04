@@ -1,0 +1,68 @@
+<package>
+  <description brief="Eigen">
+    Eigen 2 is a C++ template library for linear algebra: vectors,
+    matrices, and related algorithms. It is:
+
+    <ul>
+      <li>Versatile. Eigen handles, without code duplication, and in a
+      completely integrated way:<ul>
+
+	  <li>both fixed-size and dynamic-size matrices and vectors.</li>
+
+	  <li>both dense and sparse (the latter is still experimental)
+	  matrices and vectors.</li>
+
+	  <li>both plain matrices/vectors and abstract expressions.</li>
+
+	  <li>both column-major (the default) and row-major matrix
+	  storage.</li>
+
+	  <li>o both basic matrix/vector manipulation and many more
+	  advanced, specialized modules providing algorithms for linear
+	  algebra, geometry, quaternions, or advanced array
+	  manipulation.</li>
+	  
+      </ul></li>
+      <li>Fast<ul>
+
+	  <li>Expression templates allow to intelligently remove
+	  temporaries and enable lazy evaluation, when that is
+	  appropriate -- Eigen takes care of this automatically and
+	  handles aliasing too in most cases.</li>
+
+	  <li>Explicit vectorization is performed for the SSE (2 and
+	  later) and AltiVec instruction sets, with graceful fallback to
+	  non-vectorized code. Expression templates allow to perform
+	  these optimizations globally for whole expressions.</li>
+
+	  <li>With fixed-size objects, dynamic memory allocation is
+	  avoided, and the loops are unrolled when that makes sense.</li>
+
+	  <li>For large matrices, special attention is paid to
+	  cache-friendliness. </li>
+      </ul></li>
+
+      <li>Elegant. The API is extremely clean and expressive, thanks to
+      expression templates. Implementing an algorithm on top of Eigen
+      feels like just copying pseudocode. You can use complex
+      expressions and still rely on Eigen to produce optimized code:
+      there is no need for you to manually decompose expressions into
+      small steps.</li>
+
+      <li>Compiler-friendy. Eigen has very reasonable compilation times at
+      least with GCC, compared to other C++ libraries based on
+      expression templates and heavy metaprogramming. Eigen is also
+      standard C++ and supports various compilers. </li>
+  </ul>
+
+  </description>
+
+  <author>Gaeal Guennebaud and Benoit Jacob</author>
+  <license>LGPL</license>
+  <review status="3rdparty" notes=""/>
+  <url>http://eigen.tuxfamily.org/</url>
+  <export>
+    <cpp cflags="-I${prefix}/build/eigen2" lflags="" />
+    <doxymaker external="http://eigen.tuxfamily.org/api/"/>
+  </export>
+</package>

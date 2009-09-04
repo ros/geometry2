@@ -1,0 +1,20 @@
+<package>
+  <description brief='Transform Library Conversions'>
+
+This package contains a set of conversion functions to translate common tf datatypes into datatypes used by other libraries. Currently this package has support for the Kinematics and Dynamics Library (KDL) and the Eigen matrix library.
+
+  </description>
+  <author>Tully Foote</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://www.ros.org/wiki/tf_conversions</url>
+
+  <depend package="tf"/>
+  <depend package="kdl"/>
+  <depend package="eigen"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include"
+         lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf_conversions" />
+  </export>
+</package>

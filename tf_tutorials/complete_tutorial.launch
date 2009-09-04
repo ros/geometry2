@@ -1,0 +1,6 @@
+<launch>
+<include file="$(find tf_tutorials)/run_tutorial.launch"/>
+<node pkg="tf_tutorials" type="shuttle_observer"/>
+<node pkg="tf_tutorials" type="tutorial_listener"/>
+<node pkg="rxtools" type="rxconsole"/>
+</launch>

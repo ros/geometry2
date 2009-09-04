@@ -1,0 +1,11 @@
+glut:
+  ubuntu: libglut3-dev
+  debian: libglut3-dev
+  fedora: freeglut-devel
+  arch: freeglut
+python-sip4:
+  ubuntu: python-sip4-dev sip4
+  debian: python-sip4-dev sip4
+  macports: py25-sip
+  gentoo: dev-python/sip
+  arch: sip

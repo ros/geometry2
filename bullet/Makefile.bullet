@@ -1,0 +1,73 @@
+all: installed
+
+SVN_DIR = bullet_svn
+SVN_URL = http://bullet.googlecode.com/svn/trunk/
+SVN_PATCH = quaternion.patch demos.patch no_extras_build.patch
+SVN_REVISION=-r1685
+
+include $(shell rospack find mk)/svn_checkout.mk
+
+TARBALL_NAME = bullet-svn$(SVN_REVISION)
+
+TARBALL = build/$(TARBALL_NAME).tar.gz
+TARBALL_URL = http://pr.willowgarage.com/downloads/$(TARBALL_NAME).tar.gz
+UNPACK_CMD = tar xzf
+SOURCE_DIR = build/bullet_svn
+
+include $(shell rospack find mk)/download_unpack_build.mk
+
+.PHONY: build
+
+BULLET_TARGETS = LinearMath BulletCollision BulletDynamics BulletSoftBody
+
+# Poor man's installation procedure setup
+BULLET_LIBS = $(SOURCE_DIR)/src/BulletCollision/libBulletCollision.a \
+              $(SOURCE_DIR)/src/BulletDynamics/libBulletDynamics.a \
+              $(SOURCE_DIR)/src/LinearMath/libLinearMath.a \
+              $(SOURCE_DIR)/src/BulletSoftBody/libBulletSoftBody.a 
+
+BULLET_INC_DIRS = . \
+				  BulletCollision/CollisionShapes \
+                  BulletCollision/BroadphaseCollision \
+                  BulletCollision/NarrowPhaseCollision \
+                  BulletCollision/CollisionDispatch \
+                  BulletCollision/Gimpact \
+                  BulletDynamics/ConstraintSolver \
+                  BulletDynamics/Vehicle \
+                  BulletDynamics/Dynamics \
+                  BulletDynamics/Character \
+                  LinearMath \
+		  BulletSoftBody 
+
+
+build_tarball: $(SVN_DIR) patched
+	# How to build tarball goes here
+	-cd $(SVN_DIR) && make clean
+	-cd $(SVN_DIR) && rm -f CMakeCache.txt
+	mkdir -p build
+	tar --exclude="Extras" --exclude=".svn" -cvzf $(TARBALL) $(SVN_DIR)
+
+
+installed: $(SOURCE_DIR)/unpacked
+	cd $(SOURCE_DIR) && cmake -DCMAKE_INSTALL_PREFIX=$(CURDIR)/build -DCMAKE_CXX_FLAGS="-fPIC -DBT_USE_DOUBLE_PRECISION" . 
+	# Bullet appears not be parallel-make safe
+	#cd $(SOURCE_DIR) && make $(PARALLEL_JOBS) 
+	cd $(SOURCE_DIR) && make $(BULLET_TARGETS) 
+	# The 'install' target only works with cmake 2.6 for some reason
+	#cd $(SOURCE_DIR) && make $(PARALLEL_JOBS) install
+	mkdir -p build/lib
+	cp $(BULLET_LIBS) build/lib
+	mkdir -p build/include
+	$(foreach d,$(BULLET_INC_DIRS), mkdir -p build/include/$(d) && cp $(SOURCE_DIR)/src/$(d)/*.h build/include/$(d);)
+	touch installed
+
+clean:
+	rm -f installed
+	-make -C $(SVN_DIR) clean
+	-cd $(SOURCE_DIR) && make clean
+
+wipe: clean
+	-rm -f patched
+	-rm -rf bullet_svn
+	-rm -rf build
+

@@ -1,0 +1,30 @@
+<package>
+<description brief="The Kinematics and Dynamics Library (latest)">
+
+This package contains a recent version of the Kinematics and Dynamics
+Library (KLD), distributed by the Orocos Project.  For stability
+reasons, this package is currently locked in to version 30401 (Aug 
+8, 2009), but this revision will be updated on a regular basis to
+the latest available KDL trunk.  This ROS package does not intend to
+modify KDL in any way, it simply provides a convenient way to download 
+and compile the library, because KDL is not available from an OS package
+manager. However, this package might contain some temporary patches to
+KDL while they are being applied upstream, or while a permanent fix for
+a problem is being discussed by the KDL community.  
+
+</description>
+<author>Ruben Smits, Erwin Aertbelien, Wim Meeussen (package)</author>
+<license>LGPL</license>
+<review status="3rdparty" notes=""/>
+<url>http://pr.willowgarage.com/wiki/KDL</url>
+<export>
+  <cpp cflags="-I${prefix}/kdl/include" lflags="-Wl,-rpath,${prefix}/kdl/lib  -L${prefix}/kdl/lib -lorocos-kdl"/>
+  <doxymaker external="http://www.orocos.org/kdl" />
+  <python path="${prefix}/kdl/lib/python/site-packages"  />
+</export>
+<depend package="eigen"/>
+<rosdep name="cppunit"/>
+<rosdep name="python-sip4"/>
+<versioncontrol type="svn" url="http://svn.mech.kuleuven.be/repos/orocos/trunk/kdl"/>
+</package>
+

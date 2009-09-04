@@ -1,0 +1,291 @@
+Index: Demos/GenericJointDemo/Ragdoll.cpp
+===================================================================
+--- Demos/GenericJointDemo/Ragdoll.cpp	(revision 1686)
++++ Demos/GenericJointDemo/Ragdoll.cpp	(working copy)
+@@ -76,22 +76,22 @@
+ 
+ 	transform.setIdentity();
+ 	transform.setOrigin(btVector3(btScalar(-0.35*scale_ragdoll), btScalar(1.45*scale_ragdoll), btScalar(0.)));
+-	transform.getBasis().setEulerZYX(0,0,SIMD_HALF_PI);
++	transform.getBasis().setEulerZYX(SIMD_HALF_PI,0,0);
+ 	m_bodies[BODYPART_LEFT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_LEFT_UPPER_ARM]);
+ 
+ 	transform.setIdentity();
+ 	transform.setOrigin(btVector3(btScalar(-0.7*scale_ragdoll), btScalar(1.45*scale_ragdoll), btScalar(0.)));
+-	transform.getBasis().setEulerZYX(0,0,SIMD_HALF_PI);
++	transform.getBasis().setEulerZYX(SIMD_HALF_PI,0,0);
+ 	m_bodies[BODYPART_LEFT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_LEFT_LOWER_ARM]);
+ 
+ 	transform.setIdentity();
+ 	transform.setOrigin(btVector3(btScalar(0.35*scale_ragdoll), btScalar(1.45*scale_ragdoll), btScalar(0.)));
+-	transform.getBasis().setEulerZYX(0,0,-SIMD_HALF_PI);
++	transform.getBasis().setEulerZYX(-SIMD_HALF_PI,0,0);
+ 	m_bodies[BODYPART_RIGHT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_RIGHT_UPPER_ARM]);
+ 
+ 	transform.setIdentity();
+ 	transform.setOrigin(btVector3(btScalar(0.7*scale_ragdoll), btScalar(1.45*scale_ragdoll), btScalar(0.)));
+-	transform.getBasis().setEulerZYX(0,0,-SIMD_HALF_PI);
++	transform.getBasis().setEulerZYX(-SIMD_HALF_PI,0,0);
+ 	m_bodies[BODYPART_RIGHT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_RIGHT_LOWER_ARM]);
+ 
+ 	// Setup some damping on the m_bodies
+@@ -138,7 +138,7 @@
+ 
+ 		localA.setOrigin(btVector3(btScalar(-0.2*scale_ragdoll), btScalar(0.15*scale_ragdoll), btScalar(0.)));
+ 
+-		localB.getBasis().setEulerZYX(SIMD_HALF_PI,0,-SIMD_HALF_PI);
++		localB.getBasis().setEulerZYX(-SIMD_HALF_PI,0,SIMD_HALF_PI);
+ 		localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18*scale_ragdoll), btScalar(0.)));
+ 
+ 		joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_LEFT_UPPER_ARM], localA, localB,useLinearReferenceFrameA);
+@@ -161,7 +161,7 @@
+ 		localA.setIdentity(); localB.setIdentity();
+ 
+ 		localA.setOrigin(btVector3(btScalar(0.2*scale_ragdoll), btScalar(0.15*scale_ragdoll), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,SIMD_HALF_PI);
++		localB.getBasis().setEulerZYX(SIMD_HALF_PI,0,0);
+ 		localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18*scale_ragdoll), btScalar(0.)));
+ 		joint6DOF = new btGeneric6DofConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_RIGHT_UPPER_ARM], localA, localB,useLinearReferenceFrameA);
+ 
+Index: Demos/ForkLiftDemo/ForkLiftDemo.cpp
+===================================================================
+--- Demos/ForkLiftDemo/ForkLiftDemo.cpp	(revision 1686)
++++ Demos/ForkLiftDemo/ForkLiftDemo.cpp	(working copy)
+@@ -309,9 +309,9 @@
+ 
+ 		localA.setIdentity();
+ 		localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0, 0, M_PI_2);
++		localA.getBasis().setEulerZYX(M_PI_2, 0, 0);
+ 		localA.setOrigin(btVector3(0.0f, -1.9f, 0.05f));
+-		localB.getBasis().setEulerZYX(0, 0, M_PI_2);
++		localB.getBasis().setEulerZYX(M_PI_2, 0, 0);
+ 		localB.setOrigin(btVector3(0.0, 0.0, -0.1));
+ 		m_forkSlider = new btSliderConstraint(*m_liftBody, *m_forkBody, localA, localB, true);
+ 		m_forkSlider->setLowerLinLimit(0.1f);
+Index: Demos/RagdollDemo/RagdollDemo.cpp
+===================================================================
+--- Demos/RagdollDemo/RagdollDemo.cpp	(revision 1686)
++++ Demos/RagdollDemo/RagdollDemo.cpp	(working copy)
+@@ -161,22 +161,22 @@
+ 
+ 		transform.setIdentity();
+ 		transform.setOrigin(btVector3(btScalar(-0.35), btScalar(1.45), btScalar(0.)));
+-		transform.getBasis().setEulerZYX(0,0,M_PI_2);
++		transform.getBasis().setEulerZYX(M_PI_2,0,0);
+ 		m_bodies[BODYPART_LEFT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_LEFT_UPPER_ARM]);
+ 
+ 		transform.setIdentity();
+ 		transform.setOrigin(btVector3(btScalar(-0.7), btScalar(1.45), btScalar(0.)));
+-		transform.getBasis().setEulerZYX(0,0,M_PI_2);
++		transform.getBasis().setEulerZYX(M_PI_2,0,0);
+ 		m_bodies[BODYPART_LEFT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_LEFT_LOWER_ARM]);
+ 
+ 		transform.setIdentity();
+ 		transform.setOrigin(btVector3(btScalar(0.35), btScalar(1.45), btScalar(0.)));
+-		transform.getBasis().setEulerZYX(0,0,-M_PI_2);
++		transform.getBasis().setEulerZYX(-M_PI_2,0,0);
+ 		m_bodies[BODYPART_RIGHT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_RIGHT_UPPER_ARM]);
+ 
+ 		transform.setIdentity();
+ 		transform.setOrigin(btVector3(btScalar(0.7), btScalar(1.45), btScalar(0.)));
+-		transform.getBasis().setEulerZYX(0,0,-M_PI_2);
++		transform.getBasis().setEulerZYX(-M_PI_2,0,0);
+ 		m_bodies[BODYPART_RIGHT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_RIGHT_LOWER_ARM]);
+ 
+ 		// Setup some damping on the m_bodies
+@@ -205,8 +205,8 @@
+ 
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0,0,M_PI_2); localA.setOrigin(btVector3(btScalar(0.), btScalar(0.30), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,M_PI_2); localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.14), btScalar(0.)));
++		localA.getBasis().setEulerZYX(M_PI_2,0,0); localA.setOrigin(btVector3(btScalar(0.), btScalar(0.30), btScalar(0.)));
++		localB.getBasis().setEulerZYX(M_PI_2,0,0); localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.14), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_HEAD], localA, localB);
+ 		coneC->setLimit(M_PI_4, M_PI_4, M_PI_2);
+ 		m_joints[JOINT_SPINE_HEAD] = coneC;
+@@ -216,8 +216,8 @@
+ 
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0,0,-M_PI_4*5); localA.setOrigin(btVector3(btScalar(-0.18), btScalar(-0.10), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,-M_PI_4*5); localB.setOrigin(btVector3(btScalar(0.), btScalar(0.225), btScalar(0.)));
++		localA.getBasis().setEulerZYX(-M_PI_4*5,0,0); localA.setOrigin(btVector3(btScalar(-0.18), btScalar(-0.10), btScalar(0.)));
++		localB.getBasis().setEulerZYX(-M_PI_4*5,0,0); localB.setOrigin(btVector3(btScalar(0.), btScalar(0.225), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_LEFT_UPPER_LEG], localA, localB);
+ 		coneC->setLimit(M_PI_4, M_PI_4, 0);
+ 		m_joints[JOINT_LEFT_HIP] = coneC;
+@@ -237,8 +237,8 @@
+ 
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0,0,M_PI_4); localA.setOrigin(btVector3(btScalar(0.18), btScalar(-0.10), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,M_PI_4); localB.setOrigin(btVector3(btScalar(0.), btScalar(0.225), btScalar(0.)));
++		localA.getBasis().setEulerZYX(M_PI_4,0,0); localA.setOrigin(btVector3(btScalar(0.18), btScalar(-0.10), btScalar(0.)));
++		localB.getBasis().setEulerZYX(M_PI_4,0,0); localB.setOrigin(btVector3(btScalar(0.), btScalar(0.225), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_RIGHT_UPPER_LEG], localA, localB);
+ 		coneC->setLimit(M_PI_4, M_PI_4, 0);
+ 		m_joints[JOINT_RIGHT_HIP] = coneC;
+@@ -258,8 +258,8 @@
+ 
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0,0,M_PI); localA.setOrigin(btVector3(btScalar(-0.2), btScalar(0.15), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,M_PI_2); localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18), btScalar(0.)));
++		localA.getBasis().setEulerZYX(M_PI,0,0); localA.setOrigin(btVector3(btScalar(-0.2), btScalar(0.15), btScalar(0.)));
++		localB.getBasis().setEulerZYX(M_PI_2,0,0); localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_LEFT_UPPER_ARM], localA, localB);
+ 		coneC->setLimit(M_PI_2, M_PI_2, 0);
+ 		coneC->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
+@@ -282,7 +282,7 @@
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+ 		localA.getBasis().setEulerZYX(0,0,0); localA.setOrigin(btVector3(btScalar(0.2), btScalar(0.15), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,M_PI_2); localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18), btScalar(0.)));
++		localB.getBasis().setEulerZYX(M_PI_2,0,0); localB.setOrigin(btVector3(btScalar(0.), btScalar(-0.18), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_RIGHT_UPPER_ARM], localA, localB);
+ 		coneC->setLimit(M_PI_2, M_PI_2, 0);
+ 		m_joints[JOINT_RIGHT_SHOULDER] = coneC;
+Index: Demos/SoftDemo/SoftDemo.cpp
+===================================================================
+--- Demos/SoftDemo/SoftDemo.cpp	(revision 1686)
++++ Demos/SoftDemo/SoftDemo.cpp	(working copy)
+@@ -497,7 +497,7 @@
+ 			psb->m_cfg.collisions|=btSoftBody::fCollision::VF_SS;
+ 			psb->randomizeConstraints();
+ 			btMatrix3x3	m;
+-			m.setEulerZYX(a.x(),a.y(),a.z());
++			m.setEulerZYX(a.z(),a.y(),a.x());
+ 			psb->transform(btTransform(m,x));
+ 			psb->scale(btVector3(2,2,2));
+ 			psb->setTotalMass(50,true);
+@@ -534,7 +534,7 @@
+ 			psb->m_cfg.collisions	|=	btSoftBody::fCollision::VF_SS;
+ 			psb->randomizeConstraints();
+ 			btMatrix3x3	m;
+-			m.setEulerZYX(a.x(),a.y(),a.z());
++			m.setEulerZYX(a.z(),a.y(),a.x());
+ 			psb->transform(btTransform(m,x));
+ 			psb->scale(btVector3(6,6,6));
+ 			psb->setTotalMass(100,true);
+@@ -828,7 +828,7 @@
+ 	psb->m_cfg.piterations=2;
+ 	psb->randomizeConstraints();
+ 	btMatrix3x3	m;
+-	m.setEulerZYX(SIMD_PI/2,0,0);
++	m.setEulerZYX(0, 0, SIMD_PI/2);
+ 	psb->transform(btTransform(m,btVector3(0,4,0)));
+ 	psb->scale(btVector3(2,2,2));
+ 	psb->setTotalMass(50,true);
+@@ -850,7 +850,7 @@
+ 	psb->m_cfg.kMT				=	0.05;
+ 	psb->randomizeConstraints();
+ 	btMatrix3x3	m;
+-	m.setEulerZYX(SIMD_PI/2,0,0);
++	m.setEulerZYX(0,0,SIMD_PI/2);
+ 	psb->transform(btTransform(m,btVector3(0,4,0)));
+ 	psb->scale(btVector3(2,2,2));
+ 	psb->setTotalMass(50,true);
+@@ -916,7 +916,7 @@
+ 		btSoftBody::fCollision::CL_RS;
+ 	psb->randomizeConstraints();
+ 	btMatrix3x3	m;
+-	m.setEulerZYX(a.x(),a.y(),a.z());
++	m.setEulerZYX(a.z(),a.y(),a.x());
+ 	psb->transform(btTransform(m,x));
+ 	psb->scale(btVector3(8,8,8));
+ 	psb->setTotalMass(150,true);
+@@ -1043,7 +1043,7 @@
+ 				btSoftBody::fCollision::CL_RS;		
+ 			psb->randomizeConstraints();
+ 			btMatrix3x3	m;
+-			m.setEulerZYX(a.x(),a.y(),a.z());
++			m.setEulerZYX(a.z(),a.y(),a.x());
+ 			psb->transform(btTransform(m,x));
+ 			psb->scale(btVector3(2,2,2));
+ 			psb->setTotalMass(50,true);
+Index: Demos/Benchmarks/BenchmarkDemo.cpp
+===================================================================
+--- Demos/Benchmarks/BenchmarkDemo.cpp	(revision 1686)
++++ Demos/Benchmarks/BenchmarkDemo.cpp	(working copy)
+@@ -697,22 +697,22 @@
+ 
+ 		transform.setIdentity();
+ 		transform.setOrigin(scale*btVector3(btScalar(-0.35), btScalar(1.45), btScalar(0.)));
+-		transform.getBasis().setEulerZYX(0,0,M_PI_2);
++		transform.getBasis().setEulerZYX(M_PI_2,0,0);
+ 		m_bodies[BODYPART_LEFT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_LEFT_UPPER_ARM]);
+ 
+ 		transform.setIdentity();
+ 		transform.setOrigin(scale*btVector3(btScalar(-0.7), btScalar(1.45), btScalar(0.)));
+-		transform.getBasis().setEulerZYX(0,0,M_PI_2);
++		transform.getBasis().setEulerZYX(M_PI_2,0,0);
+ 		m_bodies[BODYPART_LEFT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_LEFT_LOWER_ARM]);
+ 
+ 		transform.setIdentity();
+ 		transform.setOrigin(scale*btVector3(btScalar(0.35), btScalar(1.45), btScalar(0.)));
+-		transform.getBasis().setEulerZYX(0,0,-M_PI_2);
++		transform.getBasis().setEulerZYX(-M_PI_2,0,0);
+ 		m_bodies[BODYPART_RIGHT_UPPER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_RIGHT_UPPER_ARM]);
+ 
+ 		transform.setIdentity();
+ 		transform.setOrigin(scale*btVector3(btScalar(0.7), btScalar(1.45), btScalar(0.)));
+-		transform.getBasis().setEulerZYX(0,0,-M_PI_2);
++		transform.getBasis().setEulerZYX(-M_PI_2,0,0);
+ 		m_bodies[BODYPART_RIGHT_LOWER_ARM] = localCreateRigidBody(btScalar(1.), offset*transform, m_shapes[BODYPART_RIGHT_LOWER_ARM]);
+ 
+ 		// Setup some damping on the m_bodies
+@@ -739,8 +739,8 @@
+ 
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0,0,M_PI_2); localA.setOrigin(scale*btVector3(btScalar(0.), btScalar(0.30), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,M_PI_2); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(-0.14), btScalar(0.)));
++		localA.getBasis().setEulerZYX(M_PI_2,0,0); localA.setOrigin(scale*btVector3(btScalar(0.), btScalar(0.30), btScalar(0.)));
++		localB.getBasis().setEulerZYX(M_PI_2,0,0); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(-0.14), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_HEAD], localA, localB);
+ 		coneC->setLimit(M_PI_4, M_PI_4, M_PI_2);
+ 		m_joints[JOINT_SPINE_HEAD] = coneC;
+@@ -748,8 +748,8 @@
+ 
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0,0,-M_PI_4*5); localA.setOrigin(scale*btVector3(btScalar(-0.18), btScalar(-0.10), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,-M_PI_4*5); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(0.225), btScalar(0.)));
++		localA.getBasis().setEulerZYX(-M_PI_4*5,0,0); localA.setOrigin(scale*btVector3(btScalar(-0.18), btScalar(-0.10), btScalar(0.)));
++		localB.getBasis().setEulerZYX(-M_PI_4*5,0,0); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(0.225), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_LEFT_UPPER_LEG], localA, localB);
+ 		coneC->setLimit(M_PI_4, M_PI_4, 0);
+ 		m_joints[JOINT_LEFT_HIP] = coneC;
+@@ -765,8 +765,8 @@
+ 
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0,0,M_PI_4); localA.setOrigin(scale*btVector3(btScalar(0.18), btScalar(-0.10), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,M_PI_4); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(0.225), btScalar(0.)));
++		localA.getBasis().setEulerZYX(M_PI_4,0,0); localA.setOrigin(scale*btVector3(btScalar(0.18), btScalar(-0.10), btScalar(0.)));
++		localB.getBasis().setEulerZYX(M_PI_4,0,0); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(0.225), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_PELVIS], *m_bodies[BODYPART_RIGHT_UPPER_LEG], localA, localB);
+ 		coneC->setLimit(M_PI_4, M_PI_4, 0);
+ 		m_joints[JOINT_RIGHT_HIP] = coneC;
+@@ -782,8 +782,8 @@
+ 
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+-		localA.getBasis().setEulerZYX(0,0,M_PI); localA.setOrigin(scale*btVector3(btScalar(-0.2), btScalar(0.15), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,M_PI_2); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(-0.18), btScalar(0.)));
++		localA.getBasis().setEulerZYX(M_PI,0,0); localA.setOrigin(scale*btVector3(btScalar(-0.2), btScalar(0.15), btScalar(0.)));
++		localB.getBasis().setEulerZYX(M_PI_2,0,0); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(-0.18), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_LEFT_UPPER_ARM], localA, localB);
+ 		coneC->setLimit(M_PI_2, M_PI_2, 0);
+ 		m_joints[JOINT_LEFT_SHOULDER] = coneC;
+@@ -801,7 +801,7 @@
+ 
+ 		localA.setIdentity(); localB.setIdentity();
+ 		localA.getBasis().setEulerZYX(0,0,0); localA.setOrigin(scale*btVector3(btScalar(0.2), btScalar(0.15), btScalar(0.)));
+-		localB.getBasis().setEulerZYX(0,0,M_PI_2); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(-0.18), btScalar(0.)));
++		localB.getBasis().setEulerZYX(M_PI_2,0,0); localB.setOrigin(scale*btVector3(btScalar(0.), btScalar(-0.18), btScalar(0.)));
+ 		coneC = new btConeTwistConstraint(*m_bodies[BODYPART_SPINE], *m_bodies[BODYPART_RIGHT_UPPER_ARM], localA, localB);
+ 		coneC->setLimit(M_PI_2, M_PI_2, 0);
+ 		m_joints[JOINT_RIGHT_SHOULDER] = coneC;

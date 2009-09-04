@@ -1,0 +1,81 @@
+Index: src/tree.hpp
+===================================================================
+--- src/tree.hpp	(revision 30408)
++++ src/tree.hpp	(working copy)
+@@ -37,7 +37,7 @@
+     class TreeElement
+     {
+     private:
+-        TreeElement():q_nr(0)
++        TreeElement(const std::string& name):segment(name), q_nr(0)
+         {};
+     public:
+         Segment segment;
+@@ -50,9 +50,9 @@
+             segment=segment_in;
+             parent=parent_in;
+         };
+-        static TreeElement Root()
++      static TreeElement Root(const std::string& root_name)
+         {
+-            return TreeElement();
++            return TreeElement(root_name);
+         };
+     };
+ 
+@@ -142,7 +142,9 @@
+          */
+         SegmentMap::const_iterator getSegment(const std::string& segment_name)const
+         {
+-            return segments.find(segment_name);
++          SegmentMap::const_iterator it = segments.find(segment_name);
++          if (it == segments.end()) throw seg_name_ex;
++          else return it;
+         };
+         /**
+          * Request the root segment of the tree
+@@ -173,6 +175,11 @@
+ 
+         virtual ~Tree(){};
+ 
++      class segment_name_exception: public std::exception{
++	virtual const char* what() const throw(){
++	  return "Segment Name excption";}
++      } seg_name_ex;
++
+     };
+ }
+ #endif
+Index: src/tree.cpp
+===================================================================
+--- src/tree.cpp	(revision 30408)
++++ src/tree.cpp	(working copy)
+@@ -27,7 +27,7 @@
+ 
+ Tree::Tree(const std::string& _root_name) :
+   nrOfSegments(0), nrOfJoints(0),root_name(_root_name) {
+-    segments.insert(make_pair(root_name, TreeElement::Root()));
++    segments.insert(make_pair(root_name, TreeElement::Root(root_name)));
+ }
+ 
+ Tree::Tree(const Tree& in) {
+@@ -36,9 +36,8 @@
+     nrOfJoints = 0;
+     root_name = in.root_name;
+ 
+-    segments.insert(make_pair(root_name, TreeElement::Root()));
++    segments.insert(make_pair(root_name, TreeElement::Root(root_name)));
+     this->addTree(in, root_name);
+-
+ }
+ 
+ Tree& Tree::operator=(const Tree& in) {
+@@ -47,7 +46,7 @@
+     nrOfJoints = 0;
+     root_name = in.root_name;
+ 
+-    segments.insert(make_pair(in.root_name, TreeElement::Root()));
++    segments.insert(make_pair(in.root_name, TreeElement::Root(root_name)));
+     this->addTree(in, root_name);
+     return *this;
+ }

@@ -1,0 +1,14 @@
+Index: CMakeLists.txt
+===================================================================
+--- CMakeLists.txt	(revision 1644)
++++ CMakeLists.txt	(working copy)
+@@ -63,9 +63,4 @@
+   SUBDIRS(Demos)
+ ENDIF(BUILD_DEMOS)
+ 
+-OPTION(BUILD_EXTRAS "Set when you want to build the extras" ON)
+-IF(BUILD_EXTRAS)
+-  SUBDIRS(Extras)
+-ENDIF(BUILD_EXTRAS)
+-
+ SUBDIRS(src)

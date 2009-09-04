@@ -1,0 +1,14 @@
+<package>
+  <description brief="Simple Angular Math Utilities">
+      This package provides simple angular math utilities,
+        such as angle conversions and shortest-angular-distance-calculations.
+  </description>
+  <author>John Hsu, Ioan Sucan</author>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/angles</url>
+  <review status="cleared" notes="2009-02-25"/>
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags=""/>
+  </export>
+</package>
+

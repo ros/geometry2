@@ -1,0 +1,9 @@
+/**
+@mainpage
+
+@htmlinclude manifest.html
+
+This package contains:
+ \li Angular manipulations (e.g. angles::from_degrees, angles::to_degrees, angles::normalize_angle_positive, angles::shortest_angular_distance)
+
+**/

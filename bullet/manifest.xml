@@ -1,0 +1,20 @@
+<package>
+<description brief="Bullet Physics Engine">
+
+The Bullet Physics Engine
+
+</description>
+<author>Erwin Coumans</author>
+<license>ZLib</license>
+<review status="3rdparty" notes=""/>
+<url>http://code.google.com/p/bullet/</url>
+<depend package="rostest"/>
+<rosdep name="libxext"/>
+<rosdep name="glut"/>
+<export>
+<cpp cflags="-I${prefix}/build/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX  -I${prefix}/swig" lflags="-L${prefix}/build/lib -lBulletDynamics -lBulletCollision -lLinearMath" />
+  <doxymaker external="http://www.continuousphysics.com/Bullet/BulletFull/index.html" />
+<swig flags="-python -c++ -I${prefix}/build/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX -I${prefix}/swig "/>
+</export>
+</package>
+

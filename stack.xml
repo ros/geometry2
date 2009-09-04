@@ -1,0 +1,13 @@
+<stack name="geometry" version="0.1">
+  <description brief="geometry and math libraries">
+    The basis geometric and math libraries used in ros.
+  </description>
+  <author>Maintained by Tully Foote tfoote@willowgarage.com</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/geometry</url>
+
+  <depend stack="ros"/> <!-- rostest, roscpp, rosconsole, rospy, rostest, roswtf, message_filters --> 
+  <depend stack="common_msgs"/> <!-- geometry_msgs, sensor_msgs --> 
+
+</stack>

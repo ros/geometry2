@@ -1,0 +1,169 @@
+/** 
+\page tutorial Tutorial
+
+This is a tutorial for the tf package the main documentations is at \ref index
+
+There are two parts 
+ - @ref tutorial_sending
+ - @ref tutorial_recieving
+
+\section tutorial_sending Sending tf_messages
+In the tf system nodes which have primary information about the relationship 
+between two coordinate frames broadcast their best estimate for that transform
+using tf::tfMessage data type over the /tf_messages topic.  Anyone can publish 
+these messages on these topics, however for convenience there is a helper class to make
+this quick to implement.  The helper class is the tf::TransformBroadcaster class.  
+
+There is also a node which allows command line tool which makes sending static transforms simple.  
+See @ref transform_sender. 
+
+
+@section tutorial_recieving Recieving and using tf_messages
+The core tf functionality is implemented in the tf::Transformer class.  
+This class provides the core features and is ROS agnostic.  However in 
+most use cases the integrated tf::TransformListener which inherits form 
+tf::Transformer will be used.  
+
+@subsection tutorial_listener tutorial_listener.cpp
+There is an example file tf/tutorials/tutorial_listener.cpp which demonstrates
+a few of the API features.  
+
+@par basic_api The Basic tools
+The most basic calls for most purposes is transform**** where **** is one 
+of the geometric primitives supported by tf.  @ref datatypes 
+
+@par zero_time Zero Time means Latest
+A time of zero passed into any tf API call means provide the most
+recent common timestamp possible for the request.  
+
+@par time_travel_example Time Traveling Transforms
+Often things have been observed in the past and their previous position 
+in a current frame is desired.  All tf APIs have a simple and a long form.  
+The long form includes not only a target frame, but a target time and a fixed 
+frame, allowing the transformation of data in time. 
+
+@par can_transform canTransform
+There is a non throwing way to check whether a transform is possible.  This
+is a lower computatioinal cost if the call is expected to fail frequenly.  
+It does not provide as much diagnostics, and even if it returns true, that does
+not guarentee a successful transform even if called immediately with the same 
+parameters, so you still need a try catch block for robustness.  
+
+@par notifier_example The MessageFilter
+The tf::MessageFilter class is a convenient and efficient way to hold data until
+transform information is available.  There is an example of data coming in 
+and being held until transforms become available at the bottom of the page.  
+
+@par running_tutorial Running the Tutorial 
+Simple cd to tf/tutorials and 
+\code
+roslaunch complete_tutorial.launch
+\endcode
+
+@subsection common_tasks Common tasks using tf
+
+\subsubsection can_transform Find out if transforming between two frames is possible
+
+\code
+
+// previously created
+// tf::TransformListener tfl_(my_node); 
+
+
+if(tfl_.canTransform("target_frame", "source_frame", ros::Time()))
+{
+ //this transform is possible with current data
+}
+else
+{
+//this transform is not possible
+}
+
+  //this can also be done with the time traveling api
+  ros::Time source_time (10.0);
+if(  tfl_.canTransform("target_frame", ros::Time(), "source_frame", source_time, 
+                       "fixed_frame_id"))
+{
+ //this transform is possible with current data
+}
+else
+{
+//this transform is not possible
+}
+
+\endcode
+
+\subsubsection lookup_transform Lookup the Transform between two coordinate frames
+To lookup the transform between two coordiniate frames use the lookupTransform method
+provided by tf::Transformer and (inherited by tf::TransformListener ).  
+
+
+\code
+
+// previously created
+// tf::TransformListener tfl_(my_node); 
+
+
+tf::Stamped<tf::Transform> output_transform;
+try{
+  tfl_.lookupTransform("target_frame", "source_frame", ros::Time(), output_transform);
+  //output_transform is now set or an exception has been thrown
+
+  //this can also be done with the time traveling api
+  ros::Time source_time (10.0);
+  tfl_.lookupTransform("target_frame", ros::Time(), "source_frame", source_time, 
+                       "fixed_frame_id", output_transform);
+  //output_transform is now set or an exception has been thrown
+}
+catch (tf::TransformException &ex)
+{
+  //just in case data isn't available
+  
+}
+
+\endcode
+
+\subsubsection transform_data Transform Data into a different frame
+tf has built in support for many different data types.  The tf::Transformer class can transform
+any of the tf::Stamped< T > where T can be the types listed here,
+tf::Point, tf::Vector, tf::Quaternion, and tf::Pose.  And the tf::TransformListener
+can also transform a number of messages directly including robot_msgs::PointStamped, 
+robot_msgs::Vector3Stamped, robot_msgs::QuaternionStamped, robot_msgs::PoseStamped.  
+
+\code
+
+// previously created
+// tf::TransformListener tfl_(my_node); 
+// recieved or generated
+// tf::Stamped<tf::Pose> stamped_in (tf::Pose(tf::Quaternion(0,0,0), 
+//                                            tf::Vector3(0,0,0)), 
+//                                   ros::Time::now(),
+//                                   "source_frame_id");
+
+tf::Stamped<tf::Pose> output_pose;
+try{
+  tfl_.transformPose("target_frame", stamped_in, output_pose);
+  //output_transform is now set or an exception has been thrown
+
+
+  //this can also be done with the time traveling api
+  tfl_.transformPose("target_frame", ros::Time(), stamped_in, 
+                     "fixed_frame", output_pose);
+  //output_transform is now set or an exception has been thrown
+}
+catch (tf::TransformException &ex)
+{
+  //just in case data isn't available
+  
+}
+
+\endcode
+
+
+\subsubsection notifier_usage Buffer messages and get callbacks when tf information is available
+\todo fill this in
+
+\subsubsection send_transforms Publish Transform Information
+\todo fill me in
+
+*/

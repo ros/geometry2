@@ -1,0 +1,26 @@
+<package>
+  <description brief='Transform Library'>
+
+    Library for doing transformations.
+
+  </description>
+  <author>Tully Foote</author>
+  <license>BSD</license>
+  <review status="API cleared" notes=""/>
+  <url>http://pr.willowgarage.com/wiki/tf</url>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/><!-- for point cloud should be removed-->
+  <depend package="roscpp"/>
+  <depend package="rosconsole"/>
+  <depend package="bullet"/>
+  <depend package="rospy"/>
+  <depend package="rostest"/>
+  <depend package="roswtf"/>
+  <depend package="message_filters"/>
+  <export>
+    <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf `rosboost-cfg --lflags thread`"/>
+    <roswtf plugin="tf.tfwtf" />
+  </export>
+  <rosdep name="python-numpy"/>
+  <rosdep name="graphviz"/>
+</package>
