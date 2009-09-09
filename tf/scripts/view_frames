@@ -58,7 +58,7 @@ import tf
 def listen(duration):
     rospy.init_node("viewFrames.py", anonymous=True)
     tf_listener = tf.TransformListener()
-    print "Listening to /tf_message for %f seconds"%duration
+    print "Listening to /tf for %f seconds"%duration
     time.sleep(duration)
     print "Done Listening"
     return tf_listener.allFramesAsDot()

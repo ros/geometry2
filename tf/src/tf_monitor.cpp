@@ -51,7 +51,7 @@ public:
   bool using_specific_chain_;
   
   ros::NodeHandle node_;
-  ros::Subscriber subscriber_;
+  ros::Subscriber subscriber_tf_, subscriber_tf_message_;
   std::vector<std::string> chain_;
   std::map<std::string, std::string> frame_authority_map;
   std::map<std::string, std::vector<double> > delay_map;
@@ -161,7 +161,8 @@ public:
       }
       cout <<endl;
     }
-    subscriber_ = node_.subscribe<tf::tfMessage>("tf_message", 100, boost::bind(&TFMonitor::callback, this, _1));
+    subscriber_tf_ = node_.subscribe<tf::tfMessage>("tf", 100, boost::bind(&TFMonitor::callback, this, _1));
+    subscriber_tf_message_ = node_.subscribe<tf::tfMessage>("tf_message", 100, boost::bind(&TFMonitor::callback, this, _1));
     
   }
 

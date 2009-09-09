@@ -182,7 +182,7 @@ TEST(MessageNotifier, noTransforms)
 TEST(MessageNotifier, preexistingTransforms)
 {
 	Notification n(1);
-	Counter<tf::tfMessage> c("tf_message", 1);
+	Counter<tf::tfMessage> c("/tf", 1);
 	MessageNotifier<geometry_msgs::PointStamped>* notifier = new MessageNotifier<geometry_msgs::PointStamped>(g_tf, g_node, boost::bind(&Notification::notify, &n, _1), "test_message", "frame1", 1);
 	std::auto_ptr<MessageNotifier<geometry_msgs::PointStamped> > notifier_ptr(notifier);
 
@@ -314,7 +314,7 @@ TEST(MessageNotifier, queueSize)
 TEST(MessageNotifier, setTopic)
 {
 	Notification n(1);
-	Counter<tf::tfMessage> c("tf_message", 1);
+	Counter<tf::tfMessage> c("/tf", 1);
 	MessageNotifier<geometry_msgs::PointStamped>* notifier = new MessageNotifier<geometry_msgs::PointStamped>(g_tf, g_node, boost::bind(&Notification::notify, &n, _1), "test_message", "frame7", 1);
 	std::auto_ptr<MessageNotifier<geometry_msgs::PointStamped> > notifier_ptr(notifier);
 	notifier->setTopic("test_message2");
@@ -356,7 +356,7 @@ TEST(MessageNotifier, setTopic)
 TEST(MessageNotifier, setTargetFrame)
 {
 	Notification n(1);
-	Counter<tf::tfMessage> c("tf_message", 1); /// \todo Switch this to tf_message once rosTF goes away completely
+	Counter<tf::tfMessage> c("/tf", 1); /// \todo Switch this to /tf once rosTF goes away completely
 	MessageNotifier<geometry_msgs::PointStamped>* notifier = new MessageNotifier<geometry_msgs::PointStamped>(g_tf, g_node, boost::bind(&Notification::notify, &n, _1), "test_message", "frame9", 1);
 	std::auto_ptr<MessageNotifier<geometry_msgs::PointStamped> > notifier_ptr(notifier);
 	notifier->setTargetFrame("frame1000");
@@ -399,7 +399,7 @@ TEST(MessageNotifier, setMultipleTargetFrame)
 {
 	Notification n(1);
 	Notification n2(1);
-	Counter<tf::tfMessage> c("tf_message", 1); /// \todo Switch this to tf_message once rosTF goes away completely
+	Counter<tf::tfMessage> c("/tf", 1); /// \todo Switch this to /tf once rosTF goes away completely
 	MessageNotifier<geometry_msgs::PointStamped>* notifier = new MessageNotifier<geometry_msgs::PointStamped>(g_tf, g_node, boost::bind(&Notification::notify, &n, _1), "test_message", "frame9", 1);
 	MessageNotifier<geometry_msgs::PointStamped>* notifier2 = new MessageNotifier<geometry_msgs::PointStamped>(g_tf, g_node, boost::bind(&Notification::notify, &n2, _1), "test_message", "frame9", 1);
 	std::auto_ptr<MessageNotifier<geometry_msgs::PointStamped> > notifier_ptr(notifier);
@@ -471,7 +471,7 @@ TEST(MessageNotifier, setTolerance)
 	Notification n(0);
 	Notification n1(1);
 	Notification n2(1);
-	Counter<tf::tfMessage> c("tf_message", 1);
+	Counter<tf::tfMessage> c("/tf", 1);
 	boost::scoped_ptr<MessageNotifier<geometry_msgs::PointStamped> > notifier(new MessageNotifier<geometry_msgs::PointStamped>(g_tf, g_node, boost::bind(&Notification::notify, &n, _1), "test_message", "frame1", 1));
 	boost::scoped_ptr<MessageNotifier<geometry_msgs::PointStamped> > notifier1(new MessageNotifier<geometry_msgs::PointStamped>(g_tf, g_node, boost::bind(&Notification::notify, &n1, _1), "test_message", "frame1", 1));
 	boost::scoped_ptr<MessageNotifier<geometry_msgs::PointStamped> > notifier2(new MessageNotifier<geometry_msgs::PointStamped>(g_tf, g_node, boost::bind(&Notification::notify, &n2, _1), "test_message", "frame1", 1));
@@ -513,7 +513,7 @@ TEST(MessageNotifier, setTolerance)
 	}
 	EXPECT_EQ(0, n.count_); //No return due to lack of space for offset
 
-	Counter<tf::tfMessage> c2("tf_message", 1);
+	Counter<tf::tfMessage> c2("/tf", 1);
 
 	g_broadcaster->sendTransform(btTransform(btQuaternion(0,0,0), btVector3(1,2,3)), stamp + offset*1.1, "frame1", "frame2");
 

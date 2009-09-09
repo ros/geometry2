@@ -146,7 +146,7 @@ private:
   ros::CallbackQueue tf_message_callback_queue_;
   boost::thread* dedicated_listener_thread_;
   ros::NodeHandle node_;
-  ros::Subscriber message_subscriber_, reset_time_subscriber_;
+  ros::Subscriber message_subscriber_tf_, message_subscriber_tf_message_, reset_time_subscriber_;
 
   void dedicatedListenerThread()
   {

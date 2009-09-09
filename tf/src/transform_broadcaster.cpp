@@ -38,7 +38,7 @@ namespace tf {
 
 TransformBroadcaster::TransformBroadcaster()
 {
-  publisher_ = node_.advertise<tfMessage>("/tf_message", 100);
+  publisher_ = node_.advertise<tfMessage>("/tf", 100);
   node_.param(std::string("~tf_prefix"),tf_prefix_, std::string(""));
 };
 

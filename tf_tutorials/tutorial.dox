@@ -10,7 +10,7 @@ There are two parts
 \section tutorial_sending Sending tf_messages
 In the tf system nodes which have primary information about the relationship 
 between two coordinate frames broadcast their best estimate for that transform
-using tf::tfMessage data type over the /tf_messages topic.  Anyone can publish 
+using tf::tfMessage data type over the /tf_message and /tf topic.  Anyone can publish 
 these messages on these topics, however for convenience there is a helper class to make
 this quick to implement.  The helper class is the tf::TransformBroadcaster class.  
 
@@ -18,7 +18,7 @@ There is also a node which allows command line tool which makes sending static t
 See @ref transform_sender. 
 
 
-@section tutorial_recieving Recieving and using tf_messages
+@section tutorial_recieving Recieving and using tf messages
 The core tf functionality is implemented in the tf::Transformer class.  
 This class provides the core features and is ROS agnostic.  However in 
 most use cases the integrated tf::TransformListener which inherits form 

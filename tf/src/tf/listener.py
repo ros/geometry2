@@ -132,7 +132,7 @@ class TransformerROS(TFX.Transformer):
         r.pose = geometry_msgs.msg.Pose(geometry_msgs.msg.Point(*xyz), geometry_msgs.msg.Quaternion(*quat))
         return r
 
-## Extends TransformerROS, subscribes to the /tf_message topic and
+## Extends TransformerROS, subscribes to the /tf_message and /tf topic and
 ## updates the Transformer with the messages.
 
 class TransformListener(TransformerROS):
@@ -141,6 +141,7 @@ class TransformListener(TransformerROS):
         print "Transform Listener initing"
         super(TransformListener, self).__init__()
         rospy.Subscriber("/tf_message", tfMessage, self.transformlistener_callback)
+        rospy.Subscriber("/tf", tfMessage, self.transformlistener_callback)
         self.frame_graph_server = rospy.Service('~tf_frames', FrameGraph, self.frame_graph_service)
 
     def transformlistener_callback(self, data):
