@@ -242,7 +242,7 @@ void Transformer::lookupTransform(const std::string& target_frame, const std::st
     else
     {
       ss << " When trying to transform between " << mapped_source_frame << " and " << mapped_target_frame <<"."
-         << " See http://pr.willowgarage.com/pr-docs/ros-packages/tf/html/faq.html" << std::endl;
+         << " See http://www.ros.org/wiki/tf#Frequently_Asked_Questions" << std::endl;
       throw ExtrapolationException(error_string + ss.str());
     }
     }
