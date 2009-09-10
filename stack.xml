@@ -1,4 +1,4 @@
-<stack name="geometry" version="0.1">
+<stack>
   <description brief="geometry and math libraries">
     The basis geometric and math libraries used in ros.
   </description>
