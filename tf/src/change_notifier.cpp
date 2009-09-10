@@ -29,7 +29,7 @@
 
 /** \author Tully Foote */
 
-#include "ros/node.h"
+#include "ros/ros.h"
 #include "tf/transform_listener.h"
 
 /** This is a program to provide notifications of changes of state within tf 
@@ -42,8 +42,8 @@ int main(int argc, char** argv)
   double translational_update_distance, angular_update_distance;
   std::string source_frame, target_frame, topic_name;
 
-  ros::init(argc, argv);
-  ros::Node node("change_notifier", ros::Node::ANONYMOUS_NAME);
+  ros::init(argc, argv, "change_notifier", ros::init_options::AnonymousName);
+  ros::NodeHandle node;
 
   node.param(std::string("~polling_frequency"), polling_frequency, 10.0);
   node.param(std::string("~translational_update_distance"), translational_update_distance, 0.10);
@@ -57,8 +57,8 @@ int main(int argc, char** argv)
   tf::TransformListener tfl(node);
 
   //Advertise the service
-  node.advertise<geometry_msgs::PoseStamped>(topic_name, 1);
-  
+  ros::Publisher pub = node.advertise<geometry_msgs::PoseStamped>(topic_name, 1);
+
 
   geometry_msgs::PoseStamped msg;
   tf::Stamped<tf::Pose> pose_in, pose_out, last_sent_pose;
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
       {
         last_sent_pose = pose_out;
         tf::poseStampedTFToMsg(pose_out, msg);
-        node.publish(topic_name, msg);
+        pub.publish(msg);
       }
       
     }
