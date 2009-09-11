@@ -1013,7 +1013,7 @@ tf::TimeCache* Transformer::getFrame(unsigned int frame_id) const
 
 void Transformer::transformQuaternion(const std::string& target_frame, const Stamped<Quaternion>& stamped_in, Stamped<Quaternion>& stamped_out) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, stamped_in.frame_id_, stamped_in.stamp_, transform);
 
   stamped_out.setData( transform * stamped_in);
@@ -1026,7 +1026,7 @@ void Transformer::transformVector(const std::string& target_frame,
                                   const Stamped<tf::Vector3>& stamped_in,
                                   Stamped<tf::Vector3>& stamped_out) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, stamped_in.frame_id_, stamped_in.stamp_, transform);
 
   /** \todo may not be most efficient */
@@ -1042,7 +1042,7 @@ void Transformer::transformVector(const std::string& target_frame,
 
 void Transformer::transformPoint(const std::string& target_frame, const Stamped<Point>& stamped_in, Stamped<Point>& stamped_out) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, stamped_in.frame_id_, stamped_in.stamp_, transform);
 
   stamped_out.setData(transform * stamped_in);
@@ -1052,7 +1052,7 @@ void Transformer::transformPoint(const std::string& target_frame, const Stamped<
 
 void Transformer::transformPose(const std::string& target_frame, const Stamped<Pose>& stamped_in, Stamped<Pose>& stamped_out) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, stamped_in.frame_id_, stamped_in.stamp_, transform);
 
   stamped_out.setData(transform * stamped_in);
@@ -1066,7 +1066,7 @@ void Transformer::transformQuaternion(const std::string& target_frame, const ros
                                       const std::string& fixed_frame,
                                       Stamped<Quaternion>& stamped_out) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, target_time,
                   stamped_in.frame_id_,stamped_in.stamp_,
                   fixed_frame, transform);
@@ -1082,7 +1082,7 @@ void Transformer::transformVector(const std::string& target_frame, const ros::Ti
                                   const std::string& fixed_frame,
                                   Stamped<Vector3>& stamped_out) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, target_time,
                   stamped_in.frame_id_,stamped_in.stamp_,
                   fixed_frame, transform);
@@ -1103,7 +1103,7 @@ void Transformer::transformPoint(const std::string& target_frame, const ros::Tim
                                  const std::string& fixed_frame,
                                  Stamped<Point>& stamped_out) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, target_time,
                   stamped_in.frame_id_,stamped_in.stamp_,
                   fixed_frame, transform);
@@ -1118,7 +1118,7 @@ void Transformer::transformPose(const std::string& target_frame, const ros::Time
                                 const std::string& fixed_frame,
                                 Stamped<Pose>& stamped_out) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, target_time,
                   stamped_in.frame_id_,stamped_in.stamp_,
                   fixed_frame, transform);
@@ -1139,16 +1139,3 @@ void Transformer::removeTransformsChangedListener(boost::signals::connection c)
   boost::mutex::scoped_lock lock(transforms_changed_mutex_);
   c.disconnect();
 }
-
-/*
-void Transformer::transformTransform(const std::string& target_frame,
-                                  const geometry_msgs::TransformStamped& msg_in,
-                                  geometry_msgs::TransformStamped& msg_out)
-{
-  Stamped<Transform> pin, pout;
-  transformStampedMsgToTF(msg_in, pin);
-  transformTransform(target_frame, pin, pout);
-  transformStampedTFToMsg(pout, msg_out);
-}
-
-*/
