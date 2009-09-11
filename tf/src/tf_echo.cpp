@@ -29,7 +29,7 @@
 
 #include <cstdio>
 #include "tf/transform_listener.h"
-#include "ros/node.h"
+#include "ros/ros.h"
 
 class echoListener
 {
@@ -38,9 +38,7 @@ public:
   tf::TransformListener tf;
 
   //constructor with name
-  echoListener(ros::Node& anode):
-    tf(anode),
-    node_(anode)
+  echoListener()
   {
 
   };
@@ -50,9 +48,7 @@ public:
 
   };
 
-  bool ok(){return node_.ok();};
 private:
-  ros::Node& node_;
 
 };
 
@@ -60,7 +56,7 @@ private:
 int main(int argc, char ** argv)
 {
   //Initialize ROS
-  ros::init(argc, argv);
+  ros::init(argc, argv, "tf_echo", ros::init_options::AnonymousName);
 
   if (argc != 3)
   {
@@ -68,10 +64,9 @@ int main(int argc, char ** argv)
     return -1;
   }
 
-
-  ros::Node node("tf_echo", ros::Node::ANONYMOUS_NAME);
+  ros::NodeHandle nh;
   //Instantiate a local listener
-  echoListener echoListener(node);
+  echoListener echoListener;
 
 
   std::string source_frameid = std::string(argv[1]);
@@ -81,7 +76,7 @@ int main(int argc, char ** argv)
   //Nothing needs to be done except wait for a quit
   //The callbacks withing the listener class
   //will take care of everything
-  while(echoListener.ok())
+  while(nh.ok())
     {
       try
       {
