@@ -50,7 +50,7 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns f
   }
   else if (num_nodes == 2)
   {
-    if(interpolating_ && ( p_temp_1.parent_frame_id == p_temp_2.parent_frame_id) ) // if we're interpolating and haven't reparented
+    if(interpolating_ && ( p_temp_1.frame_id_num_ == p_temp_2.frame_id_num_) ) // if we're interpolating and haven't reparented
     {
       interpolate(p_temp_1, p_temp_2, time, data_out);
       data_out.mode_ = mode;
@@ -172,7 +172,7 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
   output.setRotation(slerp( q1, q2 , ratio));
   output.stamp_ = one.stamp_;
   output.frame_id_ = one.frame_id_;
-  output.parent_id_ = one.parent_id_;
-  output.parent_frame_id = one.parent_frame_id;
+  output.child_frame_id_ = one.child_frame_id_;
+  output.frame_id_num_ = one.frame_id_num_;
 };
 

@@ -128,36 +128,35 @@ bool Transformer::setTransform(const Stamped<btTransform>& transform, const std:
 bool Transformer::setTransform(const StampedTransform& transform, const std::string& authority)
 {
 
-  //\todo replace usage of Stamped<btTransform> in this function
-  Stamped<btTransform> mapped_transform((btTransform)transform, transform.stamp_, transform.child_frame_id_, transform.frame_id_);
-  mapped_transform.frame_id_ = remap(tf_prefix_, transform.child_frame_id_);
-  mapped_transform.parent_id_ = remap(tf_prefix_, transform.frame_id_);
+  StampedTransform mapped_transform((btTransform)transform, transform.stamp_, transform.frame_id_, transform.child_frame_id_);
+  mapped_transform.child_frame_id_ = remap(tf_prefix_, transform.child_frame_id_);
+  mapped_transform.frame_id_ = remap(tf_prefix_, transform.frame_id_);
 
  
   bool error_exists = false;
-  if (mapped_transform.frame_id_ == mapped_transform.parent_id_)
+  if (mapped_transform.child_frame_id_ == mapped_transform.frame_id_)
   {
-    ROS_ERROR("TF_SELF_TRANSFORM: Ignoring transform from authority \"%s\" with parent_id and frame_id  \"%s\" because they are the same",  authority.c_str(), mapped_transform.frame_id_.c_str());
+    ROS_ERROR("TF_SELF_TRANSFORM: Ignoring transform from authority \"%s\" with frame_id and child_frame_id  \"%s\" because they are the same",  authority.c_str(), mapped_transform.child_frame_id_.c_str());
     error_exists = true;
   }
 
-  if (mapped_transform.frame_id_ == "/")//empty frame id will be mapped to "/"
+  if (mapped_transform.child_frame_id_ == "/")//empty frame id will be mapped to "/"
   {
-    ROS_ERROR("TF_NO_FRAME_ID: Ignoring transform from authority \"%s\" because frame_id not set ", authority.c_str());
+    ROS_ERROR("TF_NO_CHILD_FRAME_ID: Ignoring transform from authority \"%s\" because child_frame_id not set ", authority.c_str());
     error_exists = true;
   }
 
-  if (mapped_transform.parent_id_ == "/")//empty parent id will be mapped to "/"
+  if (mapped_transform.frame_id_ == "/")//empty parent id will be mapped to "/"
   {
-    ROS_ERROR("TF_NO_PARENT_ID: Ignoring transform with frame_id \"%s\"  from authority \"%s\" because parent_id not set", mapped_transform.frame_id_.c_str(), authority.c_str());
+    ROS_ERROR("TF_NO_FRAME_ID: Ignoring transform with child_frame_id \"%s\"  from authority \"%s\" because frame_id not set", mapped_transform.child_frame_id_.c_str(), authority.c_str());
     error_exists = true;
   }
 
   if (std::isnan(mapped_transform.getOrigin().x()) || std::isnan(mapped_transform.getOrigin().y()) || std::isnan(mapped_transform.getOrigin().z())||
       std::isnan(mapped_transform.getRotation().x()) ||       std::isnan(mapped_transform.getRotation().y()) ||       std::isnan(mapped_transform.getRotation().z()) ||       std::isnan(mapped_transform.getRotation().w()))
   {
-    ROS_ERROR("TF_NAN_INPUT: Ignoring transform for frame_id \"%s\" from authority \"%s\" because of a nan value in the transform (%f %f %f) (%f %f %f %f)",
-              mapped_transform.frame_id_.c_str(), authority.c_str(),
+    ROS_ERROR("TF_NAN_INPUT: Ignoring transform for child_frame_id \"%s\" from authority \"%s\" because of a nan value in the transform (%f %f %f) (%f %f %f %f)",
+              mapped_transform.child_frame_id_.c_str(), authority.c_str(),
               mapped_transform.getOrigin().x(), mapped_transform.getOrigin().y(), mapped_transform.getOrigin().z(),
               mapped_transform.getRotation().x(), mapped_transform.getRotation().y(), mapped_transform.getRotation().z(), mapped_transform.getRotation().w()
               );
@@ -166,14 +165,14 @@ bool Transformer::setTransform(const StampedTransform& transform, const std::str
 
   if (error_exists)
     return false;
-  unsigned int frame_number = lookupOrInsertFrameNumber(mapped_transform.frame_id_);
-  if (getFrame(frame_number)->insertData(TransformStorage(mapped_transform, lookupOrInsertFrameNumber(mapped_transform.parent_id_))))
+  unsigned int frame_number = lookupOrInsertFrameNumber(mapped_transform.child_frame_id_);
+  if (getFrame(frame_number)->insertData(TransformStorage(mapped_transform, lookupOrInsertFrameNumber(mapped_transform.frame_id_))))
   {
     frame_authority_[frame_number] = authority;
   }
   else
   {
-    ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", mapped_transform.frame_id_.c_str(), mapped_transform.stamp_.toSec(), authority.c_str());
+    ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", mapped_transform.child_frame_id_.c_str(), mapped_transform.stamp_.toSec(), authority.c_str());
     return false;
   }
 
@@ -292,6 +291,7 @@ void Transformer::lookupTransform(const std::string& target_frame,const ros::Tim
   transform.setData( temp2 * temp1);
   transform.stamp_ = temp2.stamp_;
   transform.frame_id_ = target_frame;
+  transform.child_frame_id_ = source_frame;
 
 };
 
@@ -406,11 +406,11 @@ bool Transformer::getParent(const std::string& frame_id, ros::Time time, std::st
     ROS_DEBUG("Transformer::getParent: No data for parent of %s", mapped_frame_id.c_str());
     return false;
   }
-  if (temp.parent_id_ == "NO_PARENT") {
+  if (temp.frame_id_ == "NO_PARENT") {
     ROS_DEBUG("Transformer::getParent: No parent for %s", mapped_frame_id.c_str());
     return false;
   }
-  parent= temp.parent_id_;
+  parent= temp.frame_id_;
   return true;
 
 };
@@ -530,7 +530,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
       }
       lists.inverseTransforms.push_back(temp);
 
-      frame = temp.parent_frame_id;
+      frame = temp.frame_id_num_;
 
 
       /* Check if we've gone too deep.  A loop in the tree would cause this */
@@ -581,7 +581,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
       }
       //      std::cout << "pushing back" << temp.frame_id_ << std::endl;
       lists.forwardTransforms.push_back(temp);
-      frame = temp.parent_frame_id;
+      frame = temp.frame_id_num_;
 
       /* Check if we've gone too deep.  A loop in the tree would cause this*/
       if (counter++ > MAX_GRAPH_DEPTH){
@@ -645,10 +645,10 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
 
     try
     {
-      if (lookupFrameNumber(lists.inverseTransforms.back().parent_id_) != target_frame)
+      if (lookupFrameNumber(lists.inverseTransforms.back().frame_id_) != target_frame)
       {
         std::stringstream ss;
-      ss<< "No Common Parent Case A between "<< lookupFrameString(target_frame) <<" and " << lookupFrameString(source_frame)  << std::endl << allFramesAsString() << std::endl << lists.inverseTransforms.back().parent_id_ << std::endl;
+      ss<< "No Common Parent Case A between "<< lookupFrameString(target_frame) <<" and " << lookupFrameString(source_frame)  << std::endl << allFramesAsString() << std::endl << lists.inverseTransforms.back().frame_id_ << std::endl;
       if (error_string) *error_string = ss.str();
       return CONNECTIVITY_ERROR;
     }
@@ -676,7 +676,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
   /* Make sure that we don't have a no parent at the top */
   try
   {
-    if (lookupFrameNumber(lists.inverseTransforms.back().frame_id_) == 0 || lookupFrameNumber( lists.forwardTransforms.back().frame_id_) == 0)
+    if (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id_) == 0 || lookupFrameNumber( lists.forwardTransforms.back().child_frame_id_) == 0)
     {
       if (error_string) *error_string = "NO_PARENT at top of tree";
       return CONNECTIVITY_ERROR;
@@ -688,7 +688,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
       std::cerr << "Base Cases done" <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
     */
 
-    while (lookupFrameNumber(lists.inverseTransforms.back().frame_id_) == lookupFrameNumber(lists.forwardTransforms.back().frame_id_))
+    while (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id_) == lookupFrameNumber(lists.forwardTransforms.back().child_frame_id_))
     {
       lists.inverseTransforms.pop_back();
       lists.forwardTransforms.pop_back();
@@ -871,14 +871,14 @@ std::string Transformer::chainAsString(const std::string & target_frame, ros::Ti
   mstream << "Inverse Transforms:" <<std::endl;
   for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
     {
-      mstream << lists.inverseTransforms[i].frame_id_<<", ";
+      mstream << lists.inverseTransforms[i].child_frame_id_<<", ";
     }
   mstream << std::endl;
 
   mstream << "Forward Transforms: "<<std::endl ;
   for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
     {
-      mstream << lists.forwardTransforms[i].frame_id_<<", ";
+      mstream << lists.forwardTransforms[i].child_frame_id_<<", ";
     }
   mstream << std::endl;
   return mstream.str();
@@ -901,11 +901,11 @@ void Transformer::chainAsVector(const std::string & target_frame, ros::Time targ
   output.clear(); //empty vector
   for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
     {
-      output.push_back(lists.inverseTransforms[i].frame_id_);
+      output.push_back(lists.inverseTransforms[i].child_frame_id_);
     }
   for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
     {
-      output.push_back(lists.forwardTransforms[i].frame_id_);
+      output.push_back(lists.forwardTransforms[i].child_frame_id_);
     }
 }
 
@@ -921,14 +921,14 @@ std::string Transformer::allFramesAsString() const
   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)
   {
-    unsigned int parent_id;
+    unsigned int frame_id_num;
     if(  getFrame(counter)->getData(ros::Time(), temp))
-      parent_id = temp.parent_frame_id;
+      frame_id_num = temp.frame_id_num_;
     else
     {
-      parent_id = 0;
+      frame_id_num = 0;
     }
-    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[parent_id] << "." <<std::endl;
+    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num] << "." <<std::endl;
   }
   return mstream.str();
 }
@@ -949,14 +949,14 @@ std::string Transformer::allFramesAsDot() const
   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
   {
-    unsigned int parent_id;
+    unsigned int frame_id_num;
     if(  getFrame(counter)->getData(ros::Time(), temp))
-      parent_id = temp.parent_frame_id;
+      frame_id_num = temp.frame_id_num_;
     else
     {
-      parent_id = 0;
+      frame_id_num = 0;
     }
-    if (parent_id != 0)
+    if (frame_id_num != 0)
     {
       std::string authority = "no recorded authority";
       std::map<unsigned int, std::string>::const_iterator it = frame_authority_.find(counter);
@@ -968,7 +968,7 @@ std::string Transformer::allFramesAsDot() const
 
       mstream << std::fixed; //fixed point notation
       mstream.precision(3); //3 decimal places
-      mstream << "\"" << frameIDs_reverse[parent_id]   << "\"" << " -> "
+      mstream << "\"" << frameIDs_reverse[frame_id_num]   << "\"" << " -> "
               << "\"" << frameIDs_reverse[counter] << "\"" << "[label=\""
               << "Authority: " << authority << "\\n"
               << getFrame(counter)->getListLength() << " Readings averaging " << rate <<" Hz\\n"
@@ -1048,7 +1048,6 @@ void Transformer::transformPoint(const std::string& target_frame, const Stamped<
   stamped_out.setData(transform * stamped_in);
   stamped_out.stamp_ = transform.stamp_;
   stamped_out.frame_id_ = target_frame;
-  stamped_out.parent_id_ = stamped_in.parent_id_;//only useful for transforms
 };
 
 void Transformer::transformPose(const std::string& target_frame, const Stamped<Pose>& stamped_in, Stamped<Pose>& stamped_out) const
@@ -1059,7 +1058,6 @@ void Transformer::transformPose(const std::string& target_frame, const Stamped<P
   stamped_out.setData(transform * stamped_in);
   stamped_out.stamp_ = transform.stamp_;
   stamped_out.frame_id_ = target_frame;
-  //  stamped_out.parent_id_ = stamped_in.parent_id_;//only useful for transforms
 };
 
 
@@ -1113,7 +1111,6 @@ void Transformer::transformPoint(const std::string& target_frame, const ros::Tim
   stamped_out.setData(transform * stamped_in);
   stamped_out.stamp_ = transform.stamp_;
   stamped_out.frame_id_ = target_frame;
-  stamped_out.parent_id_ = stamped_in.parent_id_;//only useful for transforms
 };
 
 void Transformer::transformPose(const std::string& target_frame, const ros::Time& target_time,
@@ -1129,7 +1126,6 @@ void Transformer::transformPose(const std::string& target_frame, const ros::Time
   stamped_out.setData(transform * stamped_in);
   stamped_out.stamp_ = transform.stamp_;
   stamped_out.frame_id_ = target_frame;
-  //  stamped_out.parent_id_ = stamped_in.parent_id_;//only useful for transforms
 };
 
 boost::signals::connection Transformer::addTransformsChangedListener(boost::function<void(void)> callback)

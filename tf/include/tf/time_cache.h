@@ -47,12 +47,12 @@ namespace tf
 enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_FORWARD };
 
 /** \brief Storage for transforms and their parent */
-class  TransformStorage : public Stamped<btTransform>
+class  TransformStorage : public StampedTransform
 {
 public:
   TransformStorage(){};
-  TransformStorage(const Stamped<btTransform>& data, unsigned int parent_id): Stamped<btTransform>(data), parent_frame_id(parent_id){};
-  unsigned int parent_frame_id;
+  TransformStorage(const StampedTransform& data, unsigned int frame_id_num): StampedTransform(data), frame_id_num_(frame_id_num){};
+  unsigned int frame_id_num_;
   ExtrapolationMode mode_;
 };
 
