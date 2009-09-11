@@ -80,7 +80,7 @@ int main(int argc, char ** argv)
     {
       try
       {
-        tf::Stamped<tf::Transform> echo_transform;
+        tf::StampedTransform echo_transform;
         echoListener.tf.lookupTransform(source_frameid, target_frameid, ros::Time(), echo_transform);
         std::cout << "Success at " << echo_transform.stamp_ << std::endl;
         double yaw, pitch, roll;

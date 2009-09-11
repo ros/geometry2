@@ -306,7 +306,7 @@ void TransformListener::subscription_callback(const tf::tfMessageConstPtr& msg)
   const tf::tfMessage& msg_in = *msg;
   for (unsigned int i = 0; i < msg_in.transforms.size(); i++)
   {
-    Stamped<Transform> trans;
+    StampedTransform trans;
     transformStampedMsgToTF(msg_in.transforms[i], trans);
     try
     {

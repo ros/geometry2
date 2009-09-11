@@ -69,7 +69,10 @@ class Stamped : public T{
 
   Stamped() :frame_id_ ("NO_ID_STAMPED_DEFAULT_CONSTRUCTION"), parent_id_("NOT A TRANSFORM"){}; //Default constructor used only for preallocation
 
-  __attribute__((deprecated)) Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id, const std::string & parent_id = "NOT A TRANSFORM"):
+  Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id) :
+    T (input), stamp_ ( timestamp ), frame_id_ (frame_id){ } ;
+  
+  __attribute__((deprecated)) Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id, const std::string & parent_id) :
     T (input), stamp_ ( timestamp ), frame_id_ (frame_id), parent_id_(parent_id){ } ;
 
 //Stamped(const Stamped<T>& input):data_(input.data_), stamp_(input.stamp_), frame_id_(input.frame_id_), parent_id_(input.parent_id_){};
@@ -187,11 +190,18 @@ static inline void transformTFToMsg(const Transform& bt, geometry_msgs::Transfor
 {vector3TFToMsg(bt.getOrigin(), msg.translation);  quaternionTFToMsg(bt.getRotation(), msg.rotation);};
 
 /** \brief convert TransformStamped msg to Stamped<Transform> */
-static inline void transformStampedMsgToTF(const geometry_msgs::TransformStamped & msg, Stamped<Transform>& bt)
+static inline void transformStampedMsgToTF(const geometry_msgs::TransformStamped & msg, Stamped<Transform>& bt) // \todo __attribute__((deprecated))
 {transformMsgToTF(msg.transform, bt); bt.stamp_ = msg.header.stamp; bt.parent_id_ = msg.header.frame_id; bt.frame_id_ = msg.child_frame_id;};
 /** \brief convert Stamped<Transform> to TransformStamped msg*/
-static inline void transformStampedTFToMsg(const Stamped<Transform>& bt, geometry_msgs::TransformStamped & msg)
-{transformTFToMsg(bt, msg.transform); msg.header.stamp = bt.stamp_; msg.header.frame_id = bt.parent_id_; msg.child_frame_id = bt.frame_id_;};
+static inline void transformStampedTFToMsg(const Stamped<Transform>& bt, geometry_msgs::TransformStamped & msg) //\todo __attribute__((deprecated)) 
+{transformTFToMsg(bt, msg.transform); msg.header.stamp = bt.stamp_; msg.header.frame_id = bt.parent_id_; msg.child_frame_id = bt.frame_id_;} ;
+
+/** \brief convert TransformStamped msg to tf::StampedTransform */
+static inline void transformStampedMsgToTF(const geometry_msgs::TransformStamped & msg, StampedTransform& bt)
+{transformMsgToTF(msg.transform, bt); bt.stamp_ = msg.header.stamp; bt.frame_id_ = msg.header.frame_id; bt.child_frame_id_ = msg.child_frame_id;};
+/** \brief convert tf::StampedTransform to TransformStamped msg*/
+static inline void transformStampedTFToMsg(const StampedTransform& bt, geometry_msgs::TransformStamped & msg)
+{transformTFToMsg(bt, msg.transform); msg.header.stamp = bt.stamp_; msg.header.frame_id = bt.frame_id_; msg.child_frame_id = bt.child_frame_id_;};
 
 /** \brief convert Pose msg to Pose */
 static inline void poseMsgToTF(const geometry_msgs::Pose& msg, Pose& bt)

@@ -193,7 +193,7 @@ public:
   
 
   while (node_.ok()){
-    Stamped<Transform> tmp;
+    tf::StampedTransform tmp;
     counter++;
     //    printf("looping %d\n", counter);
     if (using_specific_chain_)
