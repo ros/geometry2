@@ -173,7 +173,7 @@ static PyObject *lookupTransform(PyObject *self, PyObject *args, PyObject *kw)
 
   if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&", keywords, &target_frame, &source_frame, rostime_converter, &time))
     return NULL;
-  tf::Stamped< btTransform > transform;
+  tf::StampedTransform transform;
   try
   {
     t->lookupTransform(target_frame, source_frame, time, transform);
@@ -206,7 +206,7 @@ static PyObject *lookupTransformFull(PyObject *self, PyObject *args, PyObject *k
                         &source_time,
                         &fixed_frame))
     return NULL;
-  tf::Stamped< btTransform > transform;
+  tf::StampedTransform transform;
   try
   {
     t->lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame, transform);
@@ -231,10 +231,10 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
 
   if (!PyArg_ParseTuple(args, "O|s", &py_transform, &authority))
     return NULL;
-  tf::Stamped< btTransform > transform;
+  tf::StampedTransform transform;
   PyObject *header = PyObject_BorrowAttrString(py_transform, "header");
-  transform.frame_id_ = PyString_AsString(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
-  transform.parent_id_ = PyString_AsString(PyObject_BorrowAttrString(header, "frame_id"));
+  transform.child_frame_id_ = PyString_AsString(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
+  transform.frame_id_ = PyString_AsString(PyObject_BorrowAttrString(header, "frame_id"));
   if (rostime_converter(PyObject_BorrowAttrString(header, "stamp"), &transform.stamp_) != 1)
     return NULL;
 
