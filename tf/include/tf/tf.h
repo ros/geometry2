@@ -104,7 +104,8 @@ public:
    * \param authority The source of the information for this transform
    * returns true unless an error occured
    */
-  bool setTransform(const Stamped<btTransform>& transform, const std::string & authority = "default_authority");
+  bool setTransform(const StampedTransform& transform, const std::string & authority = "default_authority");
+  bool setTransform(const Stamped<btTransform>& transform, const std::string & authority = "default_authority") __attribute__((deprecated));
 
   /*********** Accessors *************/
 
@@ -117,11 +118,17 @@ public:
    * TransformReference::MaxDepthException
    */
   void lookupTransform(const std::string& target_frame, const std::string& source_frame,
-                       const ros::Time& time, Stamped<btTransform>& transform) const;
+                       const ros::Time& time, StampedTransform& transform) const;
+  void lookupTransform(const std::string& target_frame, const std::string& source_frame,
+                       const ros::Time& time, Stamped<btTransform>& transform) const __attribute__((deprecated));
   //time traveling version
   void lookupTransform(const std::string& target_frame, const ros::Time& target_time,
                        const std::string& source_frame, const ros::Time& source_time,
-                       const std::string& fixed_frame, Stamped<btTransform>& transform) const;
+                       const std::string& fixed_frame, StampedTransform& transform) const;
+  void lookupTransform(const std::string& target_frame, const ros::Time& target_time,
+                       const std::string& source_frame, const ros::Time& source_time,
+                       const std::string& fixed_frame, Stamped<btTransform>& transform) const __attribute__((deprecated));
+
   bool canTransform(const std::string& target_frame, const std::string& source_frame,
                     const ros::Time& time, const ros::Duration& timeout, const ros::Duration& polling_sleep_duration = ros::Duration(0.01),
                     std::string* error_msg = NULL) const __attribute__((deprecated))

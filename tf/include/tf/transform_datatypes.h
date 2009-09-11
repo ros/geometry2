@@ -69,8 +69,8 @@ class Stamped : public T{
 
   Stamped() :frame_id_ ("NO_ID_STAMPED_DEFAULT_CONSTRUCTION"), parent_id_("NOT A TRANSFORM"){}; //Default constructor used only for preallocation
 
-  Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id, const std::string & parent_id = "NOT A TRANSFORM"):
-    T (input), stamp_ ( timestamp ), frame_id_ (frame_id), parent_id_(parent_id){ };
+  __attribute__((deprecated)) Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id, const std::string & parent_id = "NOT A TRANSFORM"):
+    T (input), stamp_ ( timestamp ), frame_id_ (frame_id), parent_id_(parent_id){ } ;
 
 //Stamped(const Stamped<T>& input):data_(input.data_), stamp_(input.stamp_), frame_id_(input.frame_id_), parent_id_(input.parent_id_){};
 
@@ -81,6 +81,19 @@ class Stamped : public T{
   //  void stripStamp(T & output) { output = data_;}; //just down cast it
 };
 
+class StampedTransform : public tf::Transform
+{
+public:
+  ros::Time stamp_;
+  std::string frame_id_;
+  std::string child_frame_id_;
+  StampedTransform(const tf::Transform& input, const ros::Time& timestamp, const std::string & frame_id, const std::string & child_frame_id):
+    tf::Transform (input), stamp_ ( timestamp ), frame_id_ (frame_id), child_frame_id_(child_frame_id){ };
+  StampedTransform() { };
+
+  void setData(const tf::Transform& input){*static_cast<tf::Transform*>(this) = input;};
+
+};
 
 /** \brief convert Quaternion msg to Quaternion */
 static inline void quaternionMsgToTF(const geometry_msgs::Quaternion& msg, Quaternion& bt) 
