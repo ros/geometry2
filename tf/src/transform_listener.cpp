@@ -233,7 +233,7 @@ void TransformListener::transformPose(const std::string& target_frame, const ros
 
 void TransformListener::transformPointCloud(const std::string & target_frame, const sensor_msgs::PointCloud & cloudIn, sensor_msgs::PointCloud & cloudOut) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, cloudIn.header.frame_id, cloudIn.header.stamp, transform);
 
   transformPointCloud(target_frame, transform, cloudIn.header.stamp, cloudIn, cloudOut);
@@ -242,7 +242,7 @@ void TransformListener::transformPointCloud(const std::string& target_frame, con
     const sensor_msgs::PointCloud& cloudIn,
     const std::string& fixed_frame, sensor_msgs::PointCloud& cloudOut) const
 {
-  Stamped<Transform> transform;
+  StampedTransform transform;
   lookupTransform(target_frame, target_time,
       cloudIn.header.frame_id, cloudIn.header.stamp,
       fixed_frame,
