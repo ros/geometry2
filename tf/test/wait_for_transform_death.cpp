@@ -37,8 +37,7 @@ TEST(tf, waitForTransformUsingDedicatedThreadAssert)
 
   ros::Duration timeout = ros::Duration().fromSec(1.0);
   ros::Duration poll_freq = ros::Duration().fromSec(0.1);
-  double eps = 0.2;
-
+  
   // Default polling freq
   ros::Time start_time = ros::Time::now();
   EXPECT_DEATH(mTR.waitForTransform("parent", "me", ros::Time().fromNSec(10000000), timeout), ".*Do not call waitForTransform unless you are using another thread for populating data.*");
