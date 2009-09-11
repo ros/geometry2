@@ -142,7 +142,7 @@ public:
     if (using_specific_chain_)
     {
       cout << "Waiting for first transform to become available" << flush;
-      while (node_.ok() && !tf_.canTransform(framea_, frameb_, Time(), Duration(1.0)))
+      while (node_.ok() && !tf_.waitForTransform(framea_, frameb_, Time(), Duration(1.0)))
         cout << "." << flush;
       cout << endl;
      
