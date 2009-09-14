@@ -148,7 +148,7 @@ def _tf_handle(msg):
     _msgs.append((msg, rospy.get_rostime(), msg._connection_header['callerid']))
 
 # @return bool: True if /tf has a publisher
-def is_/tf_active():
+def is_tf_active():
     master = roslib.scriptutil.get_master()
     if master is not None:
         code, msg, val = master.getPublishedTopics('/roswtf', '/')
@@ -158,7 +158,7 @@ def is_/tf_active():
     return False
 
 # @return bool: True if /tf_message has a publisher
-def is_/tf_message_active():
+def is_tf_message_active():
     master = roslib.scriptutil.get_master()
     if master is not None:
         code, msg, val = master.getPublishedTopics('/roswtf', '/')
@@ -170,7 +170,7 @@ def is_/tf_message_active():
 # roswtf entry point for online checks
 def roswtf_plugin_online(ctx):
     # don't run plugin if tf isn't active as these checks take awhile
-    if not is_/tf_active() and not is_/tf_message_active():
+    if not is_tf_active() and not is_tf_message_active():
         return
     
     print "running tf checks, this will take a second..."
