@@ -35,10 +35,10 @@ class TransformSender
 public:
   ros::NodeHandle node_;
   //constructor
-  TransformSender(double x, double y, double z, double yaw, double pitch, double roll, ros::Time time, const std::string& frame_id, const std::string& parent_id) :
-    transform_(btTransform(btQuaternion(yaw,pitch,roll), btVector3(x,y,z)), time, parent_id, frame_id){};
-  TransformSender(double x, double y, double z, double qx, double qy, double qz, double qw, ros::Time time, const std::string& frame_id, const std::string& parent_id) :
-    transform_(btTransform(btQuaternion(qx,qy,qz,qw), btVector3(x,y,z)), time, parent_id, frame_id ){};
+  TransformSender(double x, double y, double z, double yaw, double pitch, double roll, ros::Time time, const std::string& frame_id, const std::string& child_frame_id) :
+    transform_(btTransform(btQuaternion(yaw,pitch,roll), btVector3(x,y,z)), time, frame_id, child_frame_id){};
+  TransformSender(double x, double y, double z, double qx, double qy, double qz, double qw, ros::Time time, const std::string& frame_id, const std::string& child_frame_id) :
+    transform_(btTransform(btQuaternion(qx,qy,qz,qw), btVector3(x,y,z)), time, frame_id, child_frame_id){};
   //Clean up ros connections
   ~TransformSender() { }
 
@@ -60,7 +60,6 @@ private:
 
 int main(int argc, char ** argv)
 {
-  printf("WARNING: This program is deprecated please switch to static_transform_publisher.\n");
   //Initialize ROS
   ros::init(argc, argv,"transform_sender", ros::init_options::AnonymousName);
 
@@ -115,9 +114,9 @@ int main(int argc, char ** argv)
   {
     printf("A command line utility for manually sending a transform.\n");
     printf("It will periodicaly republish the given transform. \n");
-    printf("Usage: transform_sender x y z yaw pitch roll frame_id parent_id  period(miliseconds) \n");
+    printf("Usage: transform_sender x y z yaw pitch roll frame_id child_frame_id  period(miliseconds) \n");
     printf("OR \n");
-    printf("Usage: transform_sender x y z qx qy qz qw frame_id parent_id  period(miliseconds) \n");
+    printf("Usage: transform_sender x y z qx qy qz qw frame_id child_frame_id  period(miliseconds) \n");
     ROS_ERROR("transform_sender exited due to not having the right number of arguments");
     return -1;
   }

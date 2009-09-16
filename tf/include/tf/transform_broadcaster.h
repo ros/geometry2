@@ -59,7 +59,8 @@ public:
 
   /** \brief Send a Stamped<Transform> with parent parent_id 
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
-  void sendTransform(const Stamped<Transform> & transform);
+  void sendTransform(const StampedTransform & transform);
+  void sendTransform(const Stamped<Transform> & transform) __attribute__((deprecated));
 
   /** \brief Send a TransformStamped 
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
