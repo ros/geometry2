@@ -1,7 +1,11 @@
 <package>
   <description brief='Transform Library'>
 
-    Library for doing transformations.
+TF is a package that lets the user keep track of multiple coordinate
+frames over time. TF maintains the relationship between coordinate
+frames in a tree structure buffered in time, and lets the user
+transform points, vectors, etc between any two coordinate frames at
+any desired point in time.
 
   </description>
   <author>Tully Foote</author>
