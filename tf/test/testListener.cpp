@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
       std::cout << testListener.tf.allFramesAsString()<<std::endl;
       try
       {
-        tf::Stamped<tf::Transform> test_transform;
+        tf::StampedTransform test_transform;
         testListener.tf.lookupTransform("frame1","frame2", ros::Time(), test_transform);
         std::cout << "Success at " << test_transform.stamp_ << std::endl;
       }
