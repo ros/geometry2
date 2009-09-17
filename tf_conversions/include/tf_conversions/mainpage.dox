@@ -1,0 +1,13 @@
+/** \mainpage
+
+@htmlinclude manifest.html
+
+The tf conversions package contains methods like these:
+ \li tf::PoseKDLToMsg
+ \li tf::RotationTFToEigen
+ \li tf::VectorTFToKDL
+ \li ...
+
+For a complete list of available conversion methods, follow this link: tf
+
+*/
