@@ -8,8 +8,6 @@
     way to download and compile the Eigen library. When Eigen becomes
     available from the major OS package managers, this ROS package is
     likely to be replaced by a system dependency.
-  </ul>
-
   </description>
 
   <author>Gaeal Guennebaud and Benoit Jacob</author>
