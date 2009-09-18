@@ -41,3 +41,8 @@ rospack_add_executable(shuttle_observer src/shuttle_observer.cpp)
 target_link_libraries(shuttle_observer tf)
 rospack_add_executable(tutorial_listener src/tutorial_listener.cpp)
 target_link_libraries(tutorial_listener tf)
+
+rosbuild_add_executable(tf_broadcaster src/tf_broadcaster.cpp)
+rosbuild_add_executable(message_filter src/message_filter_listener.cpp)
+rosbuild_add_executable(tf_topic_publisher src/tf_topic_publisher.cpp)
+rosbuild_add_executable(torso_tf_publisher src/torso_tf_publisher.cpp)
