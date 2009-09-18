@@ -1,8 +1,17 @@
 <package>
 <description brief="Bullet Physics Engine">
-
-The Bullet Physics Engine
-
+    This package contains version 2.7.5 of the Bullet professional
+    free 3D Game Multiphysics Library.  The ROS package automatically
+    downloads, extracts and compiles a tarball.  For each major
+    release of the Bullet library, the tarball will get updated.  The
+    Bullet library provided by this ROS package is slightly different
+    form the official Bullet release. This package modifies the
+    3-argument constructor of a quaternion: Quaternion(r, p, y), with
+    r the rotation around the fixed x-axis, p the rotation around the
+    fixed y-axis and y the rotation around the fixed z-axis. We have
+    the intention to move towards the official version of Bullet; this
+    however will take some time because it involves a number of
+    deprecation cycles for the conflicting quaternion constructor.
 </description>
 <author>Erwin Coumans</author>
 <license>ZLib</license>
