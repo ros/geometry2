@@ -37,19 +37,37 @@
 
 namespace tf
 {
+/// Converts a tf Vector3 into a KDL Vector
 void VectorTFToKDL(const tf::Vector3& t, KDL::Vector& k);
+
+/// Converts a tf Quaternion into a KDL Rotation
 void RotationTFToKDL(const tf::Quaternion& t, KDL::Rotation& k);
+
+/// Converts a tf Transform into a KDL Frame
 void TransformTFToKDL(const tf::Transform &t, KDL::Frame &k);
-void TransformKDLToTF(const KDL::Frame &k, tf::Transform &t);
+
+/// Converts a tf Pose into a KDL Frame
 void PoseTFToKDL(const tf::Pose& pose, KDL::Frame& frame);
+
+/// Converts a KDL Frame into a tf Transform
+void TransformKDLToTF(const KDL::Frame &k, tf::Transform &t);
+
+/// Converts a KDL Frame into a tf Pose
 void PoseKDLToTF(const KDL::Frame& frame, tf::Pose& pose);
 
+/// Converts a KDL Twist into a Twist message
 void TwistKDLToMsg(const KDL::Twist &t, geometry_msgs::Twist &m);
+
+/// Converts a Twist message into a KDL Twist
 void TwistMsgToKDL(const geometry_msgs::Twist &m, KDL::Twist &t);
 
+/// Converts a Pose message into a KDL Frame
 void PoseMsgToKDL(const geometry_msgs::Pose &p, KDL::Frame &t);
+
+/// Converts a KDL Frame into a Pose message 
 void PoseKDLToMsg(const KDL::Frame &t, geometry_msgs::Pose &p);
 
+/// Starting from a Pose from A to B, apply a Twist with reference frame A and reference point B, during a time t.
 geometry_msgs::Pose addDelta(const geometry_msgs::Pose &pose, const geometry_msgs::Twist &twist, const double &t);
 
 }
