@@ -83,9 +83,9 @@ static PyObject *canTransform(PyObject *self, PyObject *args, PyObject *kw)
   tf::Transformer *t = ((transformer_t*)self)->t;
   char *target_frame, *source_frame;
   ros::Time time;
-  static char *keywords[] = { "target_frame", "source_frame", "time", NULL };
+  static const char *keywords[] = { "target_frame", "source_frame", "time", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&", keywords, &target_frame, &source_frame, rostime_converter, &time))
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&", (char**)keywords, &target_frame, &source_frame, rostime_converter, &time))
     return NULL;
   return PyBool_FromLong(t->canTransform(target_frame, source_frame, time));
 }
@@ -95,9 +95,9 @@ static PyObject *canTransformFull(PyObject *self, PyObject *args, PyObject *kw)
   tf::Transformer *t = ((transformer_t*)self)->t;
   char *target_frame, *source_frame, *fixed_frame;
   ros::Time target_time, source_time;
-  static char *keywords[] = { "target_frame", "target_time", "source_frame", "source_time", "fixed_frame", NULL };
+  static const char *keywords[] = { "target_frame", "target_time", "source_frame", "source_time", "fixed_frame", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "sO&sO&s", keywords,
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "sO&sO&s", (char**)keywords,
                         &target_frame,
                         rostime_converter,
                         &target_time,
@@ -125,9 +125,9 @@ static PyObject *chain(PyObject *self, PyObject *args, PyObject *kw)
   char *target_frame, *source_frame, *fixed_frame;
   ros::Time target_time, source_time;
   std::vector< std::string > output;
-  static char *keywords[] = { "target_frame", "target_time", "source_frame", "source_time", "fixed_frame", NULL };
+  static const char *keywords[] = { "target_frame", "target_time", "source_frame", "source_time", "fixed_frame", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "sO&sO&s", keywords,
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "sO&sO&s", (char**)keywords,
                         &target_frame,
                         rostime_converter,
                         &target_time,
@@ -169,9 +169,9 @@ static PyObject *lookupTransform(PyObject *self, PyObject *args, PyObject *kw)
   tf::Transformer *t = ((transformer_t*)self)->t;
   char *target_frame, *source_frame;
   ros::Time time;
-  static char *keywords[] = { "target_frame", "source_frame", "time", NULL };
+  static const char *keywords[] = { "target_frame", "source_frame", "time", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&", keywords, &target_frame, &source_frame, rostime_converter, &time))
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&", (char**)keywords, &target_frame, &source_frame, rostime_converter, &time))
     return NULL;
   tf::StampedTransform transform;
   try
@@ -195,9 +195,9 @@ static PyObject *lookupTransformFull(PyObject *self, PyObject *args, PyObject *k
   tf::Transformer *t = ((transformer_t*)self)->t;
   char *target_frame, *source_frame, *fixed_frame;
   ros::Time target_time, source_time;
-  static char *keywords[] = { "target_frame", "target_time", "source_frame", "source_time", "fixed_frame", NULL };
+  static const char *keywords[] = { "target_frame", "target_time", "source_frame", "source_time", "fixed_frame", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kw, "sO&sO&s", keywords,
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "sO&sO&s", (char**)keywords,
                         &target_frame,
                         rostime_converter,
                         &target_time,
