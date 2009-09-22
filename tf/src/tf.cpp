@@ -191,8 +191,12 @@ void Transformer::lookupTransform(const std::string& target_frame, const std::st
   StampedTransform input((btTransform)transform, transform.stamp_, transform.parent_id_, transform.frame_id_);
   lookupTransform(target_frame, source_frame, time, 
                   input);
-  transform = Stamped<btTransform>((btTransform)input, input.stamp_, input.child_frame_id_, input.frame_id_);  
-};
+  transform = Stamped<btTransform>();
+  transform.setData((btTransform)input);
+  transform.stamp_ =  input.stamp_;
+  transform.frame_id_ = input.child_frame_id_;
+  transform.parent_id_ = input.frame_id_;  
+ };
 
 void Transformer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
                      const ros::Time& time, StampedTransform& transform) const
@@ -279,7 +283,11 @@ void Transformer::lookupTransform(const std::string& target_frame,const ros::Tim
   lookupTransform(target_frame, target_time, 
                   source_frame, source_time, 
                   fixed_frame,  input);
-  transform = Stamped<btTransform>((btTransform)input, input.stamp_, input.child_frame_id_, input.frame_id_);  
+  transform = Stamped<btTransform>();
+  transform.setData((btTransform)input);
+  transform.stamp_ =  input.stamp_;
+  transform.frame_id_ = input.child_frame_id_;
+  transform.parent_id_ = input.frame_id_;  
   
 }
 void Transformer::lookupTransform(const std::string& target_frame,const ros::Time& target_time, const std::string& source_frame,
