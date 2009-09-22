@@ -87,13 +87,14 @@ int main(int argc, char ** argv)
         echo_transform.getBasis().getEulerZYX(yaw, pitch, roll);
         tf::Quaternion q = echo_transform.getRotation();
         tf::Vector3 v = echo_transform.getOrigin();
-        printf("[%f %f %f %f] Euler(%f %f %f)\n", q.getX(), q.getY(), q.getZ(), q.getW(), yaw, pitch, roll);
-        printf("Translation: [%f %f %f]\n", v.getX(), v.getY(), v.getZ());
+        printf("- Rotation: in Quaternion [%f %f %f %f] in RPY(%f %f %f)\n", q.getX(), q.getY(), q.getZ(), q.getW(),  roll, pitch, yaw);
+        printf("- Translation: [%f %f %f]\n", v.getX(), v.getY(), v.getZ());
 
         //print transform
       }
       catch(tf::TransformException& ex)
       {
+        std::cout << "Failure at "<< ros::Time::now() << std::endl;
         std::cout << "Exception thrown:" << ex.what()<< std::endl;
         std::cout << "The current list of frames is:" <<std::endl;
         std::cout << echoListener.tf.allFramesAsString()<<std::endl;
