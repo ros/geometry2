@@ -39,9 +39,9 @@ using namespace tf;
 
 std::string tf::remap(const std::string& frame_id)
 {
-  ros::NodeHandle n;
+  ros::NodeHandle n("~");
   std::string tf_prefix;
-  n.getParam("~tf_prefix", tf_prefix);
+  n.getParam("tf_prefix", tf_prefix);
   return tf::remap(tf_prefix, frame_id);
 };
 
@@ -125,8 +125,10 @@ void TransformListener::init()
     {
       tf_frames_srv_ = node_.advertiseService("~tf_frames", &TransformListener::getFrames, this);
     }
-    
-    node_.param(std::string("~tf_prefix"), tf_prefix_, std::string(""));
+
+  ros::NodeHandle local_nh("~");
+  
+  local_nh.param(std::string("tf_prefix"), tf_prefix_, std::string(""));
 }
 
 void TransformListener::initWithThread()
@@ -149,7 +151,8 @@ void TransformListener::initWithThread()
       tf_frames_srv_ = node_.advertiseService("~tf_frames", &TransformListener::getFrames, this);
     }
     
-    node_.param(std::string("~tf_prefix"), tf_prefix_, std::string(""));
+  ros::NodeHandle local_nh("~");
+  local_nh.param(std::string("tf_prefix"), tf_prefix_, std::string(""));
 }
 
 void TransformListener::transformQuaternion(const std::string& target_frame,

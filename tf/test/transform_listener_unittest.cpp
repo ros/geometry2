@@ -57,11 +57,11 @@ using namespace tf;
 
 TEST(transform_listener, remap)
 {
-  ros::NodeHandle n;
+  ros::NodeHandle n("~");
   
   //no prefix
   EXPECT_STREQ("/id", tf::remap("id").c_str());
-  n.setParam("~tf_prefix", "a_tf_prefix");
+  n.setParam("tf_prefix", "a_tf_prefix");
   EXPECT_STREQ("/a_tf_prefix/id", tf::remap("id").c_str());
   
 
