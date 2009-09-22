@@ -1,0 +1,35 @@
+Index: src/LinearMath/btQuaternion.h
+===================================================================
+--- src/LinearMath/btQuaternion.h	(revision 1779)
++++ src/LinearMath/btQuaternion.h	(working copy)
+@@ -44,7 +44,7 @@
+    * @param yaw Angle around Y unless BT_EULER_DEFAULT_ZYX defined then Z
+    * @param pitch Angle around X unless BT_EULER_DEFAULT_ZYX defined then Y
+    * @param roll Angle around Z unless BT_EULER_DEFAULT_ZYX defined then X */
+-	btQuaternion(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
++  btQuaternion(const btScalar& yaw, const btScalar& pitch, const btScalar& roll) __attribute__((deprecated))
+ 	{ 
+ #ifndef BT_EULER_DEFAULT_ZYX
+ 		setEuler(yaw, pitch, roll); 
+@@ -87,7 +87,7 @@
+    * @param yaw Angle around Z
+    * @param pitch Angle around Y
+    * @param roll Angle around X */
+-	void setEulerZYX(const btScalar& yaw, const btScalar& pitch, const btScalar& roll)
++  void setEulerZYX(const btScalar& yaw, const btScalar& pitch, const btScalar& roll) __attribute__((deprecated))
+ 	{
+ 		btScalar halfYaw = btScalar(yaw) * btScalar(0.5);  
+ 		btScalar halfPitch = btScalar(pitch) * btScalar(0.5);  
+Index: src/LinearMath/btMatrix3x3.h
+===================================================================
+--- src/LinearMath/btMatrix3x3.h	(revision 1779)
++++ src/LinearMath/btMatrix3x3.h	(working copy)
+@@ -288,7 +287,7 @@
+    * @param pitch Pitch around Y axis
+    * @param roll around X axis 
+    * @param solution_number Which solution of two possible solutions ( 1 or 2) are possible values*/	
+-  void getEulerZYX(btScalar& yaw, btScalar& pitch, btScalar& roll, unsigned int solution_number = 1) const
++  void getEulerZYX(btScalar& yaw, btScalar& pitch, btScalar& roll, unsigned int solution_number = 1) __attribute__((deprecated)) const
+   {
+     struct Euler{btScalar yaw, pitch, roll;};
+     Euler euler_out;
