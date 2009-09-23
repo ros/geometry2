@@ -12,7 +12,7 @@
 
   <author>Gaeal Guennebaud and Benoit Jacob</author>
   <license>LGPL</license>
-  <review status="3rdparty" notes=""/>
+  <review status="3rdparty cleared" notes="ticket:2879"/>
   <url>http://eigen.tuxfamily.org/</url>
   <export>
     <cpp cflags="-I${prefix}/build/eigen2" lflags="" />
