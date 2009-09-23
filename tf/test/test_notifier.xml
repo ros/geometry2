@@ -1,3 +1,0 @@
-<launch>
-  <test test-name="test_notifier" pkg="tf" type="test_notifier"/>
-</launch>

@@ -51,14 +51,6 @@ std::string remap(const std::string& frame_id);
 class TransformListener : public Transformer { //subscribes to message and automatically stores incoming data
 
 public:
-  /**@brief The deprecated constructor for transform listener
-   * \param rosnode A reference to an instance of a ros::Node for communication
-   * \param interpolating Whether to interpolate or return the closest
-   * \param max_cache_time How long to store transform information */
-  TransformListener(ros::Node & rosnode,
-                    bool interpolating = true,
-                    ros::Duration max_cache_time = ros::Duration(DEFAULT_CACHE_TIME))__attribute__((deprecated));
-
   /**@brief Constructor for transform listener
    * \param max_cache_time How long to store transform information */
   TransformListener(ros::Duration max_cache_time = ros::Duration(DEFAULT_CACHE_TIME), bool spin_thread = true);

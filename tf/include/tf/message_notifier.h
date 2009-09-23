@@ -147,39 +147,6 @@ public:
   }
 
   /**
-   * \brief Constructor
-   * \deprecated in favor of tf::MessageFilter
-   */
-  ROSCPP_DEPRECATED MessageNotifier(Transformer* tf, ros::Node* node, Callback callback,
-      const std::string& topic, const std::string& target_frame,
-      uint32_t queue_size)
-  : tf_(*tf)
-  , callback_(callback)
-  , queue_size_(queue_size)
-  , message_count_(0)
-  , destructing_(false)
-  , new_messages_(false)
-  , new_transforms_(false)
-  , successful_transform_count_(0)
-  , failed_transform_count_(0)
-  , failed_out_the_back_count_(0)
-  , transform_message_count_(0)
-  , incoming_message_count_(0)
-  , dropped_message_count_(0)
-  , time_tolerance_(0.0)
-  {
-    target_frames_.resize(1);
-    target_frames_[0] = target_frame;
-
-    setTopic(topic);
-
-    tf_subscriber_ = node_.subscribe<tfMessage>("/tf_message", 1,
-                                  boost::bind(&MessageNotifier::incomingTFMessage, this, _1));
-
-    thread_handle_ = boost::thread(boost::bind(&MessageNotifier::workerThread, this));
-  }
-
-  /**
    * \brief Destructor
    */
   ~MessageNotifier()

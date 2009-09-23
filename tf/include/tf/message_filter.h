@@ -268,7 +268,7 @@ private:
 
     tf_connection_ = tf_.addTransformsChangedListener(boost::bind(&MessageFilter::transformsChanged, this));
 
-    max_rate_timer_ = nh_.createWallTimer(ros::WallDuration(max_rate_.toSec()), &MessageFilter::maxRateTimerCallback, this);
+    max_rate_timer_ = nh_.createTimer(max_rate_, &MessageFilter::maxRateTimerCallback, this);
   }
 
   typedef std::list<MConstPtr> L_Message;
@@ -358,7 +358,7 @@ private:
     }
   }
 
-  void maxRateTimerCallback(const ros::WallTimerEvent&)
+  void maxRateTimerCallback(const ros::TimerEvent&)
   {
     boost::mutex::scoped_lock list_lock(messages_mutex_);
     if (new_transforms_)
@@ -416,7 +416,7 @@ private:
   Transformer& tf_; ///< The Transformer used to determine if transformation data is available
   ros::NodeHandle nh_; ///< The node used to subscribe to the topic
   ros::Duration max_rate_;
-  ros::WallTimer max_rate_timer_; /// \todo Switch back to a Timer once ROS 0.7.3 comes out
+  ros::Timer max_rate_timer_;
   std::vector<std::string> target_frames_; ///< The frames we need to be able to transform to before a message is ready
   std::string target_frames_string_;
   boost::mutex target_frames_string_mutex_;

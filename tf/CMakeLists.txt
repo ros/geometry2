@@ -54,12 +54,6 @@ target_link_libraries(bin/transform_sender tf)
 rosbuild_add_executable(bin/static_transform_publisher src/static_transform_publisher.cpp)
 target_link_libraries(bin/static_transform_publisher tf)
 
-rosbuild_add_executable(test/test_notifier EXCLUDE_FROM_ALL test/test_notifier.cpp)
-rosbuild_declare_test(test/test_notifier)
-rosbuild_add_gtest_build_flags(test/test_notifier)
-target_link_libraries(test/test_notifier tf ${Boost_LIBRARIES})
-rosbuild_add_rostest_future(test/test_notifier.xml)
-
 rosbuild_add_executable(test/test_message_filter EXCLUDE_FROM_ALL test/test_message_filter.cpp)
 rosbuild_declare_test(test/test_message_filter)
 rosbuild_add_gtest_build_flags(test/test_message_filter)

@@ -77,15 +77,6 @@ static boost::numeric::ublas::matrix<double> transformAsMatrix(const Transform& 
   return outMat;
 };
 
-TransformListener::TransformListener(ros::Node & rosnode,
-                                     bool interpolating,
-                                     ros::Duration max_cache_time):
-  Transformer(interpolating, max_cache_time), dedicated_listener_thread_(NULL)
-{
-  init();
-  using_dedicated_thread_ = true; //Node API spins a thread automatically
-}
-
 TransformListener::TransformListener(ros::Duration max_cache_time, bool spin_thread):
   Transformer(true, max_cache_time), dedicated_listener_thread_(NULL)
 {

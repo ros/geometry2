@@ -36,13 +36,11 @@
 #include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include "ros/node.h"
+#include "ros/ros.h"
 
 #include <gtest/gtest.h>
 
 using namespace tf;
-
-ros::Node* g_node = NULL;
 
 class Notification
 {
