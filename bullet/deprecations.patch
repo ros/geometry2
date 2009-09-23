@@ -29,7 +29,7 @@ Index: src/LinearMath/btMatrix3x3.h
     * @param roll around X axis 
     * @param solution_number Which solution of two possible solutions ( 1 or 2) are possible values*/	
 -  void getEulerZYX(btScalar& yaw, btScalar& pitch, btScalar& roll, unsigned int solution_number = 1) const
-+  void getEulerZYX(btScalar& yaw, btScalar& pitch, btScalar& roll, unsigned int solution_number = 1) __attribute__((deprecated)) const
++  __attribute__((deprecated)) void getEulerZYX(btScalar& yaw, btScalar& pitch, btScalar& roll, unsigned int solution_number = 1) const
    {
      struct Euler{btScalar yaw, pitch, roll;};
      Euler euler_out;

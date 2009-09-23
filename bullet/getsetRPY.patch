@@ -47,7 +47,7 @@ Index: src/LinearMath/btMatrix3x3.h
 +		btScalar ci ( btCos(roll)); 
 +		btScalar cj ( btCos(pitch)); 
 +		btScalar ch ( btCos(yaw)); 
-+		btScalar si ( btSin(eulerX)); 
++		btScalar si ( btSin(roll)); 
 +		btScalar sj ( btSin(pitch)); 
 +		btScalar sh ( btSin(yaw)); 
 +		btScalar cc = ci * ch; 
