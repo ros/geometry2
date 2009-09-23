@@ -374,42 +374,68 @@ TEST(Bullet, SetEulerZYX)
 }
 
 
+
 TEST(Bullet, calculateDiffAxisAngleQuaternion)
 {
   btVector3 vec;
   btScalar ang;
-  for (unsigned int i = 0 ; i < 1000 ; i++)
+  for (unsigned int i = 1 ; i < 1000 ; i++)
   {
     btQuaternion q1(M_PI*2 *(double) i / 1000, 0, 0);
     btQuaternion q2(M_PI/2*0, 0,0);
     btTransformUtil::calculateDiffAxisAngleQuaternion(q1, q2, vec, ang);
     //    printf("%f %f %f, ang %f\n", vec.x(), vec.y(), vec.z(), ang);
-    EXPECT_NEAR(M_PI*2 *(double) i / 1000, ang, 0.001);
+    EXPECT_NEAR(std::min(M_PI*2 *(double) i / 1000, 2 * M_PI - M_PI*2 *(double) i / 1000), ang, 0.001);
     btTransformUtil::calculateDiffAxisAngleQuaternion(q2, q1, vec, ang);
-    //    printf("%f %f %f, ang %f\n", vec.x(), vec.y(), vec.z(), ang);
-    EXPECT_NEAR(M_PI*2 *(double) i / 1000, ang, 0.001);
+    //printf("%f %f %f, ang %f %d\n", vec.x(), vec.y(), vec.z(), ang, i);
+    if (i <= 500)
+      EXPECT_NEAR( vec.z(), 1.0, 0.001);
+    else
+      EXPECT_NEAR( vec.z(), -1.0, 0.001);
+
+    EXPECT_NEAR(std::min(M_PI*2 *(double) i / 1000, 2 * M_PI - M_PI*2 *(double) i / 1000), ang, 0.001);
+    if (i <= 500)
+      EXPECT_NEAR( vec.z(), 1.0, 0.001);
+    else
+      EXPECT_NEAR( vec.z(), -1.0, 0.001);
   }
-  for (unsigned int i = 0 ; i < 1000 ; i++)
+  for (unsigned int i = 1 ; i < 1000 ; i++)
   {
     btQuaternion q1(0, M_PI*2 *(double) i / 1000,1);
     btQuaternion q2(0, 0, 1);
     btTransformUtil::calculateDiffAxisAngleQuaternion(q1, q2, vec, ang);
-    //    printf("%f %f %f, ang %f\n", vec.x(), vec.y(), vec.z(), ang);
-    EXPECT_NEAR(M_PI*2 *(double) i / 1000, ang, 0.001);
+    //printf("%f %f %f, ang %f %d\n", vec.x(), vec.y(), vec.z(), ang, i);
+    EXPECT_NEAR(std::min(M_PI*2 *(double) i / 1000, 2 * M_PI - M_PI*2 *(double) i / 1000), ang, 0.001);
+    if (i < 500)
+      EXPECT_NEAR( vec.y(), -1.0, 0.001);
+    else
+      EXPECT_NEAR( vec.y(), 1.0, 0.001);
     btTransformUtil::calculateDiffAxisAngleQuaternion(q2, q1, vec, ang);
-    //    printf("%f %f %f, ang %f\n", vec.x(), vec.y(), vec.z(), ang);
-    EXPECT_NEAR(M_PI*2 *(double) i / 1000, ang, 0.001);
+    //    printf("%f %f %f, ang %f\n", vec.x(), vec.y(), vec.z(), ang); 
+    EXPECT_NEAR(std::min(M_PI*2 *(double) i / 1000, 2 * M_PI - M_PI*2 *(double) i / 1000), ang, 0.001);
+    if (i < 500)
+      EXPECT_NEAR( vec.y(), 1.0, 0.001);
+    else
+      EXPECT_NEAR( vec.y(), -1.0, 0.001);
   }
-  for (unsigned int i = 0 ; i < 1000 ; i++)
+  for (unsigned int i = 1 ; i < 1000 ; i++)
   {
     btQuaternion q1(0, 0, M_PI*2 *(double) i / 1000);
     btQuaternion q2(0, 0,0);
     btTransformUtil::calculateDiffAxisAngleQuaternion(q1, q2, vec, ang);
     //    printf("%f %f %f, ang %f\n", vec.x(), vec.y(), vec.z(), ang);
-    EXPECT_NEAR(M_PI*2 *(double) i / 1000, ang, 0.001);
+    EXPECT_NEAR(std::min(M_PI*2 *(double) i / 1000, 2 * M_PI - M_PI*2 *(double) i / 1000), ang, 0.001);
+    if (i <= 500)
+      EXPECT_NEAR( vec.x(), -1.0, 0.001);
+    else
+      EXPECT_NEAR( vec.x(), 1.0, 0.001);
     btTransformUtil::calculateDiffAxisAngleQuaternion(q2, q1, vec, ang);
     //    printf("%f %f %f, ang %f\n", vec.x(), vec.y(), vec.z(), ang);
-    EXPECT_NEAR(M_PI*2 *(double) i / 1000, ang, 0.001);
+    EXPECT_NEAR(std::min(M_PI*2 *(double) i / 1000, 2 * M_PI - M_PI*2 *(double) i / 1000), ang, 0.001);
+    if (i <= 500)
+      EXPECT_NEAR( vec.x(), 1.0, 0.001);
+    else
+      EXPECT_NEAR( vec.x(), -1.0, 0.001);
   }
 }
 
