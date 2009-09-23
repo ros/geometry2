@@ -42,7 +42,189 @@ void seed_rand()
 };
 
 
-TEST(Bullet, EulerConventions)
+
+TEST(Bullet, EulerConventionsYPR)
+{
+  double epsilon = 1e-6;
+  double yaw, pitch, roll;
+
+  /** Bullet Convention
+   * x  left
+   * y up
+   * z forward 
+   *
+   * yaw about y
+   * then
+   * pitch around x
+   * then
+   * roll around z 
+   */
+
+
+  //Yaw by 90 
+  yaw = M_PI/2;
+  pitch = 0;
+  roll = 0;
+  
+  btQuaternion q(0,0,0,1);
+  btVector3 v(1,0,0);
+  btTransform tr(btQuaternion().setEulerZYX(yaw, pitch,roll), btVector3(0,0,0));
+  
+  btVector3 v2 = tr * v;
+
+  printf("%f, %f, %f: yaw by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), yaw, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 1,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+                 
+  //Pitch by 90
+  yaw = 0;
+  pitch = M_PI/2;
+  roll = 0;
+  
+  q = btQuaternion(0,0,0);
+  v = btVector3(1,0,0);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: pitch by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), pitch, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 0,epsilon); 
+  EXPECT_NEAR(v2.z(), -1,epsilon); 
+                 
+  //Roll by 90
+  yaw = 0;
+  pitch = 0;
+  roll = M_PI/2;
+  
+  q = btQuaternion(0,0,0);
+  v = btVector3(0,1,0);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: roll by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), roll, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 0,epsilon); 
+  EXPECT_NEAR(v2.z(), 1,epsilon); 
+                 
+  //Yaw and Roll by 90
+  yaw = M_PI/2;
+  pitch = 0;
+  roll = M_PI/2;
+  
+  q = btQuaternion(0,0,0);
+  v = btVector3(1,0,0);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: yaw and roll by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), roll, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 1,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+
+  q = btQuaternion(0,0,0);
+  v = btVector3(0,1,0);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: yaw and roll by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), roll, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 0,epsilon); 
+  EXPECT_NEAR(v2.z(), 1,epsilon); 
+
+  q = btQuaternion(0,0,0);
+  v = btVector3(0,0,1);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: yaw and roll by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), roll, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 1,epsilon); 
+  EXPECT_NEAR(v2.y(), 0,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+
+  //Yaw and Pitch
+  yaw = M_PI/2;
+  pitch = M_PI/2;
+  roll = 0;
+  
+  q = btQuaternion(0,0,0);
+  v = btVector3(1,0,0);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: yaw and pitch by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), pitch, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 0,epsilon); 
+  EXPECT_NEAR(v2.z(), -1,epsilon); 
+
+  q = btQuaternion(0,0,0);
+  v = btVector3(0,1,0);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: yaw and pitch by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), pitch, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), -1,epsilon); 
+  EXPECT_NEAR(v2.y(), 0,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+
+  q = btQuaternion(0,0,0);
+  v = btVector3(0,0,1);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: yaw and pitch by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), pitch, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 1,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+
+  //Pitch and Roll
+  yaw = 0;
+  pitch = M_PI/2;
+  roll = M_PI/2;
+  
+  q = btQuaternion(0,0,0);
+  v = btVector3(1,0,0);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: pitch and roll by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), pitch, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 0,epsilon); 
+  EXPECT_NEAR(v2.z(), -1,epsilon); 
+
+  q = btQuaternion(0,0,0);
+  v = btVector3(0,1,0);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: pitch and roll by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), pitch, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 1,epsilon); 
+  EXPECT_NEAR(v2.y(), 0,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+
+  q = btQuaternion(0,0,0);
+  v = btVector3(0,0,1);
+  tr = btTransform(btQuaternion(yaw, pitch,roll), btVector3(0,0,0));
+  
+  v2 = tr * v;
+
+  printf("%f, %f, %f: pitch and roll by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), pitch, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), -1,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+};
+
+TEST(Bullet, EulerConventionsConstructors)
 {
   double epsilon = 1e-6;
   double yaw, pitch, roll;

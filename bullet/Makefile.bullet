@@ -2,7 +2,7 @@ all: installed
 
 SVN_DIR = bullet_svn
 SVN_URL = http://bullet.googlecode.com/svn/tags/bullet-2.75
-SVN_PATCH = deprecations.patch quaternion.patch demos.patch no_extras_build.patch euler.patch getsetRPY.patch ypr_doxygen.patch
+SVN_PATCH = deprecations.patch quaternion.patch demos.patch no_extras_build.patch getsetRPY.patch
 SVN_REVISION=-r1779
 
 include $(shell rospack find mk)/svn_checkout.mk
