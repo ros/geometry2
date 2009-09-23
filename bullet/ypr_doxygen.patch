@@ -1,0 +1,34 @@
+Index: src/LinearMath/btMatrix3x3.h
+===================================================================
+--- src/LinearMath/btMatrix3x3.h	(revision 1779)
++++ src/LinearMath/btMatrix3x3.h	(working copy)
+@@ -148,10 +148,10 @@
+ 		}
+ 		
+ 
+-  /** @brief Set the matrix from euler angles using YPR around YXZ respectively
+-   *  @param yaw Yaw about Y axis
+-   *  @param pitch Pitch about X axis
+-   *  @param roll Roll about Z axis 
++  /** @brief Set the matrix from euler angles using YPR around ZYX respectively
++   *  @param yaw Yaw about Z axis
++   *  @param pitch Pitch about Y axis
++   *  @param roll Roll about X axis 
+    */
+ 		void setEulerYPR(const btScalar& yaw, const btScalar& pitch, const btScalar& roll) 
+ 		{
+@@ -255,10 +277,10 @@
+ 			q.setValue(temp[0],temp[1],temp[2],temp[3]);
+ 		}
+ 
+-  /**@brief Get the matrix represented as euler angles around YXZ, roundtrip with setEulerYPR
+-   * @param yaw Yaw around Y axis
+-   * @param pitch Pitch around X axis
+-   * @param roll around Z axis */	
++  /**@brief Get the matrix represented as euler angles around ZYX, roundtrip with setEulerYPR
++   * @param yaw Yaw around Z axis
++   * @param pitch Pitch around Y axis
++   * @param roll around X axis */	
+ 		void getEulerYPR(btScalar& yaw, btScalar& pitch, btScalar& roll) const
+ 		{
+ 			
