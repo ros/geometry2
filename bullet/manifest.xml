@@ -15,7 +15,7 @@
 </description>
 <author>Erwin Coumans</author>
 <license>ZLib</license>
-<review status="3rdparty cleared" notes="ticket:2879"/>
+<review status="3rdparty doc reviewed" notes="ticket:2879"/>
 <url>http://code.google.com/p/bullet/</url>
 <depend package="rostest"/>
 <rosdep name="libxext"/>
