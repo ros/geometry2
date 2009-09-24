@@ -66,9 +66,12 @@ class TestPython(unittest.TestCase):
             t.setTransform(m)
             self.assert_(t.getLatestCommonTime("THISFRAME", "PARENT").to_seconds() == ti)
 
-        # Verify that getLatestCommonTime with nonexistent frames raises a tf.error
-        self.expect_exception(lambda: t.getLatestCommonTime("MANDALAY", "JUPITER"), tf.error)
-        self.expect_exception(lambda: t.lookupTransform("MANDALAY", "JUPITER", rospy.Time()), tf.error)
+        # Verify that getLatestCommonTime with nonexistent frames raise exception 
+        self.assertRaises(tf.Exception, lambda: t.getLatestCommonTime("MANDALAY", "JUPITER"))
+        self.assertRaises(tf.LookupException, lambda: t.lookupTransform("MANDALAY", "JUPITER", rospy.Time()))
+
+        # Ask for transform for valid frames, but more than 10 seconds in the past.  Should raise ExtrapolationException
+        self.assertRaises(tf.ExtrapolationException, lambda: t.lookupTransform("THISFRAME", "PARENT", rospy.Time(2)))
 
     def test_smoke(self):
         t = tf.Transformer(True, rospy.Duration().from_seconds(10.0))

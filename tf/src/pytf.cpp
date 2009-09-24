@@ -2,8 +2,9 @@
 
 #include "tf/tf.h"
 
-static PyObject *tf_error = NULL;
 static PyObject *pModulerospy = NULL;
+static PyObject *tf_exception = NULL;
+static PyObject *tf_connectivityexception = NULL, *tf_lookupexception = NULL, *tf_extrapolationexception = NULL;
 
 struct transformer_t {
   PyObject_HEAD
@@ -66,6 +67,16 @@ static int Transformer_init(PyObject *self, PyObject *args, PyObject *kw)
   return 0;
 }
 
+static PyObject *setUsingDedicatedThread(PyObject *self, PyObject *args)
+{
+  int value;
+  if (!PyArg_ParseTuple(args, "i", &value))
+    return NULL;
+  tf::Transformer *t = ((transformer_t*)self)->t;
+  t->setUsingDedicatedThread(value);
+  return PyString_FromString(t->allFramesAsDot().c_str());
+}
+
 static PyObject *allFramesAsDot(PyObject *self, PyObject *args)
 {
   tf::Transformer *t = ((transformer_t*)self)->t;
@@ -107,6 +118,68 @@ static PyObject *canTransformFull(PyObject *self, PyObject *args, PyObject *kw)
                         &fixed_frame))
     return NULL;
   return PyBool_FromLong(t->canTransform(target_frame, target_time, source_frame, source_time, fixed_frame));
+}
+
+static PyObject *waitForTransform(PyObject *self, PyObject *args, PyObject *kw)
+{
+  tf::Transformer *t = ((transformer_t*)self)->t;
+  char *target_frame, *source_frame;
+  ros::Time time;
+  ros::Duration timeout;
+  ros::Duration polling_sleep_duration(0.01);
+  std::string error_string;
+  static const char *keywords[] = { "target_frame", "source_frame", "time", "timeout", "polling_sleep_duration", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&O&|O&", (char**)keywords,
+    &target_frame,
+    &source_frame,
+    rostime_converter, &time,
+    rosduration_converter, &timeout,
+    rosduration_converter, &polling_sleep_duration))
+    return NULL;
+  bool r;
+  Py_BEGIN_ALLOW_THREADS
+  r = t->waitForTransform(target_frame, source_frame, time, timeout, polling_sleep_duration, &error_string);
+  Py_END_ALLOW_THREADS
+  if (r == true) {
+    Py_RETURN_NONE;
+  } else {
+    PyErr_SetString(tf_exception, error_string.c_str());
+    return NULL;
+  }
+}
+
+static PyObject *waitForTransformFull(PyObject *self, PyObject *args, PyObject *kw)
+{
+  tf::Transformer *t = ((transformer_t*)self)->t;
+  char *target_frame, *source_frame, *fixed_frame;
+  ros::Time target_time, source_time;
+  ros::Duration timeout;
+  ros::Duration polling_sleep_duration(0.01);
+  std::string error_string;
+  static const char *keywords[] = { "target_frame", "target_time", "source_frame", "source_time", "fixed_frame", "timeout", "polling_sleep_duration", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "sO&sO&sO&|O&", (char**)keywords,
+                        &target_frame,
+                        rostime_converter,
+                        &target_time,
+                        &source_frame,
+                        rostime_converter,
+                        &source_time,
+                        &fixed_frame,
+                        rosduration_converter, &timeout,
+                        rosduration_converter, &polling_sleep_duration))
+    return NULL;
+  int r;
+  Py_BEGIN_ALLOW_THREADS
+  r = t->waitForTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout, polling_sleep_duration, &error_string);
+  Py_END_ALLOW_THREADS
+  if (r == true) {
+    Py_RETURN_NONE;
+  } else {
+    PyErr_SetString(tf_exception, error_string.c_str());
+    return NULL;
+  }
 }
 
 static PyObject *asListOfStrings(std::vector< std::string > los)
@@ -159,10 +232,35 @@ static PyObject *getLatestCommonTime(PyObject *self, PyObject *args, PyObject *k
     Py_DECREF(rospy_time);
     return ob;
   } else {
-    PyErr_SetString(tf_error, error_string.c_str());
+    PyErr_SetString(tf_exception, error_string.c_str());
     return NULL;
   }
 }
+
+// Run x (a tf method, catching TF's exceptions and reraising them as Python exceptions)
+//
+#define WRAP(x) \
+  do { \
+  try \
+  { \
+    x; \
+  }  \
+  catch (const tf::ConnectivityException &e) \
+  { \
+    PyErr_SetString(tf_connectivityexception, e.what()); \
+    return NULL; \
+  } \
+  catch (const tf::LookupException &e) \
+  { \
+    PyErr_SetString(tf_lookupexception, e.what()); \
+    return NULL; \
+  } \
+  catch (const tf::ExtrapolationException &e) \
+  { \
+    PyErr_SetString(tf_extrapolationexception, e.what()); \
+    return NULL; \
+  } \
+  } while (0)
 
 static PyObject *lookupTransform(PyObject *self, PyObject *args, PyObject *kw)
 {
@@ -174,15 +272,7 @@ static PyObject *lookupTransform(PyObject *self, PyObject *args, PyObject *kw)
   if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&", (char**)keywords, &target_frame, &source_frame, rostime_converter, &time))
     return NULL;
   tf::StampedTransform transform;
-  try
-  {
-    t->lookupTransform(target_frame, source_frame, time, transform);
-  } 
-  catch (const tf::LookupException &e)
-  {
-    PyErr_SetString(tf_error, e.what());
-    return NULL;
-  }
+  WRAP(t->lookupTransform(target_frame, source_frame, time, transform));
   btVector3 origin = transform.getOrigin();
   btQuaternion rotation = transform.getRotation();
   return Py_BuildValue("(ddd)(dddd)",
@@ -207,15 +297,7 @@ static PyObject *lookupTransformFull(PyObject *self, PyObject *args, PyObject *k
                         &fixed_frame))
     return NULL;
   tf::StampedTransform transform;
-  try
-  {
-    t->lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame, transform);
-  } 
-  catch (const tf::LookupException &e)
-  {
-    PyErr_SetString(tf_error, e.what());
-    return NULL;
-  }
+  WRAP(t->lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame, transform));
   btVector3 origin = transform.getOrigin();
   btQuaternion rotation = transform.getRotation();
   return Py_BuildValue("(ddd)(dddd)",
@@ -287,6 +369,8 @@ static struct PyMethodDef transformer_methods[] =
   {"setTransform", setTransform, METH_VARARGS},
   {"canTransform", (PyCFunction)canTransform, METH_KEYWORDS},
   {"canTransformFull", (PyCFunction)canTransformFull, METH_KEYWORDS},
+  {"waitForTransform", (PyCFunction)waitForTransform, METH_KEYWORDS},
+  {"waitForTransformFull", (PyCFunction)waitForTransformFull, METH_KEYWORDS},
   {"chain", (PyCFunction)chain, METH_KEYWORDS},
   {"clear", (PyCFunction)clear, METH_KEYWORDS},
   {"frameExists", (PyCFunction)frameExists, METH_VARARGS},
@@ -294,6 +378,7 @@ static struct PyMethodDef transformer_methods[] =
   {"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
   {"lookupTransform", (PyCFunction)lookupTransform, METH_VARARGS},
   {"lookupTransformFull", (PyCFunction)lookupTransformFull, METH_VARARGS},
+  {"setUsingDedicatedThread", (PyCFunction)setUsingDedicatedThread, METH_VARARGS},
   {NULL,          NULL}
 };
 
@@ -307,9 +392,15 @@ extern "C" void init_tf()
   PyObject *item, *m, *d;
 
 #if PYTHON_API_VERSION >= 1007
-  tf_error = PyErr_NewException((char*)"tf.error", NULL, NULL);
+  tf_exception = PyErr_NewException((char*)"tf.Exception", NULL, NULL);
+  tf_connectivityexception = PyErr_NewException((char*)"tf.ConnectivityException", tf_exception, NULL);
+  tf_lookupexception = PyErr_NewException((char*)"tf.LookupException", tf_exception, NULL);
+  tf_extrapolationexception = PyErr_NewException((char*)"tf.ExtrapolationException", tf_exception, NULL);
 #else
-  tf_error = PyString_FromString("tf.error");
+  tf_exception = PyString_FromString("tf.error");
+  tf_connectivityexception = PyString_FromString("tf.ConnectivityException");
+  tf_lookupexception = PyString_FromString("tf.LookupException");
+  tf_extrapolationexception = PyString_FromString("tf.ExtrapolationException");
 #endif
 
   pModulerospy = PyImport_Import(item= PyString_FromString("rospy")); Py_DECREF(item);
@@ -325,5 +416,8 @@ extern "C" void init_tf()
   m = Py_InitModule("_tf", module_methods);
   PyModule_AddObject(m, "Transformer", (PyObject *)&transformer_Type);
   d = PyModule_GetDict(m);
-  PyDict_SetItemString(d, "error", tf_error);
+  PyDict_SetItemString(d, "Exception", tf_exception);
+  PyDict_SetItemString(d, "ConnectivityException", tf_connectivityexception);
+  PyDict_SetItemString(d, "LookupException", tf_lookupexception);
+  PyDict_SetItemString(d, "ExtrapolationException", tf_extrapolationexception);
 }

@@ -25,15 +25,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-## Python utility for iterating over messages in a ROS .bag file
-## See http://pr.willowgarage.com/wiki/ROS/LogFormat
-# authors: jamesb, kwc
-
 PKG = 'tf'
 import roslib
 roslib.load_manifest(PKG)
-
-import sys, os
 
 import rospy
 import tf as TFX
@@ -43,6 +37,8 @@ import numpy
 from tf.msg import tfMessage
 import geometry_msgs.msg
 from tf.srv import FrameGraph,FrameGraphResponse
+
+import threading
 
 def xyz_to_mat44(pos):
     return transformations.translation_matrix((pos.x, pos.y, pos.z))
@@ -135,19 +131,29 @@ class TransformerROS(TFX.Transformer):
 ## Extends TransformerROS, subscribes to the /tf_message and /tf topic and
 ## updates the Transformer with the messages.
 
-class TransformListener(TransformerROS):
-
-    def __init__(self, *args):
-        print "Transform Listener initing"
-        super(TransformListener, self).__init__()
+class TransformListenerThread(threading.Thread):
+    def __init__(self, tl):
+        threading.Thread.__init__(self)
+        self.tl = tl
+    
+    def run(self):
         rospy.Subscriber("/tf_message", tfMessage, self.transformlistener_callback)
-        rospy.Subscriber("/tf", tfMessage, self.transformlistener_callback)
-        self.frame_graph_server = rospy.Service('~tf_frames', FrameGraph, self.frame_graph_service)
+        rospy.Subscriber("/tf",         tfMessage, self.transformlistener_callback)
+        self.tl.frame_graph_server = rospy.Service('~tf_frames', FrameGraph, self.frame_graph_service)
+        rospy.spin()
 
     def transformlistener_callback(self, data):
         for transform in data.transforms:
-            self.setTransform(transform)
-        #print self.allFramesAsString()
+            self.tl.setTransform(transform)
 
     def frame_graph_service(self, req):
-        return FrameGraphResponse(self.allFramesAsDot())
+        return FrameGraphResponse(self.tl.allFramesAsDot())
+
+
+class TransformListener(TransformerROS):
+
+    def __init__(self, *args):
+        super(TransformListener, self).__init__()
+        thr = TransformListenerThread(self)
+        thr.start()
+        self.setUsingDedicatedThread(True)
