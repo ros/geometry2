@@ -6,7 +6,9 @@
         radians. But even if you're trying to calculate things like
         the shortest angular distance between two joinst space
         positions of your robot, but the joint motion is constrained
-        by joint limits, this package is what you need.
+        by joint limits, this package is what you need. The code in
+        this packge is stable and well tested. There are no plans for
+        major changes in the near future.
   </description>
   <author>John Hsu, Ioan Sucan</author>
   <license>BSD</license>
