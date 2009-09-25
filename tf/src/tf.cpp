@@ -954,6 +954,14 @@ std::string Transformer::allFramesAsDot() const
   if (frames_.size() ==1)
     mstream <<"\"no tf data recieved\"";
 
+  mstream.precision(3);
+  mstream.setf(std::ios::fixed,std::ios::floatfield);
+    
+  mstream << " subgraph cluster_legend { style=bold; color=black; label =\"view_frames Result\";\n"
+    //<< "Node: TBD" <<
+          << "\"Recorded at time: " << current_time.toSec() << "\"[ shape=plaintext ] ;\n "
+          << "}" << std::endl;
+
   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
   {
@@ -978,15 +986,14 @@ std::string Transformer::allFramesAsDot() const
       mstream.precision(3); //3 decimal places
       mstream << "\"" << frameIDs_reverse[frame_id_num]   << "\"" << " -> "
               << "\"" << frameIDs_reverse[counter] << "\"" << "[label=\""
-              << "Authority: " << authority << "\\n"
-              << getFrame(counter)->getListLength() << " Readings averaging " << rate <<" Hz\\n"
-              << " Latest reading: \\n" << getFrame(counter)->getLatestTimestamp().toSec()
-              << " ( " << (current_time - getFrame(counter)->getLatestTimestamp()).toSec()
-              <<" seconds ago )\\n"
-              << " Oldest reading:\\n"
-              << getFrame(counter)->getOldestTimestamp().toSec()
-              << " ( " << (current_time - getFrame(counter)->getOldestTimestamp()).toSec()
-              <<" seconds ago )\\n"
+        //<< "Time: " << current_time.toSec() << "\\n"
+              << "Broadcaster: " << authority << "\\n"
+              << "Average rate: " << rate << " Hz\\n"
+              << "Most recent transform: " << (current_time - getFrame(counter)->getLatestTimestamp()).toSec() << " sec old \\n"
+        //    << "(time: " << getFrame(counter)->getLatestTimestamp().toSec() << ")\\n"
+        //    << "Oldest transform: " << (current_time - getFrame(counter)->getOldestTimestamp()).toSec() << " sec old \\n"
+        //    << "(time: " << (getFrame(counter)->getOldestTimestamp()).toSec() << ")\\n"
+              << "Buffer length: " << (getFrame(counter)->getLatestTimestamp()-getFrame(counter)->getOldestTimestamp()).toSec() << " sec\\n"
               <<"\"];" <<std::endl;
     }
   }
