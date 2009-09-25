@@ -68,9 +68,29 @@ TEST(Bullet, EulerConventionsYPR)
   
   btQuaternion q(0,0,0,1);
   btVector3 v(1,0,0);
-  btTransform tr(btQuaternion().setEulerZYX(yaw, pitch,roll), btVector3(0,0,0));
+  q.setEulerZYX(yaw, pitch,roll);
+  btTransform tr(q, btVector3(0,0,0));
   
   btVector3 v2 = tr * v;
+
+  printf("%f, %f, %f: yaw by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), yaw, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 1,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+
+  btMatrix3x3 mat;
+  mat.setEulerZYX(yaw, pitch,roll);
+  tr = btTransform(mat, btVector3(0,0,0));
+  v2 = tr * v;
+
+  printf("%f, %f, %f: yaw by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), yaw, v2.x(), v2.y(), v2.z());
+  EXPECT_NEAR(v2.x(), 0,epsilon); 
+  EXPECT_NEAR(v2.y(), 1,epsilon); 
+  EXPECT_NEAR(v2.z(), 0,epsilon); 
+                 
+  mat.setEulerYPR(yaw, pitch,roll);
+  tr = btTransform(mat, btVector3(0,0,0));
+  v2 = tr * v;
 
   printf("%f, %f, %f: yaw by %f -> %f, %f, %f\n", v.x(), v.y(), v.z(), yaw, v2.x(), v2.y(), v2.z());
   EXPECT_NEAR(v2.x(), 0,epsilon); 

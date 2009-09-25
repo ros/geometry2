@@ -57,7 +57,7 @@ Index: src/LinearMath/btMatrix3x3.h
  	 **/
 -	void setEulerZYX(btScalar eulerX,btScalar eulerY,btScalar eulerZ) { 
 -  ///@todo proposed to reverse this since it's labeled zyx but takes arguments xyz and it will match all other parts of the code
-+	void setEulerZYX(btScalar eulerZ, btScalar eulerY,btScalar eulerX)  { 
++	void setEulerYPR(btScalar eulerZ, btScalar eulerY,btScalar eulerX)  { 
  		btScalar ci ( btCos(eulerX)); 
  		btScalar cj ( btCos(eulerY)); 
  		btScalar ch ( btCos(eulerZ)); 

@@ -17,7 +17,7 @@ Index: src/LinearMath/btMatrix3x3.h
     */
  		void setEulerYPR(const btScalar& yaw, const btScalar& pitch, const btScalar& roll) 
  		{
-@@ -255,10 +277,10 @@
+@@ -255,10 +255,10 @@
  			q.setValue(temp[0],temp[1],temp[2],temp[3]);
  		}
  
@@ -25,10 +25,21 @@ Index: src/LinearMath/btMatrix3x3.h
 -   * @param yaw Yaw around Y axis
 -   * @param pitch Pitch around X axis
 -   * @param roll around Z axis */	
-+  /**@brief Get the matrix represented as euler angles around ZYX, roundtrip with setEulerYPR
++  /**@brief Get the matrix represented as euler angles around ZYX axes respectively, roundtrip with setEulerYPR
 +   * @param yaw Yaw around Z axis
 +   * @param pitch Pitch around Y axis
 +   * @param roll around X axis */	
  		void getEulerYPR(btScalar& yaw, btScalar& pitch, btScalar& roll) const
  		{
  			
+@@ -283,8 +283,8 @@
+ 		};
+ 
+ 
+-  /**@brief Get the matrix represented as euler angles around ZYX
+-   * @param yaw Yaw around X axis
++  /**@brief Get the matrix represented as euler angles around ZYX axes
++   * @param yaw Yaw around Z axis
+    * @param pitch Pitch around Y axis
+    * @param roll around X axis 
+    * @param solution_number Which solution of two possible solutions ( 1 or 2) are possible values*/	
