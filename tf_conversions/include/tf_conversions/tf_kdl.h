@@ -67,8 +67,11 @@ void PoseMsgToKDL(const geometry_msgs::Pose &p, KDL::Frame &t);
 /// Converts a KDL Frame into a Pose message 
 void PoseKDLToMsg(const KDL::Frame &t, geometry_msgs::Pose &p);
 
+
+
+/* DEPRECATED FUNCTIONS */
 /// Starting from a Pose from A to B, apply a Twist with reference frame A and reference point B, during a time t.
-geometry_msgs::Pose addDelta(const geometry_msgs::Pose &pose, const geometry_msgs::Twist &twist, const double &t);
+geometry_msgs::Pose addDelta(const geometry_msgs::Pose &pose, const geometry_msgs::Twist &twist, const double &t)  __attribute__((deprecated));
 
 }
 
