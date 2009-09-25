@@ -2,12 +2,22 @@
 
 @htmlinclude manifest.html
 
-The tf conversions package contains methods like these:
- \li tf::PoseKDLToMsg
- \li tf::RotationTFToEigen
- \li tf::VectorTFToKDL
- \li ...
+The tf conversions package provide methods to convert between
+datatypes used by tf, and semantically identical data types of
+other libraries. The package now supports KDL and Eigen.
 
-For a complete list of available conversion methods, follow this link: tf
+The supported KDL data types are:
+ \li Frame
+ \li Vector
+ \li Rotation
+ \li Twist
+
+The supported Eigen data types are:
+ \li Transform3d
+ \li Vector3D
+ \li Quaterniond
+
+For a complete list of available conversion methods, follow this link:
+tf
 
 */
