@@ -9,7 +9,7 @@ and Dynamics Library (KDL) and the Eigen matrix library.
   </description>
   <author>Tully Foote</author>
   <license>BSD</license>
-  <review status="unreviewed" notes=""/>
+  <review status="API cleared" notes=""/>
   <url>http://www.ros.org/wiki/tf_conversions</url>
 
   <depend package="tf"/>
