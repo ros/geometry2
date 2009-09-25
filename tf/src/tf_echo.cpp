@@ -72,6 +72,8 @@ int main(int argc, char ** argv)
   std::string source_frameid = std::string(argv[1]);
   std::string target_frameid = std::string(argv[2]);
 
+  // Wait for up to one second for the first transforms to become avaiable. 
+  echoListener.tf.waitForTransform(source_frameid, target_frameid, ros::Time(), ros::Duration(1.0));
 
   //Nothing needs to be done except wait for a quit
   //The callbacks withing the listener class
