@@ -46,7 +46,7 @@ build_tarball: $(SVN_DIR) patched
 	-cd $(SVN_DIR) && make clean
 	-cd $(SVN_DIR) && rm -f CMakeCache.txt
 	mkdir -p build
-	tar --exclude="Extras" --exclude=".svn" -cvzf $(TARBALL) $(SVN_DIR)
+	tar --exclude="Extras" --exclude=".svn" -czf $(TARBALL) $(SVN_DIR)
 
 
 installed: $(SOURCE_DIR)/unpacked
