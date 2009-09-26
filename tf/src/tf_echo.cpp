@@ -84,13 +84,16 @@ int main(int argc, char ** argv)
       {
         tf::StampedTransform echo_transform;
         echoListener.tf.lookupTransform(source_frameid, target_frameid, ros::Time(), echo_transform);
-        std::cout << "At time " << echo_transform.stamp_ << std::endl;
+        std::cout.precision(3);
+        std::cout.setf(std::ios::fixed,std::ios::floatfield);
+        std::cout << "At time " << echo_transform.stamp_.toSec() << std::endl;
         double yaw, pitch, roll;
         echo_transform.getBasis().getEulerZYX(yaw, pitch, roll);
         tf::Quaternion q = echo_transform.getRotation();
         tf::Vector3 v = echo_transform.getOrigin();
-        printf("- Rotation: in Quaternion [%f %f %f %f] in RPY(%f %f %f)\n", q.getX(), q.getY(), q.getZ(), q.getW(),  roll, pitch, yaw);
-        printf("- Translation: [%f %f %f]\n", v.getX(), v.getY(), v.getZ());
+        std::cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << std::endl;
+        std::cout << "- Rotation: in Quaternion [" << q.getX() << ", " << q.getY() << ", " << q.getZ() << ", " << q.getW() 
+                  << "]   in RPY [" <<  roll << ", " << pitch << ", " << yaw << "]" << std::endl;
 
         //print transform
       }
