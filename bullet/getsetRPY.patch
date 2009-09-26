@@ -1,39 +1,8 @@
-Index: src/LinearMath/btQuaternion.h
-===================================================================
---- src/LinearMath/btQuaternion.h	(revision 1779)
-+++ src/LinearMath/btQuaternion.h	(working copy)
-@@ -103,6 +103,26 @@
-                          cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw, //z
-                          cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw); //formerly yzx
- 	}
-+  /**@brief Set the quaternion using fixed axis RPY
-+   * @param roll Angle around X 
-+   * @param pitch Angle around Y
-+   * @param yaw Angle around Z*/
-+  void setRPY(const btScalar& roll, const btScalar& pitch, const btScalar& yaw) __attribute__((deprecated))
-+	{
-+		btScalar halfYaw = btScalar(yaw) * btScalar(0.5);  
-+		btScalar halfPitch = btScalar(pitch) * btScalar(0.5);  
-+		btScalar halfRoll = btScalar(roll) * btScalar(0.5);  
-+		btScalar cosYaw = btCos(halfYaw);
-+		btScalar sinYaw = btSin(halfYaw);
-+		btScalar cosPitch = btCos(halfPitch);
-+		btScalar sinPitch = btSin(halfPitch);
-+		btScalar cosRoll = btCos(halfRoll);
-+		btScalar sinRoll = btSin(halfRoll);
-+		setValue(sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw, //x
-+                         cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw, //y
-+                         cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw, //z
-+                         cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw); //formerly yzx
-+	}
-   /**@brief Add two quaternions
-    * @param q The quaternion to add to this one */
- 	SIMD_FORCE_INLINE	btQuaternion& operator+=(const btQuaternion& q)
 Index: src/LinearMath/btMatrix3x3.h
 ===================================================================
 --- src/LinearMath/btMatrix3x3.h	(revision 1779)
 +++ src/LinearMath/btMatrix3x3.h	(working copy)
-@@ -185,6 +184,29 @@
+@@ -185,6 +184,16 @@
  	       			 -sj,      cj * si,      cj * ci);
  	}
  
@@ -44,26 +13,13 @@ Index: src/LinearMath/btMatrix3x3.h
 +         * 
 +	 **/
 +	void setRPY(btScalar roll, btScalar pitch,btScalar yaw) { 
-+		btScalar ci ( btCos(roll)); 
-+		btScalar cj ( btCos(pitch)); 
-+		btScalar ch ( btCos(yaw)); 
-+		btScalar si ( btSin(roll)); 
-+		btScalar sj ( btSin(pitch)); 
-+		btScalar sh ( btSin(yaw)); 
-+		btScalar cc = ci * ch; 
-+		btScalar cs = ci * sh; 
-+		btScalar sc = si * ch; 
-+		btScalar ss = si * sh;
-+		
-+		setValue(cj * ch, sj * sc - cs, sj * cc + ss,
-+				 cj * sh, sj * ss + cc, sj * cs - sc, 
-+	       			 -sj,      cj * si,      cj * ci);
++               setEulerYPR(yaw, pitch, roll);
 +	}
 +
    /**@brief Set the matrix to the identity */
  		void setIdentity()
  		{ 
-@@ -348,6 +370,71 @@
+@@ -348,6 +370,16 @@
      }
    }
  
@@ -74,62 +30,7 @@ Index: src/LinearMath/btMatrix3x3.h
 +   * @param solution_number Which solution of two possible solutions ( 1 or 2) are possible values*/	
 +  void getRPY(btScalar& roll, btScalar& pitch, btScalar& yaw, unsigned int solution_number = 1) const
 +  {
-+    struct Angles{btScalar yaw, pitch, roll;};
-+    Angles angles_out;
-+    Angles angles_out2; //second solution
-+    //get the pointer to the raw data
-+    
-+    // Check that pitch is not at a singularity
-+    if (btFabs(m_el[2].x()) >= 1)
-+    {
-+      angles_out.yaw = 0;
-+      angles_out2.yaw = 0;
-+	
-+      // From difference of angles formula
-+      btScalar delta = btAtan2(m_el[0].x(),m_el[0].z());
-+      if (m_el[2].x() > 0)  //gimbal locked up
-+      {
-+        angles_out.pitch = SIMD_PI / btScalar(2.0);
-+        angles_out2.pitch = SIMD_PI / btScalar(2.0);
-+        angles_out.roll = angles_out.pitch + delta;
-+        angles_out2.roll = angles_out.pitch + delta;
-+      }
-+      else // gimbal locked down
-+      {
-+        angles_out.pitch = -SIMD_PI / btScalar(2.0);
-+        angles_out2.pitch = -SIMD_PI / btScalar(2.0);
-+        angles_out.roll = -angles_out.pitch + delta;
-+        angles_out2.roll = -angles_out.pitch + delta;
-+      }
-+    }
-+    else
-+    {
-+      angles_out.pitch = - btAsin(m_el[2].x());
-+      angles_out2.pitch = SIMD_PI - angles_out.pitch;
-+	
-+      angles_out.roll = btAtan2(m_el[2].y()/btCos(angles_out.pitch), 
-+			       m_el[2].z()/btCos(angles_out.pitch));
-+      angles_out2.roll = btAtan2(m_el[2].y()/btCos(angles_out2.pitch), 
-+				m_el[2].z()/btCos(angles_out2.pitch));
-+	
-+      angles_out.yaw = btAtan2(m_el[1].x()/btCos(angles_out.pitch), 
-+			      m_el[0].x()/btCos(angles_out.pitch));
-+      angles_out2.yaw = btAtan2(m_el[1].x()/btCos(angles_out2.pitch), 
-+                               m_el[0].x()/btCos(angles_out2.pitch));
-+    }
-+    
-+    if (solution_number == 1)
-+    { 
-+		yaw = angles_out.yaw; 
-+		pitch = angles_out.pitch;
-+		roll = angles_out.roll;
-+    }
-+    else
-+    { 
-+		yaw = angles_out2.yaw; 
-+		pitch = angles_out2.pitch;
-+		roll = angles_out2.roll;
-+    }
++    getEulerYPR(yaw, pitch, roll, solution_number);
 +  }
 +
    /**@brief Create a scaled copy of the matrix 
