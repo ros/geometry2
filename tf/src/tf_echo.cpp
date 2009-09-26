@@ -92,8 +92,9 @@ int main(int argc, char ** argv)
         tf::Quaternion q = echo_transform.getRotation();
         tf::Vector3 v = echo_transform.getOrigin();
         std::cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << std::endl;
-        std::cout << "- Rotation: in Quaternion [" << q.getX() << ", " << q.getY() << ", " << q.getZ() << ", " << q.getW() 
-                  << "]   in RPY [" <<  roll << ", " << pitch << ", " << yaw << "]" << std::endl;
+        std::cout << "- Rotation: in Quaternion [" << q.getX() << ", " << q.getY() << ", " 
+                  << q.getZ() << ", " << q.getW() << "]" << std::endl
+                  << "            in RPY [" <<  roll << ", " << pitch << ", " << yaw << "]" << std::endl;
 
         //print transform
       }
