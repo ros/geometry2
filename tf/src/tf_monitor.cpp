@@ -238,7 +238,7 @@ public:
         else
           cout << outputFrameInfo(it, frame_authority_map[it->first]);
       }          
-      std::cerr <<std::endl<< "Authorities:" << std::endl;
+      std::cerr <<std::endl<< "Broadcasters:" << std::endl;
       std::map<std::string, std::vector<double> >::iterator it1 = authority_map.begin();
       std::map<std::string, std::vector<double> >::iterator it2 = authority_frequency_map.begin();
       for ( ; it1 != authority_map.end() ; ++it1, ++it2)
