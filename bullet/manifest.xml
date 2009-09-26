@@ -5,13 +5,34 @@
     downloads, extracts and compiles a tarball.  For each major
     release of the Bullet library, the tarball will get updated.  The
     Bullet library provided by this ROS package is slightly different
-    form the official Bullet release. This package modifies the
-    3-argument constructor of a quaternion: Quaternion(r, p, y), with
-    r the rotation around the fixed x-axis, p the rotation around the
-    fixed y-axis and y the rotation around the fixed z-axis. We have
-    the intention to move towards the official version of Bullet; this
-    however will take some time because it involves a number of
-    deprecation cycles for the conflicting quaternion constructor.
+    form the official Bullet release.
+
+    To eliminate ambiguity about which API is active the btQuaternion
+    constructor from Euler angles is deprecated.
+
+    The btMatrix3x3 and btQuaternion setEulerZYX and getEulerZYX
+    methods are deprecated.  The goal of these deprecations is to
+    remove the existing patch against Bullet which makes them
+    consistent.  They will be deprecated for a few releases, then
+    patched out for a few releases before being reintroduced in their
+    native form.
+
+    For standardization and continuity Fixed Axis getRPY and setRPY
+    methods have been added to btQuaternion and btMatrix3x3.  These
+    will be pushed back to Bullet, and hopefully accepted.  These are
+    the same format as used by kdl and gazebo. Standardization survey
+    and decision at
+    http://www.ros.org/wiki/tf/Reviews/Euler_Angle_Usage_2009-09-02_API_Review
+    
+
+    There is a patch against the btQuaternion angle and getAngle
+    methods to clamp floating point errors to prevent nan results.
+    See http://code.google.com/p/bullet/issues/detail?id=98
+
+    We have the intention to move towards the official version of
+    Bullet; this however will take some time because it involves a
+    number of deprecation cycles for the conflicting quaternion
+    constructor.
 </description>
 <author>Erwin Coumans</author>
 <license>ZLib</license>
