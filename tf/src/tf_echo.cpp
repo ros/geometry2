@@ -84,7 +84,7 @@ int main(int argc, char ** argv)
       {
         tf::StampedTransform echo_transform;
         echoListener.tf.lookupTransform(source_frameid, target_frameid, ros::Time(), echo_transform);
-        std::cout << "Success at " << echo_transform.stamp_ << std::endl;
+        std::cout << "At time " << echo_transform.stamp_ << std::endl;
         double yaw, pitch, roll;
         echo_transform.getBasis().getEulerZYX(yaw, pitch, roll);
         tf::Quaternion q = echo_transform.getRotation();
