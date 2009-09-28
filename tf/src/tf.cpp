@@ -71,7 +71,7 @@ std::string tf::remap(const std::string& prefix, const std::string& frame_id)
 
   }
   else
-  {
+ {
     std::string composite;
     composite = "/";
     composite.append(frame_id);
@@ -957,12 +957,7 @@ std::string Transformer::allFramesAsDot() const
   mstream.precision(3);
   mstream.setf(std::ios::fixed,std::ios::floatfield);
     
-  mstream << " subgraph cluster_legend { style=bold; color=black; label =\"view_frames Result\";\n"
-    //<< "Node: TBD" <<
-          << "\"Recorded at time: " << current_time.toSec() << "\"[ shape=plaintext ] ;\n "
-          << "}" << std::endl;
-
-  //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
+   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
   {
     unsigned int frame_id_num;
@@ -984,7 +979,7 @@ std::string Transformer::allFramesAsDot() const
 
       mstream << std::fixed; //fixed point notation
       mstream.precision(3); //3 decimal places
-      mstream << "\"" << frameIDs_reverse[frame_id_num]   << "\"" << " -> "
+      mstream << "\"" << frameIDs_reverse[frame_id_num] << "\"" << " -> "
               << "\"" << frameIDs_reverse[counter] << "\"" << "[label=\""
         //<< "Time: " << current_time.toSec() << "\\n"
               << "Broadcaster: " << authority << "\\n"
@@ -995,6 +990,25 @@ std::string Transformer::allFramesAsDot() const
         //    << "(time: " << (getFrame(counter)->getOldestTimestamp()).toSec() << ")\\n"
               << "Buffer length: " << (getFrame(counter)->getLatestTimestamp()-getFrame(counter)->getOldestTimestamp()).toSec() << " sec\\n"
               <<"\"];" <<std::endl;
+    }
+  }
+  
+  for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
+  {
+    unsigned int frame_id_num;
+    if(  getFrame(counter)->getData(ros::Time(), temp))
+      frame_id_num = temp.frame_id_num_;
+    else
+      {
+	frame_id_num = 0;
+      }
+
+    if(frameIDs_reverse[frame_id_num]=="NO_PARENT")
+    {
+      mstream << "edge [style=invis];" <<std::endl;
+      mstream << " subgraph cluster_legend { style=bold; color=black; label =\"view_frames Result\";\n"
+              << "\"Recorded at time: " << current_time.toSec() << "\"[ shape=plaintext ] ;\n "
+	      << "}" << "->" << "\"" << frameIDs_reverse[counter]<<"\";" <<std::endl;
     }
   }
   mstream << "}";
