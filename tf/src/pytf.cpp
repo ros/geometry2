@@ -2,6 +2,31 @@
 
 #include "tf/tf.h"
 
+// Run x (a tf method, catching TF's exceptions and reraising them as Python exceptions)
+//
+#define WRAP(x) \
+  do { \
+  try \
+  { \
+    x; \
+  }  \
+  catch (const tf::ConnectivityException &e) \
+  { \
+    PyErr_SetString(tf_connectivityexception, e.what()); \
+    return NULL; \
+  } \
+  catch (const tf::LookupException &e) \
+  { \
+    PyErr_SetString(tf_lookupexception, e.what()); \
+    return NULL; \
+  } \
+  catch (const tf::ExtrapolationException &e) \
+  { \
+    PyErr_SetString(tf_extrapolationexception, e.what()); \
+    return NULL; \
+  } \
+  } while (0)
+
 static PyObject *pModulerospy = NULL;
 static PyObject *tf_exception = NULL;
 static PyObject *tf_connectivityexception = NULL, *tf_lookupexception = NULL, *tf_extrapolationexception = NULL;
@@ -236,31 +261,6 @@ static PyObject *getLatestCommonTime(PyObject *self, PyObject *args, PyObject *k
     return NULL;
   }
 }
-
-// Run x (a tf method, catching TF's exceptions and reraising them as Python exceptions)
-//
-#define WRAP(x) \
-  do { \
-  try \
-  { \
-    x; \
-  }  \
-  catch (const tf::ConnectivityException &e) \
-  { \
-    PyErr_SetString(tf_connectivityexception, e.what()); \
-    return NULL; \
-  } \
-  catch (const tf::LookupException &e) \
-  { \
-    PyErr_SetString(tf_lookupexception, e.what()); \
-    return NULL; \
-  } \
-  catch (const tf::ExtrapolationException &e) \
-  { \
-    PyErr_SetString(tf_extrapolationexception, e.what()); \
-    return NULL; \
-  } \
-  } while (0)
 
 static PyObject *lookupTransform(PyObject *self, PyObject *args, PyObject *kw)
 {
