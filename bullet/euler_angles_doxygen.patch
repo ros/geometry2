@@ -17,7 +17,7 @@ Index: src/LinearMath/btMatrix3x3.h
     */
  		void setEulerYPR(const btScalar& yaw, const btScalar& pitch, const btScalar& roll) 
  		{
-@@ -255,10 +255,10 @@
+@@ -255,36 +255,18 @@
  			q.setValue(temp[0],temp[1],temp[2],temp[3]);
  		}
  
@@ -25,14 +25,33 @@ Index: src/LinearMath/btMatrix3x3.h
 -   * @param yaw Yaw around Y axis
 -   * @param pitch Pitch around X axis
 -   * @param roll around Z axis */	
+-		void getEulerYPR(btScalar& yaw, btScalar& pitch, btScalar& roll) const
 +  /**@brief Get the matrix represented as euler angles around ZYX axes respectively, roundtrip with setEulerYPR
 +   * @param yaw Yaw around Z axis
 +   * @param pitch Pitch around Y axis
 +   * @param roll around X axis */	
- 		void getEulerYPR(btScalar& yaw, btScalar& pitch, btScalar& roll) const
++                void getEulerYPR(btScalar& yaw, btScalar& pitch, btScalar& roll, unsigned int solution_number = 1) const
  		{
- 			
-@@ -283,8 +283,8 @@
+-			
+-			// first use the normal calculus
+-			yaw = btScalar(btAtan2(m_el[1].x(), m_el[0].x()));
+-			pitch = btScalar(btAsin(-m_el[2].x()));
+-			roll = btScalar(btAtan2(m_el[2].y(), m_el[2].z()));
+-
+-			// on pitch = +/-HalfPI
+-			if (btFabs(pitch)==SIMD_HALF_PI)
+-			{
+-				if (yaw>0)
+-					yaw-=SIMD_PI;
+-				else
+-					yaw+=SIMD_PI;
+-
+-				if (roll>0)
+-					roll-=SIMD_PI;
+-				else
+-					roll+=SIMD_PI;
+-			}
++                        getEulerZYX(yaw, pitch, roll, solution_number);
  		};
  
  
