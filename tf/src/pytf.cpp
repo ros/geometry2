@@ -210,7 +210,7 @@ static PyObject *chain(PyObject *self, PyObject *args, PyObject *kw)
                         &fixed_frame))
     return NULL;
 
-  t->chainAsVector(target_frame, target_time, source_frame, source_time, fixed_frame, output);
+  WRAP(t->chainAsVector(target_frame, target_time, source_frame, source_time, fixed_frame, output));
   return asListOfStrings(output);
 }
 

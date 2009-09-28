@@ -49,6 +49,10 @@ def xyzw_to_mat44(ori):
 ## Extends tf's Transformer, adding transform methods for ROS message
 ## types PointStamped, QuaternionStamped and PoseStamped.
 class TransformerROS(TFX.Transformer):
+    """
+    TransformerROS extends the base class :class:`tf.Transformer`,
+    adding methods for handling ROS messages. 
+    """
 
     ## Looks up the transform for ROS message header hdr to frame
     ## target_frame, and returns the transform as a Numpy 4x4 matrix.
@@ -56,6 +60,16 @@ class TransformerROS(TFX.Transformer):
     # @param hdr          A ROS message header object
 
     def asMatrix(self, target_frame, hdr):
+        """
+        :param target_frame: the tf target frame, a string
+        :param hdr: a message header
+        :return: a :class:`numpy.matrix` 4x4 representation of the transform
+        :raises: any of the exceptions that :meth:`~tf.Transformation.lookupTransform` can raise
+        
+        Uses :meth:`lookupTransform` to look up the transform for ROS message header hdr to frame
+        target_frame, and returns the transform as a :class:`numpy.matrix`
+        4x4.
+        """
         translation,rotation = self.lookupTransform(target_frame, hdr.frame_id, hdr.stamp)
         return self.fromTranslationRotation(translation, rotation)
 
@@ -64,6 +78,14 @@ class TransformerROS(TFX.Transformer):
     # @param rotation     rotation as (x,y,z,w)
 
     def fromTranslationRotation(self, translation, rotation):
+        """
+        :param translation: translation expressed as a tuple (x,y,z)
+        :param rotation: rotation quaternion expressed as a tuple (x,y,z,w)
+        :return: a :class:`numpy.matrix` 4x4 representation of the transform
+        
+        Converts a transformation from :class:`tf.Transformer` into a representation as a 4x4 matrix.
+        """
+
         return numpy.dot(transformations.translation_matrix(translation), transformations.quaternion_matrix(rotation))
 
     ## Transforms a geometry_msgs PointStamped message to frame target_frame, returns the resulting PointStamped.
@@ -71,6 +93,14 @@ class TransformerROS(TFX.Transformer):
     # @param ps           geometry_msgs.msg.PointStamped object
 
     def transformPoint(self, target_frame, ps):
+        """
+        :param target_frame: the tf target frame, a string
+        :param ps: the geometry_msgs.msg.PointStamped message
+        :return: new geometry_msgs.msg.PointStamped message, in frame target_frame
+
+        Transforms a geometry_msgs PointStamped message to frame target_frame, returns the a new PointStamped message.
+        """
+
         mat44 = self.asMatrix(target_frame, ps.header)
         xyz = tuple(numpy.dot(mat44, numpy.array([ps.point.x, ps.point.y, ps.point.z, 1.0])))[:3]
         r = geometry_msgs.msg.PointStamped()
@@ -84,6 +114,14 @@ class TransformerROS(TFX.Transformer):
     # @param ps           geometry_msgs.msg.QuaternionStamped object
 
     def transformQuaternion(self, target_frame, ps):
+        """
+        :param target_frame: the tf target frame, a string
+        :param ps: the geometry_msgs.msg.QuaternionStamped message
+        :return: new geometry_msgs.msg.QuaternionStamped message, in frame target_frame
+
+        Transforms a geometry_msgs QuaternionStamped message to frame target_frame, returns the a new QuaternionStamped message.
+        """
+
         # mat44 is frame-to-frame transform as a 4x4
         mat44 = self.asMatrix(target_frame, ps.header)
 
@@ -108,6 +146,13 @@ class TransformerROS(TFX.Transformer):
     # @param ps           geometry_msgs.msg.PoseStamped object
 
     def transformPose(self, target_frame, ps):
+        """
+        :param target_frame: the tf target frame, a string
+        :param ps: the geometry_msgs.msg.PoseStamped message
+        :return: new geometry_msgs.msg.PoseStamped message, in frame target_frame
+
+        Transforms a geometry_msgs PoseStamped message to frame target_frame, returns the a new PoseStamped message.
+        """
         # mat44 is frame-to-frame transform as a 4x4
         mat44 = self.asMatrix(target_frame, ps.header)
 
@@ -152,6 +197,32 @@ class TransformListenerThread(threading.Thread):
 
 class TransformListener(TransformerROS):
 
+    """
+    TransformListener is a subclass of :class:`tf.TransformerROS` that
+    subscribes to the ``"/tf"`` message topic, and calls :meth:`tf.Transformer.setTransform`
+    with each incoming transformation message.
+
+    In this way a TransformListener object automatically
+    stays up to to date with all current transforms.  Typical usage might be::
+
+        import tf
+        from geometry_msgs.msg import PointStamped
+
+        class MyNode:
+
+            def __init__(self):
+
+                self.tl = tf.TransformListener()
+                rospy.Subscriber("/sometopic", PointStamped, self.some_message_handler)
+                ...
+            
+            def some_message_handler(self, point_stamped):
+
+                # want to work on the point in the "world" frame
+                point_in_world = self.tl.transformPoint("world", point_stamped)
+                ...
+        
+    """
     def __init__(self, *args):
         super(TransformListener, self).__init__()
         thr = TransformListenerThread(self)

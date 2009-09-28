@@ -41,11 +41,24 @@ import geometry_msgs.msg
 import math
 
 class TransformBroadcaster:
+    """
+    :class:`TransformBroadcaster` is a convenient way to send transformation updates on the ``"/tf"`` message topic.
+    """
 
     def __init__(self):
         self.pub_tf = rospy.Publisher("/tf", tf.msg.tfMessage)
 
     def sendTransform(self, translation, rotation, time, child, parent):
+        """
+        :param translation: the translation of the transformtion as a tuple (x, y, z)
+        :param rotation: the rotation of the transformation as a tuple (x, y, z, w)
+        :param time: the time of the transformation, as a rospy.Time()
+        :param child: child frame in tf, string
+        :param parent: parent frame in tf, string
+
+        Broadcast the transformation from tf frame child to parent on ROS topic ``"/tf"``.
+        """
+
         t = geometry_msgs.msg.TransformStamped()
         t.header.frame_id = parent
         t.header.stamp = time
