@@ -17,13 +17,21 @@
     patched out for a few releases before being reintroduced in their
     native form.
 
+    There are a few errors in documentation and
+    btMatrix3x3::getEulerYPR has been changed to be a pass through to
+    getEulerZYX for it is a better implementation of the same method.
+    These are filed under issue 282
+    http://code.google.com/p/bullet/issues/detail?id=282
+
     For standardization and continuity Fixed Axis getRPY and setRPY
     methods have been added to btQuaternion and btMatrix3x3.  These
     will be pushed back to Bullet, and hopefully accepted.  These are
     the same format as used by kdl and gazebo. Standardization survey
     and decision at
     http://www.ros.org/wiki/tf/Reviews/Euler_Angle_Usage_2009-09-02_API_Review
-    
+    These patches have been pushed back in issue 285
+    http://code.google.com/p/bullet/issues/detail?id=285 This patch
+    will be maintained in parallel if Bullet does not accept it.
 
     There is a patch against the btQuaternion angle and getAngle
     methods to clamp floating point errors to prevent nan results.
