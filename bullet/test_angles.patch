@@ -2,7 +2,7 @@ Index: src/LinearMath/euler_test_unpatched.cpp
 ===================================================================
 --- src/LinearMath/euler_test_unpatched.cpp	(revision 0)
 +++ src/LinearMath/euler_test_unpatched.cpp	(revision 0)
-@@ -0,0 +1,256 @@
+@@ -0,0 +1,279 @@
 +#include <cstdio>
 +#include "btMatrix3x3.h"
 +#include "btQuaternion.h"
@@ -109,6 +109,29 @@ Index: src/LinearMath/euler_test_unpatched.cpp
 +    printf("matrix setEulerYPR roll IS about X\n");
 +  else
 +    printf("matrix setEulerYPR roll IS NOT about X\n");
++
++  printf ("\n\nMatrix getEulerYPR yaw pitch roll angles\n\n");
++  mat.setEulerYPR(twelve, 0, 0);
++  btScalar y, p, r;
++  mat.getEulerYPR(y, p, r);
++  if (y == twelve)
++    printf ("getEulerYPR yaw is the same as setEulerYPR yaw\n");
++  else
++    printf ("getEulerYPR yaw is the same as setEulerYPR yaw\n");
++
++  mat.setEulerYPR(0, twelve, 0);
++  mat.getEulerYPR(y, p, r);
++  if (p == twelve)
++    printf ("getEulerYPR pitch is the same as setEulerYPR pitch\n");
++  else
++    printf ("getEulerYPR pitch is the same as setEulerYPR pitch\n");
++
++  mat.setEulerYPR(0, 0, twelve);
++  mat.getEulerYPR(y, p, r);
++  if (r == twelve)
++    printf ("getEulerYPR roll is the same as setEulerYPR roll\n");
++  else
++    printf ("getEulerYPR roll is the same as setEulerYPR roll\n");
 +
 +  printf ("\n\nMatrix YPR Order\n\n");
 +  btVector3 vout2;
