@@ -43,7 +43,7 @@ Transformer
    :param interpolating: Whether to interpolate transformations.
    :param cache_time: how long tf should retain transformation information in the past.
 
-   The Transformer object is the heart of tf. It maintains an
+   The Transformer object is the core of tf. It maintains a
    time-varying graph of transforms, and permits asynchronous graph
    modification and queries:
 

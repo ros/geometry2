@@ -24,6 +24,7 @@ any desired point in time.
   <export>
     <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf `rosboost-cfg --lflags thread`"/>
     <roswtf plugin="tf.tfwtf" />
+    <rosdoc config="rosdoc.yaml" />
   </export>
   <rosdep name="python-numpy"/>
   <rosdep name="graphviz"/>
