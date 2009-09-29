@@ -56,7 +56,7 @@ from tf.srv import *
 import tf
 
 def listen(duration):
-    rospy.init_node("viewFrames.py", anonymous=True)
+    rospy.init_node("view_frames", anonymous=True)
     tf_listener = tf.TransformListener()
     print "Listening to /tf for %f seconds"%duration
     time.sleep(duration)
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     if not options.node:
         dot_graph = listen(5.0)
     else:
-        print "hi", options.node
+        print "Generating graph for node: ", options.node
         dot_graph = poll(options.node)
 
     generate(dot_graph)
