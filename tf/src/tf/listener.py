@@ -226,5 +226,6 @@ class TransformListener(TransformerROS):
     def __init__(self, *args):
         super(TransformListener, self).__init__()
         thr = TransformListenerThread(self)
+        thr.setDaemon(True)
         thr.start()
         self.setUsingDedicatedThread(True)
