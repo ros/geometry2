@@ -35,8 +35,12 @@ class TransformSender
 public:
   ros::NodeHandle node_;
   //constructor
-  TransformSender(double x, double y, double z, double yaw, double pitch, double roll, ros::Time time, const std::string& frame_id, const std::string& parent_id) :
-    transform_(btTransform(btQuaternion(yaw,pitch,roll), btVector3(x,y,z)), time, parent_id, frame_id){};
+  TransformSender(double x, double y, double z, double yaw, double pitch, double roll, ros::Time time, const std::string& frame_id, const std::string& parent_id) 
+  {
+    btQuaternion q;
+    q.setRPY(roll, pitch,yaw);
+    transform_ = tf::StampedTransform(btTransform(q, btVector3(x,y,z)), time, parent_id, frame_id );
+  };
   TransformSender(double x, double y, double z, double qx, double qy, double qz, double qw, ros::Time time, const std::string& frame_id, const std::string& parent_id) :
     transform_(btTransform(btQuaternion(qx,qy,qz,qw), btVector3(x,y,z)), time, parent_id, frame_id ){};
   //Clean up ros connections

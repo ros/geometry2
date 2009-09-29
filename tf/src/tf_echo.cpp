@@ -88,7 +88,7 @@ int main(int argc, char ** argv)
         std::cout.setf(std::ios::fixed,std::ios::floatfield);
         std::cout << "At time " << echo_transform.stamp_.toSec() << std::endl;
         double yaw, pitch, roll;
-        echo_transform.getBasis().getEulerZYX(yaw, pitch, roll);
+        echo_transform.getBasis().getRPY(roll, pitch, yaw);
         tf::Quaternion q = echo_transform.getRotation();
         tf::Vector3 v = echo_transform.getOrigin();
         std::cout << "- Translation: [" << v.getX() << ", " << v.getY() << ", " << v.getZ() << "]" << std::endl;

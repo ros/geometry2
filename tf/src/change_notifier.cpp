@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
   geometry_msgs::PoseStamped msg;
   tf::Stamped<tf::Pose> pose_in, pose_out, last_sent_pose;
-  pose_in = tf::Stamped<tf::Pose> (tf::Pose(tf::Quaternion(0,0,0), 
+  pose_in = tf::Stamped<tf::Pose> (tf::Pose(tf::createIdentityQuaternion(), 
                                             tf::Vector3(0,0,0)),
                                    ros::Time(), 
                                    source_frame);

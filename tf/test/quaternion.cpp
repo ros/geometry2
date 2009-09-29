@@ -60,7 +60,8 @@ int main(int argc, char **argv){
   for ( unsigned int i = 0; i < runs ; i++ )
   {
     btMatrix3x3 mat;
-    btQuaternion q_baseline(xvalues[i],yvalues[i],zvalues[i]);
+    btQuaternion q_baseline;
+    q_baseline.setRPY(zvalues[i],yvalues[i],xvalues[i]);
     mat.setRotation(q_baseline);
     btQuaternion q_from_m;
     mat.getRotation(q_from_m);

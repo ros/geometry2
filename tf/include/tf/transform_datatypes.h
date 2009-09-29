@@ -127,7 +127,7 @@ static inline void quaternionTFToMsg(const Quaternion& bt, geometry_msgs::Quater
 /** \brief Helper function for getting yaw from a Quaternion */
 static inline double getYaw(const Quaternion& bt_q){
   btScalar useless_pitch, useless_roll, yaw;
-  btMatrix3x3(bt_q).getEulerZYX(yaw, useless_pitch, useless_roll);
+  btMatrix3x3(bt_q).getRPY( useless_roll, useless_pitch,yaw);
   return yaw;
 }
 
@@ -139,15 +139,25 @@ static inline double getYaw(const geometry_msgs::Quaternion& msg_q){
 }
 
 static inline Quaternion createQuaternionFromYaw(double yaw){
-  return Quaternion(yaw, 0.0, 0.0);
+  Quaternion q;
+  q.setRPY(0.0, 0.0, yaw);
+  return q;
 }
 
 static inline geometry_msgs::Quaternion createQuaternionMsgFromYaw(double yaw){
-  Quaternion q(yaw, 0.0, 0.0);
+  Quaternion q;
+  q.setRPY(0.0, 0.0, yaw);
   geometry_msgs::Quaternion q_msg;
   quaternionTFToMsg(q, q_msg);
   return q_msg;
 }
+
+static inline tf::Quaternion createIdentityQuaternion()
+{
+  Quaternion q;
+  q.setRPY(0,0,0);
+  return q;
+};
 
 /** \brief convert QuaternionStamped msg to Stamped<Quaternion> */
 static inline void quaternionStampedMsgToTF(const geometry_msgs::QuaternionStamped & msg, Stamped<Quaternion>& bt)
