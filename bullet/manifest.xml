@@ -34,10 +34,11 @@
     will be pushed back to Bullet, and hopefully accepted.  These are
     the same format as used by kdl and gazebo. Standardization survey
     and decision at
-    <a href="http://www.ros.org/wiki/tf/Reviews/Euler_Angle_Usage_2009-09-02_API_Review">on the ROS wiki</a>.
-    These patches have been pushed back in issue 285
-    http://code.google.com/p/bullet/issues/detail?id=285 This patch
-    will be maintained in parallel if Bullet does not accept it.
+    <a href="http://www.ros.org/wiki/tf/Reviews/Euler_Angle_Usage_2009-09-02_API_Review">on
+    the ROS wiki</a>.  These patches have been pushed back
+    in <a href="http://code.google.com/p/bullet/issues/detail?id=285">issue
+    285</a> This patch will be maintained in parallel if Bullet does
+    not accept it.
     </li>
     <li>
     There is a patch against the btQuaternion angle and getAngle
@@ -50,6 +51,10 @@
     number of deprecation cycles for the conflicting quaternion
     constructor.
     </li>
+    <li>
+      This usage of bullet compiles with the flags
+      -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX set.
+    </li>
     </ul>
 </description>
 <author>Erwin Coumans, ROS package maintained by Tully Foote</author>
@@ -60,9 +65,9 @@
 <rosdep name="libxext"/>
 <rosdep name="glut"/>
 <export>
-<cpp cflags="-I${prefix}/build/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX  -I${prefix}/swig" lflags="-L${prefix}/build/lib -lBulletDynamics -lBulletCollision -lLinearMath" />
+<cpp cflags="-I${prefix}/build/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" lflags="-L${prefix}/build/lib -lBulletDynamics -lBulletCollision -lLinearMath" />
   <doxymaker external="http://www.continuousphysics.com/Bullet/BulletFull/index.html" />
-<swig flags="-python -c++ -I${prefix}/build/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX -I${prefix}/swig "/>
+<swig flags="-python -c++ -I${prefix}/build/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX "/>
 </export>
 </package>
 
