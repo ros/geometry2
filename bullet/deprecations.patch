@@ -2,7 +2,7 @@ Index: src/LinearMath/btQuaternion.h
 ===================================================================
 --- src/LinearMath/btQuaternion.h	(revision 1779)
 +++ src/LinearMath/btQuaternion.h	(working copy)
-@@ -44,7 +44,7 @@
+@@ -44,12 +44,12 @@
     * @param yaw Angle around Y unless BT_EULER_DEFAULT_ZYX defined then Z
     * @param pitch Angle around X unless BT_EULER_DEFAULT_ZYX defined then Y
     * @param roll Angle around Z unless BT_EULER_DEFAULT_ZYX defined then X */
@@ -11,6 +11,12 @@ Index: src/LinearMath/btQuaternion.h
  	{ 
  #ifndef BT_EULER_DEFAULT_ZYX
  		setEuler(yaw, pitch, roll); 
+ #else
+-		setEulerZYX(yaw, pitch, roll); 
++		setEulerRPY(roll, pitch, yaw);
+ #endif 
+ 	}
+   /**@brief Set the rotation using axis angle notation 
 @@ -83,11 +83,11 @@
  			sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,
  			cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);
