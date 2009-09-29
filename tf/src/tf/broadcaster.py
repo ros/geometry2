@@ -30,12 +30,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import roslib
-roslib.load_manifest('turtle_tf')
-
 import rospy
 import tf
-import turtlesim.msg
 import tf.msg
 import geometry_msgs.msg
 import math
