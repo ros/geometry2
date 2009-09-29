@@ -13,7 +13,7 @@ Index: src/LinearMath/btQuaternion.h
  		setEuler(yaw, pitch, roll); 
  #else
 -		setEulerZYX(yaw, pitch, roll); 
-+		setEulerRPY(roll, pitch, yaw);
++		setRPY(roll, pitch, yaw);
  #endif 
  	}
    /**@brief Set the rotation using axis angle notation 
