@@ -1,48 +1,58 @@
 <package>
 <description brief="Bullet Physics Engine">
+    <p>
     This package contains version 2.7.5 of the Bullet professional
     free 3D Game Multiphysics Library.  The ROS package automatically
     downloads, extracts and compiles a tarball.  For each major
     release of the Bullet library, the tarball will get updated.  The
     Bullet library provided by this ROS package is slightly different
-    form the official Bullet release.
-
+    from the official Bullet release.
+    </p>
+    <ul>
+    <li>
     To eliminate ambiguity about which API is active the btQuaternion
     constructor from Euler angles is deprecated.
-
+    </li>
+    <li>
     The btMatrix3x3 and btQuaternion setEulerZYX and getEulerZYX
     methods are deprecated.  The goal of these deprecations is to
     remove the existing patch against Bullet which makes them
     consistent.  They will be deprecated for a few releases, then
     patched out for a few releases before being reintroduced in their
     native form.
-
+    </li>
+    <li>
     There are a few errors in documentation and
     btMatrix3x3::getEulerYPR has been changed to be a pass through to
     getEulerZYX for it is a better implementation of the same method.
-    These are filed under issue 282
-    http://code.google.com/p/bullet/issues/detail?id=282
-
+    These are filed under 
+    <a href="http://code.google.com/p/bullet/issues/detail?id=282">issue 282</a>.
+    </li>
+    <li>
     For standardization and continuity Fixed Axis getRPY and setRPY
     methods have been added to btQuaternion and btMatrix3x3.  These
     will be pushed back to Bullet, and hopefully accepted.  These are
     the same format as used by kdl and gazebo. Standardization survey
     and decision at
-    http://www.ros.org/wiki/tf/Reviews/Euler_Angle_Usage_2009-09-02_API_Review
+    <a href="http://www.ros.org/wiki/tf/Reviews/Euler_Angle_Usage_2009-09-02_API_Review">on the ROS wiki</a>.
     These patches have been pushed back in issue 285
     http://code.google.com/p/bullet/issues/detail?id=285 This patch
     will be maintained in parallel if Bullet does not accept it.
-
+    </li>
+    <li>
     There is a patch against the btQuaternion angle and getAngle
     methods to clamp floating point errors to prevent nan results.
-    See http://code.google.com/p/bullet/issues/detail?id=98
-
+    See <a href="http://code.google.com/p/bullet/issues/detail?id=98">issue 98</a>.
+    </li>
+    <li>
     We have the intention to move towards the official version of
     Bullet; this however will take some time because it involves a
     number of deprecation cycles for the conflicting quaternion
     constructor.
+    </li>
+    </ul>
 </description>
-<author>Erwin Coumans</author>
+<author>Erwin Coumans, ROS package maintained by Tully Foote</author>
 <license>ZLib</license>
 <review status="3rdparty doc reviewed" notes="ticket:2879"/>
 <url>http://code.google.com/p/bullet/</url>
