@@ -188,8 +188,14 @@ class TransformListenerThread(threading.Thread):
         rospy.spin()
 
     def transformlistener_callback(self, data):
+        if 'callerid' in data._connection_header:
+            who = data._connection_header['callerid']
+
         for transform in data.transforms:
-            self.tl.setTransform(transform)
+            if who:
+                self.tl.setTransform(transform, who)
+            else:
+                self.tl.setTransform(transform)
 
     def frame_graph_service(self, req):
         return FrameGraphResponse(self.tl.allFramesAsDot())
