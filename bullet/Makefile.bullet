@@ -14,6 +14,7 @@ TARBALL = build/$(TARBALL_NAME).tar.gz
 TARBALL_URL = http://pr.willowgarage.com/downloads/$(TARBALL_NAME).tar.gz
 UNPACK_CMD = tar xzf
 SOURCE_DIR = build/bullet_svn
+MD5SUM_FILE = $(TARBALL_NAME).md5sum
 
 include $(shell rospack find mk)/download_unpack_build.mk
 
