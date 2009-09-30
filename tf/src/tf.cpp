@@ -261,8 +261,7 @@ void Transformer::lookupTransform(const std::string& target_frame, const std::st
     }
     else
     {
-      ss << " When trying to transform between " << mapped_source_frame << " and " << mapped_target_frame <<"."
-         << " See http://www.ros.org/wiki/tf#Frequently_Asked_Questions" << std::endl;
+      ss << " When trying to transform between " << mapped_source_frame << " and " << mapped_target_frame <<"."<< std::endl;
       throw ExtrapolationException(error_string + ss.str());
     }
     }
@@ -513,7 +512,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
   unsigned int last_inverse;
   if (getFrame(frame) == NULL) //Test if source frame exists this will throw a lookup error if it does not (inside the loop it will be caught)
   {
-    if (error_string) *error_string = "Source Frame Doesn't Exist";
+    if (error_string) *error_string = "Source frame '"+lookupFrameString(frame)+"' does not exist is tf tree.";
     return LOOKUP_ERROR;//throw LookupException("Frame didn't exist");
   }
   while (true)
@@ -547,7 +546,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
         if (error_string)
         {
           std::stringstream ss;
-          ss<<"Recursed too deep into graph ( > MAX_GRAPH_DEPTH) there is probably a loop in the graph" << std::endl
+          ss<<"The tf tree is invalid because it contains a loop." << std::endl
             << allFramesAsString() << std::endl;
           *error_string =ss.str();
         }
@@ -565,7 +564,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
   unsigned int last_forward;
   if (getFrame(frame) == NULL)
   {
-    if (error_string) *error_string = "Target Frame Did Not Exist";
+    if (error_string) *error_string = "Target frame '"+lookupFrameString(frame)+"' does not exist is tf tree.";
     return LOOKUP_ERROR;
   }//throw LookupException("fixme");; //Test if source frame exists this will throw a lookup error if it does not (inside the loop it will be caught)
   while (true)
@@ -596,7 +595,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
         if (error_string)
         {
           std::stringstream ss;
-          ss<<"Recursed too deep into graph ( > MAX_GRAPH_DEPTH) there is probably a loop in the graph" << std::endl
+          ss<<"The tf tree is invalid because it contains a loop." << std::endl
             << allFramesAsString() << std::endl;
           *error_string = ss.str();
         }
@@ -608,31 +607,21 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
   std::cerr << "Side B " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
   */
 
+  std::string connectivity_error("Could not find a connection between '"+lookupFrameString(target_frame)+"' and '"+
+                                 lookupFrameString(source_frame)+"' because they are not part of the same tree."+
+                                 "Tf has two or more unconnected trees.");
   /* Check the zero length cases*/
   if (lists.inverseTransforms.size() == 0)
   {
     if (lists.forwardTransforms.size() == 0) //If it's going to itself it's already been caught
     {
-      if (error_string)
-      {
-        std::stringstream ss;
-        ss<< "No Common Parent Case D between "<< lookupFrameString(target_frame) <<" and " << lookupFrameString(source_frame)
-          << std::endl << allFramesAsString() << std::endl;
-        *error_string = ss.str();
-      }
+      if (error_string) *error_string = connectivity_error;
       return CONNECTIVITY_ERROR;
     }
 
     if (last_forward != source_frame)  //\todo match with case A
     {
-      if (error_string)
-      {
-        std::stringstream ss;
-        ss<< "No Common Parent Case C between " << lookupFrameString(target_frame) <<" and " << lookupFrameString(source_frame)
-          << std::endl << allFramesAsString() << std::endl << lists.forwardTransforms.size() << " forward length"
-          << " with " << lookupFrameString(last_forward) << std::endl;
-        *error_string = ss.str();
-      }
+      if (error_string) *error_string = connectivity_error;
       return CONNECTIVITY_ERROR;
     }
     else return 0;
@@ -642,12 +631,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
   {
     if (lists.inverseTransforms.size() == 0)  //If it's going to itself it's already been caught
     {//\todo remove THis is the same as case D
-      if (error_string)
-      {
-        std::stringstream ss;
-        ss<< "No Common Parent Case B between "<< lookupFrameString(target_frame) <<" and " << lookupFrameString(source_frame) << std::endl << allFramesAsString() << std::endl;
-        *error_string = ss.str();
-      }
+      if (error_string) *error_string = connectivity_error;
       return CONNECTIVITY_ERROR;
     }
 
@@ -655,10 +639,8 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
     {
       if (lookupFrameNumber(lists.inverseTransforms.back().frame_id_) != target_frame)
       {
-        std::stringstream ss;
-      ss<< "No Common Parent Case A between "<< lookupFrameString(target_frame) <<" and " << lookupFrameString(source_frame)  << std::endl << allFramesAsString() << std::endl << lists.inverseTransforms.back().frame_id_ << std::endl;
-      if (error_string) *error_string = ss.str();
-      return CONNECTIVITY_ERROR;
+        if (error_string) *error_string = connectivity_error;
+        return CONNECTIVITY_ERROR;
     }
     else return 0;
     }
@@ -673,12 +655,7 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
   /* Make sure the end of the search shares a parent. */
   if (last_forward != last_inverse)
   {
-    if (error_string)
-    {
-      std::stringstream ss;
-      ss<< "No Common Parent, at top of search between "<< lookupFrameString(target_frame) <<" and " << lookupFrameString(source_frame)  << std::endl << allFramesAsString() << std::endl;
-      *error_string = ss.str();
-    }
+    if (error_string) *error_string = connectivity_error;
     return CONNECTIVITY_ERROR;
   }
   /* Make sure that we don't have a no parent at the top */
@@ -686,10 +663,10 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
   {
     if (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id_) == 0 || lookupFrameNumber( lists.forwardTransforms.back().child_frame_id_) == 0)
     {
-      if (error_string) *error_string = "NO_PARENT at top of tree";
+      //if (error_string) *error_string = "NO_PARENT at top of tree";
+      if (error_string) *error_string = connectivity_error;
       return CONNECTIVITY_ERROR;
     }
-
 
     /*
       gettimeofday(&tempt2,NULL);
@@ -721,6 +698,82 @@ int Transformer::lookupLists(unsigned int target_frame, ros::Time time, unsigned
   }
 
 
+bool Transformer::test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
+{
+  std::stringstream ss;
+  ss << std::fixed;
+  ss.precision(3);
+
+  if (tr.mode_ == ONE_VALUE)
+  {
+    if (tr.stamp_ - target_time > max_extrapolation_distance_ || target_time - tr.stamp_ > max_extrapolation_distance_)
+    {
+      if (error_string) {
+        ss << "You requested a transform at time " << (target_time).toSec() 
+           << ",\n but the tf buffer only contains a single transform " 
+           << "at time " << tr.stamp_.toSec() << ".\n";
+        if ( max_extrapolation_distance_ > ros::Duration(0))
+        {
+          ss << "The tf extrapollation distance is set to " 
+             << (max_extrapolation_distance_).toSec() <<" seconds.\n";
+        }
+        *error_string = ss.str();
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+
+bool Transformer::test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
+{
+  std::stringstream ss;
+  ss << std::fixed;
+  ss.precision(3);
+
+  if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.stamp_ - target_time > max_extrapolation_distance_)
+  {
+    if (error_string) {
+      ss << "You requested a transform that is " << (ros::Time::now() - target_time).toSec() << " seconds in the past, \n"
+         << "but the tf buffer only has a history of " << (ros::Time::now() - tr.stamp_).toSec()  << " seconds.\n";
+      if ( max_extrapolation_distance_ > ros::Duration(0))
+      {
+        ss << "The tf extrapollation distance is set to " 
+           << (max_extrapolation_distance_).toSec() <<" seconds.\n";
+      }
+      *error_string = ss.str();
+    }
+    return true;
+  }
+  return false;
+}
+
+
+bool Transformer::test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
+{
+  std::stringstream ss;
+  ss << std::fixed;
+  ss.precision(3);
+
+  if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time - tr.stamp_ > max_extrapolation_distance_)
+  {
+    if (error_string){
+      ss << "You requested a transform that is " << (ros::Time::now() - target_time).toSec()*1000 << " miliseconds in the past, \n"
+         << "but the most recent transform in the tf buffer is " << (ros::Time::now() - tr.stamp_).toSec()*1000 << " miliseconds old.\n";
+      if ( max_extrapolation_distance_ > ros::Duration(0))
+      {
+        ss << "The tf extrapollation distance is set to " 
+           << (max_extrapolation_distance_).toSec() <<" seconds.\n";
+      }
+      *error_string = ss.str();
+    }
+    return true;
+  }
+  return false;
+}
+
+
 bool Transformer::test_extrapolation(const ros::Time& target_time, const TransformLists& lists, std::string * error_string) const
 {
   bool retval = false;
@@ -728,118 +781,20 @@ bool Transformer::test_extrapolation(const ros::Time& target_time, const Transfo
   ss << std::fixed;
   ss.precision(3);
   for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
-    {
-      if (lists.inverseTransforms[i].mode_ == ONE_VALUE)
-      {
-        if (lists.inverseTransforms[i].stamp_ - target_time > max_extrapolation_distance_ || target_time - lists.inverseTransforms[i].stamp_ > max_extrapolation_distance_)
-        {
-          retval = true;
-          if (error_string) {
-            ss << "Extrapolation Too Far from single value: target_time iss "<< (target_time).toSec() <<", but the closest tf  data is at"
-               << lists.inverseTransforms[i].stamp_.toSec()  <<" which is "<<(target_time - lists.inverseTransforms[i].stamp_).toSec()
-               << " seconds away.";
-            if ( max_extrapolation_distance_ > ros::Duration(0))
-            {
-              ss << "This is greater than the max_extrapolation_distance of "
-                 << (max_extrapolation_distance_).toSec() <<".";
-            }
-          }
-        }
-      }
-      else if (lists.inverseTransforms[i].mode_ == EXTRAPOLATE_BACK)
-      {
-        if ( lists.inverseTransforms[i].stamp_ - target_time > max_extrapolation_distance_)
-        {
-          retval = true;
-          if (error_string) {
-            ss << "Extrapolation Too Far in the past: target_time is "<< (target_time).toSec() <<", but the closest tf  data is at "
-               << lists.inverseTransforms[i].stamp_.toSec()  <<" which is "<< (target_time - lists.inverseTransforms[i].stamp_).toSec()
-               << " seconds away.";
-            if ( max_extrapolation_distance_ > ros::Duration(0))
-            {
-              ss << "This is greater than the max_extrapolation_distance of "
-                 << (max_extrapolation_distance_).toSec() <<".";
-            }
-          }
-        }
-      }
-      else if( lists.inverseTransforms[i].mode_ == EXTRAPOLATE_FORWARD)
-      {
-        if ( target_time - lists.inverseTransforms[i].stamp_ > max_extrapolation_distance_)
-        {
-          retval = true;
-          if (error_string)
-            ss << "Extrapolation Too Far in the future: target_time is "<< (target_time).toSec() <<", but the closest tf  data is at "
-               << lists.inverseTransforms[i].stamp_.toSec()  <<" which is " << (target_time - lists.inverseTransforms[i].stamp_).toSec()
-               << " seconds away.";
-            if ( max_extrapolation_distance_ > ros::Duration(0))
-            {
-              ss << "This is greater than the max_extrapolation_distance of "
-                 << (max_extrapolation_distance_).toSec() <<".";
-            }
-        }
-      }
-    }
+  {
+    if (test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string)) return true;
+    if (test_extrapolation_past(target_time, lists.inverseTransforms[i], error_string)) return true;
+    if (test_extrapolation_future(target_time, lists.inverseTransforms[i], error_string)) return true;
+  }
 
   for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
-    {
-      if (lists.forwardTransforms[i].mode_ == ONE_VALUE)
-      {
-        if (lists.forwardTransforms[i].stamp_ - target_time > max_extrapolation_distance_ || target_time - lists.forwardTransforms[i].stamp_ > max_extrapolation_distance_)
-        {
-          retval = true;
-          if (error_string) {
-            ss << "Extrapolation Too Far from single value: target_time is "<< (target_time).toSec() <<", but the closest tf  data is at "
-               << lists.forwardTransforms[i].stamp_.toSec()  <<" which is "<< (target_time - lists.forwardTransforms[i].stamp_).toSec()
-               << " seconds away.";
-            if ( max_extrapolation_distance_ > ros::Duration(0))
-            {
-              ss << "This is greater than the max_extrapolation_distance of "
-                 << (max_extrapolation_distance_).toSec() <<".";
-            }
-          }
-        }
-      }
-      else if (lists.forwardTransforms[i].mode_ == EXTRAPOLATE_BACK)
-      {
-        if ( lists.forwardTransforms[i].stamp_ - target_time > max_extrapolation_distance_)
-        {
-          retval = true;
-          if (error_string)
-            ss << "Extrapolation Too Far in the past: target_time is "<< (target_time).toSec() <<", but the closest tf  data is at "
-               << lists.forwardTransforms[i].stamp_.toSec()  <<" which is " << (target_time - lists.forwardTransforms[i].stamp_).toSec()
-               << " seconds away.";
-          if ( max_extrapolation_distance_ > ros::Duration(0))
-          {
-            ss << "This is greater than the max_extrapolation_distance of "
-               << (max_extrapolation_distance_).toSec() <<".";
-          }
-        }
-      }
-      else if( lists.forwardTransforms[i].mode_ == EXTRAPOLATE_FORWARD)
-      {
-        if (target_time - lists.forwardTransforms[i].stamp_ > max_extrapolation_distance_)
-        {
-          retval = true;
-          if (error_string)
-            ss << "Extrapolation Too Far in the future: target_time is "<< (target_time).toSec() <<", but the closest tf  data is at "
-               << lists.forwardTransforms[i].stamp_.toSec()  <<" which is "<< (target_time - lists.forwardTransforms[i].stamp_).toSec()
-               << " seconds away.";
-          if ( max_extrapolation_distance_ > ros::Duration(0))
-          {
-            ss << "This is greater than the max_extrapolation_distance of "
-               << (max_extrapolation_distance_).toSec() <<".";
-          }
-        }
-      }
-    }
+  {
+    if (test_extrapolation_one_value(target_time, lists.forwardTransforms[i], error_string)) return true;
+    if (test_extrapolation_past(target_time, lists.forwardTransforms[i], error_string)) return true;
+    if (test_extrapolation_future(target_time, lists.forwardTransforms[i], error_string)) return true;
+  }
 
-  if (error_string) ss << " See http://pr.willowgarage.com/pr-docs/ros-packages/tf/html/faq.html for more info.";
-
-  if (error_string) *error_string = ss.str();
-  return retval;
-
-
+  return false;
 }
 
 

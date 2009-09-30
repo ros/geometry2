@@ -371,6 +371,9 @@ protected:
   /** Find the list of connected frames necessary to connect two different frames */
   int lookupLists(unsigned int target_frame, ros::Time time, unsigned int source_frame, TransformLists & lists, std::string* error_string) const;
 
+  bool test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
+  bool test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
+  bool test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
   bool test_extrapolation(const ros::Time& target_time, const TransformLists& t_lists, std::string * error_string) const;
 
   /** Compute the transform based on the list of frames */
