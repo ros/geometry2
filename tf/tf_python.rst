@@ -94,10 +94,10 @@ Transformer
 
         Adds a new transform to the Transformer graph. transform is an object with the following structure::
 
-            parent_id             string, parent frame
             header
                 stamp             time stamp, rospy.Time
-                frame_id          string, frame
+                frame_id          string, parent frame
+            child_frame_id        string, child frame
             transform
                 translation
                     x             float
