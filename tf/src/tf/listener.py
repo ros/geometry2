@@ -64,7 +64,7 @@ class TransformerROS(TFX.Transformer):
         :param target_frame: the tf target frame, a string
         :param hdr: a message header
         :return: a :class:`numpy.matrix` 4x4 representation of the transform
-        :raises: any of the exceptions that :meth:`~tf.Transformation.lookupTransform` can raise
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
         
         Uses :meth:`lookupTransform` to look up the transform for ROS message header hdr to frame
         target_frame, and returns the transform as a :class:`numpy.matrix`
@@ -82,6 +82,7 @@ class TransformerROS(TFX.Transformer):
         :param translation: translation expressed as a tuple (x,y,z)
         :param rotation: rotation quaternion expressed as a tuple (x,y,z,w)
         :return: a :class:`numpy.matrix` 4x4 representation of the transform
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
         
         Converts a transformation from :class:`tf.Transformer` into a representation as a 4x4 matrix.
         """
@@ -97,6 +98,7 @@ class TransformerROS(TFX.Transformer):
         :param target_frame: the tf target frame, a string
         :param ps: the geometry_msgs.msg.PointStamped message
         :return: new geometry_msgs.msg.PointStamped message, in frame target_frame
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
 
         Transforms a geometry_msgs PointStamped message to frame target_frame, returns the a new PointStamped message.
         """
@@ -118,6 +120,7 @@ class TransformerROS(TFX.Transformer):
         :param target_frame: the tf target frame, a string
         :param ps: the geometry_msgs.msg.QuaternionStamped message
         :return: new geometry_msgs.msg.QuaternionStamped message, in frame target_frame
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
 
         Transforms a geometry_msgs QuaternionStamped message to frame target_frame, returns the a new QuaternionStamped message.
         """
@@ -150,6 +153,7 @@ class TransformerROS(TFX.Transformer):
         :param target_frame: the tf target frame, a string
         :param ps: the geometry_msgs.msg.PoseStamped message
         :return: new geometry_msgs.msg.PoseStamped message, in frame target_frame
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
 
         Transforms a geometry_msgs PoseStamped message to frame target_frame, returns the a new PoseStamped message.
         """
