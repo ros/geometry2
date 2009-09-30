@@ -140,8 +140,11 @@ public:
 
     setTopic(topic);
 
-    tf_subscriber_ = node_.subscribe<tfMessage>("/tf_message", 1,
-                                  boost::bind(&MessageNotifier::incomingTFMessage, this, _1));
+    tf_subscriber_1_ = node_.subscribe<tfMessage>("/tf", 1,
+                                                  boost::bind(&MessageNotifier::incomingTFMessage, this, _1));
+
+    tf_subscriber_2_ = node_.subscribe<tfMessage>("/tf_message", 1,
+                                                  boost::bind(&MessageNotifier::incomingTFMessage, this, _1));
 
     thread_handle_ = boost::thread(boost::bind(&MessageNotifier::workerThread, this));
   }
@@ -545,7 +548,7 @@ private:
   Transformer& tf_; ///< The Transformer used to determine if transformation data is available
   ros::NodeHandle node_; ///< The node used to subscribe to the topic
   ros::Subscriber subscriber_;
-  ros::Subscriber tf_subscriber_;
+  ros::Subscriber tf_subscriber_1_, tf_subscriber_2_;
   Callback callback_; ///< The callback to call when a message is ready
   std::vector<std::string> target_frames_; ///< The frames we need to be able to transform to before a message is ready
   std::string target_frames_string_;
