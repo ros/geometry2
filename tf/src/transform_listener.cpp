@@ -114,7 +114,8 @@ void TransformListener::init()
   
   if (! ros::service::exists("~tf_frames", false))  // Avoid doublely advertizing if multiple instances of this library
     {
-      tf_frames_srv_ = node_.advertiseService("~tf_frames", &TransformListener::getFrames, this);
+      ros::NodeHandle nh("~");
+      tf_frames_srv_ = nh.advertiseService("tf_frames", &TransformListener::getFrames, this);
     }
 
   ros::NodeHandle local_nh("~");
@@ -139,7 +140,8 @@ void TransformListener::initWithThread()
 
   if (! ros::service::exists("~tf_frames", false))  // Avoid doublely advertizing if multiple instances of this library
     {
-      tf_frames_srv_ = node_.advertiseService("~tf_frames", &TransformListener::getFrames, this);
+      ros::NodeHandle nh("~");
+      tf_frames_srv_ = nh.advertiseService("tf_frames", &TransformListener::getFrames, this);
     }
     
   ros::NodeHandle local_nh("~");
