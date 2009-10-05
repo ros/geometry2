@@ -61,6 +61,16 @@
 namespace tf
 {
 
+namespace filter_failure_reasons
+{
+enum FilterFailureReason
+{
+  Unknown,
+  OutTheBack,
+};
+}
+typedef filter_failure_reasons::FilterFailureReason FilterFailureReason;
+
 class MessageFilterBase
 {
 public:
@@ -92,6 +102,8 @@ class MessageFilter : public MessageFilterBase, public message_filters::SimpleFi
 {
 public:
   typedef boost::shared_ptr<M const> MConstPtr;
+  typedef boost::function<void(const MConstPtr&, FilterFailureReason)> FailureCallback;
+  typedef boost::signal<void(const MConstPtr&, FilterFailureReason)> FailureSignal;
 
   /**
    * \brief Constructor
@@ -239,6 +251,7 @@ public:
     {
       ++dropped_message_count_;
       TF_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_, messages_.front()->header.frame_id.c_str(), messages_.front()->header.stamp.toSec());
+      signalFailure(messages_.front(), filter_failure_reasons::Unknown);
       messages_.pop_front();
       --message_count_;
     }
@@ -250,6 +263,16 @@ public:
     TF_MESSAGEFILTER_DEBUG("Added message in frame %s at time %.3f, count now %d", message->header.frame_id.c_str(), message->header.stamp.toSec(), message_count_);
 
     ++incoming_message_count_;
+  }
+
+  /**
+   * \brief Register a callback to be called when a message is about to be dropped
+   * \param callback The callback to call
+   */
+  message_filters::Connection registerFailureCallback(const FailureCallback& callback)
+  {
+    boost::mutex::scoped_lock lock(failure_signal_mutex_);
+    return message_filters::Connection(boost::bind(&MessageFilter::disconnectFailure, this, _1), failure_signal_.connect(callback));
   }
 
 private:
@@ -295,6 +318,8 @@ private:
 
           last_out_the_back_stamp_ = message->header.stamp;
           last_out_the_back_frame_ = message->header.frame_id;
+
+          signalFailure(message, filter_failure_reasons::OutTheBack);
           return true;
         }
       }
@@ -413,6 +438,18 @@ private:
     }
   }
 
+  void disconnectFailure(const message_filters::Connection& c)
+  {
+    boost::mutex::scoped_lock lock(failure_signal_mutex_);
+    c.getBoostConnection().disconnect();
+  }
+
+  void signalFailure(const MConstPtr& msg, FilterFailureReason reason)
+  {
+    boost::mutex::scoped_lock lock(failure_signal_mutex_);
+    failure_signal_(msg, reason);
+  }
+
   Transformer& tf_; ///< The Transformer used to determine if transformation data is available
   ros::NodeHandle nh_; ///< The node used to subscribe to the topic
   ros::Duration max_rate_;
@@ -445,6 +482,9 @@ private:
 
   boost::signals::connection tf_connection_;
   message_filters::Connection message_connection_;
+
+  FailureSignal failure_signal_;
+  boost::mutex failure_signal_mutex_;
 };
 
 } // namespace tf

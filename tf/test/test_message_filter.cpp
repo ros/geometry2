@@ -48,6 +48,7 @@ public:
 	Notification(int expected_count)
 	: count_(0)
 	, expected_count_(expected_count)
+	, failure_count_(0)
 	{
 	}
 
@@ -56,9 +57,14 @@ public:
 		++count_;
 	}
 
+	void failure(const geometry_msgs::PointStamped::ConstPtr& message, FilterFailureReason reason)
+	{
+	  ++failure_count_;
+	}
+
 	int count_;
 	int expected_count_;
-
+	int failure_count_;
 };
 
 TEST(MessageFilter, noTransforms)
@@ -99,7 +105,7 @@ TEST(MessageFilter, preexistingTransforms)
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
 	ros::Time stamp = ros::Time::now();
-	tf::Stamped<tf::Transform> transform(btTransform(btQuaternion(0,0,0), btVector3(1,2,3)), stamp, "frame1", "frame2");
+	tf::StampedTransform transform(btTransform(btQuaternion(0,0,0,1), btVector3(1,2,3)), stamp, "frame1", "frame2");
 	tf_client.setTransform(transform);
 
 	geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -128,7 +134,7 @@ TEST(MessageFilter, postTransforms)
 
 	EXPECT_EQ(0, n.count_);
 
-	tf::Stamped<tf::Transform> transform(btTransform(btQuaternion(0,0,0), btVector3(1,2,3)), stamp, "frame1", "frame2");
+	tf::StampedTransform transform(btTransform(btQuaternion(0,0,0,1), btVector3(1,2,3)), stamp, "frame1", "frame2");
 	tf_client.setTransform(transform);
 
 	ros::WallDuration(0.1).sleep();
@@ -143,6 +149,7 @@ TEST(MessageFilter, queueSize)
   Notification n(10);
   MessageFilter<geometry_msgs::PointStamped> filter(tf_client, "frame1", 10);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
+  filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
 	ros::Time stamp = ros::Time::now();
 
@@ -156,8 +163,9 @@ TEST(MessageFilter, queueSize)
 	}
 
 	EXPECT_EQ(0, n.count_);
+	EXPECT_EQ(10, n.failure_count_);
 
-	tf::Stamped<tf::Transform> transform(btTransform(btQuaternion(0,0,0), btVector3(1,2,3)), stamp, "frame1", "frame2");
+	tf::StampedTransform transform(btTransform(btQuaternion(0,0,0,1), btVector3(1,2,3)), stamp, "frame1", "frame2");
 	tf_client.setTransform(transform);
 
 	ros::WallDuration(0.1).sleep();
@@ -175,7 +183,7 @@ TEST(MessageFilter, setTargetFrame)
 	filter.setTargetFrame("frame1000");
 
 	ros::Time stamp = ros::Time::now();
-  tf::Stamped<tf::Transform> transform(btTransform(btQuaternion(0,0,0), btVector3(1,2,3)), stamp, "frame1000", "frame2");
+  tf::StampedTransform transform(btTransform(btQuaternion(0,0,0,1), btVector3(1,2,3)), stamp, "frame1000", "frame2");
   tf_client.setTransform(transform);
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -201,7 +209,7 @@ TEST(MessageFilter, multipleTargetFrames)
 	filter.setTargetFrames(target_frames);
 
 	ros::Time stamp = ros::Time::now();
-  tf::Stamped<tf::Transform> transform(btTransform(btQuaternion(0,0,0), btVector3(1,2,3)), stamp, "frame1", "frame3");
+  tf::StampedTransform transform(btTransform(btQuaternion(0,0,0,1), btVector3(1,2,3)), stamp, "frame1", "frame3");
   tf_client.setTransform(transform);
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -209,11 +217,14 @@ TEST(MessageFilter, multipleTargetFrames)
   msg->header.frame_id = "frame3";
   filter.add(msg);
 
+  ros::WallDuration(0.1).sleep();
+  ros::spinOnce();
+
 	EXPECT_EQ(0, n.count_); // frame1->frame3 exists, frame2->frame3 does not (yet)
 
-	ros::Time::setNow(ros::Time::now() + ros::Duration(1.0));
+	//ros::Time::setNow(ros::Time::now() + ros::Duration(1.0));
 
-	transform.frame_id_ = "frame2";
+	transform.child_frame_id_ = "frame2";
 	tf_client.setTransform(transform);
 
 	ros::WallDuration(0.1).sleep();
@@ -232,7 +243,7 @@ TEST(MessageFilter, tolerance)
   filter.setTolerance(offset);
 
 	ros::Time stamp = ros::Time::now();
-  tf::Stamped<tf::Transform> transform(btTransform(btQuaternion(0,0,0), btVector3(1,2,3)), stamp, "frame1", "frame2");
+  tf::StampedTransform transform(btTransform(btQuaternion(0,0,0,1), btVector3(1,2,3)), stamp, "frame1", "frame2");
   tf_client.setTransform(transform);
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -242,7 +253,7 @@ TEST(MessageFilter, tolerance)
 
 	EXPECT_EQ(0, n.count_); //No return due to lack of space for offset
 
-	ros::Time::setNow(ros::Time::now() + ros::Duration(0.1));
+	//ros::Time::setNow(ros::Time::now() + ros::Duration(0.1));
 
 	transform.stamp_ += offset*1.1;
 	tf_client.setTransform(transform);
@@ -268,7 +279,7 @@ TEST(MessageFilter, maxRate)
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   ros::Time stamp = ros::Time::now();
-  tf::Stamped<tf::Transform> transform(btTransform(btQuaternion(0,0,0), btVector3(1,2,3)), stamp, "frame1", "frame2");
+  tf::StampedTransform transform(btTransform(btQuaternion(0,0,0,1), btVector3(1,2,3)), stamp, "frame1", "frame2");
   tf_client.setTransform(transform);
 
   stamp += ros::Duration(0.1);
@@ -287,7 +298,7 @@ TEST(MessageFilter, maxRate)
 
   EXPECT_EQ(0, n.count_);
 
-  ros::Time::setNow(ros::Time::now() + ros::Duration(1.0));
+  //ros::Time::setNow(ros::Time::now() + ros::Duration(1.0));
   tf_client.setTransform(transform);
 
   ros::WallDuration(0.1).sleep();
@@ -296,6 +307,28 @@ TEST(MessageFilter, maxRate)
   EXPECT_EQ(1, n.count_);
 }
 #endif
+
+TEST(MessageFilter, outTheBackFailure)
+{
+  tf::TransformListener tf_client;
+  Notification n(1);
+  MessageFilter<geometry_msgs::PointStamped> filter(tf_client, "frame1", 1);
+  filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
+
+  ros::Time stamp = ros::Time::now();
+  tf::StampedTransform transform(btTransform(btQuaternion(0,0,0,1), btVector3(1,2,3)), stamp, "frame1", "frame2");
+  tf_client.setTransform(transform);
+
+  transform.stamp_ = stamp + ros::Duration(10000);
+  tf_client.setTransform(transform);
+
+  geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
+  msg->header.stamp = stamp;
+  msg->header.frame_id = "frame2";
+  filter.add(msg);
+
+  EXPECT_EQ(1, n.failure_count_);
+}
 
 int main(int argc, char** argv)
 {
