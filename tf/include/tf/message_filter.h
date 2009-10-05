@@ -65,7 +65,9 @@ namespace filter_failure_reasons
 {
 enum FilterFailureReason
 {
+  /// The message buffer overflowed, and this message was pushed off the back of the queue, but the reason it was unable to be transformed is unknown.
   Unknown,
+  /// The timestamp on the message is more than the cache length earlier than the newest data in the transform cache
   OutTheBack,
 };
 }
