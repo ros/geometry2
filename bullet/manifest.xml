@@ -11,7 +11,10 @@
     <ul>
     <li>
     To eliminate ambiguity about which API is active the btQuaternion
-    constructor from Euler angles is deprecated.
+    constructor from Euler angles is deprecated. Please explicitly 
+    construct it and populate it seperately from euler angles, 
+    otherwise it is ambiguous
+    as to what convention is being used.  
     </li>
     <li>
     The btMatrix3x3 and btQuaternion setEulerZYX and getEulerZYX
@@ -19,7 +22,9 @@
     remove the existing patch against Bullet which makes them
     consistent.  They will be deprecated for a few releases, then
     patched out for a few releases before being reintroduced in their
-    native form.
+    native form.  setEulerYPR and getEulerYPR are drop in replacements.
+    Also available is getRPY setRPY which use fixed axis notation about
+    XYZ axes.  
     </li>
     <li>
     There are a few errors in documentation and
