@@ -776,7 +776,6 @@ bool Transformer::test_extrapolation_future(const ros::Time& target_time, const 
 
 bool Transformer::test_extrapolation(const ros::Time& target_time, const TransformLists& lists, std::string * error_string) const
 {
-  bool retval = false;
   std::stringstream ss;
   ss << std::fixed;
   ss.precision(3);
