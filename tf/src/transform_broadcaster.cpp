@@ -47,6 +47,8 @@ void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped &
 {
   tfMessage message;
   message.transforms.push_back(msgtf);
+  message.transforms.back().header.frame_id = tf::remap(tf_prefix_, message.transforms.back().header.frame_id);
+  message.transforms.back().child_frame_id = tf::remap(tf_prefix_, message.transforms.back().child_frame_id);
   publisher_.publish(message);
 }
 
@@ -54,8 +56,6 @@ void TransformBroadcaster::sendTransform(const Stamped<Transform> & transform)
 {
   geometry_msgs::TransformStamped msgtf;
   transformStampedTFToMsg(transform, msgtf);
-  msgtf.header.frame_id = tf::remap(tf_prefix_, msgtf.header.frame_id);
-  msgtf.child_frame_id = tf::remap(tf_prefix_, msgtf.child_frame_id);
   sendTransform(msgtf);
 } 
 
@@ -63,8 +63,6 @@ void TransformBroadcaster::sendTransform(const StampedTransform & transform)
 {
   geometry_msgs::TransformStamped msgtf;
   transformStampedTFToMsg(transform, msgtf);
-  msgtf.header.frame_id = tf::remap(tf_prefix_, msgtf.header.frame_id);
-  msgtf.child_frame_id = tf::remap(tf_prefix_, msgtf.child_frame_id);
   sendTransform(msgtf);
 } 
   
@@ -74,11 +72,8 @@ void TransformBroadcaster::sendTransform(const Transform & transform, const ros:
   tfMessage message;
   geometry_msgs::TransformStamped msgtf;
   msgtf.header.stamp = time;
-  msgtf.header.frame_id = tf::remap(tf_prefix_, parent_id);
-  msgtf.child_frame_id = tf::remap(tf_prefix_, frame_id);
   transformTFToMsg(transform, msgtf.transform);
-  message.transforms.push_back(msgtf);
-  publisher_.publish(message);
+  sendTransform(msgtf);
 }
 
 
