@@ -251,8 +251,9 @@ public:
           max_delay = std::max(max_delay, it1->second[i]);
         }
         average_delay /= it1->second.size();
-        double frequency = (it2->second.back() - it2->second.front())/std::max((size_t)1, it2->second.size());
-        cerr << "Node: " <<it1->first << " " << cerr.precision(4) << frequency <<" Hz, Average Delay: " << average_delay << " Max Delay: " << max_delay << std::endl;
+        double frequency_out = (double)(it2->second.size())/std::max(0.00000001, (it2->second.back() - it2->second.front()));
+        //cout << "output" <<&(*it2) <<" " << it2->second.back() <<" " << it2->second.front() <<" " << std::max((size_t)1, it2->second.size()) << " " << frequency_out << endl;
+        cout << "Node: " <<it1->first << " " << frequency_out <<" Hz, Average Delay: " << average_delay << " Max Delay: " << max_delay << std::endl;
       }
       
     }
@@ -267,8 +268,6 @@ int main(int argc, char ** argv)
   //Initialize ROS
   init(argc, argv, "tf_monitor", ros::init_options::AnonymousName);
 
-  ros::NodeHandle nh;
-  boost::thread spinner( boost::bind( &ros::spin ));
 
   string framea, frameb;
   bool using_specific_chain = true;
@@ -282,9 +281,12 @@ int main(int argc, char ** argv)
     ROS_INFO("TF_Monitor: usage: tf_monitor framea frameb");
     return -1;
   }
+
+  ros::NodeHandle nh;
+  boost::thread spinner( boost::bind( &ros::spin ));
   TFMonitor monitor(using_specific_chain, tf::remap(framea), tf::remap(frameb));
   monitor.spin();
-
+  spinner.join();
   return 0;
 
 }
