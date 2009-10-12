@@ -211,11 +211,11 @@ public:
       {
         std::cout <<std::endl<< std::endl<< std::endl<< "RESULTS: for "<< framea_ << " to " << frameb_  <<std::endl;
         cout << "Chain currently is: ";
-        for (unsigned int i = 0; i < chain_.size() -1; i++)
+        for (unsigned int i = 0; i < chain_.size(); i++)
         {
           cout << chain_[i] <<" -> ";
         }
-        cout <<chain_.back() << endl;
+        cout << frameb_ << endl;
         cerr << "Net delay " << "    avg = " << avg_diff <<": max = " << max_diff << endl;
       }
       else
