@@ -136,13 +136,35 @@ public:
     return waitForTransform( target_frame, source_frame, time, timeout, polling_sleep_duration, error_msg);
   };
 
+  /** \brief Block until a transform is possible or it times out
+   * \param target_frame The frame into which to transform
+   * \param source_frame The frame from which to transform
+   * \param time The time at which to transform
+   * \param timeout How long to block before failing
+   * \param polling_sleep_duration How often to retest if failed
+   * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
+   */
   bool waitForTransform(const std::string& target_frame, const std::string& source_frame,
                         const ros::Time& time, const ros::Duration& timeout, const ros::Duration& polling_sleep_duration = ros::Duration(0.01),
                         std::string* error_msg = NULL) const;
+  /** \brief Test if a transform is possible
+   * \param target_frame The frame into which to transform
+   * \param source_frame The frame from which to transform
+   * \param time The time at which to transform
+   * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
+   */
   bool canTransform(const std::string& target_frame, const std::string& source_frame,
                     const ros::Time& time,
                     std::string* error_msg = NULL) const;
-  //time traveling version
+
+  /** \brief Test if a transform is possible
+   * \param target_frame The frame into which to transform
+   * \param target_time The time into which to transform
+   * \param source_frame The frame from which to transform
+   * \param source_time The time from which to transform
+   * \param fixed_frame The frame in which to treat the transform as constant in time
+   * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
+   */
   bool canTransform(const std::string& target_frame, const ros::Time& target_time,
                     const std::string& source_frame, const ros::Time& source_time,
                     const std::string& fixed_frame,
@@ -156,6 +178,16 @@ public:
     return waitForTransform(target_frame, target_time, source_frame,source_time, fixed_frame, timeout, polling_sleep_duration, error_msg);
   };
 
+  /** \brief Block until a transform is possible or it times out
+   * \param target_frame The frame into which to transform
+   * \param target_time The time into which to transform
+   * \param source_frame The frame from which to transform
+   * \param source_time The time from which to transform
+   * \param fixed_frame The frame in which to treat the transform as constant in time
+   * \param timeout How long to block before failing
+   * \param polling_sleep_duration How often to retest if failed
+   * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
+   */
   bool waitForTransform(const std::string& target_frame, const ros::Time& target_time,
                     const std::string& source_frame, const ros::Time& source_time,
 		    const std::string& fixed_frame,
