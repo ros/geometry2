@@ -33,7 +33,7 @@
 #define TF_MESSAGE_FILTER_H
 
 #include <ros/ros.h>
-#include <tf/tf.h>
+#include <tf/transform_listener.h>
 #include <tf/tfMessage.h>
 #include <tf/message_notifier_base.h>
 
@@ -69,6 +69,8 @@ enum FilterFailureReason
   Unknown,
   /// The timestamp on the message is more than the cache length earlier than the newest data in the transform cache
   OutTheBack,
+  /// The frame_id on the message is empty
+  EmptyFrameID,
 };
 }
 typedef filter_failure_reasons::FilterFailureReason FilterFailureReason;
@@ -199,8 +201,9 @@ public:
     target_frames_ = target_frames;
 
     std::stringstream ss;
-    for (std::vector<std::string>::const_iterator it = target_frames_.begin(); it != target_frames_.end(); ++it)
+    for (std::vector<std::string>::iterator it = target_frames_.begin(); it != target_frames_.end(); ++it)
     {
+      *it = tf::remap(*it);
       ss << *it << " ";
     }
     target_frames_string_ = ss.str();
@@ -300,6 +303,15 @@ private:
 
   bool testMessage(const MConstPtr& message)
   {
+    //Throw out messages which have an empty frame_id
+    if (message->header.frame_id.empty())
+    {
+      std::string callerid = message->__connection_header ? (*message->__connection_header)["callerid"] : "unknown";
+      TF_MESSAGEFILTER_WARN("Discarding message from [%s] due to empty frame_id", callerid.c_str());
+      signalFailure(message, filter_failure_reasons::EmptyFrameID);
+      return true;
+    }
+
     //Throw out messages which are too old
     //! \todo combine getLatestCommonTime call with the canTransform call
     for (std::vector<std::string>::iterator target_it = target_frames_.begin(); target_it != target_frames_.end(); ++target_it)

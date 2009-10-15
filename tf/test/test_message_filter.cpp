@@ -330,6 +330,20 @@ TEST(MessageFilter, outTheBackFailure)
   EXPECT_EQ(1, n.failure_count_);
 }
 
+TEST(MessageFilter, emptyFrameIDFailure)
+{
+  tf::TransformListener tf_client;
+  Notification n(1);
+  MessageFilter<geometry_msgs::PointStamped> filter(tf_client, "frame1", 1);
+  filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
+
+  geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
+  msg->header.frame_id = "";
+  filter.add(msg);
+
+  EXPECT_EQ(1, n.failure_count_);
+}
+
 int main(int argc, char** argv)
 {
 	testing::InitGoogleTest(&argc, argv);
