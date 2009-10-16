@@ -75,6 +75,7 @@ class Transformer;
  * \class MessageNotifier
  * \brief Queues messages that include a Header until there is transform data available for the time the timestamp on the message.
  *
+ * \deprecated Deprecated in favor of tf::MessageFilter
  * For use instead of extrapolation, MessageNotifier provides a way of waiting until it is possible to transform a message
  * before getting a callback notifying that the message is available.
  *
@@ -98,7 +99,6 @@ class Transformer;
  *
  \endverbatim
 
- \deprecated Deprecated in favor of tf::MessageFilter
  */
 template<class MessageT>
 class MessageNotifier : public MessageNotifierBase
