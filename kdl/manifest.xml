@@ -19,7 +19,7 @@ a problem is being discussed by the KDL community.
 <url>http://pr.willowgarage.com/wiki/KDL</url>
 <export>
   <cpp cflags="-I${prefix}/kdl/include" lflags="-Wl,-rpath,${prefix}/kdl/lib  -L${prefix}/kdl/lib -lorocos-kdl"/>
-  <doxymaker external="http://www.orocos.org/kdl" />
+  <doxymaker external="http://people.mech.kuleuven.be/~orocos/pub/devel/kdl/latest/api/html/index.html" />
   <python path="${prefix}/kdl/lib/python/site-packages"  />
 </export>
 <depend package="eigen"/>
