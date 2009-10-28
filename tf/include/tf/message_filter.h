@@ -236,6 +236,9 @@ public:
 
     messages_.clear();
     message_count_ = 0;
+
+    warned_about_unresolved_name_ = false;
+    warned_about_empty_frame_id_ = false;
   }
 
   /**
@@ -293,6 +296,8 @@ private:
     incoming_message_count_ = 0;
     dropped_message_count_ = 0;
     time_tolerance_ = ros::Duration(0.0);
+    warned_about_unresolved_name_ = false;
+    warned_about_empty_frame_id_ = false;
 
     tf_connection_ = tf_.addTransformsChangedListener(boost::bind(&MessageFilter::transformsChanged, this));
 
@@ -303,13 +308,30 @@ private:
 
   bool testMessage(const MConstPtr& message)
   {
+    std::string callerid = message->__connection_header ? (*message->__connection_header)["callerid"] : "unknown";
+
     //Throw out messages which have an empty frame_id
     if (message->header.frame_id.empty())
     {
-      std::string callerid = message->__connection_header ? (*message->__connection_header)["callerid"] : "unknown";
-      TF_MESSAGEFILTER_WARN("Discarding message from [%s] due to empty frame_id", callerid.c_str());
+      if (!warned_about_empty_frame_id_)
+      {
+        warned_about_empty_frame_id_ = true;
+        TF_MESSAGEFILTER_WARN("Discarding message from [%s] due to empty frame_id.  This message will only print once.", callerid.c_str());
+      }
       signalFailure(message, filter_failure_reasons::EmptyFrameID);
       return true;
+    }
+
+    std::string frame_id = message->header.frame_id;
+    if (frame_id[0] != '/')
+    {
+      frame_id = tf::remap(tf_.getTFPrefix(), frame_id);
+
+      if (!warned_about_unresolved_name_)
+      {
+        warned_about_unresolved_name_ = true;
+        ROS_WARN("Message from [%s] has a non-fully-qualified frame_id [%s]. Resolved locally to [%s].  This is will likely not work in multi-robot systems.  This message will only print once.", callerid.c_str(), message->header.frame_id.c_str(), frame_id.c_str());
+      }
     }
 
     //Throw out messages which are too old
@@ -318,7 +340,7 @@ private:
     {
       const std::string& target_frame = *target_it;
 
-      if (target_frame != message->header.frame_id)
+      if (target_frame != frame_id)
       {
         ros::Time latest_transform_time ;
         std::string error_string ;
@@ -479,6 +501,9 @@ private:
 
   bool new_messages_; ///< Used to skip waiting on new_data_ if new messages have come in while calling back
   volatile bool new_transforms_; ///< Used to skip waiting on new_data_ if new transforms have come in while calling back or transforming data
+
+  bool warned_about_unresolved_name_;
+  bool warned_about_empty_frame_id_;
 
   uint64_t successful_transform_count_;
   uint64_t failed_transform_count_;

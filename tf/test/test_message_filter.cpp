@@ -76,7 +76,7 @@ TEST(MessageFilter, noTransforms)
 
 	geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
 	msg->header.stamp = ros::Time::now();
-	msg->header.frame_id = "frame2";
+	msg->header.frame_id = "/frame2";
 	filter.add(msg);
 
 	EXPECT_EQ(0, n.count_);
@@ -91,7 +91,7 @@ TEST(MessageFilter, noTransformsSameFrame)
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = ros::Time::now();
-  msg->header.frame_id = "frame1";
+  msg->header.frame_id = "/frame1";
   filter.add(msg);
 
   EXPECT_EQ(1, n.count_);
@@ -110,7 +110,7 @@ TEST(MessageFilter, preexistingTransforms)
 
 	geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
 	msg->header.stamp = stamp;
-	msg->header.frame_id = "frame2";
+	msg->header.frame_id = "/frame2";
 
 	filter.add(msg);
 
@@ -128,7 +128,7 @@ TEST(MessageFilter, postTransforms)
 
 	geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
-  msg->header.frame_id = "frame2";
+  msg->header.frame_id = "/frame2";
 
   filter.add(msg);
 
@@ -157,7 +157,7 @@ TEST(MessageFilter, queueSize)
 	{
 	  geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
     msg->header.stamp = stamp;
-    msg->header.frame_id = "frame2";
+    msg->header.frame_id = "/frame2";
 
     filter.add(msg);
 	}
@@ -188,7 +188,7 @@ TEST(MessageFilter, setTargetFrame)
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
-  msg->header.frame_id = "frame2";
+  msg->header.frame_id = "/frame2";
 
 	filter.add(msg);
 
@@ -214,7 +214,7 @@ TEST(MessageFilter, multipleTargetFrames)
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
-  msg->header.frame_id = "frame3";
+  msg->header.frame_id = "/frame3";
   filter.add(msg);
 
   ros::WallDuration(0.1).sleep();
@@ -248,7 +248,7 @@ TEST(MessageFilter, tolerance)
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
-  msg->header.frame_id = "frame2";
+  msg->header.frame_id = "/frame2";
   filter.add(msg);
 
 	EXPECT_EQ(0, n.count_); //No return due to lack of space for offset
@@ -324,7 +324,7 @@ TEST(MessageFilter, outTheBackFailure)
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
-  msg->header.frame_id = "frame2";
+  msg->header.frame_id = "/frame2";
   filter.add(msg);
 
   EXPECT_EQ(1, n.failure_count_);
