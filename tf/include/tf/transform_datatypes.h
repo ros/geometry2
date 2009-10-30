@@ -152,6 +152,14 @@ static inline geometry_msgs::Quaternion createQuaternionMsgFromYaw(double yaw){
   return q_msg;
 }
 
+static inline geometry_msgs::Quaternion createQuaternionMsgFromRollPitchYaw(double roll,double pitch,double yaw){
+  Quaternion q;
+  q.setRPY(roll, pitch, yaw);
+  geometry_msgs::Quaternion q_msg;
+  quaternionTFToMsg(q, q_msg);
+  return q_msg;
+}
+
 static inline tf::Quaternion createIdentityQuaternion()
 {
   Quaternion q;
