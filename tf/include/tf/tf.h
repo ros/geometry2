@@ -43,6 +43,7 @@
 #include "tf/time_cache.h"
 #include <boost/thread/mutex.hpp>
 #include <boost/signals.hpp>
+#include "geometry_msgs/TwistStamped.h"
 
 namespace tf
 {
@@ -135,6 +136,20 @@ public:
   {
     return waitForTransform( target_frame, source_frame, time, timeout, polling_sleep_duration, error_msg);
   };
+
+
+  /** \brief Lookup the velocity of the moving_frame in the reference_frame
+   * \param moving_frame The frame to track
+   * \param reference_frame The frame in which to track
+   * \param time The time at which to get the velocity
+   * \param duration The period over which to average
+   * \param velocity The velocity output
+   * 
+   * Possible exceptions TransformReference::LookupException, TransformReference::ConnectivityException,
+   * TransformReference::MaxDepthException
+   */
+  void lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
+                      const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const;
 
   /** \brief Block until a transform is possible or it times out
    * \param target_frame The frame into which to transform

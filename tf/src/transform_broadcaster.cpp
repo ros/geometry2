@@ -67,11 +67,13 @@ void TransformBroadcaster::sendTransform(const StampedTransform & transform)
 } 
   
 
-void TransformBroadcaster::sendTransform(const Transform & transform, const ros::Time& time, const std::string& frame_id, const std::string& parent_id)
+void TransformBroadcaster::sendTransform(const Transform & transform, const ros::Time& time, const std::string& frame_id, const std::string& child_frame_id)
 {
   tfMessage message;
   geometry_msgs::TransformStamped msgtf;
   msgtf.header.stamp = time;
+  msgtf.header.frame_id = frame_id;
+  msgtf.child_frame_id = child_frame_id;
   transformTFToMsg(transform, msgtf.transform);
   sendTransform(msgtf);
 }

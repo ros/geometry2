@@ -302,6 +302,34 @@ void Transformer::lookupTransform(const std::string& target_frame,const ros::Tim
 
 };
 
+void Transformer::lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
+                    const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const
+{
+  ros::Time latest_time, target_time;
+  getLatestCommonTime(reference_frame, moving_frame, latest_time, NULL);
+
+  if (ros::Time() == time)
+    target_time = latest_time;
+
+  ros::Time end_time = std::min(time + duration *0.5 , latest_time);
+  std::cout << end_time.toSec() <<" latest " << latest_time.toSec() << " input " << time.toSec() << std::endl;
+  ros::Time start_time = end_time - duration;
+
+  StampedTransform start, end;
+  lookupTransform(moving_frame, reference_frame, start_time, start);
+  lookupTransform(moving_frame, reference_frame, end_time, end);
+
+  velocity.header.stamp = start_time + duration * 0.5;
+  velocity.header.frame_id = reference_frame;
+  velocity.twist.linear.x =  (end.getOrigin().getX() - start.getOrigin().getX())/duration.toSec();
+  velocity.twist.linear.y =  (end.getOrigin().getY() - start.getOrigin().getY())/duration.toSec();
+  velocity.twist.linear.z =  (end.getOrigin().getZ() - start.getOrigin().getZ())/duration.toSec();
+
+  //\TODO angular
+  
+    
+
+};
 
 
 bool Transformer::waitForTransform(const std::string& target_frame, const std::string& source_frame,
