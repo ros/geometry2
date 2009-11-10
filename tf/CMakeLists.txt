@@ -28,11 +28,6 @@ target_link_libraries(test/transform_listener_unittest tf)
 rosbuild_add_gtest_build_flags(test/transform_listener_unittest)
 rosbuild_add_rostest(test/transform_listener_unittest.launch)
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL Linux)
-  rosbuild_add_gtest_future(test/wait_for_transform_death test/wait_for_transform_death.cpp)
-  target_link_libraries(test/wait_for_transform_death tf)
-endif(${CMAKE_SYSTEM_NAME} STREQUAL Linux)
-
 rosbuild_add_gtest_future(test/tf_unittest_future test/tf_unittest_future.cpp)
 target_link_libraries(test/tf_unittest_future tf)
 rosbuild_add_gtest(test/cache_unittest test/cache_unittest.cpp)

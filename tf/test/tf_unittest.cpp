@@ -868,7 +868,18 @@ TEST(tf, waitForTransform)
 {
   tf::Transformer mTR(true);
 
+  // Check assertion of extra string
+  std::string error_str;
+  EXPECT_FALSE(mTR.waitForTransform("parent", "me", ros::Time().fromNSec(10000000), ros::Duration().fromSec(1.0), ros::Duration().fromSec(0.01), &error_str));
+  EXPECT_STREQ("Do not call waitForTransform unless you are using another thread for populating data. Without a dedicated thread it will always timeout.  If you have a seperate thread servicing tf messages, call setUsingDedicatedThread(true)", error_str.c_str());
+
+  // check that it doesn't segfault if NULL
+  EXPECT_FALSE(mTR.waitForTransform("parent", "me", ros::Time().fromNSec(10000000), ros::Duration().fromSec(1.0), ros::Duration().fromSec(0.01)));
+
+  
+
   //A seperate thread is required to use the blocking call for normal usage
+  // This isn't actually using it, but it will not affect this direct usage case.  
   mTR.setUsingDedicatedThread(true);  
   // make sure timeout is resonably lengthed
 

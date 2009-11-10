@@ -337,9 +337,15 @@ bool Transformer::waitForTransform(const std::string& target_frame, const std::s
                                    const ros::Duration& timeout, const ros::Duration& polling_sleep_duration,
                                    std::string* error_msg) const
 {
-  
-  ROS_ASSERT_MSG(using_dedicated_thread_, "Do not call waitForTransform unless you are using another thread for populating data. If you are using multiple threads setUsingDedicatedThread(true)");
-
+  if (!using_dedicated_thread_)
+  {
+    std::string error_string = "Do not call waitForTransform unless you are using another thread for populating data. Without a dedicated thread it will always timeout.  If you have a seperate thread servicing tf messages, call setUsingDedicatedThread(true)";
+    ROS_ERROR(error_string.c_str());
+    
+    if (error_msg) 
+      *error_msg = error_string;
+    return false;
+  }
   ros::Time start_time = ros::Time::now();
   while (!canTransform(target_frame, source_frame, time, error_msg))
   {

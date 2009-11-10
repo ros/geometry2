@@ -67,7 +67,7 @@ public:
   void sendTransform(const geometry_msgs::TransformStamped & transform);
 
   /** \brief Send a Transform, stamped with time, frame_id and parent_id */
-  void sendTransform(const Transform & transform, const ros::Time& time, const std::string& frame_id, const std::string& parent_id);
+  ROSCPP_DEPRECATED void sendTransform(const Transform & transform, const ros::Time& time, const std::string& frame_id, const std::string& parent_id);
   
 private:
   /// Internal reference to ros::Node
