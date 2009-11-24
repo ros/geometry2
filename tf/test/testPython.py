@@ -60,11 +60,11 @@ class TestPython(unittest.TestCase):
         self.assert_(len(afs) != 0)
         self.assert_("PARENT" in afs)
         self.assert_("THISFRAME" in afs)
-        self.assert_(t.getLatestCommonTime("THISFRAME", "PARENT").to_seconds() == 0)
+        self.assert_(t.getLatestCommonTime("THISFRAME", "PARENT").to_sec() == 0)
         for ti in [3, 5, 10, 11, 19, 20, 21]:
             m.header.stamp.secs = ti
             t.setTransform(m)
-            self.assert_(t.getLatestCommonTime("THISFRAME", "PARENT").to_seconds() == ti)
+            self.assert_(t.getLatestCommonTime("THISFRAME", "PARENT").to_sec() == ti)
 
         # Verify that getLatestCommonTime with nonexistent frames raise exception 
         self.assertRaises(tf.Exception, lambda: t.getLatestCommonTime("MANDALAY", "JUPITER"))
@@ -106,7 +106,7 @@ class TestPython(unittest.TestCase):
                     self.assert_(abs(x) == abs(nx.shortest_path_length(G, 0, i) - nx.shortest_path_length(G, 0, j)))
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 1 or sys.argv[1].startswith('--gtest_output'):
         rostest.unitrun('tf', 'directed', TestPython)
     else:
         suite = unittest.TestSuite()
