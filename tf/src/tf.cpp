@@ -33,6 +33,7 @@
 #include <sys/time.h>
 #include "ros/assert.h"
 #include "ros/ros.h"
+#include "angles/angles.h"
 
 using namespace tf;
 
@@ -321,13 +322,16 @@ void Transformer::lookupVelocity(const std::string& reference_frame, const std::
 
   velocity.header.stamp = start_time + duration * 0.5;
   velocity.header.frame_id = reference_frame;
+  double start_roll, start_pitch, start_yaw, end_roll, end_pitch, end_yaw;
+  end.getBasis().getRPY(end_roll, end_pitch, end_yaw);
+  start.getBasis().getRPY(start_roll, start_pitch, start_yaw);
   velocity.twist.linear.x =  (end.getOrigin().getX() - start.getOrigin().getX())/duration.toSec();
   velocity.twist.linear.y =  (end.getOrigin().getY() - start.getOrigin().getY())/duration.toSec();
   velocity.twist.linear.z =  (end.getOrigin().getZ() - start.getOrigin().getZ())/duration.toSec();
+  velocity.twist.angular.x =  angles::shortest_angular_distance(end_roll, start_roll)/duration.toSec();
+  velocity.twist.angular.y =  angles::shortest_angular_distance(end_pitch, start_pitch)/duration.toSec();
+  velocity.twist.angular.z =  angles::shortest_angular_distance(end_yaw, start_yaw)/duration.toSec();
 
-  //\TODO angular
-  
-    
 
 };
 

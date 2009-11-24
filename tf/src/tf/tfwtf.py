@@ -52,7 +52,7 @@ def rostime_delta(ctx):
     for m, stamp, callerid in _msgs:
         for t in m.transforms:
             d = t.header.stamp - stamp
-            secs = d.to_seconds()
+            secs = d.to_sec()
             if abs(secs) > 1.:
                 if callerid in deltas:
                     if abs(secs) > abs(deltas[callerid]):
