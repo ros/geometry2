@@ -148,8 +148,10 @@ public:
    * Possible exceptions TransformReference::LookupException, TransformReference::ConnectivityException,
    * TransformReference::MaxDepthException
    */
-  void lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
-                      const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const;
+  /*
+    void lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
+    const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const;
+  */
 
   /** \brief Block until a transform is possible or it times out
    * \param target_frame The frame into which to transform

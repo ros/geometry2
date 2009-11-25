@@ -1666,21 +1666,26 @@ TEST(tf, getFrameStrings)
 
 }
 
+/* 
 TEST(tf, lookupVelocity)
 {
   Transformer mTR;
   mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,0,0), btVector3(1,0,0)), ros::Time().fromSec(1), "/odom",  "/base"));
-  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,0,0), btVector3(2,0,0)), ros::Time().fromSec(2), "/odom",  "/base"));
-  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,0,0), btVector3(3,0,0)), ros::Time().fromSec(3), "/odom",  "/base"));
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(9*M_PI/2,0,0), btVector3(2,0,0)), ros::Time().fromSec(2), "/odom",  "/base"));
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(10*M_PI,0,0), btVector3(3,0,0)), ros::Time().fromSec(3), "/odom",  "/base"));
 
   geometry_msgs::TwistStamped twist;
   ros::Time query_time;
   query_time.fromSec(2);
-  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(0.5), twist);
+  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
 
   EXPECT_DOUBLE_EQ(query_time.toSec(), twist.header.stamp.toSec());
   EXPECT_DOUBLE_EQ(1.0, twist.twist.linear.x);
+  EXPECT_DOUBLE_EQ(M_PI/2, twist.twist.angular.x);
+  EXPECT_DOUBLE_EQ(M_PI/2, twist.twist.angular.y);
+  EXPECT_DOUBLE_EQ(M_PI/2, twist.twist.angular.z);
 }
+*/
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
