@@ -44,14 +44,15 @@ int main(int argc, char** argv)
 
   ros::init(argc, argv, "change_notifier", ros::init_options::AnonymousName);
   ros::NodeHandle node;
+  ros::NodeHandle local_node("~");
 
-  node.param(std::string("~polling_frequency"), polling_frequency, 10.0);
-  node.param(std::string("~translational_update_distance"), translational_update_distance, 0.10);
-  node.param(std::string("~angular_update_distance"), angular_update_distance, 0.10);
+  local_node.param(std::string("polling_frequency"), polling_frequency, 10.0);
+  local_node.param(std::string("translational_update_distance"), translational_update_distance, 0.10);
+  local_node.param(std::string("angular_update_distance"), angular_update_distance, 0.10);
 
-  node.param(std::string("~source_frame"), source_frame, std::string("base_link"));
-  node.param(std::string("~target_frame"), target_frame, std::string("map"));
-  node.param(std::string("~topic_name"), topic_name, std::string("robot_pose_visualization"));
+  local_node.param(std::string("source_frame"), source_frame, std::string("base_link"));
+  local_node.param(std::string("target_frame"), target_frame, std::string("map"));
+  local_node.param(std::string("topic_name"), topic_name, std::string("robot_pose_visualization"));
 
 
   tf::TransformListener tfl(node);
