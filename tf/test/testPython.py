@@ -3,7 +3,6 @@ roslib.load_manifest('tf')
 import rostest
 import rospy
 import numpy
-import rostest
 import unittest
 import sys
 

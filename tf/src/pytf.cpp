@@ -53,9 +53,9 @@ static PyObject *PyObject_BorrowAttrString(PyObject* o, const char *name)
 
 static int rostime_converter(PyObject *obj, ros::Time *rt)
 {
-  PyObject *tsr = PyObject_CallMethod(obj, (char*)"to_seconds", NULL);
+  PyObject *tsr = PyObject_CallMethod(obj, (char*)"to_sec", NULL);
   if (tsr == NULL) {
-    PyErr_SetString(PyExc_TypeError, "time must have a to_seconds method, e.g. rospy.Time or rospy.Duration");
+    PyErr_SetString(PyExc_TypeError, "time must have a to_sec method, e.g. rospy.Time or rospy.Duration");
     return 0;
   } else {
     (*rt).fromSec(PyFloat_AsDouble(tsr));
@@ -66,9 +66,9 @@ static int rostime_converter(PyObject *obj, ros::Time *rt)
 
 static int rosduration_converter(PyObject *obj, ros::Duration *rt)
 {
-  PyObject *tsr = PyObject_CallMethod(obj, (char*)"to_seconds", NULL);
+  PyObject *tsr = PyObject_CallMethod(obj, (char*)"to_sec", NULL);
   if (tsr == NULL) {
-    PyErr_SetString(PyExc_TypeError, "time must have a to_seconds method, e.g. rospy.Time or rospy.Duration");
+    PyErr_SetString(PyExc_TypeError, "time must have a to_sec method, e.g. rospy.Time or rospy.Duration");
     return 0;
   } else {
     (*rt).fromSec(PyFloat_AsDouble(tsr));

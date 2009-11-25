@@ -20,6 +20,7 @@ any desired point in time.
   <depend package="rospy"/>
   <depend package="rostest"/>
   <depend package="roswtf"/>
+  <depend package="angles"/>
   <depend package="message_filters"/>
   <export>
     <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf `rosboost-cfg --lflags thread`"/>
