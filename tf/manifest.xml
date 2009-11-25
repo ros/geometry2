@@ -17,6 +17,7 @@ any desired point in time.
   <depend package="roscpp"/>
   <depend package="rosconsole"/>
   <depend package="bullet"/>
+  <depend package="angles"/>
   <depend package="rospy"/>
   <depend package="rostest"/>
   <depend package="roswtf"/>
