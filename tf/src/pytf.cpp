@@ -376,8 +376,8 @@ static struct PyMethodDef transformer_methods[] =
   {"frameExists", (PyCFunction)frameExists, METH_VARARGS},
   {"getFrameStrings", (PyCFunction)getFrameStrings, METH_VARARGS},
   {"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
-  {"lookupTransform", (PyCFunction)lookupTransform, METH_VARARGS},
-  {"lookupTransformFull", (PyCFunction)lookupTransformFull, METH_VARARGS},
+  {"lookupTransform", (PyCFunction)lookupTransform, METH_KEYWORDS},
+  {"lookupTransformFull", (PyCFunction)lookupTransformFull, METH_KEYWORDS},
   {"setUsingDedicatedThread", (PyCFunction)setUsingDedicatedThread, METH_VARARGS},
   {NULL,          NULL}
 };
