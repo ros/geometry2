@@ -1666,26 +1666,63 @@ TEST(tf, getFrameStrings)
 
 }
 
-/* 
+ 
 TEST(tf, lookupVelocity)
 {
+  double epsilon = 1e-9;
   Transformer mTR;
   mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,0,0), btVector3(1,0,0)), ros::Time().fromSec(1), "/odom",  "/base"));
-  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(9*M_PI/2,0,0), btVector3(2,0,0)), ros::Time().fromSec(2), "/odom",  "/base"));
-  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(10*M_PI,0,0), btVector3(3,0,0)), ros::Time().fromSec(3), "/odom",  "/base"));
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(M_PI/2,0,0), btVector3(2,0,0)), ros::Time().fromSec(2), "/odom",  "/base"));
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(M_PI,0,0), btVector3(3,0,0)), ros::Time().fromSec(3), "/odom",  "/base"));
 
   geometry_msgs::TwistStamped twist;
   ros::Time query_time;
   query_time.fromSec(2);
   mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
 
-  EXPECT_DOUBLE_EQ(query_time.toSec(), twist.header.stamp.toSec());
-  EXPECT_DOUBLE_EQ(1.0, twist.twist.linear.x);
-  EXPECT_DOUBLE_EQ(M_PI/2, twist.twist.angular.x);
-  EXPECT_DOUBLE_EQ(M_PI/2, twist.twist.angular.y);
-  EXPECT_DOUBLE_EQ(M_PI/2, twist.twist.angular.z);
+  EXPECT_NEAR(query_time.toSec(), twist.header.stamp.toSec(), epsilon);
+  EXPECT_NEAR(1.0, twist.twist.linear.x, epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.y, epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.z, epsilon);
+  EXPECT_NEAR(0, twist.twist.angular.x, epsilon);
+  EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
+  EXPECT_NEAR(M_PI/2, twist.twist.angular.z, epsilon);
+
+
+
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromSec(4), "/odom",  "/base"));
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,M_PI/2,0), btVector3(0,0,0)), ros::Time().fromSec(5), "/odom",  "/base"));
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,M_PI,0), btVector3(0,0,0)), ros::Time().fromSec(6), "/odom",  "/base"));
+
+  query_time.fromSec(5);
+  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
+
+  EXPECT_NEAR(query_time.toSec(), twist.header.stamp.toSec(), epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.x, epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.y, epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.z, epsilon);
+  EXPECT_NEAR(0, twist.twist.angular.x, epsilon);
+  EXPECT_NEAR(M_PI/2, twist.twist.angular.y, epsilon);
+  EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
+
+
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromSec(7), "/odom",  "/base"));
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,0,.1), btVector3(0,0,0)), ros::Time().fromSec(8), "/odom",  "/base"));
+  mTR.setTransform(  Stamped<btTransform> (btTransform(btQuaternion(0,0,.2), btVector3(0,0,0)), ros::Time().fromSec(9), "/odom",  "/base"));
+
+  query_time.fromSec(8);
+  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
+
+  EXPECT_NEAR(query_time.toSec(), twist.header.stamp.toSec(), epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.x, epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.y, epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.z, epsilon);
+  EXPECT_NEAR(.1, twist.twist.angular.x, epsilon);
+  EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
+  EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
+
 }
-*/
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);

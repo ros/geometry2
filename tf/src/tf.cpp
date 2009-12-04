@@ -302,7 +302,7 @@ void Transformer::lookupTransform(const std::string& target_frame,const ros::Tim
   transform.child_frame_id_ = source_frame;
 
 };
-/*
+
 void Transformer::lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
                     const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const
 {
@@ -320,30 +320,26 @@ void Transformer::lookupVelocity(const std::string& reference_frame, const std::
   lookupTransform(moving_frame, reference_frame, start_time, start);
   lookupTransform(moving_frame, reference_frame, end_time, end);
 
+
+  btMatrix3x3 temp = start.getBasis().inverse() * end.getBasis();
+  btQuaternion quat_temp;
+  temp.getRotation(quat_temp);
+  btVector3 o = start.getBasis() * quat_temp.getAxis();
+  btScalar ang = quat_temp.getAngle();
+  
   velocity.header.stamp = start_time + duration * 0.5;
   velocity.header.frame_id = reference_frame;
-  double start_roll, start_pitch, start_yaw, end_roll, end_pitch, end_yaw;
-  end.getBasis().getRPY(end_roll, end_pitch, end_yaw);
-  start.getBasis().getRPY(start_roll, start_pitch, start_yaw);
-
-  btQuaternion q = end.getRotation() - start.getRotation();
-  btVector3 v = q.getAxis();
-  btScalar a = q.getAngle();
-  printf("a: %f v: x y z %f %f %f\n", a, v.x(), v.y(), v.z());
-
   velocity.twist.linear.x =  (end.getOrigin().getX() - start.getOrigin().getX())/duration.toSec();
   velocity.twist.linear.y =  (end.getOrigin().getY() - start.getOrigin().getY())/duration.toSec();
   velocity.twist.linear.z =  (end.getOrigin().getZ() - start.getOrigin().getZ())/duration.toSec();
-  printf("roll: end start time %f %f %f\n", end_roll, start_roll, duration.toSec());
-  printf("pitch: end start time %f %f %f\n", end_pitch, start_pitch, duration.toSec());
-  printf("yaw: end start time %f %f %f\n", end_yaw, start_yaw, duration.toSec());
-  velocity.twist.angular.x =  angles::shortest_angular_distance(end_roll, start_roll)/duration.toSec();
-  velocity.twist.angular.y =  angles::shortest_angular_distance(end_pitch, start_pitch)/duration.toSec();
-  velocity.twist.angular.z =  angles::shortest_angular_distance(end_yaw, start_yaw)/duration.toSec();
+  velocity.twist.angular.x =  o.x() * ang/duration.toSec();
+  velocity.twist.angular.y =  o.y() * ang/duration.toSec();
+  velocity.twist.angular.z =  o.z() * ang/duration.toSec();
+
+  
 
 
 };
-*/
 
 bool Transformer::waitForTransform(const std::string& target_frame, const std::string& source_frame,
                                    const ros::Time& time,
@@ -353,7 +349,7 @@ bool Transformer::waitForTransform(const std::string& target_frame, const std::s
   if (!using_dedicated_thread_)
   {
     std::string error_string = "Do not call waitForTransform unless you are using another thread for populating data. Without a dedicated thread it will always timeout.  If you have a seperate thread servicing tf messages, call setUsingDedicatedThread(true)";
-    ROS_ERROR(error_string.c_str());
+    ROS_ERROR("%s",error_string.c_str());
     
     if (error_msg) 
       *error_msg = error_string;
