@@ -51,7 +51,7 @@ class TfRemapper:
                 self.mappings[i["old"]] = i["new"]
 
         print "Applying the following mappings to incoming tf frame ids", self.mappings
-        rospy.Subscriber("/tf_original", tfMessage, self.callback)
+        rospy.Subscriber("/tf_old", tfMessage, self.callback)
 
     def callback(self, tf_msg):
         for transform in tf_msg.transforms:
