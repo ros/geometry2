@@ -35,7 +35,7 @@
 
 ## Reset time
 
-import roslib; roslib.load_manifest('rospy_tutorials')
+import roslib; roslib.load_manifest('tf')
 
 import rospy
 from std_msgs.msg import Empty
