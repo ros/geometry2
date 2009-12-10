@@ -6,10 +6,10 @@ using namespace angles;
 TEST(Angles, shortestDistanceWithLimits){
   double shortest_angle;
   bool result = angles::shortest_angular_distance_with_limits(-0.5, 0.5,-0.25,0.25,shortest_angle);
-  EXPECT_TRUE(!result);
+  EXPECT_FALSE(result);
 
   result = angles::shortest_angular_distance_with_limits(-0.5, 0.5,0.25,0.25,shortest_angle);
-  EXPECT_TRUE(!result);
+  EXPECT_FALSE(result);
 
   result = angles::shortest_angular_distance_with_limits(-0.5, 0.5,0.25,-0.25,shortest_angle);
   EXPECT_TRUE(result);
@@ -20,27 +20,27 @@ TEST(Angles, shortestDistanceWithLimits){
   EXPECT_NEAR(shortest_angle, 0,1e-6);
 
   result = angles::shortest_angular_distance_with_limits(0.5, 0,0.25,-0.25,shortest_angle);
-  EXPECT_TRUE(!result);
+  EXPECT_FALSE(result);
   EXPECT_NEAR(shortest_angle, -0.5,1e-6);
 
   result = angles::shortest_angular_distance_with_limits(-0.5, 0,0.25,-0.25,shortest_angle);
-  EXPECT_TRUE(!result);
+  EXPECT_FALSE(result);
   EXPECT_NEAR(shortest_angle, 0.5,1e-6);
 
   result = angles::shortest_angular_distance_with_limits(-0.2,0.2,0.25,-0.25,shortest_angle);
-  EXPECT_TRUE(!result);
+  EXPECT_FALSE(result);
   EXPECT_NEAR(shortest_angle, -2*M_PI+0.4,1e-6);
 
   result = angles::shortest_angular_distance_with_limits(0.2,-0.2,0.25,-0.25,shortest_angle);
-  EXPECT_TRUE(!result);
+  EXPECT_FALSE(result);
   EXPECT_NEAR(shortest_angle,2*M_PI-0.4,1e-6);
 
   result = angles::shortest_angular_distance_with_limits(0.2,0,0.25,-0.25,shortest_angle);
-  EXPECT_TRUE(!result);
+  EXPECT_FALSE(result);
   EXPECT_NEAR(shortest_angle,2*M_PI-0.2,1e-6);
 
   result = angles::shortest_angular_distance_with_limits(-0.2,0,0.25,-0.25,shortest_angle);
-  EXPECT_TRUE(!result);
+  EXPECT_FALSE(result);
   EXPECT_NEAR(shortest_angle,-2*M_PI+0.2,1e-6);
 
   result = angles::shortest_angular_distance_with_limits(-0.25,-0.5,0.25,-0.25,shortest_angle);
