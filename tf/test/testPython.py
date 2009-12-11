@@ -85,6 +85,20 @@ class TestPython(unittest.TestCase):
         self.common(t)
         self.assert_(t.extra() == 77)
 
+    def test_transformer_ros(self):
+        tr = tf.TransformerROS()
+        m = geometry_msgs.msg.TransformStamped()
+        m.header.frame_id = "PARENT"
+        m.child_frame_id = "THISFRAME"
+        m.transform.translation.y = 5.0
+        m.transform.rotation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0, 0))
+        tr.setTransform(m)
+
+        msg = geometry_msgs.msg.Vector3Stamped()
+        msg.header.frame_id = "THISFRAME"
+        msg_t = tr.transformVector3("PARENT", msg)
+        self.assertEqual(msg_t.header.frame_id, "PARENT")
+
     def no_test_random(self):
         import networkx as nx
         for (r,h) in [ (2,2), (2,5), (3,5) ]:

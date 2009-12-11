@@ -111,6 +111,31 @@ class TransformerROS(TFX.Transformer):
         r.point = geometry_msgs.msg.Point(*xyz)
         return r
 
+    ## Transforms a geometry_msgs Vector3Stamped message to frame target_frame, returns the resulting Vector3Stamped.
+    # @param target_frame The target frame
+    # @param ps           geometry_msgs.msg.Vector3Stamped object
+
+    def transformVector3(self, target_frame, v3s):
+        """
+        :param target_frame: the tf target frame, a string
+        :param v3s: the geometry_msgs.msg.Vector3Stamped message
+        :return: new geometry_msgs.msg.Vector3Stamped message, in frame target_frame
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
+
+        Transforms a geometry_msgs Vector3Stamped message to frame target_frame, returns the a new Vector3Stamped message.
+        """
+
+        mat44 = self.asMatrix(target_frame, v3s.header)
+        mat44[0,3] = 0.0
+        mat44[1,3] = 0.0
+        mat44[2,3] = 0.0
+        xyz = tuple(numpy.dot(mat44, numpy.array([v3s.vector.x, v3s.vector.y, v3s.vector.z, 1.0])))[:3]
+        r = geometry_msgs.msg.Vector3Stamped()
+        r.header.stamp = v3s.header.stamp
+        r.header.frame_id = target_frame
+        r.vector = geometry_msgs.msg.Vector3(*xyz)
+        return r
+
     ## Transforms a geometry_msgs QuaternionStamped message to frame target_frame, returns the resulting QuaternionStamped.
     # @param target_frame The target frame
     # @param ps           geometry_msgs.msg.QuaternionStamped object
