@@ -28,6 +28,7 @@ installed: wiped $(SVN_DIR) Makefile
 		install_name_tool -id `rospack find kdl`/kdl/lib/liborocos-kdl.1.0.dylib kdl/lib/liborocos-kdl.1.0.dylib; \
 	fi
 	ln -s `rospack find kdl`/kdl/lib/`readlink \`which python\`` `rospack find kdl`/kdl/lib/python; \
+        [ -d `rospack find kdl`/kdl/lib/python/dist-packages ] && ln -s `rospack find kdl`/kdl/lib/python/dist-packages `rospack find kdl`/kdl/lib/python/site-packages; \
 	touch installed
 
 wiped: Makefile $(SVN_PATCH)
