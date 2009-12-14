@@ -313,9 +313,7 @@ void Transformer::lookupVelocity(const std::string& reference_frame, const std::
     target_time = latest_time;
 
   ros::Time end_time = std::min(time + duration *0.5 , latest_time);
-  std::cout << end_time.toSec() <<" latest " << latest_time.toSec() << " input " << time.toSec() << std::endl;
   ros::Time start_time = end_time - duration;
-  std::cout << start_time.toSec() << " start time" << std::endl;
   StampedTransform start, end;
   lookupTransform(moving_frame, reference_frame, start_time, start);
   lookupTransform(moving_frame, reference_frame, end_time, end);
