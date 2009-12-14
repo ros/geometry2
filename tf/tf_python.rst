@@ -212,12 +212,14 @@ Transformer
 
         :param reference_frame: transformation reference frame in tf, string
         :param moving_frame: transformation moving frame in tf, string
-        :param time: start time of the transformation interval
+        :param time: time in middle of the transformation interval
         :param duration: duration of the transformation interval
         :returns: a tuple with linear velocity as (x, y, z) and angular velocity as (x, y, z).
         :raises: :exc:`tf.ConnectivityException`, :exc:`tf.LookupException`, or :exc:`tf.ExtrapolationException`
 
-        Return the linear and angular velocity of the moving_frame in the reference_frame.
+        Return the linear and angular velocity of the moving_frame in the reference_frame.  tf considers 
+        :math:`time - duration / 2` to :math:`time + duration / 2` as the initial interval, and will shift by
+        up to :math:`duration / 2` to avoid no data.
 
 TransformerROS
 --------------
