@@ -77,7 +77,7 @@ typedef struct
  * 0 is a frame without a parent (the top of a tree)
  * The positions of frames over time must be pushed in.
  *
- * All function calls which pass frame ids can potentially throw the exception TransformReference::LookupException
+ * All function calls which pass frame ids can potentially throw the exception tf::LookupException
  */
 class Transformer
 {
@@ -114,15 +114,26 @@ public:
    * \param target_frame The frame to which data should be transformed
    * \param source_frame The frame where the data originated
    * \param time The time at which the value of the transform is desired. (0 will get the latest)
+   * \param transform The transform reference to fill.  
    *
-   * Possible exceptions TransformReference::LookupException, TransformReference::ConnectivityException,
-   * TransformReference::MaxDepthException
+   * Possible exceptions tf::LookupException, tf::ConnectivityException,
+   * tf::MaxDepthException, tf::ExtrapolationException
    */
   void lookupTransform(const std::string& target_frame, const std::string& source_frame,
                        const ros::Time& time, StampedTransform& transform) const;
   void lookupTransform(const std::string& target_frame, const std::string& source_frame,
                        const ros::Time& time, Stamped<btTransform>& transform) const __attribute__((deprecated));
-  //time traveling version
+  /** \brief Get the transform between two frames by frame ID assuming fixed frame.
+   * \param target_frame The frame to which data should be transformed
+   * \param target_time The time to which the data should be transformed. (0 will get the latest)
+   * \param source_frame The frame where the data originated
+   * \param source_time The time at which the source_frame should be evaluated. (0 will get the latest)
+   * \param fixed_frame The frame in which to assume the transform is constant in time. 
+   * \param transform The transform reference to fill.  
+   *
+   * Possible exceptions tf::LookupException, tf::ConnectivityException,
+   * tf::MaxDepthException, tf::ExtrapolationException
+   */
   void lookupTransform(const std::string& target_frame, const ros::Time& target_time,
                        const std::string& source_frame, const ros::Time& source_time,
                        const std::string& fixed_frame, StampedTransform& transform) const;
@@ -145,8 +156,12 @@ public:
    * \param duration The period over which to average
    * \param velocity The velocity output
    * 
-   * Possible exceptions TransformReference::LookupException, TransformReference::ConnectivityException,
-   * TransformReference::MaxDepthException
+   * This will compute the average velocity on the interval 
+   * (time - duration/2, time+duration/2). If that is too close to the most
+   * recent reading, in which case it will shift the interval up to
+   * duration/2 to prevent extrapolation.  Possible exceptions
+   * tf::LookupException, tf::ConnectivityException,
+   * tf::MaxDepthException, tf::ExtrapolationException
    */
     void lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
     const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const;
@@ -247,14 +262,14 @@ public:
                      Stamped<tf::Pose>& stamped_out) const;
 
   /** \brief Debugging function that will print the spanning chain of transforms.
-   * Possible exceptions TransformReference::LookupException, TransformReference::ConnectivityException,
-   * TransformReference::MaxDepthException
+   * Possible exceptions tf::LookupException, tf::ConnectivityException,
+   * tf::MaxDepthException
    */
   std::string chainAsString(const std::string & target_frame, ros::Time target_time, const std::string & source_frame, ros::Time source_time, const std::string & fixed_frame) const;
 
   /** \brief Debugging function that will print the spanning chain of transforms.
-   * Possible exceptions TransformReference::LookupException, TransformReference::ConnectivityException,
-   * TransformReference::MaxDepthException
+   * Possible exceptions tf::LookupException, tf::ConnectivityException,
+   * tf::MaxDepthException
    */
   void chainAsVector(const std::string & target_frame, ros::Time target_time, const std::string & source_frame, ros::Time source_time, const std::string & fixed_frame, std::vector<std::string>& output) const;
 
@@ -362,7 +377,7 @@ protected:
    * \param frame_number The frameID of the desired Reference Frame
    *
    * This is an internal function which will get the pointer to the frame associated with the frame id
-   * Possible Exception: TransformReference::LookupException
+   * Possible Exception: tf::LookupException
    */
   TimeCache* getFrame(unsigned int frame_number) const;
 
