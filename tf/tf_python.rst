@@ -178,7 +178,7 @@ Transformer
         Determines the most recent time for which Transformer can compute the transform between the two given frames. 
         Raises :exc:`tf.Exception` if transformation is not possible.
 
-    .. method::  lookupTransform(target_frame, source_frame, time) -> position, quaternion
+    .. method::  lookupTransform(target_frame, source_frame, time) -> (position, quaternion)
 
         :param target_frame: transformation target frame in tf, string
         :param source_frame: transformation source frame in tf, string
@@ -207,6 +207,17 @@ Transformer
         :raises: :exc:`tf.ConnectivityException`, :exc:`tf.LookupException`, or :exc:`tf.ExtrapolationException`
 
         Extended version of :meth:`lookupTransform`.
+
+    .. method::  lookupVelocity(target_frame, source_frame, time) -> (linear, angular)
+
+        :param reference_frame: transformation reference frame in tf, string
+        :param moving_frame: transformation moving frame in tf, string
+        :param time: start time of the transformation interval
+        :param duration: duration of the transformation interval
+        :returns: a tuple with linear velocity as (x, y, z) and angular velocity as (x, y, z).
+        :raises: :exc:`tf.ConnectivityException`, :exc:`tf.LookupException`, or :exc:`tf.ExtrapolationException`
+
+        Return the linear and angular velocity of the moving_frame in the reference_frame.
 
 TransformerROS
 --------------

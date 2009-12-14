@@ -305,6 +305,33 @@ static PyObject *lookupTransformFull(PyObject *self, PyObject *args, PyObject *k
       rotation.x(), rotation.y(), rotation.z(), rotation.w());
 }
 
+static PyObject *lookupVelocity(PyObject *self, PyObject *args, PyObject *kw)
+{
+  tf::Transformer *t = ((transformer_t*)self)->t;
+  char *reference_frame, *moving_frame;
+  ros::Time time;
+  ros::Duration duration;
+  static const char *keywords[] = { "reference_frame", "moving_frame", "time", "duration", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args,
+                                   kw,
+                                   "ssO&O&",
+                                   (char**)keywords,
+                                   &reference_frame,
+                                   &moving_frame,
+                                   rostime_converter,
+                                   &time,
+                                   rosduration_converter,
+                                   &duration))
+    return NULL;
+  geometry_msgs::TwistStamped velocity;
+  WRAP(t->lookupVelocity(reference_frame, moving_frame, time, duration, velocity));
+  return Py_BuildValue("(fff)(fff)",
+      velocity.twist.linear.x, velocity.twist.linear.y, velocity.twist.linear.z, 
+      velocity.twist.angular.x, velocity.twist.angular.y, velocity.twist.angular.z);
+}
+
+
 static PyObject *setTransform(PyObject *self, PyObject *args)
 {
   tf::Transformer *t = ((transformer_t*)self)->t;
@@ -378,6 +405,7 @@ static struct PyMethodDef transformer_methods[] =
   {"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
   {"lookupTransform", (PyCFunction)lookupTransform, METH_KEYWORDS},
   {"lookupTransformFull", (PyCFunction)lookupTransformFull, METH_KEYWORDS},
+  {"lookupVelocity", (PyCFunction)lookupVelocity, METH_KEYWORDS},
   {"setUsingDedicatedThread", (PyCFunction)setUsingDedicatedThread, METH_VARARGS},
   {NULL,          NULL}
 };
