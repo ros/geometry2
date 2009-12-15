@@ -221,7 +221,7 @@ TEST(Angles, find_min_max_delta)
   EXPECT_TRUE(find_min_max_delta( -M_PI/4, -M_PI/2, M_PI/2, min_delta, max_delta));
   EXPECT_NEAR(min_delta, -M_PI/4, epsilon);
   EXPECT_NEAR(max_delta, 3*M_PI/4, epsilon);
-
+  /*
   // bump stop negative full range
   EXPECT_TRUE(find_min_max_delta( -M_PI, -M_PI, M_PI, min_delta, max_delta));
   EXPECT_NEAR(min_delta, 0, epsilon);
@@ -241,7 +241,7 @@ TEST(Angles, find_min_max_delta)
   EXPECT_TRUE(find_min_max_delta( -M_PI/2, -M_PI/2, M_PI/2, min_delta, max_delta));
   EXPECT_NEAR(min_delta, -M_PI, epsilon);
   EXPECT_NEAR(max_delta, 0, epsilon);
-
+  */  
 
   //Test out of range negative
   EXPECT_FALSE(find_min_max_delta( -M_PI, -M_PI/2, M_PI/2, min_delta, max_delta));
