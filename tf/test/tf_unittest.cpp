@@ -1721,6 +1721,16 @@ TEST(tf, lookupVelocity)
   EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
   EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
 
+  query_time.fromSec(0);
+  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
+
+  EXPECT_NEAR(ros::Time().fromSec(8.75).toSec(), twist.header.stamp.toSec(), epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.x, epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.y, epsilon);
+  EXPECT_NEAR(0.0, twist.twist.linear.z, epsilon);
+  EXPECT_NEAR(.1, twist.twist.angular.x, epsilon);
+  EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
+  EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
 }
 
 

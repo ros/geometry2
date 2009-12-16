@@ -311,9 +311,12 @@ void Transformer::lookupVelocity(const std::string& reference_frame, const std::
 
   if (ros::Time() == time)
     target_time = latest_time;
+  else
+    target_time = time;
 
-  ros::Time end_time = std::min(time + duration *0.5 , latest_time);
-  ros::Time start_time = end_time - duration;
+  ros::Time end_time = std::min(target_time + duration *0.5 , latest_time);
+  
+  ros::Time start_time = std::max(ros::Time().fromSec(.00001) + duration, end_time) - duration;  // don't collide with zero
   StampedTransform start, end;
   lookupTransform(moving_frame, reference_frame, start_time, start);
   lookupTransform(moving_frame, reference_frame, end_time, end);
