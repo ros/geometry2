@@ -318,8 +318,8 @@ void Transformer::lookupVelocity(const std::string& reference_frame, const std::
   
   ros::Time start_time = std::max(ros::Time().fromSec(.00001) + duration, end_time) - duration;  // don't collide with zero
   StampedTransform start, end;
-  lookupTransform(moving_frame, reference_frame, start_time, start);
-  lookupTransform(moving_frame, reference_frame, end_time, end);
+  lookupTransform(reference_frame, moving_frame, start_time, start);
+  lookupTransform(reference_frame, moving_frame, end_time, end);
 
 
   btMatrix3x3 temp = start.getBasis().inverse() * end.getBasis();
