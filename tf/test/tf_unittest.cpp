@@ -1721,6 +1721,8 @@ TEST(tf, lookupVelocity)
   EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
   EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
 
+
+  // Test Latest
   query_time.fromSec(0);
   mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
 
@@ -1731,6 +1733,22 @@ TEST(tf, lookupVelocity)
   EXPECT_NEAR(.1, twist.twist.angular.x, epsilon);
   EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
   EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
+
+
+  // Test extrapolation back
+
+  query_time.fromSec(1.0);
+  try
+  {
+    mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
+    EXPECT_FALSE("This should have thrown and extrapolationException for being too old");
+  }
+  catch (tf::ExtrapolationException& ex)
+  {
+    EXPECT_TRUE("Caught Exception correctly");
+  }
+
+
 }
 
 
