@@ -170,7 +170,7 @@ TEST(Angles, shortest_angular_distance)
 TEST(Angles, two_pi_complement)
 {
   double epsilon = 1e-9;
-  EXPECT_NEAR(two_pi_complement(0), -2*M_PI, epsilon); //Should this be?
+  EXPECT_NEAR(two_pi_complement(0), 2*M_PI, epsilon);
   EXPECT_NEAR(two_pi_complement(2*M_PI), 0, epsilon); 
   EXPECT_NEAR(two_pi_complement(-2*M_PI), 0, epsilon); 
   EXPECT_NEAR(two_pi_complement(2*M_PI-epsilon), -epsilon, epsilon); 
@@ -221,16 +221,22 @@ TEST(Angles, find_min_max_delta)
   EXPECT_TRUE(find_min_max_delta( -M_PI/4, -M_PI/2, M_PI/2, min_delta, max_delta));
   EXPECT_NEAR(min_delta, -M_PI/4, epsilon);
   EXPECT_NEAR(max_delta, 3*M_PI/4, epsilon);
-  /*
+
   // bump stop negative full range
   EXPECT_TRUE(find_min_max_delta( -M_PI, -M_PI, M_PI, min_delta, max_delta));
-  EXPECT_NEAR(min_delta, 0, epsilon);
+  EXPECT_TRUE((fabs(min_delta) <= epsilon && fabs(max_delta - 2*M_PI) <= epsilon) || (fabs(min_delta+2*M_PI) <= epsilon && fabs(max_delta) <= epsilon)); 
+  EXPECT_NEAR(min_delta, 0.0, epsilon);
   EXPECT_NEAR(max_delta, 2*M_PI, epsilon);
 
+  EXPECT_TRUE(find_min_max_delta(-0.25,0.25,-0.25,min_delta, max_delta));
+  EXPECT_NEAR(min_delta, -2*M_PI+0.5, epsilon);
+  EXPECT_NEAR(max_delta, 0.0, epsilon);
+  
   // bump stop positive full range
-  EXPECT_TRUE(find_min_max_delta( -M_PI, -M_PI, M_PI, min_delta, max_delta));
-  EXPECT_NEAR(min_delta, -2*M_PI, epsilon);
-  EXPECT_NEAR(max_delta, 0, epsilon);
+  EXPECT_TRUE(find_min_max_delta( M_PI-epsilon, -M_PI, M_PI, min_delta, max_delta));
+  //EXPECT_TRUE((fabs(min_delta) <= epsilon && fabs(max_delta - 2*M_PI) <= epsilon) || (fabs(min_delta+2*M_PI) <= epsilon && fabs(max_delta) <= epsilon)); 
+  EXPECT_NEAR(min_delta, -2*M_PI+epsilon, epsilon);
+  EXPECT_NEAR(max_delta, epsilon, epsilon);
 
   // bump stop negative partial range
   EXPECT_TRUE(find_min_max_delta( -M_PI, -M_PI, M_PI, min_delta, max_delta));
@@ -239,9 +245,9 @@ TEST(Angles, find_min_max_delta)
 
   // bump stop positive partial range
   EXPECT_TRUE(find_min_max_delta( -M_PI/2, -M_PI/2, M_PI/2, min_delta, max_delta));
-  EXPECT_NEAR(min_delta, -M_PI, epsilon);
-  EXPECT_NEAR(max_delta, 0, epsilon);
-  */  
+  EXPECT_NEAR(min_delta, 0.0, epsilon);
+  EXPECT_NEAR(max_delta, M_PI, epsilon);
+    
 
   //Test out of range negative
   EXPECT_FALSE(find_min_max_delta( -M_PI, -M_PI/2, M_PI/2, min_delta, max_delta));

@@ -128,8 +128,10 @@ namespace angles
       angle = fmod(angle, 2.0*M_PI);    
     if(angle < 0)
       return (2*M_PI+angle);
-    else
+    else if (angle > 0)
       return (-2*M_PI+angle);
+
+    return(2*M_PI);
   }
 
   /*! 
@@ -153,6 +155,21 @@ namespace angles
     delta[2] = two_pi_complement(delta[0]);
     delta[3] = two_pi_complement(delta[1]);
 
+    if(delta[0] == 0)
+    {
+      result_min_delta = delta[0];
+      result_max_delta = std::max<double>(delta[1],delta[3]);
+      return true;
+    }
+
+    if(delta[1] == 0)
+    {
+        result_max_delta = delta[1];
+        result_min_delta = std::min<double>(delta[0],delta[2]);
+        return true;
+    }
+
+
     double delta_min = delta[0];
     double delta_min_2pi = delta[2];
     if(delta[2] < delta_min)
@@ -170,7 +187,7 @@ namespace angles
     }
 
 
-//    printf("%f %f %f %f\n",delta_min,delta_min_2pi,delta_max,delta_max_2pi);
+    //    printf("%f %f %f %f\n",delta_min,delta_min_2pi,delta_max,delta_max_2pi);
     if((delta_min <= delta_max_2pi) || (delta_max >= delta_min_2pi))
     {
       result_min_delta = delta_max_2pi;
