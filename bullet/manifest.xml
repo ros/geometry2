@@ -70,9 +70,9 @@
 <rosdep name="libxext"/>
 <rosdep name="glut"/>
 <export>
-<cpp cflags="-I${prefix}/build/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" lflags="-L${prefix}/build/lib -lBulletDynamics -lBulletCollision -lLinearMath" />
+<cpp cflags="-I${prefix}/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" lflags="-L${prefix}/lib -lBulletDynamics -lBulletCollision -lLinearMath" />
   <doxymaker external="http://www.continuousphysics.com/Bullet/BulletFull/index.html" />
-<swig flags="-python -c++ -I${prefix}/build/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX "/>
+<swig flags="-python -c++ -I${prefix}/include -DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX "/>
 </export>
 </package>
 
