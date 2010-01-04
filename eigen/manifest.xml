@@ -1,6 +1,6 @@
 <package>
   <description brief="Eigen">
-    This package contains version 2.0.9 of the Eigen C++ template
+    This package contains version 2.0.10 of the Eigen C++ template
     library for linear algebra. It automatically downloads, extracts
     and compiles a tarball. For each major release of the Eigen
     library, the tarball will get updated. This ROS package does not
@@ -15,7 +15,7 @@
   <review status="3rdparty doc reviewed" notes="ticket:2879"/>
   <url>http://eigen.tuxfamily.org/</url>
   <export>
-    <cpp cflags="-I${prefix}/build/eigen2 -DEIGEN_USE_NEW_STDVECTOR" lflags="" />
+    <cpp cflags="-I${prefix}/build/eigen -DEIGEN_USE_NEW_STDVECTOR" lflags="" />
     <doxymaker external="http://eigen.tuxfamily.org/api/"/>
   </export>
 </package>

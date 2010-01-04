@@ -1,9 +1,9 @@
 all: eigen
 
-TARBALL     = build/eigen2-2.0.9.tar.bz2
-TARBALL_URL = http://pr.willowgarage.com/downloads/eigen2-2.0.9.tar.bz2
+TARBALL     = build/eigen2-2.0.10.tar.bz2
+TARBALL_URL = http://pr.willowgarage.com/downloads/eigen2-2.0.10.tar.bz2
 UNPACK_CMD  = tar xfj
-SOURCE_DIR  = build/eigen2
+SOURCE_DIR  = build/eigen
 
 include $(shell rospack find mk)/download_unpack_build.mk
 
