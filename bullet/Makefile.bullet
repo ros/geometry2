@@ -23,10 +23,10 @@ include $(shell rospack find mk)/download_unpack_build.mk
 BULLET_TARGETS = LinearMath BulletCollision BulletDynamics BulletSoftBody
 
 # Poor man's installation procedure setup
-BULLET_LIBS = $(SOURCE_DIR)/src/BulletCollision/libBulletCollision.a \
-              $(SOURCE_DIR)/src/BulletDynamics/libBulletDynamics.a \
-              $(SOURCE_DIR)/src/LinearMath/libLinearMath.a \
-              $(SOURCE_DIR)/src/BulletSoftBody/libBulletSoftBody.a 
+BULLET_LIBS = $(SOURCE_DIR)/src/BulletCollision/libBulletCollision.* \
+              $(SOURCE_DIR)/src/BulletDynamics/libBulletDynamics.* \
+              $(SOURCE_DIR)/src/LinearMath/libLinearMath.* \
+              $(SOURCE_DIR)/src/BulletSoftBody/libBulletSoftBody.* 
 
 BULLET_INC_DIRS = . \
 				  BulletCollision/CollisionShapes \
@@ -51,7 +51,7 @@ build_tarball: $(SVN_DIR) patched
 
 
 installed: $(SOURCE_DIR)/unpacked
-	cd $(SOURCE_DIR) && cmake -DCMAKE_INSTALL_PREFIX=$(CURDIR) -DCMAKE_CXX_FLAGS="-fPIC -DBT_USE_DOUBLE_PRECISION" . 
+	cd $(SOURCE_DIR) && cmake -DCMAKE_INSTALL_PREFIX=$(CURDIR) -DCMAKE_CXX_FLAGS="-fPIC -DBT_USE_DOUBLE_PRECISION" -D BUILD_SHARED_LIBS=on . 
 	# Bullet appears not be parallel-make safe
 	#cd $(SOURCE_DIR) && make $(PARALLEL_JOBS) 
 	cd $(SOURCE_DIR) && make $(BULLET_TARGETS) 
