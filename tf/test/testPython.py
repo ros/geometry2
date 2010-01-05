@@ -93,13 +93,46 @@ class TestPython(unittest.TestCase):
         m.header.frame_id = "PARENT"
         m.child_frame_id = "THISFRAME"
         m.transform.translation.y = 5.0
-        m.transform.rotation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0, 0))
+        m.transform.rotation.x = 0.04997917
+        m.transform.rotation.y = 0
+        m.transform.rotation.z = 0
+        m.transform.rotation.w = 0.99875026
         tr.setTransform(m)
 
-        msg = geometry_msgs.msg.Vector3Stamped()
+        # Smoke the various transform* methods
+
+        types = [ "Point", "Pose", "Quaternion", "Vector3" ]
+        for t in types:
+            msg = getattr(geometry_msgs.msg, "%sStamped" % t)()
+            msg.header.frame_id = "THISFRAME"
+            msg_t = getattr(tr, "transform%s" % t)("PARENT", msg)
+            self.assertEqual(msg_t.header.frame_id, "PARENT")
+
+
+        """
+        Two fixed quaternions, a small twist around X concatenated.
+
+        >>> t.quaternion_from_euler(0.1, 0, 0)
+        array([ 0.04997917,  0.        ,  0.        ,  0.99875026])
+        >>> t.quaternion_from_euler(0.2, 0, 0)
+        array([ 0.09983342,  0.        ,  0.        ,  0.99500417])
+        """
+
+        # Specific test for quaternion types
+
+        msg = geometry_msgs.msg.QuaternionStamped()
+        q = [ 0.04997917,  0.        ,  0.        ,  0.99875026 ]
+        msg.quaternion.x = q[0]
+        msg.quaternion.y = q[1]
+        msg.quaternion.z = q[2]
+        msg.quaternion.w = q[3]
         msg.header.frame_id = "THISFRAME"
-        msg_t = tr.transformVector3("PARENT", msg)
+        msg_t = tr.transformQuaternion("PARENT", msg)
         self.assertEqual(msg_t.header.frame_id, "PARENT")
+        for a,v in zip("xyzw", [ 0.09983342,  0.        ,  0.        ,  0.99500417]):
+            self.assertAlmostEqual(v,
+                                   getattr(msg_t.quaternion, a),
+                                   4)
 
     def no_test_random(self):
         import networkx as nx
