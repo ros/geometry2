@@ -10,7 +10,7 @@ CMAKE = cmake
 BOOST_INCLUDE =$(shell rosboost-cfg --include_dirs)
 EIGEN2_INCLUDE_DIR=`rospack cflags-only-I eigen| cut -d ' ' -f 1`
 EIGEN2_DEFINE=`rospack cflags-only-other eigen`
-TINYXML_INCLUDE_DIR=`rospack find tinyxml`/include/
+TINYXML_INCLUDE_DIR=`rospack cflags-only-I tinyxml| cut -d ' ' -f 1`
 CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=`rospack find kdl`/$(INSTALL_DIR)/ \
 		-DPYTHON_BINDINGS=ON \
 		-DBUILD_MODELS=OFF \
