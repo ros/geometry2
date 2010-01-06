@@ -138,6 +138,12 @@ static inline double getYaw(const geometry_msgs::Quaternion& msg_q){
   return getYaw(bt_q);
 }
 
+static inline tf::Quaternion createQuaternionFromRPY(double roll,double pitch,double yaw){
+  Quaternion q;
+  q.setRPY(roll, pitch, yaw);
+  return q;
+}
+
 static inline Quaternion createQuaternionFromYaw(double yaw){
   Quaternion q;
   q.setRPY(0.0, 0.0, yaw);
@@ -153,10 +159,8 @@ static inline geometry_msgs::Quaternion createQuaternionMsgFromYaw(double yaw){
 }
 
 static inline geometry_msgs::Quaternion createQuaternionMsgFromRollPitchYaw(double roll,double pitch,double yaw){
-  Quaternion q;
-  q.setRPY(roll, pitch, yaw);
   geometry_msgs::Quaternion q_msg;
-  quaternionTFToMsg(q, q_msg);
+  quaternionTFToMsg(createQuaternionFromRPY(roll, pitch, yaw), q_msg);
   return q_msg;
 }
 

@@ -23,6 +23,9 @@ target_link_libraries(bin/tf_monitor tf)
 rosbuild_add_gtest(test/tf_unittest test/tf_unittest.cpp)
 target_link_libraries(test/tf_unittest tf)
 
+rosbuild_add_gtest(test/test_transform_datatypes test/test_transform_datatypes.cpp)
+target_link_libraries(test/tf_unittest tf)
+
 rosbuild_add_executable(test/transform_listener_unittest test/transform_listener_unittest.cpp)
 target_link_libraries(test/transform_listener_unittest tf)
 rosbuild_add_gtest_build_flags(test/transform_listener_unittest)
