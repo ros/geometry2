@@ -137,9 +137,9 @@ namespace angles
   /*! 
    * \function
    *
-   * \brief Returns the min and max amount (in radians) that can be moved from "from" angle to "left_limit" and "right_limit".
+   * \brief This function is only intended for internal use and not intended for external use. If you do use it, read the documentation very carefully. Returns the min and max amount (in radians) that can be moved from "from" angle to "left_limit" and "right_limit". 
    * \return returns false if "from" angle does not lie in the interval [left_limit,right_limit]
-   * \param from - "from" angle - must lie in [-M_PI, M_PI]
+   * \param from - "from" angle - must lie in [-M_PI, M_PI)
    * \param left_limit - left limit of valid interval for angular position - must lie in [-M_PI, M_PI], left and right limits are specified on the unit circle w.r.t to a reference pointing inwards
    * \param right_limit - right limit of valid interval for angular position - must lie in [-M_PI, M_PI], left and right limits are specified on the unit circle w.r.t to a reference pointing inwards 
    * \param result_min_delta - minimum (delta) angle (in radians) that can be moved from "from" position before hitting the joint stop
