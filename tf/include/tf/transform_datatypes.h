@@ -211,13 +211,6 @@ static inline void transformMsgToTF(const geometry_msgs::Transform& msg, Transfo
 static inline void transformTFToMsg(const Transform& bt, geometry_msgs::Transform& msg)
 {vector3TFToMsg(bt.getOrigin(), msg.translation);  quaternionTFToMsg(bt.getRotation(), msg.rotation);};
 
-/** \brief convert TransformStamped msg to Stamped<Transform> */
-static inline void transformStampedMsgToTF(const geometry_msgs::TransformStamped & msg, Stamped<Transform>& bt) // \todo __attribute__((deprecated))
-{transformMsgToTF(msg.transform, bt); bt.stamp_ = msg.header.stamp; bt.parent_id_ = msg.header.frame_id; bt.frame_id_ = msg.child_frame_id;};
-/** \brief convert Stamped<Transform> to TransformStamped msg*/
-static inline void transformStampedTFToMsg(const Stamped<Transform>& bt, geometry_msgs::TransformStamped & msg) //\todo __attribute__((deprecated)) 
-{transformTFToMsg(bt, msg.transform); msg.header.stamp = bt.stamp_; msg.header.frame_id = bt.parent_id_; msg.child_frame_id = bt.frame_id_;} ;
-
 /** \brief convert TransformStamped msg to tf::StampedTransform */
 static inline void transformStampedMsgToTF(const geometry_msgs::TransformStamped & msg, StampedTransform& bt)
 {transformMsgToTF(msg.transform, bt); bt.stamp_ = msg.header.stamp; bt.frame_id_ = msg.header.frame_id; bt.child_frame_id_ = msg.child_frame_id;};

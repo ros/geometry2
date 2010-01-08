@@ -52,13 +52,6 @@ void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped &
   publisher_.publish(message);
 }
 
-void TransformBroadcaster::sendTransform(const Stamped<Transform> & transform)
-{
-  geometry_msgs::TransformStamped msgtf;
-  transformStampedTFToMsg(transform, msgtf);
-  sendTransform(msgtf);
-} 
-
 void TransformBroadcaster::sendTransform(const StampedTransform & transform)
 {
   geometry_msgs::TransformStamped msgtf;

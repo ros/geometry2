@@ -477,7 +477,7 @@ TEST(data, TransformConversions)
   
 }
 
-TEST(data, TransformStampedConversions)
+TEST(data, PoseStampedConversions)
 {
   
   uint64_t runs = 400;
@@ -492,9 +492,9 @@ TEST(data, TransformStampedConversions)
   {
     Stamped<btTransform> btv = Stamped<btTransform>(btTransform(btQuaternion(xvalues2[i], yvalues2[i], zvalues2[i]), btVector3(xvalues[i], yvalues[i], zvalues[i])), ros::Time().fromNSec(1), "no frame");
     Stamped<btTransform> btv_out;
-    geometry_msgs::TransformStamped msgv;
-    transformStampedTFToMsg(btv, msgv);
-    transformStampedMsgToTF(msgv, btv_out);
+    geometry_msgs::PoseStamped msgv;
+    poseStampedTFToMsg(btv, msgv);
+    poseStampedMsgToTF(msgv, btv_out);
     EXPECT_NEAR(btv.getOrigin().x(), btv_out.getOrigin().x(), epsilon);
     EXPECT_NEAR(btv.getOrigin().y(), btv_out.getOrigin().y(), epsilon);
     EXPECT_NEAR(btv.getOrigin().z(), btv_out.getOrigin().z(), epsilon);
