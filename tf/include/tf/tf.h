@@ -232,33 +232,39 @@ public:
   int getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time& time, std::string * error_string) const;
 
 
-  /** \brief Transform a Stamped Quaternion into the target frame */
+  /** \brief Transform a Stamped Quaternion into the target frame
+   * This can throw anything a lookupTransform can throw as well as tf::InvalidArgument. */
   void transformQuaternion(const std::string& target_frame, const Stamped<tf::Quaternion>& stamped_in, Stamped<tf::Quaternion>& stamped_out) const;
-  /** \brief Transform a Stamped Vector3 into the target frame */
+  /** \brief Transform a Stamped Vector3 into the target frame 
+   * This can throw anything a lookupTransform can throw as well as tf::InvalidArgument.*/
   void transformVector(const std::string& target_frame, const Stamped<tf::Vector3>& stamped_in, Stamped<tf::Vector3>& stamped_out) const;
-  /** \brief Transform a Stamped Point into the target frame */
+  /** \brief Transform a Stamped Point into the target frame 
+   * This can throw anything a lookupTransform can throw as well as tf::InvalidArgument.*/
   void transformPoint(const std::string& target_frame, const Stamped<tf::Point>& stamped_in, Stamped<tf::Point>& stamped_out) const;
-  /** \brief Transform a Stamped Pose into the target frame */
+  /** \brief Transform a Stamped Pose into the target frame 
+   * This can throw anything a lookupTransform can throw as well as tf::InvalidArgument.*/
   void transformPose(const std::string& target_frame, const Stamped<tf::Pose>& stamped_in, Stamped<tf::Pose>& stamped_out) const;
 
-  /** \brief Transform a Stamped Quaternion into the target frame */
+  /** \brief Transform a Stamped Quaternion into the target frame 
+   * This can throw anything a lookupTransform can throw as well as tf::InvalidArgument.*/
   void transformQuaternion(const std::string& target_frame, const ros::Time& target_time,
                            const Stamped<tf::Quaternion>& stamped_in,
                            const std::string& fixed_frame,
                            Stamped<tf::Quaternion>& stamped_out) const;
-  /** \brief Transform a Stamped Vector3 into the target frame */
+  /** \brief Transform a Stamped Vector3 into the target frame 
+   * This can throw anything a lookupTransform can throw as well as tf::InvalidArgument.*/
   void transformVector(const std::string& target_frame, const ros::Time& target_time,
                        const Stamped<tf::Vector3>& stamped_in,
                        const std::string& fixed_frame,
                        Stamped<tf::Vector3>& stamped_out) const;
   /** \brief Transform a Stamped Point into the target frame
-   * \todo document*/
+   * This can throw anything a lookupTransform can throw as well as tf::InvalidArgument.*/
   void transformPoint(const std::string& target_frame, const ros::Time& target_time,
                       const Stamped<tf::Point>& stamped_in,
                       const std::string& fixed_frame,
                       Stamped<tf::Point>& stamped_out) const;
   /** \brief Transform a Stamped Pose into the target frame
-   * \todo document*/
+   * This can throw anything a lookupTransform can throw as well as tf::InvalidArgument.*/
   void transformPose(const std::string& target_frame, const ros::Time& target_time,
                      const Stamped<tf::Pose>& stamped_in,
                      const std::string& fixed_frame,

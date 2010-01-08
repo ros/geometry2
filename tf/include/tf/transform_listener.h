@@ -72,38 +72,48 @@ public:
   using Transformer::transformPose;
 
 
-  /** \brief Transform a Stamped Quaternion Message into the target frame */
+  /** \brief Transform a Stamped Quaternion Message into the target frame 
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformQuaternion(const std::string& target_frame, const geometry_msgs::QuaternionStamped& stamped_in, geometry_msgs::QuaternionStamped& stamped_out) const;
-  /** \brief Transform a Stamped Vector Message into the target frame */
+  /** \brief Transform a Stamped Vector Message into the target frame 
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformVector(const std::string& target_frame, const geometry_msgs::Vector3Stamped& stamped_in, geometry_msgs::Vector3Stamped& stamped_out) const;
-  /** \brief Transform a Stamped Point Message into the target frame */
+  /** \brief Transform a Stamped Point Message into the target frame 
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformPoint(const std::string& target_frame, const geometry_msgs::PointStamped& stamped_in, geometry_msgs::PointStamped& stamped_out) const;
-  /** \brief Transform a Stamped Pose Message into the target frame */
+  /** \brief Transform a Stamped Pose Message into the target frame 
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformPose(const std::string& target_frame, const geometry_msgs::PoseStamped& stamped_in, geometry_msgs::PoseStamped& stamped_out) const;
 
 
-  /** \brief Transform a Stamped Quaternion Message into the target frame*/
+  /** \brief Transform a Stamped Quaternion Message into the target frame
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformQuaternion(const std::string& target_frame, const ros::Time& target_time,
                            const geometry_msgs::QuaternionStamped& qin,
                            const std::string& fixed_frame, geometry_msgs::QuaternionStamped& qout) const;
-  /** \brief Transform a Stamped Vector Message into the target frame and time */
+  /** \brief Transform a Stamped Vector Message into the target frame and time 
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformVector(const std::string& target_frame, const ros::Time& target_time,
                        const geometry_msgs::Vector3Stamped& vin,
                            const std::string& fixed_frame, geometry_msgs::Vector3Stamped& vout) const;
-  /** \brief Transform a Stamped Point Message into the target frame and time  */
+  /** \brief Transform a Stamped Point Message into the target frame and time  
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformPoint(const std::string& target_frame, const ros::Time& target_time,
                            const geometry_msgs::PointStamped& pin,
                            const std::string& fixed_frame, geometry_msgs::PointStamped& pout) const;
-  /** \brief Transform a Stamped Pose Message into the target frame and time  */
+  /** \brief Transform a Stamped Pose Message into the target frame and time  
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformPose(const std::string& target_frame, const ros::Time& target_time,
                      const geometry_msgs::PoseStamped& pin,
                      const std::string& fixed_frame, geometry_msgs::PoseStamped& pout) const;
 
 
-  /** \brief Transform a sensor_msgs::PointCloud natively */
+  /** \brief Transform a sensor_msgs::PointCloud natively 
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
     void transformPointCloud(const std::string& target_frame, const sensor_msgs::PointCloud& pcin, sensor_msgs::PointCloud& pcout) const;
 
-  /** @brief Transform a sensor_msgs::PointCloud in space and time */
+  /** @brief Transform a sensor_msgs::PointCloud in space and time 
+   * This can throw all that lookupTransform can throw as well as tf::InvalidTransform */
   void transformPointCloud(const std::string& target_frame, const ros::Time& target_time,
                            const sensor_msgs::PointCloud& pcin,
                            const std::string& fixed_frame, sensor_msgs::PointCloud& pcout) const;

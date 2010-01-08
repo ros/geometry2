@@ -1040,6 +1040,9 @@ tf::TimeCache* Transformer::getFrame(unsigned int frame_id) const
 
 void Transformer::transformQuaternion(const std::string& target_frame, const Stamped<Quaternion>& stamped_in, Stamped<Quaternion>& stamped_out) const
 {
+  if (stamped_in.w() <= 0.0 || stamped_in.w() > 1.0)
+    throw tf::InvalidArgument("Input Stamped Quaternion has w which is malformed");
+
   StampedTransform transform;
   lookupTransform(target_frame, stamped_in.frame_id_, stamped_in.stamp_, transform);
 
@@ -1093,6 +1096,8 @@ void Transformer::transformQuaternion(const std::string& target_frame, const ros
                                       const std::string& fixed_frame,
                                       Stamped<Quaternion>& stamped_out) const
 {
+  if (stamped_in.w() <= 0.0 || stamped_in.w() > 1.0)
+    throw tf::InvalidArgument("Input Stamped Quaternion has w which is malformed");
   StampedTransform transform;
   lookupTransform(target_frame, target_time,
                   stamped_in.frame_id_,stamped_in.stamp_,
