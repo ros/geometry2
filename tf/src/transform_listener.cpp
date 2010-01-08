@@ -36,6 +36,15 @@
 
 
 using namespace tf;
+std::string tf::remap(const std::string& frame_id)
+{
+  ros::NodeHandle n("~");
+  std::string tf_prefix;
+  std::string searched_param;
+  n.searchParam("tf_prefix", searched_param);
+  n.getParam(searched_param, tf_prefix);
+  return tf::remap(tf_prefix, frame_id);
+};
 
 
 /** \brief Convert the transform to a Homogeneous matrix for large operations */

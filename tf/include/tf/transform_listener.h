@@ -45,7 +45,7 @@
 namespace tf{
 
 /** \brief resolve names \todo document me */
-std::string resolve(const std::string& frame_id);
+std::string remap(const std::string& frame_id) __attribute__((deprecated));
 
 /** \brief This class inherits from Transformer and automatically subscribes to ROS transform messages */
 class TransformListener : public Transformer { //subscribes to message and automatically stores incoming data
