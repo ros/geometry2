@@ -289,6 +289,18 @@ int main(int argc, char ** argv)
   local_nh.getParam(searched_param, tf_prefix);
   
 
+  //Make sure we don't start before recieving time when in simtime
+  int iterations = 0;
+  while (ros::Time::now() == ros::Time())
+  {
+    if (++iterations > 10)
+    {
+      ROS_INFO("tf_monitor waiting for time to be published");
+      iterations = 0;
+    }
+    ros::WallDuration(0.1).sleep();
+  }
+
   ros::NodeHandle nh;
   boost::thread spinner( boost::bind( &ros::spin ));
   TFMonitor monitor(using_specific_chain, tf::resolve(tf_prefix, framea), tf::resolve(tf_prefix, frameb));
