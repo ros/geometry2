@@ -82,6 +82,17 @@ public:
   ExtrapolationException(const std::string errorDescription) : tf::TransformException(errorDescription) { ; };
 };
 
+/** \brief An exception class to notify that one of the arguments is invalid
+ * 
+ * usually it's an uninitalized Quaternion (0,0,0,0)
+ * 
+ */
+class InvalidArgument: public TransformException  
+{ 
+public:
+  InvalidArgument(const std::string errorDescription) : tf::TransformException(errorDescription) { ; };
+};
+
 
 }
 
