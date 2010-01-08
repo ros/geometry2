@@ -47,8 +47,8 @@ void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped &
 {
   tfMessage message;
   message.transforms.push_back(msgtf);
-  message.transforms.back().header.frame_id = tf::remap(tf_prefix_, message.transforms.back().header.frame_id);
-  message.transforms.back().child_frame_id = tf::remap(tf_prefix_, message.transforms.back().child_frame_id);
+  message.transforms.back().header.frame_id = tf::resolve(tf_prefix_, message.transforms.back().header.frame_id);
+  message.transforms.back().child_frame_id = tf::resolve(tf_prefix_, message.transforms.back().child_frame_id);
   publisher_.publish(message);
 }
 

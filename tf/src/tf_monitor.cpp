@@ -282,9 +282,16 @@ int main(int argc, char ** argv)
     return -1;
   }
 
+  std::string searched_param;
+  std::string tf_prefix;
+  ros::NodeHandle local_nh("~");
+  local_nh.searchParam("tf_prefix", searched_param);
+  local_nh.getParam(searched_param, tf_prefix);
+  
+
   ros::NodeHandle nh;
   boost::thread spinner( boost::bind( &ros::spin ));
-  TFMonitor monitor(using_specific_chain, tf::remap(framea), tf::remap(frameb));
+  TFMonitor monitor(using_specific_chain, tf::resolve(tf_prefix, framea), tf::resolve(tf_prefix, frameb));
   monitor.spin();
   spinner.join();
   return 0;

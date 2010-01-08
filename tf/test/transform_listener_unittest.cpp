@@ -55,14 +55,17 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 using namespace tf;
 
 
-TEST(transform_listener, remap)
+TEST(transform_listener, resolve)
 {
   ros::NodeHandle n("~");
+  tf::TransformListener tl; 
   
   //no prefix
-  EXPECT_STREQ("/id", tf::remap("id").c_str());
+  EXPECT_STREQ("/id", tl.resolve("id").c_str());
+  
   n.setParam("tf_prefix", "a_tf_prefix");
-  EXPECT_STREQ("/a_tf_prefix/id", tf::remap("id").c_str());
+  tf::TransformListener tp; 
+  EXPECT_STREQ("/a_tf_prefix/id", tp.resolve("id").c_str());
   
 
 }

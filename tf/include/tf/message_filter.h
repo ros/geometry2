@@ -203,7 +203,7 @@ public:
     std::stringstream ss;
     for (std::vector<std::string>::iterator it = target_frames_.begin(); it != target_frames_.end(); ++it)
     {
-      *it = tf::remap(*it);
+      *it = tf::resolve(tf_.getTFPrefix(), *it);
       ss << *it << " ";
     }
     target_frames_string_ = ss.str();
@@ -325,7 +325,7 @@ private:
     std::string frame_id = message->header.frame_id;
     if (frame_id[0] != '/')
     {
-      frame_id = tf::remap(tf_.getTFPrefix(), frame_id);
+      frame_id = tf::resolve(tf_.getTFPrefix(), frame_id);
 
       if (!warned_about_unresolved_name_)
       {

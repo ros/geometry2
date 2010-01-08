@@ -819,7 +819,7 @@ TEST(tf, getParent)
   for  (uint64_t i = 0; i <  children.size(); i++)
     {
       EXPECT_TRUE(mTR.getParent(children[i], ros::Time().fromNSec(10), output));
-      EXPECT_STREQ(tf::remap("",parents[i]).c_str(), output.c_str());
+      EXPECT_STREQ(tf::resolve("",parents[i]).c_str(), output.c_str());
     }
   
   EXPECT_FALSE(mTR.getParent("j", ros::Time().fromNSec(10), output));
@@ -1315,7 +1315,7 @@ TEST(tf, frameExists)
   EXPECT_FALSE(mTR.frameExists("/other"));
   EXPECT_FALSE(mTR.frameExists("/frame"));
 
-  //test with remapping
+  //test with resolveping
   EXPECT_FALSE(mTR.frameExists("b"));;
   EXPECT_FALSE(mTR.frameExists("parent"));
   EXPECT_FALSE(mTR.frameExists("other"));
@@ -1329,7 +1329,7 @@ TEST(tf, frameExists)
   EXPECT_FALSE(mTR.frameExists("/other"));
   EXPECT_FALSE(mTR.frameExists("/frame"));
 
-  //Test with remapping
+  //Test with resolveping
   EXPECT_TRUE(mTR.frameExists("b"));
   EXPECT_TRUE(mTR.frameExists("parent"));
   EXPECT_FALSE(mTR.frameExists("other"));
@@ -1343,7 +1343,7 @@ TEST(tf, frameExists)
   EXPECT_TRUE(mTR.frameExists("/other"));
   EXPECT_TRUE(mTR.frameExists("/frame"));
   
-  //Test with remapping
+  //Test with resolveping
   EXPECT_TRUE(mTR.frameExists("b"));
   EXPECT_TRUE(mTR.frameExists("parent"));
   EXPECT_TRUE(mTR.frameExists("other"));
@@ -1351,18 +1351,18 @@ TEST(tf, frameExists)
 
 }
 
-TEST(tf, remap)
+TEST(tf, resolve)
 {
   //no prefix
-  EXPECT_STREQ("/id", tf::remap("","id").c_str());
+  EXPECT_STREQ("/id", tf::resolve("","id").c_str());
   //prefix w/o /
-  EXPECT_STREQ("/asdf/id", tf::remap("asdf","id").c_str());
+  EXPECT_STREQ("/asdf/id", tf::resolve("asdf","id").c_str());
   //prefix w /
-  EXPECT_STREQ("/asdf/id", tf::remap("/asdf","id").c_str());
+  EXPECT_STREQ("/asdf/id", tf::resolve("/asdf","id").c_str());
   // frame_id w / -> no prefix
-  EXPECT_STREQ("/id", tf::remap("asdf","/id").c_str());
+  EXPECT_STREQ("/id", tf::resolve("asdf","/id").c_str());
   // frame_id w / -> no prefix
-  EXPECT_STREQ("/id", tf::remap("/asdf","/id").c_str());
+  EXPECT_STREQ("/id", tf::resolve("/asdf","/id").c_str());
 
 }
 

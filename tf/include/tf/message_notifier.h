@@ -196,7 +196,7 @@ public:
     std::stringstream ss;
     for (std::vector<std::string>::const_iterator it = target_frames_.begin(); it != target_frames_.end(); ++it)
     {
-      ss << tf::remap(tf_.getTFPrefix(), *it) << " ";
+      ss << tf::resolve(tf_.getTFPrefix(), *it) << " ";
     }
     target_frames_string_ = ss.str();
   }

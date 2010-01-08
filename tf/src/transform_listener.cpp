@@ -37,15 +37,6 @@
 
 using namespace tf;
 
-std::string tf::remap(const std::string& frame_id)
-{
-  ros::NodeHandle n("~");
-  std::string tf_prefix;
-  std::string searched_param;
-  n.searchParam("tf_prefix", searched_param);
-  n.getParam(searched_param, tf_prefix);
-  return tf::remap(tf_prefix, frame_id);
-};
 
 /** \brief Convert the transform to a Homogeneous matrix for large operations */
 static boost::numeric::ublas::matrix<double> transformAsMatrix(const Transform& bt) 
@@ -122,7 +113,9 @@ void TransformListener::init()
 
   ros::NodeHandle local_nh("~");
   
-  local_nh.param(std::string("tf_prefix"), tf_prefix_, std::string(""));
+  std::string searched_param;
+  local_nh.searchParam("tf_prefix", searched_param);
+  local_nh.getParam(searched_param, tf_prefix_);
 }
 
 void TransformListener::initWithThread()
@@ -147,7 +140,10 @@ void TransformListener::initWithThread()
     }
     
   ros::NodeHandle local_nh("~");
-  local_nh.param(std::string("tf_prefix"), tf_prefix_, std::string(""));
+  
+  std::string searched_param;
+  local_nh.searchParam("tf_prefix", searched_param);
+  local_nh.getParam(searched_param, tf_prefix_);
 }
 
 void TransformListener::transformQuaternion(const std::string& target_frame,

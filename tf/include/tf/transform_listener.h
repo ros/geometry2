@@ -44,8 +44,8 @@
 
 namespace tf{
 
-/** \brief remap names \todo document me */
-std::string remap(const std::string& frame_id);
+/** \brief resolve names \todo document me */
+std::string resolve(const std::string& frame_id);
 
 /** \brief This class inherits from Transformer and automatically subscribes to ROS transform messages */
 class TransformListener : public Transformer { //subscribes to message and automatically stores incoming data
@@ -117,6 +117,11 @@ public:
     res.dot_graph = allFramesAsDot();
     return true;
   }
+
+  std::string resolve(const std::string& frame_id)
+  {
+    return tf::resolve(tf_prefix_, frame_id);
+  };
 
 private:
   /// Initialize this transform listener, subscribing, advertising services, etc.
