@@ -50,7 +50,7 @@ build_tarball: $(SVN_DIR) patched
 	tar --exclude="Extras" --exclude=".svn" -czf $(TARBALL) $(SVN_DIR)
 
 
-installed: $(SOURCE_DIR)/unpacked
+installed: $(SOURCE_DIR)/unpacked Makefile.bullet
 	cd $(SOURCE_DIR) && cmake -DCMAKE_INSTALL_PREFIX=$(CURDIR) -DCMAKE_CXX_FLAGS="-fPIC -DBT_USE_DOUBLE_PRECISION" -D BUILD_SHARED_LIBS=on . 
 	# Bullet appears not be parallel-make safe
 	#cd $(SOURCE_DIR) && make $(PARALLEL_JOBS) 
