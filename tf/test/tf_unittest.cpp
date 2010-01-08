@@ -1666,7 +1666,7 @@ TEST(tf, getFrameStrings)
 
 }
 
- 
+/*
 TEST(tf, lookupVelocity)
 {
   double epsilon = 1e-9;
@@ -1750,7 +1750,7 @@ TEST(tf, lookupVelocity)
 
 
 }
-
+*/
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);

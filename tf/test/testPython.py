@@ -72,7 +72,7 @@ class TestPython(unittest.TestCase):
         # Ask for transform for valid frames, but more than 10 seconds in the past.  Should raise ExtrapolationException
         self.assertRaises(tf.ExtrapolationException, lambda: t.lookupTransform("THISFRAME", "PARENT", rospy.Time(2)))
 
-        print t.lookupVelocity("THISFRAME", "PARENT", rospy.Time(15), rospy.Duration(5))
+        #### print t.lookupVelocity("THISFRAME", "PARENT", rospy.Time(15), rospy.Duration(5))
 
     def test_smoke(self):
         t = tf.Transformer(True, rospy.Duration().from_seconds(10.0))

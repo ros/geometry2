@@ -305,6 +305,7 @@ static PyObject *lookupTransformFull(PyObject *self, PyObject *args, PyObject *k
       rotation.x(), rotation.y(), rotation.z(), rotation.w());
 }
 
+/*
 static PyObject *lookupVelocity(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf::Transformer *t = ((transformer_t*)self)->t;
@@ -330,7 +331,7 @@ static PyObject *lookupVelocity(PyObject *self, PyObject *args, PyObject *kw)
       velocity.twist.linear.x, velocity.twist.linear.y, velocity.twist.linear.z, 
       velocity.twist.angular.x, velocity.twist.angular.y, velocity.twist.angular.z);
 }
-
+*/
 
 static PyObject *setTransform(PyObject *self, PyObject *args)
 {
@@ -405,7 +406,7 @@ static struct PyMethodDef transformer_methods[] =
   {"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
   {"lookupTransform", (PyCFunction)lookupTransform, METH_KEYWORDS},
   {"lookupTransformFull", (PyCFunction)lookupTransformFull, METH_KEYWORDS},
-  {"lookupVelocity", (PyCFunction)lookupVelocity, METH_KEYWORDS},
+  //  {"lookupVelocity", (PyCFunction)lookupVelocity, METH_KEYWORDS},
   {"setUsingDedicatedThread", (PyCFunction)setUsingDedicatedThread, METH_VARARGS},
   {NULL,          NULL}
 };
