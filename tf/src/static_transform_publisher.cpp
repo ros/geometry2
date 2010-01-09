@@ -65,7 +65,7 @@ private:
 int main(int argc, char ** argv)
 {
   //Initialize ROS
-  ros::init(argc, argv,"transform_sender", ros::init_options::AnonymousName);
+  ros::init(argc, argv,"static_transform_publisher", ros::init_options::AnonymousName);
 
   if(argc == 11)
   {
@@ -118,10 +118,10 @@ int main(int argc, char ** argv)
   {
     printf("A command line utility for manually sending a transform.\n");
     printf("It will periodicaly republish the given transform. \n");
-    printf("Usage: static_transform_sender x y z yaw pitch roll frame_id child_frame_id  period(miliseconds) \n");
+    printf("Usage: static_transform_publisher x y z yaw pitch roll frame_id child_frame_id  period(miliseconds) \n");
     printf("OR \n");
-    printf("Usage: static_transform_sender x y z qx qy qz qw frame_id child_frame_id  period(miliseconds) \n");
-    ROS_ERROR("static_transform_sender exited due to not having the right number of arguments");
+    printf("Usage: static_transform_publisher x y z qx qy qz qw frame_id child_frame_id  period(miliseconds) \n");
+    ROS_ERROR("static_transform_publisher exited due to not having the right number of arguments");
     return -1;
   }
 
