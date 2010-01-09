@@ -65,21 +65,12 @@ class Stamped : public T{
  public:
   ros::Time stamp_;
   std::string frame_id_;
-  std::string parent_id_; ///only used for transform
 
-  Stamped() :frame_id_ ("NO_ID_STAMPED_DEFAULT_CONSTRUCTION"), parent_id_("NOT A TRANSFORM"){}; //Default constructor used only for preallocation
+  Stamped() :frame_id_ ("NO_ID_STAMPED_DEFAULT_CONSTRUCTION"){}; //Default constructor used only for preallocation
 
   Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id) :
     T (input), stamp_ ( timestamp ), frame_id_ (frame_id){ } ;
   
-  __attribute__((deprecated)) Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id, const std::string & parent_id) :
-    T (input), stamp_ ( timestamp ), frame_id_ (frame_id), parent_id_(parent_id){ } ;
-
-//Stamped(const Stamped<T>& input):data_(input.data_), stamp_(input.stamp_), frame_id_(input.frame_id_), parent_id_(input.parent_id_){};
-
-//Stamped& operator=(const Stamped<T>& input){data_ = input.data_; stamp_ = input.stamp_; frame_id_ = input.frame_id_;
-//  parent_id_ = input.parent_id_; return *this;};
-
   void setData(const T& input){*static_cast<T*>(this) = input;};
   //  void stripStamp(T & output) { output = data_;}; //just down cast it
 };
