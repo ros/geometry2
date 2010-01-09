@@ -60,15 +60,11 @@ public:
   /** \brief Send a Stamped<Transform> with parent parent_id 
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
   void sendTransform(const StampedTransform & transform);
-  void sendTransform(const Stamped<Transform> & transform) __attribute__((deprecated));
 
   /** \brief Send a TransformStamped 
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
   void sendTransform(const geometry_msgs::TransformStamped & transform);
 
-  /** \brief Send a Transform, stamped with time, frame_id and parent_id */
-  ROSCPP_DEPRECATED void sendTransform(const Transform & transform, const ros::Time& time, const std::string& frame_id, const std::string& parent_id);
-  
 private:
   /// Internal reference to ros::Node
   ros::NodeHandle node_;
