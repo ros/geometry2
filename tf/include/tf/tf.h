@@ -143,13 +143,6 @@ public:
                        const std::string& source_frame, const ros::Time& source_time,
                        const std::string& fixed_frame, Stamped<btTransform>& transform) const __attribute__((deprecated));
 
-  bool canTransform(const std::string& target_frame, const std::string& source_frame,
-                    const ros::Time& time, const ros::Duration& timeout, const ros::Duration& polling_sleep_duration = ros::Duration(0.01),
-                    std::string* error_msg = NULL) const __attribute__((deprecated))
-  {
-    return waitForTransform( target_frame, source_frame, time, timeout, polling_sleep_duration, error_msg);
-  };
-
 
   /** \brief Lookup the velocity of the moving_frame in the reference_frame
    * \param moving_frame The frame to track
