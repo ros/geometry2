@@ -187,19 +187,6 @@ bool Transformer::setTransform(const StampedTransform& transform, const std::str
 
 
 void Transformer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
-                     const ros::Time& time, Stamped<btTransform>& transform) const
-{
-  StampedTransform input((btTransform)transform, transform.stamp_, transform.parent_id_, transform.frame_id_);
-  lookupTransform(target_frame, source_frame, time, 
-                  input);
-  transform = Stamped<btTransform>();
-  transform.setData((btTransform)input);
-  transform.stamp_ =  input.stamp_;
-  transform.frame_id_ = input.child_frame_id_;
-  transform.parent_id_ = input.frame_id_;  
- };
-
-void Transformer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
                      const ros::Time& time, StampedTransform& transform) const
 {
   std::string mapped_target_frame = resolve(tf_prefix_, target_frame);
@@ -276,20 +263,6 @@ void Transformer::lookupTransform(const std::string& target_frame, const std::st
 };
 
 
-void Transformer::lookupTransform(const std::string& target_frame,const ros::Time& target_time, const std::string& source_frame,
-                     const ros::Time& source_time, const std::string& fixed_frame, Stamped<btTransform>& transform) const
-{
-  StampedTransform input((btTransform)transform, transform.stamp_, transform.parent_id_, transform.frame_id_);
-  lookupTransform(target_frame, target_time, 
-                  source_frame, source_time, 
-                  fixed_frame,  input);
-  transform = Stamped<btTransform>();
-  transform.setData((btTransform)input);
-  transform.stamp_ =  input.stamp_;
-  transform.frame_id_ = input.child_frame_id_;
-  transform.parent_id_ = input.frame_id_;  
-  
-}
 void Transformer::lookupTransform(const std::string& target_frame,const ros::Time& target_time, const std::string& source_frame,
                      const ros::Time& source_time, const std::string& fixed_frame, StampedTransform& transform) const
 {

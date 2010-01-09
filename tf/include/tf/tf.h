@@ -123,8 +123,6 @@ public:
    */
   void lookupTransform(const std::string& target_frame, const std::string& source_frame,
                        const ros::Time& time, StampedTransform& transform) const;
-  void lookupTransform(const std::string& target_frame, const std::string& source_frame,
-                       const ros::Time& time, Stamped<btTransform>& transform) const __attribute__((deprecated));
   /** \brief Get the transform between two frames by frame ID assuming fixed frame.
    * \param target_frame The frame to which data should be transformed
    * \param target_time The time to which the data should be transformed. (0 will get the latest)
@@ -139,10 +137,6 @@ public:
   void lookupTransform(const std::string& target_frame, const ros::Time& target_time,
                        const std::string& source_frame, const ros::Time& source_time,
                        const std::string& fixed_frame, StampedTransform& transform) const;
-  void lookupTransform(const std::string& target_frame, const ros::Time& target_time,
-                       const std::string& source_frame, const ros::Time& source_time,
-                       const std::string& fixed_frame, Stamped<btTransform>& transform) const __attribute__((deprecated));
-
 
   /** \brief Lookup the velocity of the moving_frame in the reference_frame
    * \param moving_frame The frame to track
