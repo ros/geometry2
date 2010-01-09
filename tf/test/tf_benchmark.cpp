@@ -85,7 +85,7 @@ TEST(tf_benchmark, canTransformCacheLength10000)
   unsigned int cache_length = 10000;
   for (unsigned int i = 0; i < cache_length; i++)
   {
-    Stamped<btTransform> tranStamped(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10.0+i), "child", "my_parent");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10.0+i), "my_parent", "child");
     mTR.setTransform(tranStamped);
   }
 
@@ -146,7 +146,7 @@ TEST(tf_benchmark, benchmarkExhaustiveSearch)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    Stamped<btTransform> tranStamped(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10.0 + i), "child", "my_parent");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10.0 + i), "my_parent", "child");
     mTR.setTransform(tranStamped);
 
   }
