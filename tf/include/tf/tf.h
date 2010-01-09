@@ -108,7 +108,6 @@ public:
    * returns true unless an error occured
    */
   bool setTransform(const StampedTransform& transform, const std::string & authority = "default_authority");
-  bool setTransform(const Stamped<btTransform>& transform, const std::string & authority = "default_authority") __attribute__((deprecated));
 
   /*********** Accessors *************/
 

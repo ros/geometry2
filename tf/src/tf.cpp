@@ -121,11 +121,6 @@ void Transformer::clear()
 }
 
 
-bool Transformer::setTransform(const Stamped<btTransform>& transform, const std::string& authority)
-{
-  return setTransform(StampedTransform((btTransform)transform, transform.stamp_, transform.parent_id_, transform.frame_id_), authority);
-}
-
 bool Transformer::setTransform(const StampedTransform& transform, const std::string& authority)
 {
 
