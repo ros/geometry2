@@ -42,6 +42,13 @@ using namespace tf;
 // Thanks to Rob for pointing out the right way to do this.
 const double tf::Transformer::DEFAULT_CACHE_TIME;
 
+std::string assert_resolved(const std::string& prefix, const std::string& frame_id)
+{
+  if (frame_id.size() > 0)
+    if (frame_id[0] != '/')
+      ROS_DEBUG("TF operating on not fully resolved frame id %s, resolving using local prefix %s", frame_id.c_str(), prefix.c_str());
+  return tf::resolve(prefix, frame_id);
+};
 
 std::string tf::resolve(const std::string& prefix, const std::string& frame_id)
 {
@@ -125,8 +132,8 @@ bool Transformer::setTransform(const StampedTransform& transform, const std::str
 {
 
   StampedTransform mapped_transform((btTransform)transform, transform.stamp_, transform.frame_id_, transform.child_frame_id_);
-  mapped_transform.child_frame_id_ = resolve(tf_prefix_, transform.child_frame_id_);
-  mapped_transform.frame_id_ = resolve(tf_prefix_, transform.frame_id_);
+  mapped_transform.child_frame_id_ = assert_resolved(tf_prefix_, transform.child_frame_id_);
+  mapped_transform.frame_id_ = assert_resolved(tf_prefix_, transform.frame_id_);
 
  
   bool error_exists = false;
@@ -184,8 +191,8 @@ bool Transformer::setTransform(const StampedTransform& transform, const std::str
 void Transformer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
                      const ros::Time& time, StampedTransform& transform) const
 {
-  std::string mapped_target_frame = resolve(tf_prefix_, target_frame);
-  std::string mapped_source_frame = resolve(tf_prefix_, source_frame);
+  std::string mapped_target_frame = assert_resolved(tf_prefix_, target_frame);
+  std::string mapped_source_frame = assert_resolved(tf_prefix_, source_frame);
 
   // Short circuit if zero length transform to allow lookups on non existant links
   if (mapped_source_frame == mapped_target_frame)
@@ -339,8 +346,8 @@ bool Transformer::canTransform(const std::string& target_frame, const std::strin
                                const ros::Time& time,
                                std::string* error_msg) const
 {
-  std::string mapped_target_frame = resolve(tf_prefix_, target_frame);
-  std::string mapped_source_frame = resolve(tf_prefix_, source_frame);
+  std::string mapped_target_frame = assert_resolved(tf_prefix_, target_frame);
+  std::string mapped_source_frame = assert_resolved(tf_prefix_, source_frame);
 
   ros::Time local_time = time;
 
@@ -408,7 +415,7 @@ bool Transformer::waitForTransform(const std::string& target_frame,const ros::Ti
 
 bool Transformer::getParent(const std::string& frame_id, ros::Time time, std::string& parent) const
 {
-  std::string mapped_frame_id = tf::resolve(tf_prefix_, frame_id);
+  std::string mapped_frame_id = assert_resolved(tf_prefix_, frame_id);
   tf::TimeCache* cache;
   try
   {
@@ -438,7 +445,7 @@ bool Transformer::getParent(const std::string& frame_id, ros::Time time, std::st
 bool Transformer::frameExists(const std::string& frame_id_str) const
 {
   boost::mutex::scoped_lock(frame_mutex_);
-  std::string frame_id_resolveped = tf::resolve(tf_prefix_, frame_id_str);
+  std::string frame_id_resolveped = assert_resolved(tf_prefix_, frame_id_str);
   
   std::map<std::string, unsigned int>::const_iterator map_it = frameIDs_.find(frame_id_resolveped);
   if (map_it == frameIDs_.end())
@@ -456,8 +463,8 @@ void Transformer::setExtrapolationLimit(const ros::Duration& distance)
 
 int Transformer::getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time & time, std::string * error_string) const
 {
-  std::string mapped_source = tf::resolve(tf_prefix_, source);
-  std::string mapped_dest = tf::resolve(tf_prefix_, dest);
+  std::string mapped_source = assert_resolved(tf_prefix_, source);
+  std::string mapped_dest = assert_resolved(tf_prefix_, dest);
 
   time = ros::Time(UINT_MAX, 999999999);///\todo replace with ros::TIME_MAX when it is merged from stable
   int retval;
