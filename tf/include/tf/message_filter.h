@@ -35,7 +35,6 @@
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 #include <tf/tfMessage.h>
-#include <tf/message_notifier_base.h>
 
 #include <string>
 #include <list>
