@@ -880,14 +880,30 @@ void Transformer::chainAsVector(const std::string & target_frame, ros::Time targ
   }
 
   output.clear(); //empty vector
-  for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
+  if (! lists.inverseTransforms.empty())
+  {
+    for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
     {
       output.push_back(lists.inverseTransforms[i].child_frame_id_);
     }
-  for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
+    output.push_back(lists.inverseTransforms.back().frame_id_);
+
+    for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
     {
       output.push_back(lists.forwardTransforms[i].child_frame_id_);
     }
+  }
+  else
+  {
+    output.push_back(source_frame);
+    
+    for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
+    {
+      output.push_back(lists.forwardTransforms[i].child_frame_id_);
+    }
+    
+
+  }
 }
 
 std::string Transformer::allFramesAsString() const

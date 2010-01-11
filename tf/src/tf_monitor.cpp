@@ -85,15 +85,15 @@ public:
     boost::mutex::scoped_lock my_lock(map_lock_);  
     for (unsigned int i = 0; i < message.transforms.size(); i++)
     {
-      frame_authority_map[message.transforms[i].header.frame_id] = authority;
+      frame_authority_map[message.transforms[i].child_frame_id] = authority;
 
       double offset = (ros::Time::now() - message.transforms[i].header.stamp).toSec();
       average_offset  += offset;
       
-      std::map<std::string, std::vector<double> >::iterator it = delay_map.find(message.transforms[i].header.frame_id);
+      std::map<std::string, std::vector<double> >::iterator it = delay_map.find(message.transforms[i].child_frame_id);
       if (it == delay_map.end())
       {
-        delay_map[message.transforms[i].header.frame_id] = std::vector<double>(1,offset);
+        delay_map[message.transforms[i].child_frame_id] = std::vector<double>(1,offset);
       }
       else
       {
@@ -141,13 +141,13 @@ public:
     
     if (using_specific_chain_)
     {
-      cout << "Waiting for first transform to become available between "<< framea_ << " and " << frameb_<< " " << flush;
+      cout << "Waiting for transform chain to become available between "<< framea_ << " and " << frameb_<< " " << flush;
       while (node_.ok() && !tf_.waitForTransform(framea_, frameb_, Time(), Duration(1.0)))
         cout << "." << flush;
       cout << endl;
      
       try{
-        tf_.chainAsVector(framea_, ros::Time(), frameb_, ros::Time(), frameb_, chain_);
+        tf_.chainAsVector(frameb_, ros::Time(), framea_, ros::Time(), frameb_, chain_);
       }
       catch(tf::TransformException& ex){
         ROS_WARN("Transform Exception %s", ex.what());
@@ -210,13 +210,15 @@ public:
       if (using_specific_chain_)
       {
         std::cout <<std::endl<< std::endl<< std::endl<< "RESULTS: for "<< framea_ << " to " << frameb_  <<std::endl;
-        cout << "Chain currently is: ";
+        cout << "Chain is: ";
         for (unsigned int i = 0; i < chain_.size(); i++)
         {
-          cout << chain_[i] <<" -> ";
+          cout << chain_[i] ;
+          if (i != chain_.size()-1)
+            cout <<" -> ";
         }
-        cout << frameb_ << endl;
-        cerr << "Net delay " << "    avg = " << avg_diff <<": max = " << max_diff << endl;
+        cout <<std::endl;
+        cout << "Net delay " << "    avg = " << avg_diff <<": max = " << max_diff << endl;
       }
       else
         std::cout <<std::endl<< std::endl<< std::endl<< "RESULTS: for all Frames" <<std::endl;
@@ -238,7 +240,7 @@ public:
         else
           cout << outputFrameInfo(it, frame_authority_map[it->first]);
       }          
-      std::cerr <<std::endl<< "Broadcasters:" << std::endl;
+      std::cerr <<std::endl<< "All Broadcasters:" << std::endl;
       std::map<std::string, std::vector<double> >::iterator it1 = authority_map.begin();
       std::map<std::string, std::vector<double> >::iterator it2 = authority_frequency_map.begin();
       for ( ; it1 != authority_map.end() ; ++it1, ++it2)
