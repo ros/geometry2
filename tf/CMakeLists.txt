@@ -8,7 +8,7 @@ rosbuild_add_boost_directories()
 rosbuild_genmsg()
 rosbuild_gensrv()
 
-rosbuild_add_library(tf src/tf.cpp src/transform_listener.cpp src/cache.cpp src/message_notifier.cpp src/transform_broadcaster.cpp)
+rosbuild_add_library(tf src/tf.cpp src/transform_listener.cpp src/cache.cpp src/transform_broadcaster.cpp)
 rosbuild_link_boost(tf thread signals)
 
 rosbuild_add_executable(bin/tf_echo src/tf_echo.cpp)
@@ -50,11 +50,6 @@ target_link_libraries(test/testBroadcaster tf)
 rosbuild_add_executable(bin/static_transform_publisher src/static_transform_publisher.cpp)
 target_link_libraries(bin/static_transform_publisher tf)
 
-rosbuild_add_executable(test/test_message_filter EXCLUDE_FROM_ALL test/test_message_filter.cpp)
-rosbuild_declare_test(test/test_message_filter)
-rosbuild_add_gtest_build_flags(test/test_message_filter)
-target_link_libraries(test/test_message_filter tf ${Boost_LIBRARIES})
-rosbuild_add_rostest(test/test_message_filter.xml)
 
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_PATH})
