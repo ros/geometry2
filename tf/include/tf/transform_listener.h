@@ -48,7 +48,7 @@ namespace tf{
  * \param nh The node handle to use to lookup the parameter.
  * \return The tf_prefix value for this NodeHandle 
  */
-std::string getPrefixParam(ros::NodeHandle & nh) {
+inline std::string getPrefixParam(ros::NodeHandle & nh) {
   std::string param; 
   if (!nh.searchParam("tf_prefix", param)) 
     return ""; 
