@@ -39,7 +39,7 @@ using namespace tf;
 std::string tf::remap(const std::string& frame_id)
 {
   ros::NodeHandle n("~");
-  return getPrefixParam(n);
+  return tf::resolve(getPrefixParam(n), frame_id);
 };
 
 
