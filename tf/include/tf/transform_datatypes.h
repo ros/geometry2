@@ -77,6 +77,7 @@ class Stamped : public T{
   void setData(const T& input){*static_cast<T*>(this) = input;};
 };
 
+/** \brief The Stamped Transform datatype used by tf */
 class StampedTransform : public tf::Transform
 {
 public:
