@@ -59,32 +59,37 @@ typedef btTransform Pose;
 static const double QUATERNION_TOLERANCE = 0.1f;
 
 /** \brief The data type which will be cross compatable with geometry_msgs
- * this will require the associated rosTF package to convert */
+ * This is the tf datatype equivilant of a MessageStamped */
 template <typename T>
 class Stamped : public T{
  public:
-  ros::Time stamp_;
-  std::string frame_id_;
+  ros::Time stamp_; ///< The timestamp associated with this data
+  std::string frame_id_; ///< The frame_id associated this data
 
+  /** Default constructor */
   Stamped() :frame_id_ ("NO_ID_STAMPED_DEFAULT_CONSTRUCTION"){}; //Default constructor used only for preallocation
 
+  /** Full constructor */
   Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id) :
     T (input), stamp_ ( timestamp ), frame_id_ (frame_id){ } ;
   
+  /** Set the data element */
   void setData(const T& input){*static_cast<T*>(this) = input;};
-  //  void stripStamp(T & output) { output = data_;}; //just down cast it
 };
 
 class StampedTransform : public tf::Transform
 {
 public:
-  ros::Time stamp_;
-  std::string frame_id_;
-  std::string child_frame_id_;
+  ros::Time stamp_; ///< The timestamp associated with this transform
+  std::string frame_id_; ///< The frame_id of the coordinate frame  in which this transform is defined
+  std::string child_frame_id_; ///< The frame_id of the coordinate frame this transform defines
   StampedTransform(const tf::Transform& input, const ros::Time& timestamp, const std::string & frame_id, const std::string & child_frame_id):
     tf::Transform (input), stamp_ ( timestamp ), frame_id_ (frame_id), child_frame_id_(child_frame_id){ };
+
+  /** \brief Default constructor only to be used for preallocation */
   StampedTransform() { };
 
+  /** \brief Set the inherited Traonsform data */
   void setData(const tf::Transform& input){*static_cast<tf::Transform*>(this) = input;};
 
 };
@@ -129,18 +134,32 @@ static inline double getYaw(const geometry_msgs::Quaternion& msg_q){
   return getYaw(bt_q);
 }
 
+/** \brief construct a Quaternion from Fixed angles
+ * \param roll The roll about the X axis
+ * \param pitch The pitch about the Y axis
+ * \param yaw The yaw about the Z axis
+ * \return The quaternion constructed
+ */
 static inline tf::Quaternion createQuaternionFromRPY(double roll,double pitch,double yaw){
   Quaternion q;
   q.setRPY(roll, pitch, yaw);
   return q;
 }
 
+/** \brief construct a Quaternion from yaw only
+ * \param yaw The yaw about the Z axis
+ * \return The quaternion constructed
+ */
 static inline Quaternion createQuaternionFromYaw(double yaw){
   Quaternion q;
   q.setRPY(0.0, 0.0, yaw);
   return q;
 }
 
+/** \brief construct a Quaternion Message from yaw only
+ * \param yaw The yaw about the Z axis
+ * \return The quaternion constructed
+ */
 static inline geometry_msgs::Quaternion createQuaternionMsgFromYaw(double yaw){
   Quaternion q;
   q.setRPY(0.0, 0.0, yaw);
@@ -149,12 +168,21 @@ static inline geometry_msgs::Quaternion createQuaternionMsgFromYaw(double yaw){
   return q_msg;
 }
 
+/** \brief construct a Quaternion Message from Fixed angles
+ * \param roll The roll about the X axis
+ * \param pitch The pitch about the Y axis
+ * \param yaw The yaw about the Z axis
+ * \return The quaternion constructed
+ */
 static inline geometry_msgs::Quaternion createQuaternionMsgFromRollPitchYaw(double roll,double pitch,double yaw){
   geometry_msgs::Quaternion q_msg;
   quaternionTFToMsg(createQuaternionFromRPY(roll, pitch, yaw), q_msg);
   return q_msg;
 }
 
+/** \brief construct an Identity Quaternion
+ * \return The quaternion constructed
+ */
 static inline tf::Quaternion createIdentityQuaternion()
 {
   Quaternion q;
