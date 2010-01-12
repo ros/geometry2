@@ -105,7 +105,6 @@ TransformListener::~TransformListener()
 
 void TransformListener::init()
 {
-  message_subscriber_tf_message_ = node_.subscribe<tf::tfMessage>("/tf_message", 100, boost::bind(&TransformListener::subscription_callback, this, _1)); ///\todo magic number
   message_subscriber_tf_ = node_.subscribe<tf::tfMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1)); ///\todo magic number
   
   reset_time_subscriber_ = node_.subscribe<std_msgs::Empty>("/reset_time", 100, boost::bind(&TransformListener::reset_callback, this, _1)); ///\todo magic number
@@ -125,9 +124,7 @@ void TransformListener::initWithThread()
 {
   using_dedicated_thread_ = true;
   ros::SubscribeOptions ops_tf = ros::SubscribeOptions::create<tf::tfMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
-  ros::SubscribeOptions ops_tf_message = ros::SubscribeOptions::create<tf::tfMessage>("/tf_message", 100, boost::bind(&TransformListener::subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
     
-    message_subscriber_tf_message_ = node_.subscribe(ops_tf_message);
     message_subscriber_tf_ = node_.subscribe(ops_tf);
   
   ros::SubscribeOptions reset_ops = ros::SubscribeOptions::create<std_msgs::Empty>("/reset_time", 100, boost::bind(&TransformListener::reset_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number

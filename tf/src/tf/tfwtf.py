@@ -143,7 +143,7 @@ tf_errors = [
   (multiple_authority, "TF multiple authority contention:"),
 ]
 
-# rospy subscriber callback for /tf and /tf_message
+# rospy subscriber callback for /tf
 def _tf_handle(msg):
     _msgs.append((msg, rospy.get_rostime(), msg._connection_header['callerid']))
 
@@ -157,28 +157,16 @@ def is_tf_active():
                 return True
     return False
 
-# @return bool: True if /tf_message has a publisher
-def is_tf_message_active():
-    master = roslib.scriptutil.get_master()
-    if master is not None:
-        code, msg, val = master.getPublishedTopics('/roswtf', '/')
-        if code == 1:
-            if filter(lambda x: x[0] == '/tf_message', val):
-                return True
-    return False
-
 # roswtf entry point for online checks
 def roswtf_plugin_online(ctx):
     # don't run plugin if tf isn't active as these checks take awhile
-    if not is_tf_active() and not is_tf_message_active():
+    if not is_tf_active():
         return
     
     print "running tf checks, this will take a second..."
     sub1 = rospy.Subscriber('/tf', tf.msg.tfMessage, _tf_handle)
-    sub2 = rospy.Subscriber('/tf_message', tf.msg.tfMessage, _tf_handle)
     time.sleep(1.0)
     sub1.unregister()
-    sub2.unregister()
     print "... tf checks complete"    
 
     for r in tf_warnings:

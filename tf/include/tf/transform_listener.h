@@ -143,9 +143,10 @@ public:
     return true;
   }
 
-  std::string resolve(const std::string& frame_id)
+  /* \brief Resolve frame_name into a frame_id using tf_prefix parameter */
+  std::string resolve(const std::string& frame_name)
   {
-    return tf::resolve(tf_prefix_, frame_id);
+    return tf::resolve(tf_prefix_, frame_name);
   };
 
 private:
@@ -168,7 +169,7 @@ private:
   ros::CallbackQueue tf_message_callback_queue_;
   boost::thread* dedicated_listener_thread_;
   ros::NodeHandle node_;
-  ros::Subscriber message_subscriber_tf_, message_subscriber_tf_message_, reset_time_subscriber_;
+  ros::Subscriber message_subscriber_tf_, reset_time_subscriber_;
 
   void dedicatedListenerThread()
   {
