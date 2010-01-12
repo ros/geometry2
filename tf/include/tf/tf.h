@@ -48,9 +48,10 @@
 namespace tf
 {
 /** \brief resolve tf names */
-std::string resolve(const std::string& prefix, const std::string& frame_id);
+std::string resolve(const std::string& prefix, const std::string& frame_name);
 
-__attribute__((deprecated)) static inline std::string remap(const std::string& prefix, const std::string& frame_id) { return tf::resolve(prefix, frame_id);} ;
+/** \deprecated This has been renamed to tf::resolve */
+__attribute__((deprecated)) static inline std::string remap(const std::string& prefix, const std::string& frame_name) { return tf::resolve(prefix, frame_name);} ;
 
 enum ErrorValues { NO_ERROR = 0, LOOKUP_ERROR, CONNECTIVITY_ERROR, EXTRAPOLATION_ERROR};
 

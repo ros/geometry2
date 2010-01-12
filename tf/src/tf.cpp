@@ -50,13 +50,13 @@ std::string assert_resolved(const std::string& prefix, const std::string& frame_
   return tf::resolve(prefix, frame_id);
 };
 
-std::string tf::resolve(const std::string& prefix, const std::string& frame_id)
+std::string tf::resolve(const std::string& prefix, const std::string& frame_name)
 {
-  //  printf ("resolveping prefix:%s with frame_id:%s\n", prefix.c_str(), frame_id.c_str());
-  if (frame_id.size() > 0)
-    if (frame_id[0] == '/')
+  //  printf ("resolveping prefix:%s with frame_name:%s\n", prefix.c_str(), frame_name.c_str());
+  if (frame_name.size() > 0)
+    if (frame_name[0] == '/')
     {
-      return frame_id;
+      return frame_name;
     }
   if (prefix.size() > 0)
   {
@@ -64,7 +64,7 @@ std::string tf::resolve(const std::string& prefix, const std::string& frame_id)
     {
       std::string composite = prefix;
       composite.append("/");
-      composite.append(frame_id);
+      composite.append(frame_name);
       return composite;
     }
     else
@@ -73,7 +73,7 @@ std::string tf::resolve(const std::string& prefix, const std::string& frame_id)
       composite = "/";
       composite.append(prefix);
       composite.append("/");
-      composite.append(frame_id);
+      composite.append(frame_name);
       return composite;
     }
 
@@ -82,7 +82,7 @@ std::string tf::resolve(const std::string& prefix, const std::string& frame_id)
  {
     std::string composite;
     composite = "/";
-    composite.append(frame_id);
+    composite.append(frame_name);
     return composite;
   }
 };
