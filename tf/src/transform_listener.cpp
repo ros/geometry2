@@ -39,11 +39,7 @@ using namespace tf;
 std::string tf::remap(const std::string& frame_id)
 {
   ros::NodeHandle n("~");
-  std::string tf_prefix;
-  std::string searched_param;
-  n.searchParam("tf_prefix", searched_param);
-  n.getParam(searched_param, tf_prefix);
-  return tf::resolve(tf_prefix, frame_id);
+  return getPrefixParam(n);
 };
 
 
@@ -122,9 +118,7 @@ void TransformListener::init()
 
   ros::NodeHandle local_nh("~");
   
-  std::string searched_param;
-  local_nh.searchParam("tf_prefix", searched_param);
-  local_nh.getParam(searched_param, tf_prefix_);
+  tf_prefix_ = getPrefixParam(local_nh);
 }
 
 void TransformListener::initWithThread()
@@ -149,10 +143,7 @@ void TransformListener::initWithThread()
     }
     
   ros::NodeHandle local_nh("~");
-  
-  std::string searched_param;
-  local_nh.searchParam("tf_prefix", searched_param);
-  local_nh.getParam(searched_param, tf_prefix_);
+  tf_prefix_ = getPrefixParam(local_nh);
 }
 
 void TransformListener::transformQuaternion(const std::string& target_frame,

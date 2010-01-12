@@ -44,6 +44,20 @@
 
 namespace tf{
 
+/** \brief Get the tf_prefix from the parameter server
+ * \param nh The node handle to use to lookup the parameter.
+ * \return The tf_prefix value for this NodeHandle 
+ */
+std::string getPrefixParam(ros::NodeHandle & nh) {
+  std::string param; 
+  if (!nh.searchParam("tf_prefix", param)) 
+    return ""; 
+  
+  std::string return_val;
+  nh.getParam(param, return_val);
+  return return_val;
+}
+
 /** \brief resolve names \todo document me */
 std::string remap(const std::string& frame_id) __attribute__((deprecated));
 
