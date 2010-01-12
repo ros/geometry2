@@ -55,6 +55,22 @@ TEST(Angles, shortestDistanceWithLimits){
   EXPECT_TRUE(result);
   EXPECT_NEAR(shortest_angle,-2*M_PI+0.5+0.2500001,1e-6);
 
+  result = angles::shortest_angular_distance_with_limits(-0.6, 0.5,-0.25,0.25,shortest_angle);
+  EXPECT_FALSE(result);
+
+  result = angles::shortest_angular_distance_with_limits(-0.5, 0.6,-0.25,0.25,shortest_angle);
+  EXPECT_FALSE(result);
+
+  result = angles::shortest_angular_distance_with_limits(-0.6, 0.75,-0.25,0.3,shortest_angle);
+  EXPECT_FALSE(result);
+
+  result = angles::shortest_angular_distance_with_limits(-0.6, M_PI*3.0/4.0,-0.25,0.3,shortest_angle);
+  EXPECT_FALSE(result);
+
+  result = angles::shortest_angular_distance_with_limits(-M_PI, M_PI,-M_PI,M_PI,shortest_angle);
+  EXPECT_TRUE(result);
+  EXPECT_NEAR(shortest_angle,0.0,1e-6);
+
 }
 
 TEST(Angles, from_degrees)
@@ -253,6 +269,13 @@ TEST(Angles, find_min_max_delta)
   EXPECT_FALSE(find_min_max_delta( -M_PI, -M_PI/2, M_PI/2, min_delta, max_delta));
   //Test out of range postive
   EXPECT_FALSE(find_min_max_delta( M_PI, -M_PI/2, M_PI/2, min_delta, max_delta));
+
+
+  // M_PI/4 Partial Range
+  EXPECT_TRUE(find_min_max_delta( 3*M_PI/4, M_PI/2, -M_PI/2, min_delta, max_delta));
+  EXPECT_NEAR(min_delta, -M_PI/4, epsilon);
+  EXPECT_NEAR(max_delta, 3*M_PI/4, epsilon);
+
 
 }
 
