@@ -33,14 +33,15 @@
 
 #include "ros/ros.h"
 #include "tf/transform_broadcaster.h"
+#include "tf/transform_listener.h"
 
 namespace tf {
 
 TransformBroadcaster::TransformBroadcaster()
 {
   publisher_ = node_.advertise<tfMessage>("/tf", 100);
-  ros::NodeHandle local_nh("~");
-  local_nh.param(std::string("tf_prefix"),tf_prefix_, std::string(""));
+  ros::NodeHandle l_nh("~");
+  tf_prefix_ = getPrefixParam(l_nh);
 };
 
 void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped & msgtf)
