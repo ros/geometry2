@@ -277,7 +277,7 @@ void Transformer::lookupTransform(const std::string& target_frame,const ros::Tim
   transform.child_frame_id_ = source_frame;
 
 };
-/*
+
 void Transformer::lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
                     const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const
 {
@@ -316,7 +316,7 @@ void Transformer::lookupVelocity(const std::string& reference_frame, const std::
 
 
 };
-*/
+
 bool Transformer::waitForTransform(const std::string& target_frame, const std::string& source_frame,
                                    const ros::Time& time,
                                    const ros::Duration& timeout, const ros::Duration& polling_sleep_duration,

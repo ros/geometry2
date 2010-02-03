@@ -33,6 +33,10 @@ rosbuild_add_rostest(test/transform_listener_unittest.launch)
 
 rosbuild_add_gtest_future(test/tf_unittest_future test/tf_unittest_future.cpp)
 target_link_libraries(test/tf_unittest_future tf)
+
+rosbuild_add_gtest(test/test_velocity test/velocity_test.cpp)
+target_link_libraries(test/test_velocity tf)
+
 rosbuild_add_gtest(test/cache_unittest test/cache_unittest.cpp)
 target_link_libraries(test/cache_unittest tf)
 
