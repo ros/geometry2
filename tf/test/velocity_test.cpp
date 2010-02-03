@@ -26,6 +26,8 @@ protected:
       else if (t < 5) z += .1;
       else            z -= .1;
       tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(x, y, z)), ros::Time(t), "foo", "bar"));
+      tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(1,0,0)), ros::Time(t), "foo", "stationary_offset_child"));
+      tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(0,0,1)), ros::Time(t), "stationary_offset_parent", "foo"));
     }
 
     // You can do set-up work for each test here.
@@ -54,65 +56,74 @@ protected:
 
 };
 
-TEST_F(LinearVelocitySquareTest, lvt)
+TEST_F(LinearVelocitySquareTest, LinearVelocityToThreeFrames)
 {
   geometry_msgs::TwistStamped tw;
-  try
+  std::vector<std::string> offset_frames;
+
+  offset_frames.push_back("foo");
+  offset_frames.push_back("stationary_offset_child");
+  offset_frames.push_back("stationary_offset_parent");
+
+
+  for (std::vector<std::string>::iterator it = offset_frames.begin(); it != offset_frames.end(); ++it)
   {
-    tf_.lookupVelocity("foo", "bar", ros::Time(0.5), ros::Duration(0.1), tw);
-  EXPECT_FLOAT_EQ(tw.twist.linear.x, 1.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+    try
+    {
+      tf_.lookupVelocity(*it, "bar", ros::Time(0.5), ros::Duration(0.1), tw);
+      EXPECT_FLOAT_EQ(tw.twist.linear.x, 1.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
   
-  tf_.lookupVelocity("foo", "bar", ros::Time(1.5), ros::Duration(0.1), tw);
-  EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.y, 1.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+      tf_.lookupVelocity(*it, "bar", ros::Time(1.5), ros::Duration(0.1), tw);
+      EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.y, 1.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
 
-  tf_.lookupVelocity("foo", "bar", ros::Time(2.5), ros::Duration(0.1), tw);
-  EXPECT_FLOAT_EQ(tw.twist.linear.x, -1.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+      tf_.lookupVelocity(*it, "bar", ros::Time(2.5), ros::Duration(0.1), tw);
+      EXPECT_FLOAT_EQ(tw.twist.linear.x, -1.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
 
-  tf_.lookupVelocity("foo", "bar", ros::Time(3.5), ros::Duration(0.1), tw);
-  EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.y, -1.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+      tf_.lookupVelocity(*it, "bar", ros::Time(3.5), ros::Duration(0.1), tw);
+      EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.y, -1.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
 
-  tf_.lookupVelocity("foo", "bar", ros::Time(4.5), ros::Duration(0.1), tw);
-  EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.z, 1.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+      tf_.lookupVelocity(*it, "bar", ros::Time(4.5), ros::Duration(0.1), tw);
+      EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.z, 1.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
 
-  tf_.lookupVelocity("foo", "bar", ros::Time(5.5), ros::Duration(0.1), tw);
-  EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.linear.z, -1.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
-  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
-  }
-  catch(tf::TransformException &ex)
-  {
-    ASSERT_FALSE(ex.what());
+      tf_.lookupVelocity(*it, "bar", ros::Time(5.5), ros::Duration(0.1), tw);
+      EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.linear.z, -1.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+      EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+    }
+    catch(tf::TransformException &ex)
+    {
+      EXPECT_STREQ("", ex.what());
+    }
   }
 };
-
 
 
 
