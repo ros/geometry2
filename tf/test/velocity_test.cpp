@@ -8,27 +8,30 @@ using namespace tf;
 
 
 // The fixture for testing class Foo.
-class LinearVelocityTest : public ::testing::Test {
+class LinearVelocitySquareTest : public ::testing::Test {
 protected:
   // You can remove any or all of the following functions if its body
   // is empty.
 
-  LinearVelocityTest() {
+  LinearVelocitySquareTest() {
     double x = 0;
     double y = 0;
-    for (double t = 0; t < 10; t += 0.1)
+    double z = 0;
+    for (double t = 0; t < 6; t += 0.1)
     {
-      if ( t < 2.5) x += .1;
-      else if (t < 5) y += .1;
-      else if (t < 7.5) x -= .1;
-      else y -= .1;
-      tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(x, y, 0)), ros::Time(t), "foo", "bar"));
+      if      (t < 1) x += .1;
+      else if (t < 2) y += .1;
+      else if (t < 3) x -= .1;
+      else if (t < 4) y -= .1;
+      else if (t < 5) z += .1;
+      else            z -= .1;
+      tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(x, y, z)), ros::Time(t), "foo", "bar"));
     }
 
     // You can do set-up work for each test here.
   }
 
-  virtual ~LinearVelocityTest() {
+  virtual ~LinearVelocitySquareTest() {
     // You can do clean-up work that doesn't throw exceptions here.
   }
 
@@ -51,13 +54,63 @@ protected:
 
 };
 
-TEST_F(LinearVelocityTest, lvt)
+TEST_F(LinearVelocitySquareTest, lvt)
 {
   geometry_msgs::TwistStamped tw;
-  tf_.lookupVelocity("foo", "bar", ros::Time(1.25), ros::Duration(0.1), tw);
+  try
+  {
+    tf_.lookupVelocity("foo", "bar", ros::Time(0.5), ros::Duration(0.1), tw);
   EXPECT_FLOAT_EQ(tw.twist.linear.x, 1.0);
   EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
   
+  tf_.lookupVelocity("foo", "bar", ros::Time(1.5), ros::Duration(0.1), tw);
+  EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.y, 1.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+
+  tf_.lookupVelocity("foo", "bar", ros::Time(2.5), ros::Duration(0.1), tw);
+  EXPECT_FLOAT_EQ(tw.twist.linear.x, -1.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+
+  tf_.lookupVelocity("foo", "bar", ros::Time(3.5), ros::Duration(0.1), tw);
+  EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.y, -1.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.z, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+
+  tf_.lookupVelocity("foo", "bar", ros::Time(4.5), ros::Duration(0.1), tw);
+  EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.z, 1.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+
+  tf_.lookupVelocity("foo", "bar", ros::Time(5.5), ros::Duration(0.1), tw);
+  EXPECT_FLOAT_EQ(tw.twist.linear.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.linear.z, -1.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.x, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.y, 0.0);
+  EXPECT_FLOAT_EQ(tw.twist.angular.z, 0.0);
+  }
+  catch(tf::TransformException &ex)
+  {
+    ASSERT_FALSE(ex.what());
+  }
 };
 
 
