@@ -56,6 +56,55 @@ protected:
 
 };
 
+// The fixture for testing class Foo.
+class AngularVelocitySquareTest : public ::testing::Test {
+protected:
+  // You can remove any or all of the following functions if its body
+  // is empty.
+
+  AngularVelocitySquareTest() {
+    double x = 0;
+    double y = 0;
+    double z = 0;
+    for (double t = 0; t < 6; t += 0.1)
+    {
+      if      (t < 1) x += .1;
+      else if (t < 2) x -= .1;
+      else if (t < 3) y += .1;
+      else if (t < 4) y -= .1;
+      else if (t < 5) z += .1;
+      else            z -= .1;
+      tf_.setTransform(StampedTransform(btTransform(tf::createQuaternionFromRPY(x, y, z), btVector3(0,0,0)), ros::Time(t), "foo", "bar"));
+      tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(1,0,0)), ros::Time(t), "foo", "stationary_offset_child"));
+      tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(0,0,1)), ros::Time(t), "stationary_offset_parent", "foo"));
+    }
+
+    // You can do set-up work for each test here.
+  }
+
+  virtual ~AngularVelocitySquareTest() {
+    // You can do clean-up work that doesn't throw exceptions here.
+  }
+
+  // If the constructor and destructor are not enough for setting up
+  // and cleaning up each test, you can define the following methods:
+
+  virtual void SetUp() {
+    // Code here will be called immediately after the constructor (right
+    // before each test).
+  }
+
+  virtual void TearDown() {
+    // Code here will be called immediately after each test (right
+    // before the destructor).
+  }
+
+  // Objects declared here can be used by all tests in the test case for AngularVelocity.
+
+  tf::Transformer tf_;
+
+};
+
 TEST_F(LinearVelocitySquareTest, LinearVelocityToThreeFrames)
 {
   geometry_msgs::TwistStamped tw;
@@ -125,6 +174,185 @@ TEST_F(LinearVelocitySquareTest, LinearVelocityToThreeFrames)
   }
 };
 
+TEST_F(AngularVelocitySquareTest, AngularVelocityAlone)
+{
+  double epsilon = 1e-14;
+  geometry_msgs::TwistStamped tw;
+  try
+  {
+    tf_.lookupVelocity("foo", "bar", ros::Time(0.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+  
+    tf_.lookupVelocity("foo", "bar", ros::Time(1.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("foo", "bar", ros::Time(2.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x,  0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("foo", "bar", ros::Time(3.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("foo", "bar", ros::Time(4.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 1.0, epsilon);
+
+    tf_.lookupVelocity("foo", "bar", ros::Time(5.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, -1.0, epsilon);
+  }
+  catch(tf::TransformException &ex)
+  {
+    EXPECT_STREQ("", ex.what());
+  }
+};
+
+TEST_F(AngularVelocitySquareTest, AngularVelocityOffsetChildFrameInX)
+{
+  double epsilon = 1e-14;
+  geometry_msgs::TwistStamped tw;
+  try
+  {
+    tf_.lookupVelocity("stationary_offset_child", "bar", ros::Time(0.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+  
+    tf_.lookupVelocity("stationary_offset_child", "bar", ros::Time(1.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("stationary_offset_child", "bar", ros::Time(2.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x,  0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("stationary_offset_child", "bar", ros::Time(3.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("stationary_offset_child", "bar", ros::Time(4.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 1.0, epsilon);
+
+    tf_.lookupVelocity("stationary_offset_child", "bar", ros::Time(5.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, -1.0, epsilon);
+  }
+  catch(tf::TransformException &ex)
+  {
+    EXPECT_STREQ("", ex.what());
+  }
+};
+
+TEST_F(AngularVelocitySquareTest, AngularVelocityOffsetParentFrameInZ)
+{
+  double epsilon = 1e-14;
+  geometry_msgs::TwistStamped tw;
+  try
+  {
+    tf_.lookupVelocity("stationary_offset_parent", "bar", ros::Time(0.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+  
+    tf_.lookupVelocity("stationary_offset_parent", "bar", ros::Time(1.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("stationary_offset_parent", "bar", ros::Time(2.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("stationary_offset_parent", "bar", ros::Time(3.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
+
+    tf_.lookupVelocity("stationary_offset_parent", "bar", ros::Time(4.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, 1.0, epsilon);
+
+    tf_.lookupVelocity("stationary_offset_parent", "bar", ros::Time(5.5), ros::Duration(0.1), tw);
+    EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.y, 0.0, epsilon);
+    EXPECT_NEAR(tw.twist.angular.z, -1.0, epsilon);
+  }
+  catch(tf::TransformException &ex)
+  {
+    EXPECT_STREQ("", ex.what());
+  }
+};
 
 
 int main(int argc, char **argv){
