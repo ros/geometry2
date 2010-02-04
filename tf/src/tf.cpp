@@ -305,15 +305,40 @@ void Transformer::lookupVelocity(const std::string& reference_frame, const std::
   
   velocity.header.stamp = start_time + duration * 0.5;
   velocity.header.frame_id = reference_frame;
-  velocity.twist.linear.x =  (end.getOrigin().getX() - start.getOrigin().getX())/duration.toSec();
-  velocity.twist.linear.y =  (end.getOrigin().getY() - start.getOrigin().getY())/duration.toSec();
-  velocity.twist.linear.z =  (end.getOrigin().getZ() - start.getOrigin().getZ())/duration.toSec();
-  velocity.twist.angular.x =  o.x() * ang/duration.toSec();
-  velocity.twist.angular.y =  o.y() * ang/duration.toSec();
-  velocity.twist.angular.z =  o.z() * ang/duration.toSec();
+  double delta_x = end.getOrigin().getX() - start.getOrigin().getX();
+  double delta_y = end.getOrigin().getY() - start.getOrigin().getY();
+  double delta_z = end.getOrigin().getZ() - start.getOrigin().getZ();
 
-  
 
+  btVector3 twist_vel ((delta_x)/duration.toSec(), 
+                       (delta_y)/duration.toSec(),
+                       (delta_z)/duration.toSec());
+  btVector3 twist_rot = o * (ang / duration.toSec());
+
+
+  //correct for different frames  the above reports the angular in the tracked frame
+
+
+  tf::StampedTransform inverse;
+  lookupTransform(reference_frame,moving_frame,  target_time, inverse);
+
+
+  btVector3 out_rot = inverse.getBasis() * twist_rot;
+  btVector3 out_vel = inverse.getBasis()* twist_vel + inverse.getOrigin().cross(out_rot);
+
+
+  /*
+    printf("KDL: Rotation %f %f %f, Translation:%f %f %f\n", 
+         out_rot.x(),out_rot.y(),out_rot.z(),
+         out_vel.x(),out_vel.y(),out_vel.z());
+  */     
+
+  velocity.twist.linear.x =  out_vel.x();
+  velocity.twist.linear.y =  out_vel.y();
+  velocity.twist.linear.z =  out_vel.z();
+  velocity.twist.angular.x =  out_rot.x();
+  velocity.twist.angular.y =  out_rot.y();
+  velocity.twist.angular.z =  out_rot.z();
 
 };
 

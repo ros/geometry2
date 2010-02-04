@@ -14,10 +14,10 @@ protected:
   // is empty.
 
   LinearVelocitySquareTest() {
-    double x = 0;
+    double x = -.1;
     double y = 0;
     double z = 0;
-    for (double t = 0; t < 6; t += 0.1)
+    for (double t = 0.1; t <= 6; t += 0.1)
     {
       if      (t < 1) x += .1;
       else if (t < 2) y += .1;
@@ -63,10 +63,10 @@ protected:
   // is empty.
 
   AngularVelocitySquareTest() {
-    double x = 0;
+    double x = -.1;
     double y = 0;
     double z = 0;
-    for (double t = 0; t < 6; t += 0.1)
+    for (double t = 0.1; t < 6; t += 0.1)
     {
       if      (t < 1) x += .1;
       else if (t < 2) x -= .1;
@@ -76,7 +76,7 @@ protected:
       else            z -= .1;
       tf_.setTransform(StampedTransform(btTransform(tf::createQuaternionFromRPY(x, y, z), btVector3(0,0,0)), ros::Time(t), "foo", "bar"));
       tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(1,0,0)), ros::Time(t), "foo", "stationary_offset_child"));
-      tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(0,0,1)), ros::Time(t), "stationary_offset_parent", "foo"));
+      tf_.setTransform(StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(0,0,-1)), ros::Time(t), "stationary_offset_parent", "foo"));
     }
 
     // You can do set-up work for each test here.
@@ -259,7 +259,7 @@ TEST_F(AngularVelocitySquareTest, AngularVelocityOffsetChildFrameInX)
     tf_.lookupVelocity("stationary_offset_child", "bar", ros::Time(2.5), ros::Duration(0.1), tw);
     EXPECT_NEAR(tw.twist.linear.x,  0.0, epsilon);
     EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
-    EXPECT_NEAR(tw.twist.linear.z, 1.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, -1.0, epsilon);
     EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
     EXPECT_NEAR(tw.twist.angular.y, 1.0, epsilon);
     EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
@@ -267,7 +267,7 @@ TEST_F(AngularVelocitySquareTest, AngularVelocityOffsetChildFrameInX)
     tf_.lookupVelocity("stationary_offset_child", "bar", ros::Time(3.5), ros::Duration(0.1), tw);
     EXPECT_NEAR(tw.twist.linear.x, 0.0, epsilon);
     EXPECT_NEAR(tw.twist.linear.y, 0.0, epsilon);
-    EXPECT_NEAR(tw.twist.linear.z, -1.0, epsilon);
+    EXPECT_NEAR(tw.twist.linear.z, 1.0, epsilon);
     EXPECT_NEAR(tw.twist.angular.x, 0.0, epsilon);
     EXPECT_NEAR(tw.twist.angular.y, -1.0, epsilon);
     EXPECT_NEAR(tw.twist.angular.z, 0.0, epsilon);
