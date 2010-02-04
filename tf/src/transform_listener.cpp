@@ -189,6 +189,33 @@ void TransformListener::transformPose(const std::string& target_frame,
   transformPose(target_frame, pin, pout);
   poseStampedTFToMsg(pout, msg_out);
 }
+void TransformListener::transformTwist(const std::string& target_frame,
+    const geometry_msgs::TwistStamped& msg_in,
+    geometry_msgs::TwistStamped& msg_out) const
+{
+  tf::Vector3 twist_rot(msg_in.twist.angular.x,
+                        msg_in.twist.angular.y,
+                        msg_in.twist.angular.z);
+  tf::Vector3 twist_vel(msg_in.twist.linear.x,
+                        msg_in.twist.linear.y,
+                        msg_in.twist.linear.z);
+
+  tf::StampedTransform transform;
+  lookupTransform(target_frame,msg_in.header.frame_id,  msg_in.header.stamp, transform);
+
+
+  btVector3 out_rot = transform.getBasis() * twist_rot;
+  btVector3 out_vel = transform.getBasis()* twist_vel + transform.getOrigin().cross(out_rot);
+  msg_out.header.stamp = msg_in.header.stamp;
+  msg_out.header.frame_id = target_frame;
+  msg_out.twist.linear.x =  out_vel.x();
+  msg_out.twist.linear.y =  out_vel.y();
+  msg_out.twist.linear.z =  out_vel.z();
+  msg_out.twist.angular.x =  out_rot.x();
+  msg_out.twist.angular.y =  out_rot.y();
+  msg_out.twist.angular.z =  out_rot.z();
+
+}
 void TransformListener::transformQuaternion(const std::string& target_frame, const ros::Time& target_time,
     const geometry_msgs::QuaternionStamped& msg_in,
     const std::string& fixed_frame, geometry_msgs::QuaternionStamped& msg_out) const
