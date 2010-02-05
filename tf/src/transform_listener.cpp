@@ -206,14 +206,18 @@ void TransformListener::transformTwist(const std::string& target_frame,
 
   btVector3 out_rot = transform.getBasis() * twist_rot;
   btVector3 out_vel = transform.getBasis()* twist_vel + transform.getOrigin().cross(out_rot);
+
+  geometry_msgs::TwistStamped interframe_twist;
+  lookupVelocity(target_frame, msg_in.header.frame_id, msg_in.header.stamp, ros::Duration(0.1), interframe_twist); //\todo get rid of hard coded number
+
   msg_out.header.stamp = msg_in.header.stamp;
   msg_out.header.frame_id = target_frame;
-  msg_out.twist.linear.x =  out_vel.x();
-  msg_out.twist.linear.y =  out_vel.y();
-  msg_out.twist.linear.z =  out_vel.z();
-  msg_out.twist.angular.x =  out_rot.x();
-  msg_out.twist.angular.y =  out_rot.y();
-  msg_out.twist.angular.z =  out_rot.z();
+  msg_out.twist.linear.x =  out_vel.x() + interframe_twist.twist.linear.x;
+  msg_out.twist.linear.y =  out_vel.y() + interframe_twist.twist.linear.y;
+  msg_out.twist.linear.z =  out_vel.z() + interframe_twist.twist.linear.z;
+  msg_out.twist.angular.x =  out_rot.x() + interframe_twist.twist.angular.x;
+  msg_out.twist.angular.y =  out_rot.y() + interframe_twist.twist.angular.y;
+  msg_out.twist.angular.z =  out_rot.z() + interframe_twist.twist.angular.z;
 
 }
 void TransformListener::transformQuaternion(const std::string& target_frame, const ros::Time& target_time,
