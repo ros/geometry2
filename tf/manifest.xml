@@ -10,7 +10,7 @@ any desired point in time.
   </description>
   <author>Tully Foote</author>
   <license>BSD</license>
-  <review status="API cleared" notes=""/>
+  <review status="doc reviewed" notes="http://www.ros.org/wiki/tf/Reviews/2009-10-07_Doc_Review"/>
   <url>http://www.ros.org/wiki/tf</url>
   <depend package="geometry_msgs"/>
   <depend package="sensor_msgs"/><!-- for point cloud should be removed-->
