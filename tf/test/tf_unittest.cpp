@@ -1666,91 +1666,147 @@ TEST(tf, getFrameStrings)
 
 }
 
-/*
-TEST(tf, lookupVelocity)
+bool expectInvalidQuaternion(tf::Quaternion q)
 {
-  double epsilon = 1e-9;
-  Transformer mTR;
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(1,0,0)), ros::Time().fromSec(1),  "/base", "/odom"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(M_PI/2,0,0), btVector3(2,0,0)), ros::Time().fromSec(2),  "/base", "/odom"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(M_PI,0,0), btVector3(3,0,0)), ros::Time().fromSec(3),  "/base", "/odom"));
-
-  geometry_msgs::TwistStamped twist;
-  ros::Time query_time;
-  query_time.fromSec(2);
-  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
-
-  EXPECT_NEAR(query_time.toSec(), twist.header.stamp.toSec(), epsilon);
-  EXPECT_NEAR(1.0, twist.twist.linear.x, epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.y, epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.z, epsilon);
-  EXPECT_NEAR(0, twist.twist.angular.x, epsilon);
-  EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
-  EXPECT_NEAR(M_PI/2, twist.twist.angular.z, epsilon);
-
-
-
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromSec(4),  "/base", "/odom"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,M_PI/2,0), btVector3(0,0,0)), ros::Time().fromSec(5),  "/base", "/odom"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,M_PI,0), btVector3(0,0,0)), ros::Time().fromSec(6),  "/base", "/odom"));
-
-  query_time.fromSec(5);
-  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
-
-  EXPECT_NEAR(query_time.toSec(), twist.header.stamp.toSec(), epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.x, epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.y, epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.z, epsilon);
-  EXPECT_NEAR(0, twist.twist.angular.x, epsilon);
-  EXPECT_NEAR(M_PI/2, twist.twist.angular.y, epsilon);
-  EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
-
-
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromSec(7),  "/base", "/odom"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,.1), btVector3(0,0,0)), ros::Time().fromSec(8),  "/base", "/odom"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,.2), btVector3(0,0,0)), ros::Time().fromSec(9),  "/base", "/odom"));
-
-  query_time.fromSec(8);
-  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
-
-  EXPECT_NEAR(query_time.toSec(), twist.header.stamp.toSec(), epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.x, epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.y, epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.z, epsilon);
-  EXPECT_NEAR(.1, twist.twist.angular.x, epsilon);
-  EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
-  EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
-
-
-  // Test Latest
-  query_time.fromSec(0);
-  mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
-
-  EXPECT_NEAR(ros::Time().fromSec(8.75).toSec(), twist.header.stamp.toSec(), epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.x, epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.y, epsilon);
-  EXPECT_NEAR(0.0, twist.twist.linear.z, epsilon);
-  EXPECT_NEAR(.1, twist.twist.angular.x, epsilon);
-  EXPECT_NEAR(0, twist.twist.angular.y, epsilon);
-  EXPECT_NEAR(0, twist.twist.angular.z, epsilon);
-
-
-  // Test extrapolation back
-
-  query_time.fromSec(1.0);
   try
   {
-    mTR.lookupVelocity("/odom", "/base", query_time, ros::Duration().fromSec(.5), twist);
-    EXPECT_FALSE("This should have thrown and extrapolationException for being too old");
+    tf::assertQuaternionValid(q);
+    printf("this should have thrown\n");
+    return false;
   }
-  catch (tf::ExtrapolationException& ex)
+  catch (tf::InvalidArgument &ex)  
   {
-    EXPECT_TRUE("Caught Exception correctly");
+    return true;
   }
-
-
+  catch  (...)
+  {
+    printf("A different type of exception was expected\n");
+    return false;
+  }
+  return false;
 }
-*/
+
+bool expectValidQuaternion(tf::Quaternion q)
+{
+  try
+  {
+    tf::assertQuaternionValid(q);
+  }
+  catch (tf::TransformException &ex)  
+  {
+    return false;
+  }
+  return true;
+}
+
+bool expectInvalidQuaternion(geometry_msgs::Quaternion q)
+{
+  try
+  {
+    tf::assertQuaternionValid(q);
+    printf("this should have thrown\n");
+    return false;
+  }
+  catch (tf::InvalidArgument &ex)  
+  {
+    return true;
+  }
+  catch  (...)
+  {
+    printf("A different type of exception was expected\n");
+    return false;
+  }
+  return false;
+}
+
+bool expectValidQuaternion(geometry_msgs::Quaternion q)
+{
+  try
+  {
+    tf::assertQuaternionValid(q);
+  }
+  catch (tf::TransformException &ex)  
+  {
+    return false;
+  }
+  return true;
+}
+
+
+TEST(tf, assertQuaternionValid)
+{
+  tf::Quaternion q(1,0,0,0);
+  EXPECT_TRUE(expectValidQuaternion(q));
+  q.setX(0);
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+  q.setY(1);
+  EXPECT_TRUE(expectValidQuaternion(q));
+  q.setZ(1);
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+  q.setY(0);
+  EXPECT_TRUE(expectValidQuaternion(q));
+  q.setW(1);
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+  q.setZ(0);
+  EXPECT_TRUE(expectValidQuaternion(q));
+  q.setZ(sqrt(2.0)/2.0);
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+  q.setW(sqrt(2.0)/2.0);
+  EXPECT_TRUE(expectValidQuaternion(q));
+
+  q.setZ(sqrt(2.0)/2.0 + 0.01);
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+
+  q.setZ(sqrt(2.0)/2.0 - 0.01);
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+
+
+  /*    Waiting for gtest 1.1 or later
+    EXPECT_NO_THROW(tf::assertQuaternionValid(q));
+  q.setX(0);
+  EXPECT_THROW(tf::assertQuaternionValid(q), tf::InvalidArgument);
+  q.setY(1);
+  EXPECT_NO_THROW(tf::assertQuaternionValid(q));
+  */
+}
+TEST(tf, assertQuaternionMsgValid)
+{
+  geometry_msgs::Quaternion q;
+  q.x = 1;//others zeroed to start
+
+  EXPECT_TRUE(expectValidQuaternion(q));
+  q.x = 0;
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+  q.y = 1;
+  EXPECT_TRUE(expectValidQuaternion(q));
+  q.z = 1;
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+  q.y = 0;
+  EXPECT_TRUE(expectValidQuaternion(q));
+  q.w = 1;
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+  q.z = 0;
+  EXPECT_TRUE(expectValidQuaternion(q));
+  q.z = sqrt(2.0)/2.0;
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+  q.w = sqrt(2.0)/2.0;
+  EXPECT_TRUE(expectValidQuaternion(q));
+
+  q.z = sqrt(2.0)/2.0 + 0.01;
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+
+  q.z = sqrt(2.0)/2.0 - 0.01;
+  EXPECT_TRUE(expectInvalidQuaternion(q));
+
+
+  /*    Waiting for gtest 1.1 or later
+    EXPECT_NO_THROW(tf::assertQuaternionValid(q));
+  q.x = 0);
+  EXPECT_THROW(tf::assertQuaternionValid(q), tf::InvalidArgument);
+  q.y = 1);
+  EXPECT_NO_THROW(tf::assertQuaternionValid(q));
+  */
+}
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);

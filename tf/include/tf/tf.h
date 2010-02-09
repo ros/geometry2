@@ -432,6 +432,26 @@ protected:
 };
 
 
+/** \brief Throw InvalidArgument if quaternion is malformed */
+inline void assertQuaternionValid(const tf::Quaternion & q)
+{
+  if(std::fabs(q.x()*q.x() + q.y()*q.y() + q.z()*q.z() + q.w()*q.w() - 1) > 0.01)
+  {
+    std::stringstream ss;
+    ss << "Quaternion malformed, magnitude: " << q.x()*q.x() + q.y()*q.y() + q.z()*q.z() + q.w()*q.w() << " should be 1.0" <<std::endl;
+    throw tf::InvalidArgument(ss.str());
+  }  //  ROS_ASSERT(std::fabs(q.x()*q.x() + q.y()*q.y() + q.z*q.z() + q.w()*q.w() - 1 < 0.01));
+};
 
+/** \brief Throw InvalidArgument if quaternion is malformed */
+inline void assertQuaternionValid(const geometry_msgs::Quaternion & q)
+{
+  if(std::fabs(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w - 1) > 0.01)
+  {
+    std::stringstream ss;
+    ss << "Quaternion malformed, magnitude: " << q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w << " should be 1.0" <<std::endl;
+    throw tf::InvalidArgument(ss.str());
+  }  //  ROS_ASSERT(std::fabs(q.x()*q.x() + q.y()*q.y() + q.z*q.z() + q.w()*q.w() - 1 < 0.01));
+};
 }
 #endif //TF_TF_H

@@ -147,11 +147,10 @@ void TransformListener::transformQuaternion(const std::string& target_frame,
     const geometry_msgs::QuaternionStamped& msg_in,
     geometry_msgs::QuaternionStamped& msg_out) const
 {
-  if (msg_in.quaternion.w <= 0.0 || msg_in.quaternion.w > 1.0)
-    throw tf::InvalidArgument("Input Stamped Quaternion has w which is malformed");
+  tf::assertQuaternionValid(msg_in.quaternion);
 
   Stamped<Quaternion> pin, pout;
-  quaternionStampedMsgToTF(msg_in, pin);
+  quaternionStampedMsgToTF(msg_in, pin);  
   transformQuaternion(target_frame, pin, pout);
   quaternionStampedTFToMsg(pout, msg_out);
 }
@@ -180,9 +179,7 @@ void TransformListener::transformPose(const std::string& target_frame,
     const geometry_msgs::PoseStamped& msg_in,
     geometry_msgs::PoseStamped& msg_out) const
 {
-  btScalar w = msg_in.pose.orientation.w;
-  if (w <= 0.0 || w > 1.0)
-    throw tf::InvalidArgument("Input Stamped Quaternion has w which is malformed");
+  tf::assertQuaternionValid(msg_in.pose.orientation);
 
   Stamped<Pose> pin, pout;
   poseStampedMsgToTF(msg_in, pin);
@@ -224,10 +221,7 @@ void TransformListener::transformQuaternion(const std::string& target_frame, con
     const geometry_msgs::QuaternionStamped& msg_in,
     const std::string& fixed_frame, geometry_msgs::QuaternionStamped& msg_out) const
 {
-  if (msg_in.quaternion.w <= 0.0 || msg_in.quaternion.w > 1.0)
-    throw tf::InvalidArgument("Input Stamped Quaternion has w which is malformed");
-
-
+  tf::assertQuaternionValid(msg_in.quaternion);
   Stamped<Quaternion> pin, pout;
   quaternionStampedMsgToTF(msg_in, pin);
   transformQuaternion(target_frame, target_time, pin, fixed_frame, pout);
@@ -258,9 +252,7 @@ void TransformListener::transformPose(const std::string& target_frame, const ros
     const geometry_msgs::PoseStamped& msg_in,
     const std::string& fixed_frame, geometry_msgs::PoseStamped& msg_out) const
 {
-  btScalar w = msg_in.pose.orientation.w;
-  if (w <= 0.0 || w > 1.0)
-    throw tf::InvalidArgument("Input Stamped Quaternion has w which is malformed");
+  tf::assertQuaternionValid(msg_in.pose.orientation);
 
   Stamped<Pose> pin, pout;
   poseStampedMsgToTF(msg_in, pin);
