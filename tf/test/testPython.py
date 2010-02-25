@@ -75,8 +75,39 @@ class TestPython(unittest.TestCase):
         #### print t.lookupVelocity("THISFRAME", "PARENT", rospy.Time(15), rospy.Duration(5))
 
     def test_smoke(self):
-        t = tf.Transformer(True, rospy.Duration().from_seconds(10.0))
+        t = tf.Transformer()
         self.common(t)
+
+    def test_cache_time(self):
+        # Vary cache_time and confirm its effect on ExtrapolationException from lookupTransform().
+
+        for cache_time in range(2, 98):
+            t = tf.Transformer(True, rospy.Duration(cache_time))
+            m = geometry_msgs.msg.TransformStamped()
+            m.header.frame_id = "PARENT"
+            m.child_frame_id = "THISFRAME"
+            m.transform.translation.y = 5.0
+            m.transform.rotation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0, 0))
+            t.setTransform(m)
+            afs = t.allFramesAsString()
+            self.assert_(len(afs) != 0)
+            self.assert_("PARENT" in afs)
+            self.assert_("THISFRAME" in afs)
+            self.assert_(t.getLatestCommonTime("THISFRAME", "PARENT").to_sec() == 0)
+
+            # Set transforms for time 0..100 inclusive
+            for ti in range(101):
+                m.header.stamp = rospy.Time(ti)
+                t.setTransform(m)
+                self.assert_(t.getLatestCommonTime("THISFRAME", "PARENT").to_sec() == ti)
+            self.assertEqual(t.getLatestCommonTime("THISFRAME", "PARENT").to_sec(), 100)
+
+            # (avoid time of 0 because that means 'latest')
+
+            for ti in range(1, 100 - cache_time):
+                self.assertRaises(tf.ExtrapolationException, lambda: t.lookupTransform("THISFRAME", "PARENT", rospy.Time(ti)))
+            for ti in range(100 - cache_time, 100):
+                t.lookupTransform("THISFRAME", "PARENT", rospy.Time(ti))
 
     def test_subclass(self):
         class TransformerSubclass(tf.Transformer):
