@@ -158,6 +158,10 @@ Transformer
 
         returns the chain of frames connecting source_frame to target_frame.
 
+    .. method::  clear() -> None
+
+        Clear all transformations.
+
     .. method::  frameExists(frame_id) -> Bool
 
         :param frame_id: a tf frame, string
