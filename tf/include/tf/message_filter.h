@@ -247,12 +247,12 @@ public:
    */
   void add(const MConstPtr& message)
   {
+    boost::mutex::scoped_lock lock(messages_mutex_);
+
     testMessages();
 
     if (!testMessage(message))
     {
-      boost::mutex::scoped_lock lock(messages_mutex_);
-
       // If this message is about to push us past our queue size, erase the oldest message
       if (queue_size_ != 0 && message_count_ + 1 > queue_size_)
       {
@@ -271,10 +271,7 @@ public:
 
     TF_MESSAGEFILTER_DEBUG("Added message in frame %s at time %.3f, count now %d", message->header.frame_id.c_str(), message->header.stamp.toSec(), message_count_);
 
-    {
-      boost::mutex::scoped_lock lock(messages_mutex_);
-      ++incoming_message_count_;
-    }
+    ++incoming_message_count_;
   }
 
   /**
