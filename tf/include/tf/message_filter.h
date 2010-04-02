@@ -242,34 +242,39 @@ public:
 
   /**
    * \brief Manually add a message into this filter.
-   * \note If the message is immediately transformable, this will immediately call through to its output callback
+   * \note If the message (or any other messages in the queue) are immediately transformable this will immediately call through to the output callback, possibly
+   * multiple times
    */
   void add(const MConstPtr& message)
   {
-    if (testMessage(message))
+    testMessages();
+
+    if (!testMessage(message))
     {
-      return;
+      boost::mutex::scoped_lock lock(messages_mutex_);
+
+      // If this message is about to push us past our queue size, erase the oldest message
+      if (queue_size_ != 0 && message_count_ + 1 > queue_size_)
+      {
+        ++dropped_message_count_;
+        TF_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_, messages_.front()->header.frame_id.c_str(), messages_.front()->header.stamp.toSec());
+        signalFailure(messages_.front(), filter_failure_reasons::Unknown);
+
+        messages_.pop_front();
+        --message_count_;
+      }
+
+      // Add the message to our list
+      messages_.push_back(message);
+      ++message_count_;
     }
-
-    boost::mutex::scoped_lock lock(messages_mutex_);
-
-    // If this message is about to push us past our queue size, erase the oldest message
-    if (queue_size_ != 0 && message_count_ + 1 > queue_size_)
-    {
-      ++dropped_message_count_;
-      TF_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_, messages_.front()->header.frame_id.c_str(), messages_.front()->header.stamp.toSec());
-      signalFailure(messages_.front(), filter_failure_reasons::Unknown);
-      messages_.pop_front();
-      --message_count_;
-    }
-
-    // Add the message to our list
-    messages_.push_back(message);
-    ++message_count_;
 
     TF_MESSAGEFILTER_DEBUG("Added message in frame %s at time %.3f, count now %d", message->header.frame_id.c_str(), message->header.stamp.toSec(), message_count_);
 
-    ++incoming_message_count_;
+    {
+      boost::mutex::scoped_lock lock(messages_mutex_);
+      ++incoming_message_count_;
+    }
   }
 
   /**
