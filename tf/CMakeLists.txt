@@ -45,6 +45,11 @@ rosbuild_add_rostest(test/transform_twist_test.launch)
 rosbuild_add_gtest(test/cache_unittest test/cache_unittest.cpp)
 target_link_libraries(test/cache_unittest tf)
 
+rosbuild_add_executable(test/test_message_filter EXCLUDE_FROM_ALL test/test_message_filter.cpp)
+rosbuild_declare_test(test/test_message_filter)
+rosbuild_add_gtest_build_flags(test/test_message_filter)
+target_link_libraries(test/test_message_filter tf ${Boost_LIBRARIES})
+rosbuild_add_rostest(test/test_message_filter.xml)
 
 ### Benchmarking
 rosbuild_add_gtest_future(test/tf_benchmark test/tf_benchmark.cpp)
