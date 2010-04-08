@@ -96,6 +96,10 @@ TEST(TFEigenConversions, tf_eigen_transform)
       ASSERT_NEAR(t.getBasis()[i][j],k.matrix()(i,j),1e-6);
     }
   }
+  for (int col = 0 ; col < 3; col ++)
+    ASSERT_NEAR(k.matrix()(3, col), 0, 1e-6);
+  ASSERT_NEAR(k.matrix()(3,3), 1, 1e-6);
+  
 }
 
 TEST(TFEigenConversions, eigen_tf_transform)

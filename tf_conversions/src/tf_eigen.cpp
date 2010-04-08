@@ -54,6 +54,11 @@ namespace tf {
         k.matrix()(i,j) = t.getBasis()[i][j];
       }
     }
+    // Fill in identity in last row
+    for (int col = 0 ; col < 3; col ++)
+      k.matrix()(3, col) = 0;
+    k.matrix()(3,3) = 1;
+
   };
 
   void TransformEigenToTF(const Eigen::Transform3d &k, tf::Transform &t)
