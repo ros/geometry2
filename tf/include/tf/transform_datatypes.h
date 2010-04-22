@@ -102,6 +102,11 @@ public:
 
 };
 
+static inline bool operator==(const StampedTransform &a, const StampedTransform &b) {
+  return a.frame_id_ == b.frame_id_ && a.child_frame_id_ == b.child_frame_id_ && a.stamp_ == b.stamp_ && static_cast<const tf::Transform&>(a) == static_cast<const tf::Transform&>(b);
+};
+
+
 /** \brief convert Quaternion msg to Quaternion */
 static inline void quaternionMsgToTF(const geometry_msgs::Quaternion& msg, Quaternion& bt) 
 {
