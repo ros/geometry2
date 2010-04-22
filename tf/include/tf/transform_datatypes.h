@@ -77,6 +77,13 @@ class Stamped : public T{
   void setData(const T& input){*static_cast<T*>(this) = input;};
 };
 
+/** \brief Comparison Operator for Stamped datatypes */
+template <typename T> 
+bool operator==(const Stamped<T> &a, const Stamped<T> &b) {
+  return a.frame_id_ == b.frame_id_ && a.stamp_ == b.stamp_ && static_cast<const T&>(a) == static_cast<const T&>(b);
+};
+
+
 /** \brief The Stamped Transform datatype used by tf */
 class StampedTransform : public tf::Transform
 {

@@ -1808,6 +1808,46 @@ TEST(tf, assertQuaternionMsgValid)
   */
 }
 
+TEST(data, StampedOperatorEqualEqual)
+{
+  tf::Pose pose0, pose1, pose0a;
+  pose0.setIdentity();
+  pose0a.setIdentity();
+  pose1.setIdentity();
+  pose1.setOrigin(btVector3(1, 0, 0));
+  tf::Stamped<tf::Pose> stamped_pose_reference(pose0a, ros::Time(), "frame_id");
+  tf::Stamped<tf::Pose> stamped_pose0A(pose0, ros::Time(), "frame_id");
+  EXPECT_TRUE(stamped_pose0A == stamped_pose_reference); // Equal
+  tf::Stamped<tf::Pose> stamped_pose0B(pose0, ros::Time(), "frame_id_not_equal");
+  EXPECT_FALSE(stamped_pose0B == stamped_pose_reference); // Different Frame id
+  tf::Stamped<tf::Pose> stamped_pose0C(pose0, ros::Time(1.0), "frame_id");
+  EXPECT_FALSE(stamped_pose0C == stamped_pose_reference); // Different Time
+  tf::Stamped<tf::Pose> stamped_pose0D(pose0, ros::Time(1.0), "frame_id_not_equal");
+  EXPECT_FALSE(stamped_pose0D == stamped_pose_reference); // Different frame id and time
+  tf::Stamped<tf::Pose> stamped_pose0E(pose1, ros::Time(), "frame_id_not_equal");
+  EXPECT_FALSE(stamped_pose0E == stamped_pose_reference); // Different pose, frame id
+  tf::Stamped<tf::Pose> stamped_pose0F(pose1, ros::Time(1.0), "frame_id");
+  EXPECT_FALSE(stamped_pose0F == stamped_pose_reference); // Different pose, time
+  tf::Stamped<tf::Pose> stamped_pose0G(pose1, ros::Time(1.0), "frame_id_not_equal");
+  EXPECT_FALSE(stamped_pose0G == stamped_pose_reference); // Different pose, frame id and time
+  tf::Stamped<tf::Pose> stamped_pose0H(pose1, ros::Time(), "frame_id");
+  EXPECT_FALSE(stamped_pose0H == stamped_pose_reference); // Different pose
+
+}
+TEST(data, StampedOperatorEqual)
+{
+ tf::Pose pose0, pose1, pose0a;
+  pose0.setIdentity();
+  pose1.setIdentity();
+  pose1.setOrigin(btVector3(1, 0, 0));
+  tf::Stamped<tf::Pose> stamped_pose0(pose0, ros::Time(), "frame_id");
+  tf::Stamped<tf::Pose> stamped_pose1(pose1, ros::Time(1.0), "frame_id_not_equal");
+  EXPECT_FALSE(stamped_pose1 == stamped_pose0);
+  stamped_pose1 = stamped_pose0;
+  EXPECT_TRUE(stamped_pose1 == stamped_pose0);
+
+}
+
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
