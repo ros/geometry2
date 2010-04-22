@@ -57,7 +57,9 @@ target_link_libraries(test/tf_benchmark tf)
 
 rosbuild_add_executable(test/btTest test/quaternion.cpp)
 rosbuild_add_executable(test/testListener test/testListener.cpp)
+rosbuild_add_gtest_build_flags(test/testListener)
 target_link_libraries(test/testListener tf)
+rosbuild_add_rostest(test/test_broadcaster.launch)
                                  
 rosbuild_add_executable(test/testBroadcaster test/testBroadcaster.cpp)
 target_link_libraries(test/testBroadcaster tf)

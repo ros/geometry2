@@ -46,18 +46,42 @@ TransformBroadcaster::TransformBroadcaster()
 
 void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped & msgtf)
 {
-  tfMessage message;
-  message.transforms.push_back(msgtf);
-  message.transforms.back().header.frame_id = tf::resolve(tf_prefix_, message.transforms.back().header.frame_id);
-  message.transforms.back().child_frame_id = tf::resolve(tf_prefix_, message.transforms.back().child_frame_id);
-  publisher_.publish(message);
+  std::vector<geometry_msgs::TransformStamped> v1;
+  v1.push_back(msgtf);
+  sendTransform(v1);
 }
 
 void TransformBroadcaster::sendTransform(const StampedTransform & transform)
 {
-  geometry_msgs::TransformStamped msgtf;
-  transformStampedTFToMsg(transform, msgtf);
-  sendTransform(msgtf);
+  std::vector<StampedTransform> v1;
+  v1.push_back(transform);
+  sendTransform(v1);
+} 
+
+void TransformBroadcaster::sendTransform(const std::vector<geometry_msgs::TransformStamped> & msgtf)
+{
+  tfMessage message;
+  for (std::vector<geometry_msgs::TransformStamped>::const_iterator it = msgtf.begin(); it != msgtf.end(); ++it)
+  {
+    message.transforms.push_back(*it);
+    //Make sure to resolve anything published
+    message.transforms.back().header.frame_id = tf::resolve(tf_prefix_, message.transforms.back().header.frame_id);
+    message.transforms.back().child_frame_id = tf::resolve(tf_prefix_, message.transforms.back().child_frame_id);
+  }
+  publisher_.publish(message);
+}
+
+void TransformBroadcaster::sendTransform(const std::vector<StampedTransform> & transforms)
+{
+  std::vector<geometry_msgs::TransformStamped> msgtfs;
+  for (std::vector<StampedTransform>::const_iterator it = transforms.begin(); it != transforms.end(); ++it)
+  {
+    geometry_msgs::TransformStamped msgtf;
+    transformStampedTFToMsg(*it, msgtf);
+    msgtfs.push_back(msgtf);
+
+  }
+  sendTransform(msgtfs);
 } 
   
 

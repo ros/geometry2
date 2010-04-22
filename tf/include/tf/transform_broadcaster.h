@@ -57,13 +57,21 @@ public:
   /** \brief Constructor (needs a ros::Node reference) */
   TransformBroadcaster();
 
-  /** \brief Send a Stamped<Transform> with parent parent_id 
+  /** \brief Send a StampedTransform 
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
   void sendTransform(const StampedTransform & transform);
 
-  /** \brief Send a TransformStamped 
+  /** \brief Send a vector of StampedTransforms 
+   * The stamped data structure includes frame_id, and time, and parent_id already.  */
+  void sendTransform(const std::vector<StampedTransform> & transforms);
+
+  /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
   void sendTransform(const geometry_msgs::TransformStamped & transform);
+
+  /** \brief Send a vector of TransformStamped messages
+   * The stamped data structure includes frame_id, and time, and parent_id already.  */
+  void sendTransform(const std::vector<geometry_msgs::TransformStamped> & transforms);
 
 private:
   /// Internal reference to ros::Node

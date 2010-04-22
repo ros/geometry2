@@ -30,57 +30,32 @@
 #include "tf/transform_listener.h"
 #include "ros/ros.h"
 
+#include <gtest/gtest.h>
 
-class testListener 
+TEST(TransformBroadcaster, single_frame)
 {
-public:
+  tf::TransformListener tfl;
+  EXPECT_TRUE(tfl.waitForTransform("frame1", "frame2", ros::Time(), ros::Duration(2.0)));
+  
+}
 
-  tf::TransformListener tf;
+TEST(TransformBroadcaster, multi_frame)
+{
+  tf::TransformListener tfl;
+  EXPECT_TRUE(tfl.waitForTransform("vframe0", "vframe2", ros::Time(), ros::Duration(2.0)));
 
-  //constructor with name
-  testListener() 
-  {
-
-  };
-
-  ~testListener()
-  {
-
-  };
-
-};
-
+}
 
 int main(int argc, char ** argv)
 {
+  testing::InitGoogleTest(&argc, argv);
+
   //Initialize ROS
   ros::init(argc, argv, "listener");
+  ros::NodeHandle nh;
 
-  //Instantiate a local listener
-  testListener testListener;
+  int ret = RUN_ALL_TESTS();
 
-  //Nothing needs to be done except wait for a quit
-  //The callbacks withing the listener class
-  //will take care of everything
-  ros::NodeHandle n;
-  while(n.ok())
-    {
-      std::cout << "The current list of frames is:" <<std::endl;
-      std::cout << testListener.tf.allFramesAsString()<<std::endl;
-      try
-      {
-        tf::StampedTransform test_transform;
-        testListener.tf.lookupTransform("frame1","frame2", ros::Time(), test_transform);
-        std::cout << "Success at " << test_transform.stamp_ << std::endl;
-      }
-      catch(...)
-      {
-        std::cout << "Failure" << std::endl;
-
-      }
-      sleep(1);
-    }
-
-  return 0;
+  return ret;
 };
 

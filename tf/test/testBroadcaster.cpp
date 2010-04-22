@@ -34,7 +34,7 @@ class testBroadcaster
 {
 public:
   //constructor
-  testBroadcaster() : count(2){};
+  testBroadcaster() : count(0), count1(0){};
   //Clean up ros connections
   ~testBroadcaster() { }
 
@@ -45,19 +45,36 @@ public:
   // A function to call to send data periodically
   void test () {
     broadcaster.sendTransform(tf::StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(1,2,3)), ros::Time().fromSec(1), "frame2", "frame1"));
-    /*    pTFServer->sendEuler("count","count++",1,1,1,1,1,1,ros::Time(100000,100000));
-    pTFServer->sendInverseEuler("count","count++",1,1,1,1,1,1,ros::Time(100000,100000));
-    pTFServer->sendDH("count","count++",1,1,1,1,ros::Time(100000,100000));
-    pTFServer->sendQuaternion("count","count++",1,1,1,1,1,1,1,ros::Time(100000,100000));
-    pTFServer->sendMatrix("count","count++",mat, ros::Time::now());
-*/
+
     if (count > 9000)
+    {
       count = 0;
-    std::cerr<<count<<std::endl;
+      std::cerr<<"Counter 0 rolledover at 9000"<< std::endl;
+    }
+    else
+      count ++;
+    //std::cerr<<count<<std::endl;
   };
 
+  // A function to call to send data periodically
+  void test_vector () {
+    std::vector<tf::StampedTransform> vec;
+    vec.push_back(tf::StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(1,2,3)), ros::Time().fromSec(1), "vframe2", "vframe1"));
+    vec.push_back(tf::StampedTransform(btTransform(tf::createIdentityQuaternion(), btVector3(1,2,3)), ros::Time().fromSec(1), "vframe1", "vframe0"));
+    broadcaster.sendTransform(vec);
+
+    if (count1 > 9000)
+    {
+      count1 = 0;
+      std::cerr<<"Counter 1 rolledover at 9000"<< std::endl;
+    }
+    else
+      count1 ++;
+    //std::cerr<<count1<<std::endl;
+  };
 private:
   int count;
+  int count1;
 
 };
 
@@ -74,6 +91,7 @@ int main(int argc, char ** argv)
   {
       //Send some data
       myTestBroadcaster.test();
+      myTestBroadcaster.test_vector();
       usleep(1000);
   }
 
