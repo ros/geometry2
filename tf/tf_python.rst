@@ -1,8 +1,6 @@
 tf (Python)
 ===========
 
-.. module:: tf
-
 .. exception:: Exception
 
     base class for tf exceptions.  Because :exc:`tf.Exception` is the
