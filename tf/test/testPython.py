@@ -37,17 +37,6 @@ class TestPython(unittest.TestCase):
     def setUp(self):
         pass
 
-    def expect_exception(self, func, exception):
-       tripped = False
-       try:
-           func()
-       except exception:
-           tripped = True
-       self.assert_(tripped)
-
-    class SubClass(tf.Transformer):
-        pass
-
     def common(self, t):
         m = geometry_msgs.msg.TransformStamped()
         m.header.frame_id = "PARENT"
