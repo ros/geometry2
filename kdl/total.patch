@@ -1,145 +1,46 @@
-Index: src/tree.hpp
+Index: src/bindings/python/CMakeLists.txt
 ===================================================================
---- src/tree.hpp	(revision 30401)
-+++ src/tree.hpp	(working copy)
-@@ -37,7 +37,7 @@
-     class TreeElement
-     {
-     private:
--        TreeElement():q_nr(0)
-+        TreeElement(const std::string& name):segment(name), q_nr(0)
-         {};
-     public:
-         Segment segment;
-@@ -50,9 +50,9 @@
-             segment=segment_in;
-             parent=parent_in;
-         };
--        static TreeElement Root()
-+      static TreeElement Root(const std::string& root_name)
-         {
--            return TreeElement();
-+            return TreeElement(root_name);
-         };
-     };
+--- src/bindings/python/CMakeLists.txt	(revision 31693)
++++ src/bindings/python/CMakeLists.txt	(working copy)
+@@ -7,6 +7,21 @@
+   ${CMAKE_SOURCE_DIR}/src
+   ${EIGEN2_INCLUDE_DIR})
  
-@@ -142,7 +142,9 @@
-          */
-         SegmentMap::const_iterator getSegment(const std::string& segment_name)const
-         {
--            return segments.find(segment_name);
-+          SegmentMap::const_iterator it = segments.find(segment_name);
-+          if (it == segments.end()) throw seg_name_ex;
-+          else return it;
-         };
-         /**
-          * Request the root segment of the tree
-@@ -173,6 +175,11 @@
- 
-         virtual ~Tree(){};
- 
-+      class segment_name_exception: public std::exception{
-+	virtual const char* what() const throw(){
-+	  return "Segment Name excption";}
-+      } seg_name_ex;
 +
-     };
- }
- #endif
-Index: src/tree.cpp
++# use, i.e. don't skip the full RPATH for the build tree
++SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
++
++# when building, don't use the install RPATH already
++# (but later on when installing)
++SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
++
++# the RPATH to be used when installing
++SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
++
++# add the automatically determined parts of the RPATH
++# which point to directories outside the build tree to the install RPATH
++SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
++
+ file(GLOB SIP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.sip")
+ set(SIP_INCLUDES ${SIP_FILES})
+ add_sip_python_module(PyKDL PyKDL/PyKDL.sip orocos-kdl)
+Index: config/FindSIPandPython.cmake
 ===================================================================
---- src/tree.cpp	(revision 30401)
-+++ src/tree.cpp	(working copy)
-@@ -27,7 +27,7 @@
- 
- Tree::Tree(const std::string& _root_name) :
-   nrOfSegments(0), nrOfJoints(0),root_name(_root_name) {
--    segments.insert(make_pair(root_name, TreeElement::Root()));
-+    segments.insert(make_pair(root_name, TreeElement::Root(root_name)));
- }
- 
- Tree::Tree(const Tree& in) {
-@@ -36,9 +36,8 @@
-     nrOfJoints = 0;
-     root_name = in.root_name;
- 
--    segments.insert(make_pair(root_name, TreeElement::Root()));
-+    segments.insert(make_pair(root_name, TreeElement::Root(root_name)));
-     this->addTree(in, root_name);
--
- }
- 
- Tree& Tree::operator=(const Tree& in) {
-@@ -47,7 +46,7 @@
-     nrOfJoints = 0;
-     root_name = in.root_name;
- 
--    segments.insert(make_pair(in.root_name, TreeElement::Root()));
-+    segments.insert(make_pair(in.root_name, TreeElement::Root(root_name)));
-     this->addTree(in, root_name);
-     return *this;
- }
-Index: src/bindings/rtt/corba/CMakeLists.txt
-===================================================================
---- src/bindings/rtt/corba/CMakeLists.txt	(revision 30401)
-+++ src/bindings/rtt/corba/CMakeLists.txt	(working copy)
-@@ -46,9 +46,9 @@
-   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/rtt/${OROCOS_TARGET}/plugins")
-   # Is used for building  the library
-   TARGET_LINK_LIBRARIES(orocos-kdltk-corba-${OROCOS_TARGET} orocos-rtt-corba-${OROCOS_TARGET} orocos-kdltk-${OROCOS_TARGET} ${CORBA_LIBRARIES})
--  CONFIGURE_FILE( orocos-kdltk-corba.pc.in src/bindings/rtt/corba/orocos-kdltk-corba-${OROCOS_TARGET}.pc @ONLY)
-+  CONFIGURE_FILE( orocos-kdltk-corba.pc.in ${CMAKE_CURRENT_BINARY_DIR}/orocos-kdltk-corba-${OROCOS_TARGET}.pc @ONLY)
- 
-   INSTALL_TARGETS(/lib/rtt/${OROCOS_TARGET}/plugins orocos-kdltk-corba-${OROCOS_TARGET})
--  INSTALL_FILES( /lib/pkgconfig FILES orocos-kdltk-corba-${OROCOS_TARGET}.pc)
-+  INSTALL_FILES( /lib/pkgconfig FILES ${CMAKE_CURRENT_BINARY_DIR}/orocos-kdltk-corba-${OROCOS_TARGET}.pc)
- 
- ENDIF(ENABLE_CORBA)
-Index: src/bindings/rtt/CMakeLists.txt
-===================================================================
---- src/bindings/rtt/CMakeLists.txt	(revision 30401)
-+++ src/bindings/rtt/CMakeLists.txt	(working copy)
-@@ -13,14 +13,15 @@
- #    SET(ROTATION_PROPERTIES_EULER 1)
- #  ENDIF(${ROTATION_PROPERTIES} STREQUAL "EULER")
- 
--  CONFIGURE_FILE( kdltk.hpp.in src/bindings/rtt/kdltk.hpp)
--  INSTALL_FILES( /include/kdl/bindings/rtt FILES kdltk.hpp)
-+  CONFIGURE_FILE( kdltk.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/kdltk.hpp)
-+  INSTALL_FILES( /include/kdl/bindings/rtt FILES ${CMAKE_CURRENT_BINARY_DIR}/kdltk.hpp)
-   INCLUDE_DIRECTORIES(${PROJ_SOURCE_DIR}/src)
- 
-   FILE( GLOB SRCS [^.]*.cpp [^.]*.cxx)
-   FILE( GLOB HPPS [^.]*.hpp [^.]*.h)
-   
-   INCLUDE_DIRECTORIES(${PROJ_SOURCE_DIR} ${PROJ_BINARY_DIR}/src/bindings/rtt
-+	${CMAKE_CURRENT_BINARY_DIR}/src/bindings/rtt/
-       ${OROCOS_RTT_INCLUDE_DIRS} ${OROCOS_INSTALL}/include/rtt /usr/include/orbsvcs)
-   ADD_DEFINITIONS(-D_REENTRANT)
-   INCLUDE_DIRECTORIES(/usr/include/orbsvcs /usr/include/rtt)
-@@ -33,8 +34,8 @@
-   INSTALL_FILES( /include/kdl/bindings/rtt FILES ${HPPS})
-   TARGET_LINK_LIBRARIES(orocos-kdltk-${OROCOS_TARGET} orocos-kdl orocos-rtt-${OROCOS_TARGET})
- 
--  CONFIGURE_FILE( kdltk.pc.in src/bindings/rtt/orocos-kdltk-${OROCOS_TARGET}.pc @ONLY)
--  INSTALL_FILES( /lib/pkgconfig FILES orocos-kdltk-${OROCOS_TARGET}.pc)
-+  CONFIGURE_FILE( kdltk.pc.in ${CMAKE_CURRENT_BINARY_DIR}/orocos-kdltk-${OROCOS_TARGET}.pc @ONLY)
-+  INSTALL_FILES( /lib/pkgconfig FILES ${CMAKE_CURRENT_BINARY_DIR}/orocos-kdltk-${OROCOS_TARGET}.pc)
- 
-   add_subdirectory(corba)
- 
-Index: src/CMakeLists.txt
-===================================================================
---- src/CMakeLists.txt	(revision 30401)
-+++ src/CMakeLists.txt	(working copy)
-@@ -17,8 +17,8 @@
- INSTALL_FILES( /include/kdl/utilities FILES ${UTIL_HPPS})
- 
- # Orocos convention:
--CONFIGURE_FILE( kdl.pc.in src/orocos-kdl.pc @ONLY)
--INSTALL_FILES( /lib/pkgconfig FILES orocos-kdl.pc)
-+CONFIGURE_FILE( kdl.pc.in ${CMAKE_CURRENT_BINARY_DIR}/orocos-kdl.pc @ONLY)
-+INSTALL_FILES( /lib/pkgconfig FILES ${CMAKE_CURRENT_BINARY_DIR}/orocos-kdl.pc)
- 
- IF( OROCOS_PLUGIN )
-   ADD_SUBDIRECTORY( bindings/rtt )
+--- config/FindSIPandPython.cmake	(revision 31693)
++++ config/FindSIPandPython.cmake	(working copy)
+@@ -18,13 +18,13 @@
+   #INCLUDE(${PROJ_SOURCE_DIR}/config/FindSIP.cmake)
+   IF (SIP_FOUND)
+     # check for SIP version
+-    SET (SIP_MIN_VERSION "4.7.9")
++    SET (SIP_MIN_VERSION "4.7.3")
+     IF (${SIP_VERSION} VERSION_EQUAL "${SIP_MIN_VERSION}" OR ${SIP_VERSION} VERSION_GREATER "${SIP_MIN_VERSION}")
+       SET (SIP_IS_GOOD TRUE)
+     ENDIF (${SIP_VERSION} VERSION_EQUAL "${SIP_MIN_VERSION}" OR ${SIP_VERSION} VERSION_GREATER "${SIP_MIN_VERSION}")
+     
+     IF (NOT SIP_IS_GOOD)
+-      MESSAGE (STATUS "SIP is required in version 4.7.9 or later!")
++      MESSAGE (STATUS "SIP is required in version 4.7.3 or later!")
+     ENDIF (NOT SIP_IS_GOOD)
+   ELSE (SIP_FOUND)
+     MESSAGE (STATUS "SIP not found!")
