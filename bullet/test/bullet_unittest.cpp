@@ -42,6 +42,38 @@ void seed_rand()
 };
 
 
+TEST(Bullet, QuaternionAngleScaling)
+{
+  double epsilon = 1e-6;
+
+  btQuaternion id(0,0,0,1);
+  btQuaternion ninty(0,0,sqrt(2.0)/2.0,sqrt(2.0)/2.0);
+  EXPECT_NEAR(id.angle(ninty), SIMD_PI/2, epsilon); //These two quaternions are 90 degrees apart
+
+  btQuaternion id2(0,0,0);
+  btQuaternion ninty2(SIMD_PI/2,0,0);
+  EXPECT_NEAR(id2.angle(ninty2), SIMD_PI/2, epsilon); //These two quaternions are 90 degrees apart
+}
+TEST(Bullet, QuaternionAngleShortestPath)
+{
+  btQuaternion q1 (SIMD_PI/4,0,0);
+  btQuaternion q2(-q1.x(), -q1.y(), -q1.z()-.0001, -q1.w()+.0001);
+  q2.normalize();
+  //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
+
+  EXPECT_NEAR(q2.angle(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+}
+
+TEST(Bullet, AngleQuaternionQuaternionShortestPath)
+{
+  btQuaternion q1 (SIMD_PI/4,0,0);
+  btQuaternion q2(-q1.x(), -q1.y(), -q1.z()-.0001, -q1.w()+.0001);
+  q2.normalize();
+
+  //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
+
+  EXPECT_NEAR(angle(q1, q2), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+}
 
 TEST(Bullet, EulerConventionsYPR)
 {
@@ -539,9 +571,8 @@ TEST(Bullet, TransformOrder )
 }
 
 
-TEST(Bullet, SlerpOppositeSigns)
+TEST(Bullet, SlerpZeroDistanceOppositeSigns)
 {
-  //  btQuaternion q1 (M_PI/2,0,0);
   btQuaternion q1 (M_PI/4,0,0);
   btQuaternion q2(-q1.x(), -q1.y(), -q1.z()-.0001, -q1.w()+.0001);
   q2.normalize();
@@ -549,11 +580,9 @@ TEST(Bullet, SlerpOppositeSigns)
 
   //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
 
-  EXPECT_NEAR(q2.x(), q3.x(), 0.01);
-  EXPECT_NEAR(q2.y(), q3.y(), 0.01);
-  EXPECT_NEAR(q2.z(), q3.z(), 0.01);
-  EXPECT_NEAR(q2.w(), q3.w(), 0.01);
-
+  EXPECT_NEAR(q1.angle(q2), 0, 0.01);
+  EXPECT_NEAR(q2.angle(q2), 0, 0.01);
+  EXPECT_NEAR(q1.angle(q3), 0, 0.01);
 }
 
 TEST(Bullet, SetEulerZYX)

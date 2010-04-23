@@ -2,26 +2,19 @@ Index: src/LinearMath/btQuaternion.h
 ===================================================================
 --- src/LinearMath/btQuaternion.h	(revision 1780)
 +++ src/LinearMath/btQuaternion.h	(working copy)
-@@ -200,12 +200,17 @@
+@@ -200,8 +200,11 @@
  	{
  		btScalar s = btSqrt(length2() * q.length2());
  		btAssert(s != btScalar(0.0));
 -		return btAcos(dot(q) / s);
-+    btScalar retval;
-+    if (dot(q) < 0) // Take care of long angle case see http://en.wikipedia.org/wiki/Slerp
-+      retval = btAcos(GEN_clamped(dot(-q) / s, (btScalar)-1.0, (btScalar)1.0)); //Clamped to prevent floating point precision crashes
-+    else 
-+      retval = btAcos(GEN_clamped(dot(q) / s, (btScalar)-1.0, (btScalar)1.0)); //Clamped to prevent floating point precision crashes
-+    return retval;
++               if (dot(q) < 0) // Take care of long angle case see http://en.wikipedia.org/wiki/Slerp
++                     return btAcos(dot(-q) / s) * btScalar(2.0);
++               else 
++                     return btAcos(dot(q) / s) * btScalar(2.0);
  	}
    /**@brief Return the angle of rotation represented by this quaternion */
  	btScalar getAngle() const 
  	{
--		btScalar s = btScalar(2.) * btAcos(m_floats[3]);
-+    btScalar s = btScalar(2.) * btAcos(GEN_clamped(m_floats[3], (btScalar)-1.0, (btScalar)1.0));
- 		return s;
- 	}
- 
 @@ -285,10 +290,17 @@
  			btScalar d = btScalar(1.0) / btSin(theta);
  			btScalar s0 = btSin((btScalar(1.0) - t) * theta);
