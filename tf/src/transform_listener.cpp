@@ -186,6 +186,7 @@ void TransformListener::transformPose(const std::string& target_frame,
   transformPose(target_frame, pin, pout);
   poseStampedTFToMsg(pout, msg_out);
 }
+/* http://www.ros.org/wiki/tf/Reviews/2010-03-12_API_Review
 void TransformListener::transformTwist(const std::string& target_frame,
     const geometry_msgs::TwistStamped& msg_in,
     geometry_msgs::TwistStamped& msg_out) const
@@ -216,7 +217,8 @@ void TransformListener::transformTwist(const std::string& target_frame,
   msg_out.twist.angular.y =  out_rot.y() + interframe_twist.twist.angular.y;
   msg_out.twist.angular.z =  out_rot.z() + interframe_twist.twist.angular.z;
 
-}
+  }*/
+
 void TransformListener::transformQuaternion(const std::string& target_frame, const ros::Time& target_time,
     const geometry_msgs::QuaternionStamped& msg_in,
     const std::string& fixed_frame, geometry_msgs::QuaternionStamped& msg_out) const
