@@ -14,6 +14,25 @@ class PoseMath(object):
 
     The PoseMath class is useful for working with poses from a variety of sources: from :meth:`tf.Transformer.lookupTransform`, from :mod:`opencv` or from ROS messages.
 
+    .. doctest::
+
+        >>> from geometry_msgs.msg import Pose
+        >>> from tf.posemath import PoseMath
+        >>> msg = Pose()
+        >>> msg.position.x = 7.0
+        >>> msg.orientation.w = 1.0
+        >>> p = PoseMath(msg)
+        >>> print p
+        position: 
+          x: 7.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+
     Poses can be concatenated using ``*``:
 
     .. doctest::
@@ -48,7 +67,6 @@ class PoseMath(object):
     .. doctest::
 
         >>> from tf.posemath import PoseMath
-        >>> from math import pi
         >>> trans = PoseMath.fromEuler(1, 2, 3, 0, 0, 0)
         >>> print ~trans
         position: 
