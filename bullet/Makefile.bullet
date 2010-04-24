@@ -1,14 +1,14 @@
 all: installed
 
 SVN_DIR = bullet_svn
-SVN_URL = http://bullet.googlecode.com/svn/tags/bullet-2.75
+SVN_URL = http://bullet.googlecode.com/svn/tags/bullet-2.76
 SVN_PATCH = deprecations.patch quaternion.patch demos.patch no_extras_build.patch getsetRPY.patch gimbal_lock.patch
-SVN_REVISION=-r1779
+SVN_REVISION=-r2038
 
 include $(shell rospack find mk)/svn_checkout.mk
 
 #TARBALL_NAME = bullet-svn$(SVN_REVISION)
-TARBALL_NAME = bullet-2.75-patched4
+TARBALL_NAME = bullet-2.76-patched
 
 TARBALL = build/$(TARBALL_NAME).tar.gz
 TARBALL_URL = http://pr.willowgarage.com/downloads/$(TARBALL_NAME).tar.gz

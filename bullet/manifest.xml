@@ -1,7 +1,7 @@
 <package>
 <description brief="Bullet Physics Engine">
     <p>
-    This package contains version 2.75 of the Bullet professional
+    This package contains version 2.76 of the Bullet professional
     free 3D Game Multiphysics Library.  The ROS package automatically
     downloads, extracts and compiles a tarball.  For each major
     release of the Bullet library, the tarball will get updated.  The
