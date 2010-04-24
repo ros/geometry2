@@ -64,6 +64,21 @@ TEST(Bullet, QuaternionAngleShortestPath)
   EXPECT_NEAR(q2.angle(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
 }
 
+TEST(Bullet, QuaternionAngleIdentity)
+{
+  btQuaternion q1 (SIMD_PI/4,0,0);
+  btQuaternion q2(-q1.x(), -q1.y(), -q1.z(), -q1.w());
+  q2.normalize();
+  //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
+
+  EXPECT_NEAR(q2.angle(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+  btQuaternion q3(-q1.x(), -q1.y(), -q1.z(), -q1.w());
+  q3.normalize();
+  //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
+
+  EXPECT_NEAR(q3.angle(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+}
+
 TEST(Bullet, AngleQuaternionQuaternionShortestPath)
 {
   btQuaternion q1 (SIMD_PI/4,0,0);
