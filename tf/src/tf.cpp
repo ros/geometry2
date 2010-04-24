@@ -278,23 +278,35 @@ void Transformer::lookupTransform(const std::string& target_frame,const ros::Tim
 
 };
 
-void Transformer::lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
-                    const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const
+
+void Transformer::lookupTwist(const std::string& tracking_frame, const std::string& observation_frame,
+                              const ros::Time& time, const ros::Duration& averaging_interval, 
+                              geometry_msgs::Twist& twist) const
+{
+  lookupTwist(tracking_frame, observation_frame, observation_frame, tf::Point(0,0,0), tracking_frame, time, averaging_interval, twist);
+};
+// ref point is origin of tracking_frame, ref_frame = obs_frame
+
+
+void Transformer::lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, const std::string& reference_frame,
+                 const tf::Point & reference_point, const std::string& reference_point_frame, 
+                 const ros::Time& time, const ros::Duration& averaging_interval, 
+                 geometry_msgs::Twist& twist) const
 {
   ros::Time latest_time, target_time;
-  getLatestCommonTime(reference_frame, moving_frame, latest_time, NULL);
+  getLatestCommonTime(observation_frame, tracking_frame, latest_time, NULL); ///\TODO check time on reference point too
 
   if (ros::Time() == time)
     target_time = latest_time;
   else
     target_time = time;
 
-  ros::Time end_time = std::min(target_time + duration *0.5 , latest_time);
+  ros::Time end_time = std::min(target_time + averaging_interval *0.5 , latest_time);
   
-  ros::Time start_time = std::max(ros::Time().fromSec(.00001) + duration, end_time) - duration;  // don't collide with zero
+  ros::Time start_time = std::max(ros::Time().fromSec(.00001) + averaging_interval, end_time) - averaging_interval;  // don't collide with zero
   StampedTransform start, end;
-  lookupTransform(reference_frame, moving_frame, start_time, start);
-  lookupTransform(reference_frame, moving_frame, end_time, end);
+  lookupTransform(observation_frame, tracking_frame, start_time, start);
+  lookupTransform(observation_frame, tracking_frame, end_time, end);
 
 
   btMatrix3x3 temp = start.getBasis().inverse() * end.getBasis();
@@ -303,42 +315,52 @@ void Transformer::lookupVelocity(const std::string& reference_frame, const std::
   btVector3 o = start.getBasis() * quat_temp.getAxis();
   btScalar ang = quat_temp.getAngle();
   
-  velocity.header.stamp = start_time + duration * 0.5;
-  velocity.header.frame_id = reference_frame;
   double delta_x = end.getOrigin().getX() - start.getOrigin().getX();
   double delta_y = end.getOrigin().getY() - start.getOrigin().getY();
   double delta_z = end.getOrigin().getZ() - start.getOrigin().getZ();
 
 
-  btVector3 twist_vel ((delta_x)/duration.toSec(), 
-                       (delta_y)/duration.toSec(),
-                       (delta_z)/duration.toSec());
-  btVector3 twist_rot = o * (ang / duration.toSec());
+  btVector3 twist_vel ((delta_x)/averaging_interval.toSec(), 
+                       (delta_y)/averaging_interval.toSec(),
+                       (delta_z)/averaging_interval.toSec());
+  btVector3 twist_rot = o * (ang / averaging_interval.toSec());
 
 
-  //correct for different frames  the above reports the angular in the tracked frame
+  // This is a twist w/ reference frame in observation_frame  and reference point is in the tracking_frame at the origin (at start_time)
 
 
+  //correct for the position of the reference frame
   tf::StampedTransform inverse;
-  lookupTransform(reference_frame,moving_frame,  target_time, inverse);
-
-
+  lookupTransform(reference_frame,tracking_frame,  target_time, inverse);
   btVector3 out_rot = inverse.getBasis() * twist_rot;
   btVector3 out_vel = inverse.getBasis()* twist_vel + inverse.getOrigin().cross(out_rot);
 
 
-  /*
+  //Rereference the twist about a new reference point
+  // Start by computing the original reference point in the reference frame:
+  tf::Stamped<tf::Point> rp_orig(tf::Point(0,0,0), target_time, tracking_frame);
+  transformPoint(reference_frame, rp_orig, rp_orig);
+  // convert the requrested reference point into the right frame
+  tf::Stamped<tf::Point> rp_desired(reference_point, target_time, reference_point_frame);
+  transformPoint(reference_frame, rp_desired, rp_desired);
+  // compute the delta
+  tf::Point delta = rp_desired - rp_orig;
+  // Correct for the change in reference point 
+  out_vel = out_vel + out_rot * delta;
+  // out_rot unchanged   
+
+  
     printf("KDL: Rotation %f %f %f, Translation:%f %f %f\n", 
          out_rot.x(),out_rot.y(),out_rot.z(),
          out_vel.x(),out_vel.y(),out_vel.z());
-  */     
+       
 
-  velocity.twist.linear.x =  out_vel.x();
-  velocity.twist.linear.y =  out_vel.y();
-  velocity.twist.linear.z =  out_vel.z();
-  velocity.twist.angular.x =  out_rot.x();
-  velocity.twist.angular.y =  out_rot.y();
-  velocity.twist.angular.z =  out_rot.z();
+  twist.linear.x =  out_vel.x();
+  twist.linear.y =  out_vel.y();
+  twist.linear.z =  out_vel.z();
+  twist.angular.x =  out_rot.x();
+  twist.angular.y =  out_rot.y();
+  twist.angular.z =  out_rot.z();
 
 };
 

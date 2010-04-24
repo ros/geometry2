@@ -138,12 +138,15 @@ public:
                        const std::string& source_frame, const ros::Time& source_time,
                        const std::string& fixed_frame, StampedTransform& transform) const;
 
-  /** \brief Lookup the velocity of the moving_frame in the reference_frame
-   * \param moving_frame The frame to track
-   * \param reference_frame The frame in which to track
+  /** \brief Lookup the twist of the tracking_frame with respect to the obsercation frame in the reference_frame using the reference point
+   * \param tracking_frame The frame to track
+   * \param observation_frame The frame from which to measure the twist
+   * \param reference_frame The reference frame in which to express the twist
+   * \param reference_point The reference point with which to express the twist
+   * \param reference_point_frame The frame_id in which the reference point is expressed
    * \param time The time at which to get the velocity
    * \param duration The period over which to average
-   * \param velocity The velocity output
+   * \param twist The twist output
    * 
    * This will compute the average velocity on the interval 
    * (time - duration/2, time+duration/2). If that is too close to the most
@@ -153,8 +156,21 @@ public:
    * tf::MaxDepthException, tf::ExtrapolationException
    */
 
-  void lookupVelocity(const std::string& reference_frame, const std::string& moving_frame,
-                      const ros::Time& time, const ros::Duration& duration, geometry_msgs::TwistStamped& velocity) const;
+  void lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, const std::string& reference_frame,
+                   const tf::Point & reference_point, const std::string& reference_point_frame, 
+                   const ros::Time& time, const ros::Duration& averaging_interval, 
+                   geometry_msgs::Twist& twist) const;
+
+  /** \brief lookup the twist of the tracking frame with respect to the obsercational frame 
+   * 
+   * This is a simplified version of
+   * lookupTwist with it assumed that the reference point is the
+   * origin of the tracking frame, and the reference frame is the
+   * observation frame.  */
+
+  void lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, 
+                   const ros::Time& time, const ros::Duration& averaging_interval,
+                   geometry_msgs::Twist& twist) const;
 
   /** \brief Block until a transform is possible or it times out
    * \param target_frame The frame into which to transform
