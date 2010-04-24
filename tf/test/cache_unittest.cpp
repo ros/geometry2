@@ -434,10 +434,7 @@ TEST(TimeCache, AngularInterpolation)
       btQuaternion ground_truth = quats[0].slerp(quats[1], pos/100.0);
       
       //Make sure the transformed one and the direct call match
-      EXPECT_NEAR(ground_truth.x(), quat.x(), epsilon);
-      EXPECT_NEAR(ground_truth.y(), quat.y(), epsilon);
-      EXPECT_NEAR(ground_truth.z(), quat.z(), epsilon);
-      EXPECT_NEAR(ground_truth.w(), quat.w(), epsilon);
+      EXPECT_NEAR(0, angle(ground_truth, quat), epsilon);
             
     }
     

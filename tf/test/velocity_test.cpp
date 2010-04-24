@@ -180,7 +180,7 @@ TEST_F(AngularVelocitySquareTest, AngularVelocityAlone)
   geometry_msgs::Twist twist;
   try
   {
-    tf_.lookupTwist("foo", "bar", ros::Time(0.5), ros::Duration(0.1), twist);
+    tf_.lookupTwist("bar", "foo", ros::Time(0.5), ros::Duration(0.1), twist);
     EXPECT_NEAR(twist.linear.x, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.y, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.z, 0.0, epsilon);
@@ -188,7 +188,7 @@ TEST_F(AngularVelocitySquareTest, AngularVelocityAlone)
     EXPECT_NEAR(twist.angular.y, 0.0, epsilon);
     EXPECT_NEAR(twist.angular.z, 0.0, epsilon);
   
-    tf_.lookupTwist("foo", "bar", ros::Time(1.5), ros::Duration(0.1), twist);
+    tf_.lookupTwist("bar", "foo", ros::Time(1.5), ros::Duration(0.1), twist);
     EXPECT_NEAR(twist.linear.x, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.y, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.z, 0.0, epsilon);
@@ -196,7 +196,7 @@ TEST_F(AngularVelocitySquareTest, AngularVelocityAlone)
     EXPECT_NEAR(twist.angular.y, 0.0, epsilon);
     EXPECT_NEAR(twist.angular.z, 0.0, epsilon);
 
-    tf_.lookupTwist("foo", "bar", ros::Time(2.5), ros::Duration(0.1), twist);
+    tf_.lookupTwist("bar", "foo", ros::Time(2.5), ros::Duration(0.1), twist);
     EXPECT_NEAR(twist.linear.x,  0.0, epsilon);
     EXPECT_NEAR(twist.linear.y, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.z, 0.0, epsilon);
@@ -204,7 +204,7 @@ TEST_F(AngularVelocitySquareTest, AngularVelocityAlone)
     EXPECT_NEAR(twist.angular.y, 1.0, epsilon);
     EXPECT_NEAR(twist.angular.z, 0.0, epsilon);
 
-    tf_.lookupTwist("foo", "bar", ros::Time(3.5), ros::Duration(0.1), twist);
+    tf_.lookupTwist("bar", "foo", ros::Time(3.5), ros::Duration(0.1), twist);
     EXPECT_NEAR(twist.linear.x, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.y, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.z, 0.0, epsilon);
@@ -212,7 +212,7 @@ TEST_F(AngularVelocitySquareTest, AngularVelocityAlone)
     EXPECT_NEAR(twist.angular.y, -1.0, epsilon);
     EXPECT_NEAR(twist.angular.z, 0.0, epsilon);
 
-    tf_.lookupTwist("foo", "bar", ros::Time(4.5), ros::Duration(0.1), twist);
+    tf_.lookupTwist("bar", "foo", ros::Time(4.5), ros::Duration(0.1), twist);
     EXPECT_NEAR(twist.linear.x, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.y, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.z, 0.0, epsilon);
@@ -220,7 +220,7 @@ TEST_F(AngularVelocitySquareTest, AngularVelocityAlone)
     EXPECT_NEAR(twist.angular.y, 0.0, epsilon);
     EXPECT_NEAR(twist.angular.z, 1.0, epsilon);
 
-    tf_.lookupTwist("foo", "bar", ros::Time(5.5), ros::Duration(0.1), twist);
+    tf_.lookupTwist("bar", "foo", ros::Time(5.5), ros::Duration(0.1), twist);
     EXPECT_NEAR(twist.linear.x, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.y, 0.0, epsilon);
     EXPECT_NEAR(twist.linear.z, 0.0, epsilon);
