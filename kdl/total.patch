@@ -1,6 +1,6 @@
 Index: src/bindings/python/CMakeLists.txt
 ===================================================================
---- src/bindings/python/CMakeLists.txt	(revision 31693)
+--- src/bindings/python/CMakeLists.txt	(revision 31715)
 +++ src/bindings/python/CMakeLists.txt	(working copy)
 @@ -7,6 +7,21 @@
    ${CMAKE_SOURCE_DIR}/src
@@ -28,7 +28,7 @@ Index: config/FindSIPandPython.cmake
 ===================================================================
 --- config/FindSIPandPython.cmake	(revision 31715)
 +++ config/FindSIPandPython.cmake	(working copy)
-@@ -16,16 +16,31 @@
+@@ -16,16 +16,28 @@
    ENDIF (UNIX AND NOT APPLE)
    FIND_PACKAGE(SIP)
    #INCLUDE(${PROJ_SOURCE_DIR}/config/FindSIP.cmake)
@@ -61,9 +61,6 @@ Index: config/FindSIPandPython.cmake
 +        MESSAGE("SIP is required in versin 4.7.3 or greater")
 +      ENDIF (SIP_VERSION EQUAL "${SIP_MIN_VERSION}" OR SIP_VERSION GREATER "${SIP_MIN_VERSION}")
 +    ENDIF ("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.4)
-+    MESSAGE(${SIP_VERSION})
-+    MESSAGE(${SIP_MIN_VERSION})
-+    MESSAGE(${CMAKE_VERSION})
 +  
    ELSE (SIP_FOUND)
      MESSAGE (STATUS "SIP not found!")
