@@ -154,6 +154,8 @@ public:
    * duration/2 to prevent extrapolation.  Possible exceptions
    * tf::LookupException, tf::ConnectivityException,
    * tf::MaxDepthException, tf::ExtrapolationException
+   * 
+   * New in geometry 1.1
    */
 
   void lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, const std::string& reference_frame,
@@ -166,7 +168,10 @@ public:
    * This is a simplified version of
    * lookupTwist with it assumed that the reference point is the
    * origin of the tracking frame, and the reference frame is the
-   * observation frame.  */
+   * observation frame.  
+   * 
+   * New in geometry 1.1
+   */
 
   void lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, 
                    const ros::Time& time, const ros::Duration& averaging_interval,
