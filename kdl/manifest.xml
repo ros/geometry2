@@ -3,8 +3,8 @@
 
 This package contains a recent version of the Kinematics and Dynamics
 Library (KLD), distributed by the Orocos Project.  For stability
-reasons, this package is currently locked to revision 31693 of April
-22 2010 (C-turtle) and revision 30401 of August 8 2009 (Boxturtle),
+reasons, this package is currently locked to revision 31715 of April
+26 2010 (C-turtle) and revision 30401 of August 8 2009 (Boxturtle),
 but this revision will be updated on a regular basis to the latest
 available KDL trunk.  This ROS package does not intend to modify KDL
 in any way, it simply provides a convenient way to download and

@@ -1,6 +1,6 @@
 all: installed
  
-SVN_REVISION=-r 31693
+SVN_REVISION=-r 31715
 SVN_DIR = kdl-svn-trunk
 OLD_SVN_DIR = kdl-svn
 SVN_URL = http://svn.mech.kuleuven.be/repos/orocos/trunk/kdl
