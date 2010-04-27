@@ -349,11 +349,11 @@ void Transformer::lookupTwist(const std::string& tracking_frame, const std::stri
   out_vel = out_vel + out_rot * delta;
   // out_rot unchanged   
 
-  
+  /*
     printf("KDL: Rotation %f %f %f, Translation:%f %f %f\n", 
          out_rot.x(),out_rot.y(),out_rot.z(),
          out_vel.x(),out_vel.y(),out_vel.z());
-       
+  */   
 
   twist.linear.x =  out_vel.x();
   twist.linear.y =  out_vel.y();
