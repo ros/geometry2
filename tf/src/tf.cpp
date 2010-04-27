@@ -304,6 +304,7 @@ void Transformer::lookupTwist(const std::string& tracking_frame, const std::stri
   ros::Time end_time = std::min(target_time + averaging_interval *0.5 , latest_time);
   
   ros::Time start_time = std::max(ros::Time().fromSec(.00001) + averaging_interval, end_time) - averaging_interval;  // don't collide with zero
+  ros::Duration corrected_averaging_interval = end_time - start_time; //correct for the possiblity that start time was truncated above.
   StampedTransform start, end;
   lookupTransform(observation_frame, tracking_frame, start_time, start);
   lookupTransform(observation_frame, tracking_frame, end_time, end);
@@ -320,10 +321,10 @@ void Transformer::lookupTwist(const std::string& tracking_frame, const std::stri
   double delta_z = end.getOrigin().getZ() - start.getOrigin().getZ();
 
 
-  btVector3 twist_vel ((delta_x)/averaging_interval.toSec(), 
-                       (delta_y)/averaging_interval.toSec(),
-                       (delta_z)/averaging_interval.toSec());
-  btVector3 twist_rot = o * (ang / averaging_interval.toSec());
+  btVector3 twist_vel ((delta_x)/corrected_averaging_interval.toSec(), 
+                       (delta_y)/corrected_averaging_interval.toSec(),
+                       (delta_z)/corrected_averaging_interval.toSec());
+  btVector3 twist_rot = o * (ang / corrected_averaging_interval.toSec());
 
 
   // This is a twist w/ reference frame in observation_frame  and reference point is in the tracking_frame at the origin (at start_time)
