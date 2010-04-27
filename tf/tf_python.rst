@@ -210,18 +210,51 @@ Transformer
 
         Extended version of :meth:`lookupTransform`.
 
-    .. method::  lookupVelocity(target_frame, source_frame, time) -> (linear, angular)
+    .. method:: lookupTwist(tracking_frame, observation_frame, time, averaging_interval) -> linear, angular
 
-        :param reference_frame: transformation reference frame in tf, string
-        :param moving_frame: transformation moving frame in tf, string
-        :param time: time in middle of the transformation interval
-        :param duration: duration of the transformation interval
-        :returns: a tuple with linear velocity as (x, y, z) and angular velocity as (x, y, z).
+        :param tracking_frame: The frame to track
+        :type tracking_frame: str
+        :param observation_frame: The frame from which to measure the twist
+        :type observation_frame: str
+        :param time: The time at which to get the velocity
+        :type time: :class:`rospy.Time`
+        :param duration: The period over which to average
+        :type duration: :class:`rospy.Duration`
+        :returns: a tuple with linear velocity as (x, y, z) and angular velocity as (x, y, z)
+        :raises: :exc:`tf.ConnectivityException`, :exc:`tf.LookupException`, or :exc:`tf.ExtrapolationException`
+
+        Simplified version of :meth:`tf.lookupTwistFull`.
+
+        Return the linear and angular velocity of the moving_frame in the reference_frame.  tf considers 
+        :math:`time - duration / 2` to :math:`time + duration / 2` as the initial interval, and will shift by
+        up to :math:`duration / 2` to avoid no data.
+
+        .. versionadded:: 1.1
+
+    .. method:: lookupTwistFull(tracking_frame, observation_frame, reference_frame, reference_point, reference_point_frame, time, averaging_interval) -> linear, angular
+
+        :param tracking_frame: The frame to track
+        :type tracking_frame: str
+        :param observation_frame: The frame from which to measure the twist
+        :type observation_frame: str
+        :param reference_frame: The reference frame in which to express the twist
+        :type reference_frame: str
+        :param reference_point: The reference point with which to express the twist
+        :type reference_point: x, y, z
+        :param reference_point_frame: The frame_id in which the reference point is expressed
+        :type reference_point_frame: str
+        :param time: The time at which to get the velocity
+        :type time: :class:`rospy.Time`
+        :param duration: The period over which to average
+        :type duration: :class:`rospy.Duration`
+        :returns: a tuple with linear velocity as (x, y, z) and angular velocity as (x, y, z)
         :raises: :exc:`tf.ConnectivityException`, :exc:`tf.LookupException`, or :exc:`tf.ExtrapolationException`
 
         Return the linear and angular velocity of the moving_frame in the reference_frame.  tf considers 
         :math:`time - duration / 2` to :math:`time + duration / 2` as the initial interval, and will shift by
         up to :math:`duration / 2` to avoid no data.
+
+        .. versionadded:: 1.1
 
 TransformerROS
 --------------

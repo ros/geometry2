@@ -305,33 +305,49 @@ static PyObject *lookupTransformFull(PyObject *self, PyObject *args, PyObject *k
       rotation.x(), rotation.y(), rotation.z(), rotation.w());
 }
 
-/*
-static PyObject *lookupVelocity(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *lookupTwist(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf::Transformer *t = ((transformer_t*)self)->t;
-  char *reference_frame, *moving_frame;
+  char *tracking_frame, *observation_frame;
   ros::Time time;
-  ros::Duration duration;
-  static const char *keywords[] = { "reference_frame", "moving_frame", "time", "duration", NULL };
+  ros::Duration averaging_interval;
+  static const char *keywords[] = { "tracking_frame", "observation_frame", "time", "averaging_interval", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args,
-                                   kw,
-                                   "ssO&O&",
-                                   (char**)keywords,
-                                   &reference_frame,
-                                   &moving_frame,
-                                   rostime_converter,
-                                   &time,
-                                   rosduration_converter,
-                                   &duration))
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&O&", (char**)keywords, &tracking_frame, &observation_frame, rostime_converter, &time, rosduration_converter, &averaging_interval))
     return NULL;
-  geometry_msgs::TwistStamped velocity;
-  WRAP(t->lookupVelocity(reference_frame, moving_frame, time, duration, velocity));
-  return Py_BuildValue("(fff)(fff)",
-      velocity.twist.linear.x, velocity.twist.linear.y, velocity.twist.linear.z, 
-      velocity.twist.angular.x, velocity.twist.angular.y, velocity.twist.angular.z);
+  geometry_msgs::Twist twist;
+  WRAP(t->lookupTwist(tracking_frame, observation_frame, time, averaging_interval, twist));
+
+  return Py_BuildValue("(ddd)(ddd)",
+      twist.linear.x, twist.linear.y, twist.linear.z,
+      twist.angular.x, twist.angular.y, twist.angular.z);
 }
-*/
+
+static PyObject *lookupTwistFull(PyObject *self, PyObject *args)
+{
+  tf::Transformer *t = ((transformer_t*)self)->t;
+  char *tracking_frame, *observation_frame, *reference_frame, *reference_point_frame;
+  ros::Time time;
+  ros::Duration averaging_interval;
+  double px, py, pz;
+
+  if (!PyArg_ParseTuple(args, "sss(ddd)sO&O&",
+                        &tracking_frame,
+                        &observation_frame,
+                        &reference_frame,
+                        &px, &py, &pz,
+                        &reference_point_frame,
+                        rostime_converter, &time,
+                        rosduration_converter, &averaging_interval))
+    return NULL;
+  geometry_msgs::Twist twist;
+  tf::Point pt(px, py, pz);
+  WRAP(t->lookupTwist(tracking_frame, observation_frame, reference_frame, pt, reference_point_frame, time, averaging_interval, twist));
+
+  return Py_BuildValue("(ddd)(ddd)",
+      twist.linear.x, twist.linear.y, twist.linear.z,
+      twist.angular.x, twist.angular.y, twist.angular.z);
+}
 
 static PyObject *setTransform(PyObject *self, PyObject *args)
 {
@@ -406,7 +422,8 @@ static struct PyMethodDef transformer_methods[] =
   {"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
   {"lookupTransform", (PyCFunction)lookupTransform, METH_KEYWORDS},
   {"lookupTransformFull", (PyCFunction)lookupTransformFull, METH_KEYWORDS},
-  //  {"lookupVelocity", (PyCFunction)lookupVelocity, METH_KEYWORDS},
+  {"lookupTwist", (PyCFunction)lookupTwist, METH_KEYWORDS},
+  {"lookupTwistFull", lookupTwistFull, METH_VARARGS},
   {"setUsingDedicatedThread", (PyCFunction)setUsingDedicatedThread, METH_VARARGS},
   {NULL,          NULL}
 };

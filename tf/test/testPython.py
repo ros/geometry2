@@ -107,6 +107,24 @@ class TestPython(unittest.TestCase):
         self.common(t)
         self.assert_(t.extra() == 77)
 
+    def test_twist(self):
+        t = tf.Transformer()
+
+        vel = 3
+        for ti in range(5):
+            m = geometry_msgs.msg.TransformStamped()
+            m.header.frame_id = "PARENT"
+            m.header.stamp = rospy.Time(ti)
+            m.child_frame_id = "THISFRAME"
+            m.transform.translation.x = ti * vel
+            m.transform.rotation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0, 0))
+            t.setTransform(m)
+
+        tw0 = t.lookupTwist("THISFRAME", "PARENT", rospy.Time(0.0), rospy.Duration(4.001))
+        self.assertAlmostEqual(tw0[0][0], vel, 2)
+        tw1 = t.lookupTwistFull("THISFRAME", "PARENT", "PARENT", (0, 0, 0), "THISFRAME", rospy.Time(0.0), rospy.Duration(4.001))
+        self.assertEqual(tw0, tw1)
+
     def test_transformer_ros(self):
         tr = tf.TransformerROS()
         m = geometry_msgs.msg.TransformStamped()
