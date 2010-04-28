@@ -61,22 +61,25 @@ TEST(Bullet, QuaternionAngleShortestPath)
   q2.normalize();
   //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
 
-  EXPECT_NEAR(q2.angle(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+  EXPECT_NEAR(q2.angleShortestPath(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
 }
 
-TEST(Bullet, QuaternionAngleIdentity)
+TEST(Bullet, QuaternionAngleIdentityShortestPath)
 {
   btQuaternion q1 (SIMD_PI/4,0,0);
   btQuaternion q2(-q1.x(), -q1.y(), -q1.z(), -q1.w());
   q2.normalize();
   //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
 
-  EXPECT_NEAR(q2.angle(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+  EXPECT_NEAR(q2.angleShortestPath(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+  EXPECT_NEAR((q2*(q1.inverse())).getAngleShortestPath(), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
   btQuaternion q3(-q1.x(), -q1.y(), -q1.z(), -q1.w());
   q3.normalize();
   //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
 
-  EXPECT_NEAR(q3.angle(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+  EXPECT_NEAR(q3.angleShortestPath(q1), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+  EXPECT_NEAR((q3*(q1.inverse())).getAngleShortestPath(), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+  
 }
 
 TEST(Bullet, AngleQuaternionQuaternionShortestPath)
@@ -87,7 +90,7 @@ TEST(Bullet, AngleQuaternionQuaternionShortestPath)
 
   //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
 
-  EXPECT_NEAR(angle(q1, q2), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
+  EXPECT_NEAR(angleShortestPath(q1, q2), 0, 0.01); //These two quaternions are basically the same but expressed on the other side of quaternion space
 }
 
 TEST(Bullet, EulerConventionsYPR)
@@ -595,9 +598,9 @@ TEST(Bullet, SlerpZeroDistanceOppositeSigns)
 
   //  printf("%f %f %f %f,%f %f %f %f\n", q2.x(), q2.y(), q2.z(), q2.w(), q3.x(), q3.y(), q3.z(), q3.w());
 
-  EXPECT_NEAR(q1.angle(q2), 0, 0.01);
-  EXPECT_NEAR(q2.angle(q2), 0, 0.01);
-  EXPECT_NEAR(q1.angle(q3), 0, 0.01);
+  EXPECT_NEAR(q1.angleShortestPath(q2), 0, 0.01);
+  EXPECT_NEAR(q2.angleShortestPath(q2), 0, 0.01);
+  EXPECT_NEAR(q1.angleShortestPath(q3), 0, 0.01);
 }
 
 TEST(Bullet, SetEulerZYX)
