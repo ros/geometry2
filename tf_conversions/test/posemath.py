@@ -40,21 +40,33 @@ class TestPoseMath(unittest.TestCase):
         c = ~(a * ~b)
         c = b * a
 
+    def pose_equal(self, a, b):
+        ma = a.asMessage()
+        mb = b.asMessage()
+        self.assertAlmostEqual(ma.position.x, mb.position.x, 3)
+        self.assertAlmostEqual(ma.position.y, mb.position.y, 3)
+        self.assertAlmostEqual(ma.position.z, mb.position.z, 3)
+        self.assertAlmostEqual(ma.orientation.x, mb.orientation.x, 3)
+        self.assertAlmostEqual(ma.orientation.y, mb.orientation.y, 3)
+        self.assertAlmostEqual(ma.orientation.z, mb.orientation.z, 3)
+        self.assertAlmostEqual(ma.orientation.w, mb.orientation.w, 3)
+
     def test_roundtrip(self):
+            
         c = PoseMath.fromEuler(1.0, 3.0 , 7.0,  0, pi/2, 0)
         # Attempt various round-trips c->d, and assert that c == d
 
         d = PoseMath(c.asMessage())
-        self.assertEqual(repr(c), repr(d))
+        self.pose_equal(c, d)
 
         d = PoseMath.fromMatrix(c.asMatrix())
-        self.assertEqual(repr(c), repr(d))
+        self.pose_equal(c, d)
 
         d = PoseMath.fromEuler(*c.asEuler())
-        # self.assertEqual(repr(c), repr(d))
+        self.pose_equal(c, d)
 
         d = PoseMath.fromTf(c.asTf())
-        self.assertEqual(repr(c), repr(d))
+        self.pose_equal(c, d)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1 or sys.argv[1].startswith('--gtest_output'):
