@@ -7,15 +7,19 @@ import unittest
 import sys
 
 from tf import Transformer
-import tf_conversions.posemath as pm
+from tf_conversions.posemath import PoseMath
 
 from geometry_msgs.msg import TransformStamped
-from PyKDL import Frame
+from math import pi
 
 class TestPoseMath(unittest.TestCase):
 
     def setUp(self):
         pass
+
+    def test_fromEuler(self):
+        a = PoseMath.fromEuler(5,0,0,  0, pi/2, 0)
+        self.assert_(repr(a) != "")
 
     def test_fromTf(self):
         transformer = Transformer(True, rospy.Duration(10.0))
@@ -25,19 +29,44 @@ class TestPoseMath(unittest.TestCase):
         m.transform.translation.x = 2.71828183
         m.transform.rotation.w = 1.0
         transformer.setTransform(m)
-        b = pm.fromTf(transformer.lookupTransform('wim', 'james', rospy.Time(0)))
+        b = PoseMath.fromTf(transformer.lookupTransform('wim', 'james', rospy.Time(0)))
         
+    def test_Operator(self):
+        a = PoseMath.fromEuler(5.0, 0.0, 0.0,  0, pi/2, 0)
+        b = PoseMath.fromEuler(1.0, 3.0, 7.0,  pi/2, pi/4, pi/3)
+        # Exercise the operators
+        c = ~b * a
+        c = ~(b * ~a)
+        c = ~(a * ~b)
+        c = b * a
+
+    def pose_equal(self, a, b):
+        ma = a.asMessage()
+        mb = b.asMessage()
+        self.assertAlmostEqual(ma.position.x, mb.position.x, 3)
+        self.assertAlmostEqual(ma.position.y, mb.position.y, 3)
+        self.assertAlmostEqual(ma.position.z, mb.position.z, 3)
+        self.assertAlmostEqual(ma.orientation.x, mb.orientation.x, 3)
+        self.assertAlmostEqual(ma.orientation.y, mb.orientation.y, 3)
+        self.assertAlmostEqual(ma.orientation.z, mb.orientation.z, 3)
+        self.assertAlmostEqual(ma.orientation.w, mb.orientation.w, 3)
+
     def test_roundtrip(self):
-        c = Frame()
+            
+        c = PoseMath.fromEuler(1.0, 3.0 , 7.0,  0, pi/2, 0)
+        # Attempt various round-trips c->d, and assert that c == d
 
-        d = pm.fromMsg(pm.toMsg(c))
-        self.assertEqual(repr(c), repr(d))
+        d = PoseMath(c.asMessage())
+        self.pose_equal(c, d)
 
-        d = pm.fromMatrix(pm.toMatrix(c))
-        self.assertEqual(repr(c), repr(d))
+        d = PoseMath.fromMatrix(c.asMatrix())
+        self.pose_equal(c, d)
 
-        d = pm.fromTf(c.toTf())
-        self.assertEqual(repr(c), repr(d))
+        d = PoseMath.fromEuler(*c.asEuler())
+        self.pose_equal(c, d)
+
+        d = PoseMath.fromTf(c.asTf())
+        self.pose_equal(c, d)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1 or sys.argv[1].startswith('--gtest_output'):
