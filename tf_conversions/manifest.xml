@@ -19,9 +19,11 @@ the next major release cycle (see roadmap).
   <depend package="tf"/>
   <depend package="kdl"/>
   <depend package="eigen"/>
+  <depend package="geometry_msgs"/>
 
   <export>
     <cpp cflags="-I${prefix}/include"
          lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf_conversions" />
+    <rosdoc config="rosdoc.yaml" />
   </export>
 </package>
