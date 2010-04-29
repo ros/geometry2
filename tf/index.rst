@@ -5,7 +5,6 @@ tf
     :maxdepth: 2
 
     tf_python
-    posemath
 
 Indices and tables
 ==================
