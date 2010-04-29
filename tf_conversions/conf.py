@@ -39,8 +39,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'tf'
-copyright = u'2009, Willow Garage, Inc.'
+project = u'tf_conversions'
+copyright = u'2010, Willow Garage, Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -174,7 +174,7 @@ htmlhelp_basename = 'tfdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'tf.tex', u'stereo\\_utils Documentation',
+  ('index', 'tf_conversions.tex', u'stereo\\_utils Documentation',
    u'James Bowman', 'manual'),
 ]
 
