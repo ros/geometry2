@@ -15,4 +15,4 @@ rosbuild_add_library(tf_conversions
 
 rosbuild_add_gtest(test_eigen_tf test/test_eigen_tf.cpp)
 target_link_libraries(test_eigen_tf tf_conversions gtest)
-rosbuild_add_pyunit(test/testPython.py)
+rosbuild_add_pyunit(test/posemath.py)
