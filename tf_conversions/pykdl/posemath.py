@@ -33,7 +33,6 @@ class TestPoseMath(unittest.TestCase):
         d = pm.fromMsg(pm.toMsg(c))
         self.assertEqual(repr(c), repr(d))
 
-        print pm.toMatrix(c)
         d = pm.fromMatrix(pm.toMatrix(c))
         self.assertEqual(repr(c), repr(d))
 
