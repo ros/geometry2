@@ -97,7 +97,7 @@ public:
 \verbatim
 message_filters::Subscriber<MessageType> sub(node_handle_, "topic", 10);
 tf::MessageFilter<MessageType> tf_filter(sub, tf_listener_, "/map", 10);
-tf_filter.registerCallback(boost::bind(&MyClass::myCallback, this, _1));
+tf_filter.registerCallback(&MyClass::myCallback, this);
 \endverbatim
  */
 template<class M>
@@ -105,8 +105,12 @@ class MessageFilter : public MessageFilterBase, public message_filters::SimpleFi
 {
 public:
   typedef boost::shared_ptr<M const> MConstPtr;
+  typedef ros::MessageEvent<M const> MEvent;
   typedef boost::function<void(const MConstPtr&, FilterFailureReason)> FailureCallback;
   typedef boost::signal<void(const MConstPtr&, FilterFailureReason)> FailureSignal;
+
+  // If you hit this assert your message does not have a header, or does not have the HasHeader trait defined for it
+  ROS_STATIC_ASSERT(ros::message_traits::HasHeader<M>::value);
 
   /**
    * \brief Constructor
@@ -159,7 +163,7 @@ public:
   void connectInput(F& f)
   {
     message_connection_.disconnect();
-    message_connection_ = f.registerCallback(boost::bind(&MessageFilter::incomingMessage, this, _1));
+    message_connection_ = f.registerCallback(&MessageFilter::incomingMessage, this);
   }
 
   /**
@@ -240,24 +244,20 @@ public:
     warned_about_empty_frame_id_ = false;
   }
 
-  /**
-   * \brief Manually add a message into this filter.
-   * \note If the message (or any other messages in the queue) are immediately transformable this will immediately call through to the output callback, possibly
-   * multiple times
-   */
-  void add(const MConstPtr& message)
+  void add(const MEvent& evt)
   {
     boost::mutex::scoped_lock lock(messages_mutex_);
 
     testMessages();
 
-    if (!testMessage(message))
+    if (!testMessage(evt))
     {
       // If this message is about to push us past our queue size, erase the oldest message
       if (queue_size_ != 0 && message_count_ + 1 > queue_size_)
       {
         ++dropped_message_count_;
-        TF_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_, messages_.front()->header.frame_id.c_str(), messages_.front()->header.stamp.toSec());
+        const MEvent& front = messages_.front();
+        TF_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_, front.getMessage()->header.frame_id.c_str(), front.getMessage()->header.stamp.toSec());
         signalFailure(messages_.front(), filter_failure_reasons::Unknown);
 
         messages_.pop_front();
@@ -265,13 +265,25 @@ public:
       }
 
       // Add the message to our list
-      messages_.push_back(message);
+      messages_.push_back(evt);
       ++message_count_;
     }
 
-    TF_MESSAGEFILTER_DEBUG("Added message in frame %s at time %.3f, count now %d", message->header.frame_id.c_str(), message->header.stamp.toSec(), message_count_);
+    TF_MESSAGEFILTER_DEBUG("Added message in frame %s at time %.3f, count now %d", evt.getMessage()->header.frame_id.c_str(), evt.getMessage()->header.stamp.toSec(), message_count_);
 
     ++incoming_message_count_;
+  }
+
+  /**
+   * \brief Manually add a message into this filter.
+   * \note If the message (or any other messages in the queue) are immediately transformable this will immediately call through to the output callback, possibly
+   * multiple times
+   */
+  void add(const MConstPtr& message)
+  {
+    boost::shared_ptr<std::map<std::string, std::string> > header(new std::map<std::string, std::string>);
+    (*header)["callerid"] = "unknown";
+    add(MEvent(message, header, ros::Time::now()));
   }
 
   /**
@@ -305,33 +317,36 @@ private:
     max_rate_timer_ = nh_.createTimer(max_rate_, &MessageFilter::maxRateTimerCallback, this);
   }
 
-  typedef std::list<MConstPtr> L_Message;
+  typedef std::list<MEvent> L_Event;
 
-  bool testMessage(const MConstPtr& message)
+  bool testMessage(const MEvent& evt)
   {
-    std::string callerid = message->__connection_header ? (*message->__connection_header)["callerid"] : "unknown";
+    const MConstPtr& message = evt.getMessage();
+    std::string callerid = evt.getPublisherName();//message->__connection_header ? (*message->__connection_header)["callerid"] : "unknown";
+    std::string frame_id = ros::message_traits::FrameId<M>::value(*message);
+    ros::Time stamp = ros::message_traits::TimeStamp<M>::value(*message);
 
     //Throw out messages which have an empty frame_id
-    if (message->header.frame_id.empty())
+    if (frame_id.empty())
     {
       if (!warned_about_empty_frame_id_)
       {
         warned_about_empty_frame_id_ = true;
         TF_MESSAGEFILTER_WARN("Discarding message from [%s] due to empty frame_id.  This message will only print once.", callerid.c_str());
       }
-      signalFailure(message, filter_failure_reasons::EmptyFrameID);
+      signalFailure(evt, filter_failure_reasons::EmptyFrameID);
       return true;
     }
 
-    std::string frame_id = message->header.frame_id;
     if (frame_id[0] != '/')
     {
+      std::string unresolved = frame_id;
       frame_id = tf::resolve(tf_.getTFPrefix(), frame_id);
 
       if (!warned_about_unresolved_name_)
       {
         warned_about_unresolved_name_ = true;
-        ROS_WARN("Message from [%s] has a non-fully-qualified frame_id [%s]. Resolved locally to [%s].  This is will likely not work in multi-robot systems.  This message will only print once.", callerid.c_str(), message->header.frame_id.c_str(), frame_id.c_str());
+        ROS_WARN("Message from [%s] has a non-fully-qualified frame_id [%s]. Resolved locally to [%s].  This is will likely not work in multi-robot systems.  This message will only print once.", callerid.c_str(), unresolved.c_str(), frame_id.c_str());
       }
     }
 
@@ -346,17 +361,17 @@ private:
         ros::Time latest_transform_time ;
         std::string error_string ;
 
-        tf_.getLatestCommonTime(message->header.frame_id, target_frame, latest_transform_time, &error_string) ;
-        if (message->header.stamp + tf_.getCacheLength() < latest_transform_time)
+        tf_.getLatestCommonTime(frame_id, target_frame, latest_transform_time, &error_string) ;
+        if (stamp + tf_.getCacheLength() < latest_transform_time)
         {
           ++failed_out_the_back_count_;
           ++dropped_message_count_;
           TF_MESSAGEFILTER_DEBUG("Discarding Message, in frame %s, Out of the back of Cache Time(stamp: %.3f + cache_length: %.3f < latest_transform_time %.3f.  Message Count now: %d", message->header.frame_id.c_str(), message->header.stamp.toSec(),  tf_.getCacheLength().toSec(), latest_transform_time.toSec(), message_count_);
 
-          last_out_the_back_stamp_ = message->header.stamp;
-          last_out_the_back_frame_ = message->header.frame_id;
+          last_out_the_back_stamp_ = stamp;
+          last_out_the_back_frame_ = frame_id;
 
-          signalFailure(message, filter_failure_reasons::OutTheBack);
+          signalFailure(evt, filter_failure_reasons::OutTheBack);
           return true;
         }
       }
@@ -369,22 +384,22 @@ private:
       std::string& target_frame = *target_it;
       if (time_tolerance_ != ros::Duration(0.0))
       {
-        ready = ready && (tf_.canTransform(target_frame, message->header.frame_id, message->header.stamp) &&
-                          tf_.canTransform(target_frame, message->header.frame_id, message->header.stamp + time_tolerance_) );
+        ready = ready && (tf_.canTransform(target_frame, frame_id, stamp) &&
+                          tf_.canTransform(target_frame, frame_id, stamp + time_tolerance_) );
       }
       else
       {
-        ready = ready && tf_.canTransform(target_frame, message->header.frame_id, message->header.stamp);
+        ready = ready && tf_.canTransform(target_frame, frame_id, stamp);
       }
     }
 
     if (ready)
     {
-      TF_MESSAGEFILTER_DEBUG("Message ready in frame %s at time %.3f, count now %d", message->header.frame_id.c_str(), message->header.stamp.toSec(), message_count_);
+      TF_MESSAGEFILTER_DEBUG("Message ready in frame %s at time %.3f, count now %d", frame_id.c_str(), stamp.toSec(), message_count_);
 
       ++successful_transform_count_;
 
-      signalMessage(message);
+      signalMessage(evt);
     }
     else
     {
@@ -403,12 +418,12 @@ private:
 
     int i = 0;
 
-    typename L_Message::iterator it = messages_.begin();
+    typename L_Event::iterator it = messages_.begin();
     for (; it != messages_.end(); ++i)
     {
-      MConstPtr& message = *it;
+      MEvent& evt = *it;
 
-      if (testMessage(message))
+      if (testMessage(evt))
       {
         --message_count_;
         it = messages_.erase(it);
@@ -435,9 +450,9 @@ private:
   /**
    * \brief Callback that happens when we receive a message on the message topic
    */
-  void incomingMessage(const MConstPtr& msg)
+  void incomingMessage(const ros::MessageEvent<M const>& evt)
   {
-    add(msg);
+    add(evt);
   }
 
   void transformsChanged()
@@ -481,10 +496,10 @@ private:
     c.getBoostConnection().disconnect();
   }
 
-  void signalFailure(const MConstPtr& msg, FilterFailureReason reason)
+  void signalFailure(const MEvent& evt, FilterFailureReason reason)
   {
     boost::mutex::scoped_lock lock(failure_signal_mutex_);
-    failure_signal_(msg, reason);
+    failure_signal_(evt.getMessage(), reason);
   }
 
   Transformer& tf_; ///< The Transformer used to determine if transformation data is available
@@ -496,7 +511,7 @@ private:
   boost::mutex target_frames_string_mutex_;
   uint32_t queue_size_; ///< The maximum number of messages we queue up
 
-  L_Message messages_; ///< The message list
+  L_Event messages_; ///< The message list
   uint32_t message_count_; ///< The number of messages in the list.  Used because messages_.size() has linear cost
   boost::mutex messages_mutex_; ///< The mutex used for locking message list operations
 
