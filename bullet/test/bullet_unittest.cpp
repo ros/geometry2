@@ -48,11 +48,11 @@ TEST(Bullet, QuaternionAngleScaling)
 
   btQuaternion id(0,0,0,1);
   btQuaternion ninty(0,0,sqrt(2.0)/2.0,sqrt(2.0)/2.0);
-  EXPECT_NEAR(id.angle(ninty), SIMD_PI/2, epsilon); //These two quaternions are 90 degrees apart
+  EXPECT_NEAR(id.angle(ninty), SIMD_PI/4, epsilon); //These two quaternions are 90 degrees apart half angle is 45
 
   btQuaternion id2(0,0,0);
   btQuaternion ninty2(SIMD_PI/2,0,0);
-  EXPECT_NEAR(id2.angle(ninty2), SIMD_PI/2, epsilon); //These two quaternions are 90 degrees apart
+  EXPECT_NEAR(id2.angle(ninty2), SIMD_PI/4, epsilon); //These two quaternions are 90 degrees apart half angle is 45
 }
 TEST(Bullet, QuaternionAngleShortestPath)
 {

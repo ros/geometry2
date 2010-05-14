@@ -8,7 +8,7 @@ SVN_REVISION=-r2038
 include $(shell rospack find mk)/svn_checkout.mk
 
 #TARBALL_NAME = bullet-svn$(SVN_REVISION)
-TARBALL_NAME = bullet-2.76-patched1
+TARBALL_NAME = bullet-2.76-patched2
 
 TARBALL = build/$(TARBALL_NAME).tar.gz
 TARBALL_URL = http://pr.willowgarage.com/downloads/$(TARBALL_NAME).tar.gz
