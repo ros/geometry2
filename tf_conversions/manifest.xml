@@ -26,4 +26,7 @@ the next major release cycle (see roadmap).
          lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf_conversions" />
     <rosdoc config="rosdoc.yaml" />
   </export>
+  <platform os="ubuntu" version="9.04"/>
+  <platform os="ubuntu" version="9.10"/>
+  <platform os="ubuntu" version="10.04"/>
 </package>

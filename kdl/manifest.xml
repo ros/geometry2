@@ -26,5 +26,8 @@ for a problem is being discussed by the KDL community.
 <rosdep name="cppunit"/>
 <rosdep name="python-sip4"/>
 <versioncontrol type="svn" url="http://svn.mech.kuleuven.be/repos/orocos/trunk/kdl"/>
+  <platform os="ubuntu" version="9.04"/>
+  <platform os="ubuntu" version="9.10"/>
+  <platform os="ubuntu" version="10.04"/>
 </package>
 

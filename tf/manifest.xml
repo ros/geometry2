@@ -29,4 +29,7 @@ any desired point in time.
   </export>
   <rosdep name="python-numpy"/>
   <rosdep name="graphviz"/>
+  <platform os="ubuntu" version="9.04"/>
+  <platform os="ubuntu" version="9.10"/>
+  <platform os="ubuntu" version="10.04"/>
 </package>
