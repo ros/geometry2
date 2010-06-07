@@ -6,7 +6,7 @@ import numpy
 
 from PyKDL import *
 
-def fromTf(tf):
+def from_tf(tf):
     """
     :param tf: :class:`tf.Transformer` transform
     :type tf: tuple (translation, quaternion)
@@ -49,7 +49,7 @@ def fromTf(tf):
     return Frame(Rotation.Quaternion(Qx, Qy, Qz, Qw), 
                  Vector(x, y, z))
 
-def toTf(f):
+def to_tf(f):
     """
     :param f: input pose
     :type f: :class:`PyKDL.Frame`
@@ -60,7 +60,7 @@ def toTf(f):
     return ((f.p[0], f.p[1], f.p[2]), f.M.GetQuaternion())
 
 # to and from pose message
-def fromMsg(p):
+def from_msg(p):
     """
     :param p: input pose
     :type p: :class:`geometry_msgs.msg.Pose`
@@ -74,7 +74,7 @@ def fromMsg(p):
                                      p.orientation.w),  
                  Vector(p.position.x, p.position.y, p.position.z))
 
-def toMsg(f):
+def to_msg(f):
     """
     :param f: input pose
     :type f: :class:`PyKDL.Frame`
@@ -91,7 +91,7 @@ def toMsg(f):
 
 
 # to and from matrix
-def fromMatrix(m):
+def from_matrix(m):
     """
     :param m: input 4x4 matrix
     :type m: :func:`numpy.array`
@@ -105,7 +105,7 @@ def fromMatrix(m):
                           m[2,0], m[2,1], m[2,2]),  
                  Vector(m[0,3], m[1, 3], m[2, 3]))
     
-def toMatrix(f):
+def to_matrix(f):
     """
     :param f: input pose
     :type f: :class:`PyKDL.Frame`
@@ -119,7 +119,7 @@ def toMatrix(f):
 
 
 # from camera parameters
-def fromCameraParams(cv, rvec, tvec):
+def from_camera_params(cv, rvec, tvec):
     """
     :param cv: OpenCV module
     :param rvec: A Rodrigues rotation vector - see :func:`Rodrigues2`
