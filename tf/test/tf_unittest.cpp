@@ -31,6 +31,7 @@
 #include <tf/tf.h>
 #include <sys/time.h>
 
+#include "ros/ros.h" // for ros::Time::now() #4150
 #include "LinearMath/btVector3.h"
 
 void seed_rand()
@@ -1897,5 +1898,6 @@ TEST(data, StampedOperatorEqual)
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
+  ros::init(argc, argv, "tf_unittest"); //needed for ros::TIme::now()
   return RUN_ALL_TESTS();
 }

@@ -380,6 +380,21 @@ protected:
   //Whether it is safe to use waitForTransform.  This is basically stating that tf is multithreaded.  
   bool using_dedicated_thread_;
   
+ public:
+  // A flag to allow falling back to wall time
+  bool fall_back_to_wall_time_;
+  
+ protected:
+  /** Hack method to work around #4150 */
+  ros::Time now() const { 
+    if (!fall_back_to_wall_time_) 
+      return ros::Time::now() ; 
+    else {
+      ros::WallTime wt = ros::WallTime::now();
+      return ros::Time(wt.sec, wt.nsec);
+    };
+  }
+   
   /************************* Internal Functions ****************************/
 
   /** \brief An accessor to get a frame, which will throw an exception if the frame is no there.

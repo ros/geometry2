@@ -93,7 +93,8 @@ Transformer::Transformer(bool interpolating,
                                 ros::Duration cache_time):
   cache_time(cache_time),
   interpolating (interpolating), 
-  using_dedicated_thread_(false)
+  using_dedicated_thread_(false),
+  fall_back_to_wall_time_(false)
 {
   max_extrapolation_distance_.fromNSec(DEFAULT_MAX_EXTRAPOLATION_DISTANCE);
   frameIDs_["NO_PARENT"] = 0;
@@ -200,7 +201,7 @@ void Transformer::lookupTransform(const std::string& target_frame, const std::st
     transform.setIdentity();
 
     if (time == ros::Time())
-      transform.stamp_ = ros::Time::now();
+      transform.stamp_ = now();
     else
       transform.stamp_  = time;
 
@@ -379,10 +380,10 @@ bool Transformer::waitForTransform(const std::string& target_frame, const std::s
       *error_msg = error_string;
     return false;
   }
-  ros::Time start_time = ros::Time::now();
+  ros::Time start_time = now();
   while (!canTransform(target_frame, source_frame, time, error_msg))
   {
-    if ((ros::Time::now() - start_time) >= timeout)
+    if ((now() - start_time) >= timeout)
       return false;
     ros::Duration(polling_sleep_duration).sleep(); //\todo remove copy construction after ros 0.5.1 is released
   }
@@ -532,7 +533,7 @@ int Transformer::getLatestCommonTime(const std::string& source, const std::strin
     //Set time to latest timestamp of frameid in case of target and mapped_source frame id are the same
     if (lists.inverseTransforms.size() == 0 && lists.forwardTransforms.size() == 0)
     {
-      time = ros::Time::now();
+      time = now();
       return retval;
     }
 
@@ -802,8 +803,8 @@ bool Transformer::test_extrapolation_past(const ros::Time& target_time, const Tr
   if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.stamp_ - target_time > max_extrapolation_distance_)
   {
     if (error_string) {
-      ss << "You requested a transform that is " << (ros::Time::now() - target_time).toSec() << " seconds in the past, \n"
-         << "but the tf buffer only has a history of " << (ros::Time::now() - tr.stamp_).toSec()  << " seconds.\n";
+      ss << "You requested a transform that is " << (now() - target_time).toSec() << " seconds in the past, \n"
+         << "but the tf buffer only has a history of " << (now() - tr.stamp_).toSec()  << " seconds.\n";
       if ( max_extrapolation_distance_ > ros::Duration(0))
       {
         ss << "The tf extrapollation distance is set to " 
@@ -826,8 +827,8 @@ bool Transformer::test_extrapolation_future(const ros::Time& target_time, const 
   if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time - tr.stamp_ > max_extrapolation_distance_)
   {
     if (error_string){
-      ss << "You requested a transform that is " << (ros::Time::now() - target_time).toSec()*1000 << " miliseconds in the past, \n"
-         << "but the most recent transform in the tf buffer is " << (ros::Time::now() - tr.stamp_).toSec()*1000 << " miliseconds old.\n";
+      ss << "You requested a transform that is " << (now() - target_time).toSec()*1000 << " miliseconds in the past, \n"
+         << "but the most recent transform in the tf buffer is " << (now() - tr.stamp_).toSec()*1000 << " miliseconds old.\n";
       if ( max_extrapolation_distance_ > ros::Duration(0))
       {
         ss << "The tf extrapollation distance is set to " 
@@ -986,7 +987,7 @@ std::string Transformer::allFramesAsDot() const
 
   TransformStorage temp;
 
-  ros::Time current_time = ros::Time::now();
+  ros::Time current_time = now();
 
   if (frames_.size() ==1)
     mstream <<"\"no tf data recieved\"";

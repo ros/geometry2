@@ -88,6 +88,7 @@ static int Transformer_init(PyObject *self, PyObject *args, PyObject *kw)
     return -1;
 
   ((transformer_t*)self)->t = new tf::Transformer(interpolating, cache_time);
+  ((transformer_t*)self)->t->fall_back_to_wall_time_ = true;
 
   return 0;
 }
