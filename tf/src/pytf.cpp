@@ -103,6 +103,14 @@ static PyObject *setUsingDedicatedThread(PyObject *self, PyObject *args)
   return PyString_FromString(t->allFramesAsDot().c_str());
 }
 
+static PyObject *getTFPrefix(PyObject *self, PyObject *args)
+{
+  if (!PyArg_ParseTuple(args, ""))
+    return NULL;
+  tf::Transformer *t = ((transformer_t*)self)->t;
+  return PyString_FromString(t->getTFPrefix().c_str());
+}
+
 static PyObject *allFramesAsDot(PyObject *self, PyObject *args)
 {
   tf::Transformer *t = ((transformer_t*)self)->t;
@@ -426,6 +434,7 @@ static struct PyMethodDef transformer_methods[] =
   {"lookupTwist", (PyCFunction)lookupTwist, METH_KEYWORDS},
   {"lookupTwistFull", lookupTwistFull, METH_VARARGS},
   {"setUsingDedicatedThread", (PyCFunction)setUsingDedicatedThread, METH_VARARGS},
+  {"getTFPrefix", (PyCFunction)getTFPrefix, METH_VARARGS},
   {NULL,          NULL}
 };
 

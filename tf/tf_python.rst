@@ -256,6 +256,12 @@ Transformer
 
         .. versionadded:: 1.1
 
+    .. method:: getTFPrefix() -> str
+
+        :returns: the TF Prefix that the transformer is running with
+      
+        Returns the tf_prefix this transformer is running with.
+
 TransformerROS
 --------------
 

@@ -171,6 +171,9 @@ class TestPython(unittest.TestCase):
             self.assertAlmostEqual(v,
                                    getattr(msg_t.quaternion, a),
                                    4)
+    def test_getTFPrefix(self):
+        t = tf.Transformer()
+        self.assertEqual(t.getTFPrefix(), "")
 
     def no_test_random(self):
         import networkx as nx
