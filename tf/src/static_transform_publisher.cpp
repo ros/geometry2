@@ -76,7 +76,7 @@ int main(int argc, char ** argv)
 
     TransformSender tf_sender(atof(argv[1]), atof(argv[2]), atof(argv[3]),
                               atof(argv[4]), atof(argv[5]), atof(argv[6]), atof(argv[7]),
-                              ros::Time::now() + sleeper, //Future dating to allow slower sending w/o timeout
+                              ros::Time() + sleeper, //Future dating to allow slower sending w/o timeout
                               argv[8], argv[9]);
 
 
