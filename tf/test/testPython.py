@@ -176,6 +176,17 @@ class TestPython(unittest.TestCase):
             self.assertAlmostEqual(v,
                                    getattr(msg_t.quaternion, a),
                                    4)
+
+    def test_transformer_wait_for_transform_dedicated_thread(self):
+        tr = tf.Transformer()
+        try:
+          tr.waitForTransform("PARENT", "THISFRAME", rospy.Time().from_sec(4.0), rospy.Duration(3.0))
+          self.assertFalse("This should throw")
+        except tf.Exception, ex:
+          print "successfully caught"
+          pass 
+        
+
     def test_transformer_wait_for_transform(self):
         tr = tf.Transformer()
         tr.setUsingDedicatedThread(1)
