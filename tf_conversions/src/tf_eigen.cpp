@@ -38,11 +38,26 @@ namespace tf {
     k(2) = t[2];
   };
 
+void VectorEigenToTF(const Eigen::Vector3d& k, tf::Vector3& t)
+{
+  t[0] = k(0);
+  t[1] = k(1);
+  t[2] = k(2);
+}
+
   void RotationTFToEigen(const tf::Quaternion& t, Eigen::Quaterniond& k)
   {
     Eigen::Quaterniond m(t[3],t[0],t[1],t[2]);
     k = m;
   };
+
+void RotationEigenToTF(const Eigen::Quaterniond& k, tf::Quaternion& t)
+{
+  t[0] = k.x();
+  t[1] = k.y();
+  t[2] = k.z();
+  t[3] = k.w();
+}
 
   void TransformTFToEigen(const tf::Transform &t, Eigen::Transform3d &k)
   {

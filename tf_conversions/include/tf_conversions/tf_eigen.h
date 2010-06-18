@@ -39,8 +39,14 @@ namespace tf {
 /// Converts a tf Vector3 into an Eigen Vector3d
 void VectorTFToEigen(const tf::Vector3& t, Eigen::Vector3d& k);
 
+/// Converts an Eigen Vector3d into a tf Vector3
+void VectorEigenToTF(const Eigen::Vector3d& k, tf::Vector3& t);
+
 /// Converts a tf Quaternion into an Eigen Quaternion
 void RotationTFToEigen(const tf::Quaternion& t, Eigen::Quaterniond& k);
+
+/// Converts an Eigen Quaternion into a tf Quaternion
+void RotationEigenToTF(const Eigen::Quaterniond& k, tf::Quaternion& t);
 
 /// Converts a tf Transform into an Eigen Transform3d
 void TransformTFToEigen(const tf::Transform &t, Eigen::Transform3d &k);
