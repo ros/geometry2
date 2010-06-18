@@ -102,7 +102,7 @@ class TestPython(unittest.TestCase):
         class TransformerSubclass(tf.Transformer):
             def extra(self):
               return 77
-        t = TransformerSubclass(True, rospy.Duration.from_seconds(10.0))
+        t = TransformerSubclass(True, rospy.Duration.from_sec(10.0))
         self.assert_(t.extra() == 77)
         self.common(t)
         self.assert_(t.extra() == 77)
@@ -127,7 +127,9 @@ class TestPython(unittest.TestCase):
 
     def test_transformer_ros(self):
         tr = tf.TransformerROS()
+
         m = geometry_msgs.msg.TransformStamped()
+        m.header.stamp = rospy.Time().from_sec(3.0)
         m.header.frame_id = "PARENT"
         m.child_frame_id = "THISFRAME"
         m.transform.translation.y = 5.0
@@ -135,6 +137,8 @@ class TestPython(unittest.TestCase):
         m.transform.rotation.y = 0
         m.transform.rotation.z = 0
         m.transform.rotation.w = 0.99875026
+        tr.setTransform(m)
+        m.header.stamp = rospy.Time().from_sec(5.0)
         tr.setTransform(m)
 
         # Smoke the various transform* methods
@@ -164,6 +168,7 @@ class TestPython(unittest.TestCase):
         msg.quaternion.y = q[1]
         msg.quaternion.z = q[2]
         msg.quaternion.w = q[3]
+        msg.header.stamp = rospy.Time().from_sec(3.0)
         msg.header.frame_id = "THISFRAME"
         msg_t = tr.transformQuaternion("PARENT", msg)
         self.assertEqual(msg_t.header.frame_id, "PARENT")
@@ -171,6 +176,35 @@ class TestPython(unittest.TestCase):
             self.assertAlmostEqual(v,
                                    getattr(msg_t.quaternion, a),
                                    4)
+    def test_transformer_wait_for_transform(self):
+        tr = tf.Transformer()
+        tr.setUsingDedicatedThread(1)
+        
+        try:
+          tr.waitForTransform("PARENT", "THISFRAME", rospy.Time().from_sec(4.0), rospy.Duration(3.0))
+          self.assertFalse("This should throw")
+        except tf.Exception, ex:
+          pass 
+
+        m = geometry_msgs.msg.TransformStamped()
+        m.header.stamp = rospy.Time().from_sec(3.0)
+        m.header.frame_id = "PARENT"
+        m.child_frame_id = "THISFRAME"
+        m.transform.translation.y = 5.0
+        m.transform.rotation.x = 0.04997917
+        m.transform.rotation.y = 0
+        m.transform.rotation.z = 0
+        m.transform.rotation.w = 0.99875026
+        tr.setTransform(m)
+        m.header.stamp = rospy.Time().from_sec(5.0)
+        tr.setTransform(m)
+
+        try:
+          tr.waitForTransform("PARENT", "THISFRAME", rospy.Time().from_sec(4.0), rospy.Duration(3.0))
+        except tf.Exception, ex:
+          self.assertFalse("This should not throw")
+
+
     def test_getTFPrefix(self):
         t = tf.Transformer()
         self.assertEqual(t.getTFPrefix(), "")
@@ -195,9 +229,4 @@ class TestPython(unittest.TestCase):
                     self.assert_(abs(x) == abs(nx.shortest_path_length(G, 0, i) - nx.shortest_path_length(G, 0, j)))
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1 or sys.argv[1].startswith('--gtest_output'):
-        rostest.unitrun('tf', 'directed', TestPython)
-    else:
-        suite = unittest.TestSuite()
-        suite.addTest(TestPython(sys.argv[1]))
-        unittest.TextTestRunner(verbosity=2).run(suite)
+    rostest.unitrun('tf', 'directed', TestPython)

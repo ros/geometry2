@@ -385,7 +385,7 @@ bool Transformer::waitForTransform(const std::string& target_frame, const std::s
   {
     if ((now() - start_time) >= timeout)
       return false;
-    ros::Duration(polling_sleep_duration).sleep(); //\todo remove copy construction after ros 0.5.1 is released
+    usleep(polling_sleep_duration.sec * 1000000 + polling_sleep_duration.nsec / 1000); //hack to avoid calling ros::Time::now() in Duration.sleep
   }
   return true;
 }
