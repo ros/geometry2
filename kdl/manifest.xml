@@ -21,6 +21,7 @@ for a problem is being discussed by the KDL community.
 <export>
   <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib  -L${prefix}/lib -lorocos-kdl"/>
   <doxymaker external="http://people.mech.kuleuven.be/~orocos/pub/devel/kdl/latest/api/html/index.html" />
+  <rosdoc config="rosdoc.yaml" />
 </export>
 <depend package="eigen"/>
 <rosdep name="cppunit"/>
