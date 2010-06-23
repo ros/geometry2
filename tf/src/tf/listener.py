@@ -32,6 +32,7 @@ roslib.load_manifest(PKG)
 import rospy
 import tf as TFX
 from tf import transformations
+from tf import transform_datatypes
 import numpy
 
 from tf.msg import tfMessage
@@ -40,11 +41,11 @@ from tf.srv import FrameGraph,FrameGraphResponse
 
 import threading
 
-def xyz_to_mat44(pos):
-    return transformations.translation_matrix((pos.x, pos.y, pos.z))
+def pose_to_mat44(pose):
+	return transform_datatypes.pose_to_mat44(pose)
 
-def xyzw_to_mat44(ori):
-    return transformations.quaternion_matrix((ori.x, ori.y, ori.z, ori.w))
+def mat44_to_pose(mat):
+	return transform_datatypes.mat44_to_pose(mat)
 
 ## Extends tf's Transformer, adding transform methods for ROS message
 ## types PointStamped, QuaternionStamped and PoseStamped.
