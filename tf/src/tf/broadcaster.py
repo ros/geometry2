@@ -71,6 +71,23 @@ class TransformBroadcaster:
         tfm = tf.msg.tfMessage([t])
         self.pub_tf.publish(tfm)
 
+    def sendTransform(self, pose, child):
+        """
+        :param pose: stamped pose for new child tf, geometry_msgs.msg.PoseStamped
+        :param child: child frame in tf, string
+
+        Broadcast the transformation from tf frame child to parent on ROS topic ``"/tf"``.
+        """
+
+        t = geometry_msgs.msg.TransformStamped()
+        t.header = pose.header
+        t.child_frame_id = child
+        t.transform.translation = pose.pose.position
+        t.transform.rotation = pose.pose.orientation
+
+        tfm = tf.msg.tfMessage([t])
+        self.pub_tf.publish(tfm)
+
 if __name__ == '__main__':
     rospy.init_node('tf_turtle')
     tfb = TurtleTFBroadcaster(rospy.get_param('~turtle'))
