@@ -202,7 +202,6 @@ int main(int argc, char** argv)
     catch (tf::TransformException& ex)
     {
       ROS_DEBUG("Exception: %s\n", ex.what());
-      continue;
     }
     
     // Sleep until next polling
