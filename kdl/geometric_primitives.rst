@@ -9,6 +9,8 @@ Available Types
 
   .. method:: Norm() -> None
 
+    This is a comment. :class:`Chain`, :meth:`Vector.Normalize`
+
   .. method:: Normalize() -> None
 
   .. method:: ReverseSign() -> None
