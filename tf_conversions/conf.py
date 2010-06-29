@@ -202,5 +202,6 @@ intersphinx_mapping = {
     'http://opencv.willowgarage.com/documentation/': None,
     'http://opencv.willowgarage.com/documentation/python/': None,
     'http://www.ros.org/doc/api/tf/html/python/' : None,
-    'http://docs.scipy.org/doc/numpy' : None
+    'http://docs.scipy.org/doc/numpy' : None,
+    'http://www.ros.org/doc/api/kdl/html/python/' : None
     }
