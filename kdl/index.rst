@@ -3,6 +3,8 @@ PyKDL
 
 This is the Python API reference of the Kinematics and Dynamics Library (KDL). KDL offers different kinds of functionality:
 
+.. module:: PyKDL
+
 .. toctree::
     :maxdepth: 2
 
