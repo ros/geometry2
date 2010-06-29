@@ -20,7 +20,7 @@ for a problem is being discussed by the KDL community.
 <url>http://pr.willowgarage.com/wiki/KDL</url>
 <export>
   <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib  -L${prefix}/lib -lorocos-kdl"/>
-  <doxymaker external="http://people.mech.kuleuven.be/~orocos/pub/devel/kdl/latest/api/html/index.html" />
+  <doxymaker external="http://orocos.org/kdl" />
   <rosdoc config="rosdoc.yaml" />
 </export>
 <depend package="eigen"/>
