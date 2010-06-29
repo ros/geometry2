@@ -81,6 +81,10 @@ include_directories(${PYTHON_INCLUDE_PATH})
 #                     DEPENDS ${LIBRARY_OUTPUT_PATH}/_${PROJECT_NAME}_swig.so)
 # endif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 
+
+# Check for SSE
+rosbuild_check_for_sse()
+
 # Dynamic linking with tf worked OK, except for exception propagation, which failed in the unit test.
 # so build with the objects directly instead.
 
@@ -89,5 +93,6 @@ rosbuild_add_library(pytf_py src/pytf.cpp src/tf.cpp src/transform_listener.cpp 
 find_package(PythonLibs REQUIRED)
 set_target_properties(pytf_py PROPERTIES OUTPUT_NAME tf PREFIX "_" SUFFIX ".so")
 # target_link_libraries(pytf_py tf)
-rosbuild_add_compile_flags(pytf_py -g -Wno-missing-field-initializers -msse3)
+rosbuild_add_compile_flags(pytf_py -g -Wno-missing-field-initializers)
+rosbuild_add_compile_flags(pytf_py ${SSE_FLAGS}) #conditionally adds sse flags if available
 rosbuild_add_pyunit(test/testPython.py)
