@@ -1,5 +1,5 @@
 all: installed
-
+  
 FILENAME = kdl-31715.tar.gz
 TARBALL = build/$(FILENAME)
 TARBALL_URL = http://pr.willowgarage.com/downloads/$(FILENAME)
@@ -26,7 +26,7 @@ CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)/ \
 		-DCMAKE_BUILD_TYPE="Release"
 
 
-installed: $(SOURCE_DIR)/unpacked 
+installed: wiped $(SOURCE_DIR)/unpacked 
 	cd $(SOURCE_DIR) && patch -p0 < ../../$(PATCH)
 	mkdir -p $(SOURCE_DIR)/build
 	cd $(SOURCE_DIR)/build && $(CMAKE) $(CMAKE_ARGS) ..
@@ -37,7 +37,11 @@ installed: $(SOURCE_DIR)/unpacked
 	touch installed
 
 
-wiped: Makefile
+docs: 
+	cd $(SOURCE_DIR)/build && make docs
+	ln -s $(SOURCE_DIR)/build/doc doc
+
+wiped: Makefile $(PATCH) kdl-31715.tar.gz.md5sum
 	make wipe
 	touch wiped
 
