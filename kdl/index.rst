@@ -1,12 +1,7 @@
 PyKDL
 =====
 
-.. doctest::
-    :options: -ELLIPSIS, +NORMALIZE_WHITESPACE
-
-    >>> import PyKDL
-    >>> print PyKDL.Vector()
-    [           0,           0,           0]
+This is the Python API reference of the Kinematics and Dynamics Library (KDL). KDL offers different kinds of functionality:
 
 .. toctree::
     :maxdepth: 2
