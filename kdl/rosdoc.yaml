@@ -2,7 +2,7 @@
  - builder: sphinx
    name: Python API
    output_dir: python
- - builder: doxygen
+ - builder: external
+   external_url: http://people.mech.kuleuven.be/~orocos/pub/devel/kdl/latest/api/html/
+   output_dir: cpp
    name: C++ API
-   output_dir: c++
-   file_patterns: '*.c *.cpp *.h *.cc *.hh *.dox'
