@@ -1,6 +1,7 @@
 Kinematic Solvers
 -----------------
 
+.. currentmodule:: PyKDL
 
 
 .. class:: ChainFkSolverPos

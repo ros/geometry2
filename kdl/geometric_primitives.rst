@@ -4,6 +4,7 @@ Geometric Primitives
 * :ref:`genindex`
 * :ref:`search`
 
+.. module:: PyKDL
 
 Vector
 ^^^^^^

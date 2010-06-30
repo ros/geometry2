@@ -1,6 +1,8 @@
 Kinematic Chains
 ----------------
 
+.. currentmodule:: PyKDL
+
 (jcb) Not sure where these should go:
 
 .. class:: FrameVel
