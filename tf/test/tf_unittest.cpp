@@ -30,7 +30,7 @@
 #include <gtest/gtest.h>
 #include <tf/tf.h>
 #include <sys/time.h>
-
+#include <ros/ros.h>
 #include "LinearMath/btVector3.h"
 
 void seed_rand()
@@ -866,6 +866,8 @@ TEST(tf, NO_PARENT_SET)
 
 TEST(tf, waitForTransform)
 {
+  EXPECT_TRUE(ros::ok());
+
   tf::Transformer mTR(true);
 
   // Check assertion of extra string
@@ -1898,5 +1900,6 @@ TEST(data, StampedOperatorEqual)
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::Time::init(); //needed for ros::TIme::now()
+  ros::init(argc, argv, "tf_unittest");
   return RUN_ALL_TESTS();
 }
