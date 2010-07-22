@@ -1,6 +1,6 @@
 <package>
   <description brief="Eigen">
-    This package contains version 2.0.10 of the Eigen C++ template
+    This package contains version 2.0.15 of the Eigen C++ template
     library for linear algebra. It automatically downloads, extracts
     and compiles a tarball. For each major release of the Eigen
     library, the tarball will get updated. This ROS package does not
