@@ -8,6 +8,7 @@ import sys
 
 import tf.transformations
 import geometry_msgs.msg
+import sensor_msgs.msg
 
 import tf
 
@@ -150,6 +151,15 @@ class TestPython(unittest.TestCase):
             msg_t = getattr(tr, "transform%s" % t)("PARENT", msg)
             self.assertEqual(msg_t.header.frame_id, "PARENT")
 
+        # PointCloud is a bit different, so smoke is different
+
+        msg = sensor_msgs.msg.PointCloud()
+        msg.header.frame_id = "THISFRAME"
+        msg.points = [geometry_msgs.msg.Point32(1,2,3)]
+        xmsg = tr.transformPointCloud("PARENT", msg)
+        self.assertEqual(xmsg.header.frame_id, "PARENT")
+        self.assertEqual(len(msg.points), len(xmsg.points))
+        self.assertNotEqual(msg.points[0], xmsg.points[0])
 
         """
         Two fixed quaternions, a small twist around X concatenated.

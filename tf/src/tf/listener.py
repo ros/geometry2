@@ -36,6 +36,7 @@ import numpy
 
 from tf.msg import tfMessage
 import geometry_msgs.msg
+import sensor_msgs.msg
 from tf.srv import FrameGraph,FrameGraphResponse
 
 import threading
@@ -100,7 +101,7 @@ class TransformerROS(TFX.Transformer):
         :return: new geometry_msgs.msg.PointStamped message, in frame target_frame
         :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
 
-        Transforms a geometry_msgs PointStamped message to frame target_frame, returns the a new PointStamped message.
+        Transforms a geometry_msgs PointStamped message to frame target_frame, returns a new PointStamped message.
         """
 
         mat44 = self.asMatrix(target_frame, ps.header)
@@ -122,7 +123,7 @@ class TransformerROS(TFX.Transformer):
         :return: new geometry_msgs.msg.Vector3Stamped message, in frame target_frame
         :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
 
-        Transforms a geometry_msgs Vector3Stamped message to frame target_frame, returns the a new Vector3Stamped message.
+        Transforms a geometry_msgs Vector3Stamped message to frame target_frame, returns a new Vector3Stamped message.
         """
 
         mat44 = self.asMatrix(target_frame, v3s.header)
@@ -147,7 +148,7 @@ class TransformerROS(TFX.Transformer):
         :return: new geometry_msgs.msg.QuaternionStamped message, in frame target_frame
         :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
 
-        Transforms a geometry_msgs QuaternionStamped message to frame target_frame, returns the a new QuaternionStamped message.
+        Transforms a geometry_msgs QuaternionStamped message to frame target_frame, returns a new QuaternionStamped message.
         """
 
         # mat44 is frame-to-frame transform as a 4x4
@@ -180,7 +181,7 @@ class TransformerROS(TFX.Transformer):
         :return: new geometry_msgs.msg.PoseStamped message, in frame target_frame
         :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
 
-        Transforms a geometry_msgs PoseStamped message to frame target_frame, returns the a new PoseStamped message.
+        Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
         """
         # mat44 is frame-to-frame transform as a 4x4
         mat44 = self.asMatrix(target_frame, ps.header)
@@ -200,6 +201,27 @@ class TransformerROS(TFX.Transformer):
         r.header.stamp = ps.header.stamp
         r.header.frame_id = target_frame
         r.pose = geometry_msgs.msg.Pose(geometry_msgs.msg.Point(*xyz), geometry_msgs.msg.Quaternion(*quat))
+        return r
+
+    def transformPointCloud(self, target_frame, point_cloud):
+        """
+        :param target_frame: the tf target frame, a string
+        :param ps: the sensor_msgs.msg.PointCloud message
+        :return: new sensor_msgs.msg.PointCloud message, in frame target_frame
+        :raises: any of the exceptions that :meth:`~tf.Transformer.lookupTransform` can raise
+
+        Transforms a geometry_msgs PoseStamped message to frame target_frame, returns a new PoseStamped message.
+        """
+        r = sensor_msgs.msg.PointCloud()
+        r.header.stamp = point_cloud.header.stamp
+        r.header.frame_id = target_frame
+        r.channels = point_cloud.channels
+
+        mat44 = self.asMatrix(target_frame, point_cloud.header)
+        def xf(p):
+            xyz = tuple(numpy.dot(mat44, numpy.array([p.x, p.y, p.z, 1.0])))[:3]
+            return geometry_msgs.msg.Point(*xyz)
+        r.points = [xf(p) for p in point_cloud.points]
         return r
 
 ## Extends TransformerROS, subscribes to the /tf topic and
