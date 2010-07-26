@@ -41,3 +41,16 @@ Index: src/bindings/python/CMakeLists.txt
          chain.addSegment(Segment(getSegment(parents_chain_root[s+1])->second.segment.getName(),
                                   jnt, f_tip, getSegment(parents_chain_root[s+1])->second.segment.getInertia()));
      }
+
+
+--- tests/kinfamtest.cpp	2009-08-06 02:37:29.000000000 -0700
++++ tests/kinfamtest.cpp	2010-07-26 13:30:56.822183616 -0700
+@@ -220,7 +220,7 @@
+     JntArray jnt2(extract_chain2.getNrOfJoints());
+     for (int i=0; i<(int)extract_chain2.getNrOfJoints(); i++){
+       jnt1(i) = (i+1)*2;
+-      jnt2((int)extract_chain2.getNrOfJoints()-i-1) = -jnt1(i);
++      jnt2((int)extract_chain2.getNrOfJoints()-i-1) = jnt1(i);
+     }
+     solver1.JntToCart(jnt1, f1);
+     solver2.JntToCart(jnt2, f2);
