@@ -1,9 +1,8 @@
 all: installed
   
-FILENAME = kdl-31715.tar.gz
-# new tarbal that pulls in a number of kdl bugfixes
-# needs extensive testing before we start using it
-#FILENAME = kdl-32171.tar.gz
+#old tarbal
+#FILENAME = kdl-31715.tar.gz
+FILENAME = kdl-32171.tar.gz
 TARBALL = build/$(FILENAME)
 TARBALL_URL = http://pr.willowgarage.com/downloads/$(FILENAME)
 SOURCE_DIR = build/kdl-tar
