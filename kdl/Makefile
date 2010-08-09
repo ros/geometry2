@@ -1,3 +1,5 @@
+include $(shell rospack find mk)/cmake.mk
+
 all: installed
   
 #old tarbal
@@ -22,6 +24,7 @@ CMAKE_ARGS = -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)/ \
                 -DCMAKE_CXX_FLAGS=$(EIGEN2_DEFINE) \
 	        -DPYTHON_SITE_PACKAGES_DIR=$(INSTALL_DIR)/lib \
 		-DBUILD_MODELS=OFF \
+		-DENABLE_TESTS=ON \
 		-DBOOST:STRING=$(BOOST_INCLUDE)\
 		-DEIGEN2_INCLUDE_DIR=$(EIGEN2_INCLUDE_DIR)\
 		-DTINYXML_INCLUDE_DIR=$(TINYXML_INCLUDE_DIR)\

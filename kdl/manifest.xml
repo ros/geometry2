@@ -24,6 +24,7 @@ for a problem is being discussed by the KDL community.
   <rosdoc config="rosdoc.yaml" />
 </export>
 <depend package="eigen"/>
+<depend package="rostest"/>
 <rosdep name="cppunit"/>
 <rosdep name="python-sip4"/>
 <versioncontrol type="svn" url="http://svn.mech.kuleuven.be/repos/orocos/trunk/kdl"/>

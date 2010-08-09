@@ -1,0 +1,3 @@
+<launch>
+  <test test-name="kdl_tests" pkg="kdl" type="run_tests.py" />
+</launch>
