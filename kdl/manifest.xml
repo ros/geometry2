@@ -2,7 +2,7 @@
 <description brief="The Kinematics and Dynamics Library (latest)">
 
 This package contains a recent version of the Kinematics and Dynamics
-Library (KLD), distributed by the Orocos Project.  For stability
+Library (KDL), distributed by the Orocos Project.  For stability
 reasons, this package is currently locked to revision 31715 of April
 26 2010 (C-turtle) and revision 30401 of August 8 2009 (Boxturtle),
 but this revision will be updated on a regular basis to the latest
