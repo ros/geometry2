@@ -154,6 +154,9 @@ public:
   };
 
 private:
+  /// last time
+  ros::Time last_update_ros_time_;
+
   /// Initialize this transform listener, subscribing, advertising services, etc.
   void init();
   void initWithThread();
@@ -165,7 +168,6 @@ private:
   void transformPointCloud(const std::string & target_frame, const Transform& transform, const ros::Time& target_time, const sensor_msgs::PointCloud& pcin, sensor_msgs::PointCloud& pcout) const;
 
   /// clear the cached data
-  void reset_callback(const std_msgs::EmptyConstPtr &msg);
   std_msgs::Empty empty_;
   ros::ServiceServer tf_frames_srv_;
 

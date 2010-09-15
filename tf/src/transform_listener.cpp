@@ -107,7 +107,6 @@ void TransformListener::init()
 {
   message_subscriber_tf_ = node_.subscribe<tf::tfMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1)); ///\todo magic number
   
-  reset_time_subscriber_ = node_.subscribe<std_msgs::Empty>("/reset_time", 100, boost::bind(&TransformListener::reset_callback, this, _1)); ///\todo magic number
   
   if (! ros::service::exists("~tf_frames", false))  // Avoid doublely advertizing if multiple instances of this library
     {
@@ -118,6 +117,7 @@ void TransformListener::init()
   ros::NodeHandle local_nh("~");
   
   tf_prefix_ = getPrefixParam(local_nh);
+  last_update_ros_time_ = ros::Time::now();
 }
 
 void TransformListener::initWithThread()
@@ -126,10 +126,6 @@ void TransformListener::initWithThread()
   ros::SubscribeOptions ops_tf = ros::SubscribeOptions::create<tf::tfMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
     
     message_subscriber_tf_ = node_.subscribe(ops_tf);
-  
-  ros::SubscribeOptions reset_ops = ros::SubscribeOptions::create<std_msgs::Empty>("/reset_time", 100, boost::bind(&TransformListener::reset_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
-
-  reset_time_subscriber_ = node_.subscribe(reset_ops);
   
   dedicated_listener_thread_ = new boost::thread(boost::bind(&TransformListener::dedicatedListenerThread, this));
 
@@ -141,6 +137,7 @@ void TransformListener::initWithThread()
     
   ros::NodeHandle local_nh("~");
   tf_prefix_ = getPrefixParam(local_nh);
+  last_update_ros_time_ = ros::Time::now();
 }
 
 void TransformListener::transformQuaternion(const std::string& target_frame,
@@ -334,6 +331,17 @@ void TransformListener::transformPointCloud(const std::string & target_frame, co
 
 void TransformListener::subscription_callback(const tf::tfMessageConstPtr& msg)
 {
+  ros::Duration ros_diff = ros::Time::now() - last_update_ros_time_;
+  float ros_dt = ros_diff.toSec();
+
+  if (ros_dt < 0.0)
+  {
+    ROS_WARN("Saw a negative time change of %f seconds, clearing the tf buffer.", ros_dt);
+    clear();
+  }
+
+  last_update_ros_time_ = ros::Time::now();
+
   const tf::tfMessage& msg_in = *msg;
   for (unsigned int i = 0; i < msg_in.transforms.size(); i++)
   {
@@ -365,10 +373,7 @@ void TransformListener::subscription_callback(const tf::tfMessageConstPtr& msg)
   }
 };
 
-void TransformListener::reset_callback(const std_msgs::EmptyConstPtr &msg)
-{
-  clear();
-};
+
 
 
 
