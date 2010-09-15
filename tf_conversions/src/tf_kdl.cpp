@@ -38,20 +38,20 @@ namespace tf {
 
   void RotationTFToKDL(const tf::Quaternion& t, KDL::Rotation& k)
   {
-    k.Quaternion(t[0], t[1], t[2], t[3]);
+    k = KDL::Rotation::Quaternion(t[0], t[1], t[2], t[3]);
   }
 
   void TransformTFToKDL(const tf::Transform &t, KDL::Frame &k)
   {
     for (unsigned int i = 0; i < 3; ++i)
-      k.p.data[i] = t.getOrigin()[i];
+      k.p[i] = t.getOrigin()[i];
     for (unsigned int i = 0; i < 9; ++i)
       k.M.data[i] = t.getBasis()[i/3][i%3];
   }
 
   void TransformKDLToTF(const KDL::Frame &k, tf::Transform &t)
   {
-    t.setOrigin(tf::Vector3(k.p.data[0], k.p.data[1], k.p.data[2]));
+    t.setOrigin(tf::Vector3(k.p[0], k.p[1], k.p[2]));
     t.setBasis(btMatrix3x3(k.M.data[0], k.M.data[1], k.M.data[2],
                            k.M.data[3], k.M.data[4], k.M.data[5],
                            k.M.data[6], k.M.data[7], k.M.data[8]));
@@ -60,38 +60,37 @@ namespace tf {
   void PoseTFToKDL(const tf::Pose& t, KDL::Frame& k)
   {
     for (unsigned int i = 0; i < 3; ++i)
-      k.p.data[i] = t.getOrigin()[i];
+      k.p[i] = t.getOrigin()[i];
     for (unsigned int i = 0; i < 9; ++i)
       k.M.data[i] = t.getBasis()[i/3][i%3];
   }
 
   void PoseKDLToTF(const KDL::Frame& k, tf::Pose& t)
   {
-    t.getOrigin()[0] = k.p.data[0];
-    t.getOrigin()[1] = k.p.data[1];
-    t.getOrigin()[2] = k.p.data[2];
-    for (unsigned int i = 0; i < 9; ++i)
-      t.getBasis()[i/3][i%3] = k.M.data[i];
+    t.setOrigin(tf::Vector3(k.p[0], k.p[1], k.p[2]));
+    t.setBasis(btMatrix3x3(k.M.data[0], k.M.data[1], k.M.data[2],
+                           k.M.data[3], k.M.data[4], k.M.data[5],
+                           k.M.data[6], k.M.data[7], k.M.data[8]));
   }
 
   void TwistKDLToMsg(const KDL::Twist &t, geometry_msgs::Twist &m)
   {
-    m.linear.x = t.vel.data[0];
-    m.linear.y = t.vel.data[1];
-    m.linear.z = t.vel.data[2];
-    m.angular.x = t.rot.data[0];
-    m.angular.y = t.rot.data[1];
-    m.angular.z = t.rot.data[2];
+    m.linear.x = t.vel[0];
+    m.linear.y = t.vel[1];
+    m.linear.z = t.vel[2];
+    m.angular.x = t.rot[0];
+    m.angular.y = t.rot[1];
+    m.angular.z = t.rot[2];
   }
 
   void TwistMsgToKDL(const geometry_msgs::Twist &m, KDL::Twist &t)
   {
-    t.vel.data[0] = m.linear.x;
-    t.vel.data[1] = m.linear.y;
-    t.vel.data[2] = m.linear.z;
-    t.rot.data[0] = m.angular.x;
-    t.rot.data[1] = m.angular.y;
-    t.rot.data[2] = m.angular.z;
+    t.vel[0] = m.linear.x;
+    t.vel[1] = m.linear.y;
+    t.vel[2] = m.linear.z;
+    t.rot[0] = m.angular.x;
+    t.rot[1] = m.angular.y;
+    t.rot[2] = m.angular.z;
   }
 
   void PoseMsgToKDL(const geometry_msgs::Pose &p, KDL::Frame &t)
