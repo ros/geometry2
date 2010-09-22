@@ -29,8 +29,8 @@
 
 /** \author Tully Foote */
 
-#ifndef TF2_CORE_H
-#define TF2_CORE_H
+#ifndef TF2_BUFFER_CORE_H
+#define TF2_BUFFER_CORE_H
 
 #include <string>
 
@@ -62,7 +62,7 @@ namespace tf2
  *
  * All function calls which pass frame ids can potentially throw the exception tf::LookupException
  */
-class TF2Core
+class BufferCore
 {
 public:
   /************* Constants ***********************/
@@ -73,8 +73,8 @@ public:
    * \param cache_time How long to keep a history of transforms in nanoseconds
    *
    */
-  TF2Core(ros::Duration cache_time_ = ros::Duration(DEFAULT_CACHE_TIME));
-  virtual ~TF2Core(void);
+  BufferCore(ros::Duration cache_time_ = ros::Duration(DEFAULT_CACHE_TIME));
+  virtual ~BufferCore(void);
 
   /** \brief Clear all data */
   void clear();

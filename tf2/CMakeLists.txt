@@ -30,7 +30,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-rosbuild_add_library(tf2 src/cache.cpp src/tf2_core.cpp)
+rosbuild_add_library(tf2 src/cache.cpp src/buffer_core.cpp)
 rosbuild_link_boost(tf2 thread signals)
 
 rosbuild_add_gtest(test/cache_unittest test/cache_unittest.cpp)

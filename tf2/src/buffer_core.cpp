@@ -29,7 +29,7 @@
 
 /** \author Tully Foote */
 
-#include "tf2/tf2_core.h"
+#include "tf2/buffer_core.h"
 
 //legacy
 #include "tf/tf.h"
@@ -37,22 +37,22 @@
 
 using namespace tf2;
 
-TF2Core::TF2Core(ros::Duration cache_time): old_tf_(true, cache_time)
+BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
 {
 
 }
 
-TF2Core::~TF2Core()
+BufferCore::~BufferCore()
 {
 
 }
 
-void TF2Core::clear()
+void BufferCore::clear()
 {
   old_tf_.clear();
 }
 
-bool TF2Core::setTransform(const geometry_msgs::TransformStamped& transform, const std::string& authority)
+bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform, const std::string& authority)
 {
   tf::StampedTransform tf_transform;
   tf::transformStampedMsgToTF(transform, tf_transform);
@@ -60,7 +60,7 @@ bool TF2Core::setTransform(const geometry_msgs::TransformStamped& transform, con
 };
 
 
-geometry_msgs::TransformStamped TF2Core::lookupTransform(const std::string& target_frame, 
+geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame, 
                                                         const std::string& source_frame,
                                                         const ros::Time& time) const
 {
@@ -72,7 +72,7 @@ geometry_msgs::TransformStamped TF2Core::lookupTransform(const std::string& targ
 };
 
                                                        
-geometry_msgs::TransformStamped TF2Core::lookupTransform(const std::string& target_frame, 
+geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame, 
                                                         const ros::Time& target_time,
                                                         const std::string& source_frame,
                                                         const ros::Time& source_time,
@@ -88,7 +88,7 @@ geometry_msgs::TransformStamped TF2Core::lookupTransform(const std::string& targ
 
 
 
-geometry_msgs::Twist TF2Core::lookupTwist(const std::string& tracking_frame, 
+geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame, 
                                           const std::string& observation_frame, 
                                           const ros::Time& time, 
                                           const ros::Duration& averaging_interval) const
@@ -99,7 +99,7 @@ geometry_msgs::Twist TF2Core::lookupTwist(const std::string& tracking_frame,
   return t;
 };
 
-geometry_msgs::Twist TF2Core::lookupTwist(const std::string& tracking_frame, 
+geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame, 
                                           const std::string& observation_frame, 
                                           const std::string& reference_frame,
                                           const tf::Point & reference_point, 
@@ -115,13 +115,13 @@ geometry_msgs::Twist TF2Core::lookupTwist(const std::string& tracking_frame,
 
 
 
-bool TF2Core::canTransform(const std::string& target_frame, const std::string& source_frame,
+bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
                            const ros::Time& time, std::string* error_msg) const
 {
   return old_tf_.canTransform(target_frame, source_frame, time, error_msg);
 }
 
-bool TF2Core::canTransform(const std::string& target_frame, const ros::Time& target_time,
+bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& target_time,
                           const std::string& source_frame, const ros::Time& source_time,
                           const std::string& fixed_frame, std::string* error_msg) const
 {
