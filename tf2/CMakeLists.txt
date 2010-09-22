@@ -35,3 +35,6 @@ rosbuild_link_boost(tf2 thread signals)
 
 rosbuild_add_gtest(test/cache_unittest test/cache_unittest.cpp)
 target_link_libraries(test/cache_unittest tf2)
+
+rosbuild_add_gtest(test/tf2_core test/tf2_core_unittest.cpp)
+target_link_libraries(test/tf2_core tf2)
