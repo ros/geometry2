@@ -29,20 +29,20 @@
 
 /** \author Tully Foote */
 
-#ifndef TF_TIME_CACHE_H
-#define TF_TIME_CACHE_H
+#ifndef TF2_TIME_CACHE_H
+#define TF2_TIME_CACHE_H
 
 #include <list>
 #include <boost/thread/mutex.hpp>
 
-#include "tf/transform_datatypes.h"
-#include "tf/exceptions.h"
+#include "tf2/transform_datatypes.h"
+#include "tf2/exceptions.h"
 
 #include "LinearMath/btTransform.h"
 
 #include <sstream>
 
-namespace tf
+namespace tf2
 {
 enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_FORWARD };
 
@@ -164,4 +164,4 @@ class TimeCache
 
 
 }
-#endif // TF_TIME_CACHE_H
+#endif // TF2_TIME_CACHE_H

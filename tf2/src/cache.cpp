@@ -29,9 +29,9 @@
 
 /** \author Tully Foote */
 
-#include "tf/time_cache.h"
+#include "tf2/time_cache.h"
 
-using namespace tf;
+using namespace tf2;
 
 bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns false if data not available
 {
