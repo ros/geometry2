@@ -94,6 +94,15 @@ public:
 };
 
 
+/** \brief An exception class to notify that transforming timed out
+ * 
+ */
+class TimeoutException: public TransformException
+{ 
+public:
+ TimeoutException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
+};
+
 }
 
 
