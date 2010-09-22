@@ -33,6 +33,13 @@
 
 using namespace tf2;
 
+TimeCache::TimeCache(bool interpolating , ros::Duration  max_storage_time,
+                     ros::Duration max_extrapolation_time):
+  interpolating_(interpolating),
+  max_storage_time_(max_storage_time),
+  max_extrapolation_time_(max_extrapolation_time)
+{};
+
 bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns false if data not available
 {
   TransformStorage p_temp_1, p_temp_2;
@@ -65,6 +72,34 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns f
   return (num_nodes > 0);
 
 };
+
+bool TimeCache::insertData(const TransformStorage& new_data)
+  {
+    
+    boost::mutex::scoped_lock lock(storage_lock_);
+    
+    std::list<TransformStorage >::iterator storage_it = storage_.begin();
+    
+    if(storage_it != storage_.end())
+    {
+      if (storage_it->stamp_ > new_data.stamp_ + max_storage_time_)
+      {
+        return false;
+      }
+    }
+    
+    
+    while(storage_it != storage_.end())
+    {
+      if (storage_it->stamp_ <= new_data.stamp_)
+        break;
+      storage_it++;
+    }
+    storage_.insert(storage_it, new_data);
+
+    pruneList();
+    return true;
+  };
 
 
 uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, ExtrapolationMode& mode)
@@ -176,3 +211,32 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
   output.frame_id_num_ = one.frame_id_num_;
 };
 
+void TimeCache::clearList() {   boost::mutex::scoped_lock lock(storage_lock_); storage_.clear(); };
+
+unsigned int TimeCache::getListLength() {   boost::mutex::scoped_lock lock(storage_lock_); return storage_.size(); };
+
+
+ros::Time TimeCache::getLatestTimestamp() 
+{   
+  boost::mutex::scoped_lock lock(storage_lock_); 
+  if (storage_.empty()) return ros::Time(); //empty list case
+  return storage_.front().stamp_; 
+};
+
+ros::Time TimeCache::getOldestTimestamp() 
+{   
+  boost::mutex::scoped_lock lock(storage_lock_); 
+  if (storage_.empty()) return ros::Time(); //empty list case
+  return storage_.back().stamp_; 
+};
+
+void TimeCache::pruneList()
+{
+  ros::Time latest_time = storage_.begin()->stamp_;
+  
+  while(!storage_.empty() && storage_.back().stamp_ + max_storage_time_ < latest_time)
+  {
+    storage_.pop_back();
+  }
+  
+};
