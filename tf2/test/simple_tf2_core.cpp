@@ -55,11 +55,23 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 
 using namespace tf;
 
-TEST(tf2, setTransform)
+TEST(tf2, setTransformFail)
 {
   tf2::BufferCore tfc;
   geometry_msgs::TransformStamped st;
-  EXPECT_FALSE(tfc.setTransform(st, "foo"));
+  EXPECT_FALSE(tfc.setTransform(st, "authority1"));
+  
+}
+
+TEST(tf2, setTransformValid)
+{
+  tf2::BufferCore tfc;
+  geometry_msgs::TransformStamped st;
+  st.header.frame_id = "foo";
+  st.header.stamp = ros::Time(1.0);
+  st.child_frame_id = "child";
+  st.transform.rotation.w = 1;
+  EXPECT_TRUE(tfc.setTransform(st, "authority1"));
   
 }
 
