@@ -1,0 +1,16 @@
+<package>
+  <description brief="tf_cpp">
+
+     tf_cpp
+
+  </description>
+  <author>Wim Meeussen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tf_cpp</url>
+  <depend package="roscpp"/>
+  <depend package="tf_core"/>
+
+</package>
+
+

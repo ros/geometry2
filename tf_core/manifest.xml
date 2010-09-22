@@ -1,0 +1,16 @@
+<package>
+  <description brief="tf_core">
+
+     tf_core
+
+  </description>
+  <author>Wim Meeussen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tf_core</url>
+  <depend package="roslib"/>
+  <depend package="geometry_msgs"/>
+
+</package>
+
+
