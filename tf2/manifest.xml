@@ -1,0 +1,17 @@
+<package>
+  <description brief="tf2">
+
+     tf2
+
+  </description>
+  <author>Tully Foote</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tf2</url>
+  <depend package="tf"/>
+  <depend package="bullet"/>
+  <depend package="geometry_msgs"/>
+
+</package>
+
+
