@@ -32,35 +32,17 @@
 #ifndef TF2_CORE_H
 #define TF2_CORE_H
 
-#include <iostream>
-#include <iomanip>
-#include <cmath>
-#include <vector>
-#include <sstream>
-#include <map>
+#include <string>
 
-#include <tf/exceptions.h>
-#include "tf/time_cache.h"
-#include <boost/thread/mutex.hpp>
-#include <boost/signals.hpp>
-#include "geometry_msgs/TwistStamped.h"
-#include "geometry_msgs/TransformStamped.h"
+#include "ros/Time.h"
+//#include "geometry_msgs/TwistStamped.h"
+//#include "geometry_msgs/TransformStamped.h"
+class geometry_msgs::TwistStamped;
+class geometry_msgs::TransformStamped;
+class tf::Transformer; // migration temporary
 
 namespace tf2
 {
-/** \brief resolve tf names */
-std::string resolve(const std::string& prefix, const std::string& frame_name);
-
-enum ErrorValues { NO_ERROR = 0, LOOKUP_ERROR, CONNECTIVITY_ERROR, EXTRAPOLATION_ERROR};
-
-/** \brief An internal representation of transform chains
- *
- * This struct is how the list of transforms are stored before being passed to computeTransformFromList. */
-typedef struct
-{
-  std::vector<TransformStorage > inverseTransforms;
-  std::vector<TransformStorage > forwardTransforms;
-} TransformLists;
 
 /** \brief A Class which provides coordinate transforms between any two frames in a system.
  *
@@ -84,18 +66,14 @@ class TFCore
 {
 public:
   /************* Constants ***********************/
-  static const unsigned int MAX_GRAPH_DEPTH = 100UL;   //!< The maximum number of time to recurse before assuming the tree has a loop.
   static const double DEFAULT_CACHE_TIME = 10.0;  //!< The default amount of time to cache data in seconds
-  static const int64_t DEFAULT_MAX_EXTRAPOLATION_DISTANCE = 0ULL; //!< The default amount of time to extrapolate
-
 
   /** Constructor
    * \param interpolating Whether to interpolate, if this is false the closest value will be returned
    * \param cache_time How long to keep a history of transforms in nanoseconds
    *
    */
-  TFCore(bool interpolating = true,
-              ros::Duration cache_time_ = ros::Duration(DEFAULT_CACHE_TIME));
+  TFCore(ros::Duration cache_time_ = ros::Duration(DEFAULT_CACHE_TIME));
   virtual ~TFCore(void);
 
   /** \brief Clear all data */
@@ -106,7 +84,7 @@ public:
    * \param authority The source of the information for this transform
    * returns true unless an error occured
    */
-  bool setTransform(const StampedTransform& transform, const std::string & authority = "default_authority");
+  bool setTransform(const geometry_msgs::TransformStamped& transform, const std::string & authority);
 
   /*********** Accessors *************/
 
@@ -202,7 +180,17 @@ public:
                     const std::string& source_frame, const ros::Time& source_time,
                     const std::string& fixed_frame, std::string* error_msg = NULL) const;
   
-  
+
+
+
+
+
+
+
+private:
+
+  //Using tf for now will be replaced fully
+  tf::Transformer old_tf_;
 }
 
 }
