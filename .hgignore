@@ -7,5 +7,6 @@ syntax: regexp
 .*src/.*/msg/_.*
 .*src/.*/srv/_.*
 .*/msg_gen/.*
+.*/srv_gen/.*
 .*/msg/lisp/.*
 .*/srv/lisp/.*
