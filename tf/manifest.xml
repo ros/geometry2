@@ -8,7 +8,7 @@ transform points, vectors, etc between any two coordinate frames at
 any desired point in time.
 
   </description>
-  <author>Tully Foote</author>
+  <author>Tully Foote, Eitan Marder-Eppstein, Wim Meeussen</author>
   <license>BSD</license>
   <review status="doc reviewed" notes="http://www.ros.org/wiki/tf/Reviews/2009-10-07_Doc_Review"/>
   <url>http://www.ros.org/wiki/tf</url>
