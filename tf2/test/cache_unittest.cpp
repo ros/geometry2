@@ -417,7 +417,7 @@ TEST(TimeCache, AngularInterpolation)
       yawvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX / 100.0;
       pitchvalues[step] = 0;//10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
       rollvalues[step] = 0;//10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-      quats[step] = btQuaternion(yawvalues[step], pitchvalues[step], rollvalues[step]);
+      quats[step].setRPY(yawvalues[step], pitchvalues[step], rollvalues[step]);
       stor.setRotation(quats[step]);
       stor.frame_id_ = "NO_NEED";
       stor.frame_id_num_ = 3;
