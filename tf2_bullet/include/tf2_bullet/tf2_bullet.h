@@ -55,6 +55,14 @@ template <>
   }
 
 
+// this method needs to be implemented by client library developers
+template <>
+  void doTransform(const tf2::Stamped<btTransform>& t_in, tf2::Stamped<btTransform>& t_out, const geometry_msgs::TransformStamped& transform)
+  {
+    t_out = tf2::Stamped<btTransform>(transformToBullet(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+  }
+
+
 } // namespace
 
 #endif // TF2_BULLET_H

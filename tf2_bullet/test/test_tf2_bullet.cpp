@@ -43,6 +43,7 @@ int main(int argc, char** argv)
   tf2::TransformListener listener(tf_buffer);
   ros::Duration(2.0).sleep();
 
+  // btVector3
   btVector3 v1(1,2,3);
   std::cout << tf_buffer.transform(tf2::Stamped<btVector3>(v1, ros::Time::now(), "head_pan_link"),
 				   "r_forearm_link", ros::Time(),
@@ -50,5 +51,15 @@ int main(int argc, char** argv)
 
   std::cout << tf_buffer.transform(tf2::Stamped<btVector3>(v1, ros::Time(), "head_pan_link"), 
 				   "torso_lift_link", ros::Duration(3.0)) << std::endl;
+
+  // btTransform
+  btTransform t1(btQuaternion(1,0,0,0));
+  std::cout << tf_buffer.transform(tf2::Stamped<btTransform>(t1, ros::Time::now(), "head_pan_link"),
+				   "r_forearm_link", ros::Time(),
+				   "base_link", ros::Duration(3.0)).getOrigin().getY() << std::endl;
+
+  std::cout << tf_buffer.transform(tf2::Stamped<btTransform>(t1, ros::Time(), "head_pan_link"), 
+				   "torso_lift_link", ros::Duration(3.0)).getOrigin().getY() << std::endl;
+
   return 0;
 }
