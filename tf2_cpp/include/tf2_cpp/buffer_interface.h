@@ -77,25 +77,25 @@ public:
   // lookup transform with timeout, simple api
   virtual geometry_msgs::TransformStamped
     lookupTransform(const std::string& target_frame, const std::string& source_frame, 
-		    const ros::Time& target_time, const ros::Duration timeout = ros::Duration(0.0)) const = 0;
+		    const ros::Time& target_time, const ros::Duration timeout) const = 0;
 
   // lookup transform with timeout, advanced api
   virtual geometry_msgs::TransformStamped 
     lookupTransform(const std::string& target_frame, const ros::Time& target_time,
 		    const std::string& source_frame, const ros::Time& source_time,
-		    const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0)) const = 0;
+		    const std::string& fixed_frame, const ros::Duration timeout) const = 0;
 
 
   // can transform with timeout, simple api
   virtual bool
     canTransform(const std::string& target_frame, const std::string& source_frame, 
-		 const ros::Time& target_time, const ros::Duration timeout = ros::Duration(0.0)) const = 0;
+		 const ros::Time& target_time, const ros::Duration timeout) const = 0;
 
   // can transform with timeout, advanced api
   virtual bool
     canTransform(const std::string& target_frame, const ros::Time& target_time,
 		 const std::string& source_frame, const ros::Time& source_time,
-		 const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0)) const = 0;
+		 const std::string& fixed_frame, const ros::Duration timeout) const = 0;
 
 
 
