@@ -63,6 +63,17 @@ int main(int argc, char** argv)
   tf_buffer.transform(v2, "blo", ros::Time::now(), "fixed_frame", ros::Duration(3.0));
   tf_buffer.transform(v2, "blo", ros::Duration(3.0));
 
+  // PoseStamped
+  geometry_msgs::PoseStamped v3;
+  v3.pose.position.x = 1;
+  v3.pose.position.y = 2;
+  v3.pose.position.z = 3;
+  v3.pose.orientation.x = 1;
+  v3.header.stamp = ros::Time::now();
+  v3.header.frame_id = "wimpie";
+
+  tf_buffer.transform(v3, "blo", ros::Time::now(), "fixed_frame", ros::Duration(3.0));
+  tf_buffer.transform(v3, "blo", ros::Duration(3.0));
 
 
   return 0;

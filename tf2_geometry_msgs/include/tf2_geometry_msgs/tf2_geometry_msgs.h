@@ -102,6 +102,37 @@ template <>
   }
 
 
+/*****************/
+/** PoseStamped **/
+/*****************/
+
+// method to extract timestamp from object
+template <>
+  const ros::Time& getTimestamp(const geometry_msgs::PoseStamped& t)  {return t.header.stamp;}
+
+// method to extract frame id from object
+template <>
+  const std::string& getFrameId(const geometry_msgs::PoseStamped& t)  {return t.header.frame_id;}
+
+// this method needs to be implemented by client library developers
+template <>
+  void doTransform(const geometry_msgs::PoseStamped& t_in, geometry_msgs::PoseStamped& t_out, const geometry_msgs::TransformStamped& transform)
+  {
+    KDL::Vector v(t_in.pose.position.x, t_in.pose.position.y, t_in.pose.position.z);
+    KDL::Rotation r = KDL::Rotation::Quaternion(t_in.pose.orientation.x, t_in.pose.orientation.y, t_in.pose.orientation.z, t_in.pose.orientation.w);
+
+    tf2::Stamped<KDL::Frame> v_out = tf2::Stamped<KDL::Frame>(transformToKDL(transform) * KDL::Frame(r, v),
+							      transform.header.stamp, transform.header.frame_id);
+    t_out.pose.position.x = v_out.p[0];
+    t_out.pose.position.y = v_out.p[1];
+    t_out.pose.position.z = v_out.p[2];
+    v_out.M.GetQuaternion(t_out.pose.orientation.x, t_out.pose.orientation.y, t_out.pose.orientation.z, t_out.pose.orientation.w);
+    t_out.header.stamp = v_out.stamp_;
+    t_out.header.frame_id = v_out.frame_id_;
+  }
+
+
+
 } // namespace
 
 #endif // TF2_GEOMETRY_MSGS_H
