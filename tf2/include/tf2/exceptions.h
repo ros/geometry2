@@ -87,10 +87,20 @@ public:
  * usually it's an uninitalized Quaternion (0,0,0,0)
  * 
  */
-class InvalidArgument: public TransformException  
+class InvalidArgumentException: public TransformException  
 { 
 public:
-  InvalidArgument(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
+  InvalidArgumentException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
+};
+
+/** \brief An exception class to notify that a timeout has occured
+ * 
+ * 
+ */
+class TimeoutException: public TransformException  
+{ 
+public:
+  TimeoutException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
 

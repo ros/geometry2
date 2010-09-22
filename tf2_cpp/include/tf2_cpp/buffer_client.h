@@ -39,13 +39,16 @@
 
 #include <tf2_cpp/buffer_interface.h>
 #include <actionlib/client/simple_action_client.h>
+#include <tf2_msgs/LookupTransformAction.h>
 
 namespace tf2
 {
   class BufferClient : public BufferInterface
   {
     public:
-      typedef actionlib::SimpleActionClient<tf2_msgs::LookupTransform> LookupActionClient;
+      typedef actionlib::SimpleActionClient<tf2_msgs::LookupTransformAction> LookupActionClient;
+
+      BufferClient(std::string ns, double check_frequency = 10.0, ros::Duration timeout_padding_ = ros::Duration(2.0));
 
       virtual geometry_msgs::TransformStamped
         lookupTransform(const std::string& target_frame, const std::string& source_frame,
@@ -57,7 +60,11 @@ namespace tf2
             const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0)) const;
 
     private:
-      LookupActionClient client_;
+      geometry_msgs::TransformStamped processGoal(const tf2_msgs::LookupTransformGoal& goal) const;
+      geometry_msgs::TransformStamped processResult(const tf2_msgs::LookupTransformResult& result) const;
+      mutable LookupActionClient client_;
+      double check_frequency_;
+      ros::Duration timeout_padding_;
   };
 };
 #endif

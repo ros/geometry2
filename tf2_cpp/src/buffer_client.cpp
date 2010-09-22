@@ -38,4 +38,91 @@
 
 namespace tf2
 {
+  BufferClient::BufferClient(std::string ns, double check_frequency, ros::Duration timeout_padding): 
+    client_(ns), 
+    check_frequency_(check_frequency),
+    timeout_padding_(timeout_padding)
+  {
+  }
+
+  geometry_msgs::TransformStamped BufferClient::lookupTransform(const std::string& target_frame, const std::string& source_frame,
+      const ros::Time& time, const ros::Duration timeout) const
+  {
+    //populate the goal message
+    tf2_msgs::LookupTransformGoal goal;
+    goal.target_frame = target_frame;
+    goal.source_frame = source_frame;
+    goal.source_time = time;
+    goal.timeout = timeout;
+    goal.advanced = false;
+
+    return processGoal(goal);
+  }
+
+  geometry_msgs::TransformStamped BufferClient::lookupTransform(const std::string& target_frame, const ros::Time& target_time,
+      const std::string& source_frame, const ros::Time& source_time,
+      const std::string& fixed_frame, const ros::Duration timeout) const
+  {
+    //populate the goal message
+    tf2_msgs::LookupTransformGoal goal;
+    goal.target_frame = target_frame;
+    goal.source_frame = source_frame;
+    goal.source_time = source_time;
+    goal.timeout = timeout;
+    goal.target_time = target_time;
+    goal.fixed_frame = fixed_frame;
+    goal.advanced = true;
+
+    return processGoal(goal);
+  }
+
+  geometry_msgs::TransformStamped BufferClient::processGoal(const tf2_msgs::LookupTransformGoal& goal) const
+  {
+    client_.sendGoal(goal);
+    ros::Rate r(check_frequency_);
+    bool timed_out = false;
+    ros::Time start_time = ros::Time::now();
+    while(ros::ok() && !client_.getState().isDone() && !timed_out)
+    {
+      timed_out = ros::Time::now() > start_time + goal.timeout + timeout_padding_;
+      r.sleep();
+    }
+
+    //this shouldn't happen, but could in rare cases where the server hangs
+    if(timed_out)
+    {
+      //make sure to cancel the goal the server is pursuing
+      client_.cancelGoal();
+      throw TimeoutException("The LookupTransform goal sent to the BufferServer did not come back in the specified time. Something is likely wrong with the server.");
+    }
+
+    if(client_.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
+      throw TimeoutException("The LookupTransform goal sent to the BufferServer did not come back with SUCCEEDED status. Something is likely wrong with the server.");
+
+    //process the result for errors and return it
+    return processResult(*client_.getResult());
+  }
+
+  geometry_msgs::TransformStamped BufferClient::processResult(const tf2_msgs::LookupTransformResult& result) const
+  {
+    //if there's no error, then we'll just return the transform
+    if(result.error.error > 0){
+      //otherwise, we'll have to throw the appropriate exception
+      if(result.error.error == 1)
+        throw LookupException(result.error.error_string);
+
+      if(result.error.error == 2)
+        throw ConnectivityException(result.error.error_string);
+
+      if(result.error.error == 3)
+        throw ExtrapolationException(result.error.error_string);
+
+      if(result.error.error == 4)
+        throw InvalidArgumentException(result.error.error_string);
+
+      throw TransformException(result.error.error_string);
+    }
+
+    return result.transform;
+  }
 };
