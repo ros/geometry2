@@ -39,7 +39,7 @@
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
 
-#include "tf2/buffer.h"
+#include "tf2_cpp/buffer.h"
 
 #include "boost/thread.hpp"
 
