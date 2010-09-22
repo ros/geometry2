@@ -47,8 +47,9 @@ namespace tf2
       : buffer_core_(BufferCore())
       {}
 
-    virtual  lookupTransform(const std::string& source_frame, const std::string& target_frame,
-				 const ros::Time& time, const ros::Duration timeout = ros::Duration(0.0))
+    virtual geometry_msgs::TransformStamped 
+      lookupTransform(const std::string& source_frame, const std::string& target_frame,
+		      const ros::Time& time, const ros::Duration timeout = ros::Duration(0.0)) const
     {
       // poll for transform if timeout is set
       if (timeout != ros::Duration(0.0)){
