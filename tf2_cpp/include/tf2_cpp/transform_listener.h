@@ -70,13 +70,6 @@ public:
 
   ~TransformListener();
 
-
-  /* \brief Resolve frame_name into a frame_id using tf_prefix parameter */
-  std::string resolve(const std::string& frame_name)
-  {
-    return tf::resolve(tf_prefix_, frame_name);
-  };
-
 private:
 
   /// Initialize this transform listener, subscribing, advertising services, etc.
@@ -90,7 +83,8 @@ private:
   boost::thread* dedicated_listener_thread_;
   ros::NodeHandle node_;
   ros::Subscriber message_subscriber_tf_;
-  tf2::Buffer buffer_;
+  tf2::Buffer& buffer_;
+  bool using_dedicated_thread_;
  
   /// last time
   ros::Time last_update_ros_time_;

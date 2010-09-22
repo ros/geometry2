@@ -29,17 +29,14 @@
 
 /** \author Tully Foote */
 
-#include "tf/transform_listener.h"
-
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/io.hpp>
+#include "tf2_cpp/transform_listener.h"
 
 
 using namespace tf2;
 
 
 TransformListener::TransformListener(tf2::Buffer& buffer, bool spin_thread):
-  buffer_(buffer), dedicated_listener_thread_(NULL)
+  dedicated_listener_thread_(NULL), buffer_(buffer), using_dedicated_thread_(false)
 {
   if (spin_thread)
     initWithThread();
@@ -65,7 +62,6 @@ void TransformListener::init()
   
   ros::NodeHandle local_nh("~");
   
-  tf_prefix_ = getPrefixParam(local_nh);
   last_update_ros_time_ = ros::Time::now();
 }
 
@@ -79,7 +75,6 @@ void TransformListener::initWithThread()
   dedicated_listener_thread_ = new boost::thread(boost::bind(&TransformListener::dedicatedListenerThread, this));
 
   ros::NodeHandle local_nh("~");
-  tf_prefix_ = getPrefixParam(local_nh);
   last_update_ros_time_ = ros::Time::now();
 }
 
