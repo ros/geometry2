@@ -106,19 +106,22 @@ namespace tf2
   geometry_msgs::TransformStamped BufferClient::processResult(const tf2_msgs::LookupTransformResult& result) const
   {
     //if there's no error, then we'll just return the transform
-    if(result.error.error > 0){
+    if(result.error.error != result.error.NO_ERROR){
       //otherwise, we'll have to throw the appropriate exception
-      if(result.error.error == 1)
+      if(result.error.error == result.error.LOOKUP_ERROR)
         throw LookupException(result.error.error_string);
 
-      if(result.error.error == 2)
+      if(result.error.error == result.error.CONNECTIVITY_ERROR)
         throw ConnectivityException(result.error.error_string);
 
-      if(result.error.error == 3)
+      if(result.error.error == result.error.EXTRAPOLATION_ERROR)
         throw ExtrapolationException(result.error.error_string);
 
-      if(result.error.error == 4)
+      if(result.error.error == result.error.INVALID_ARGUMENT_ERROR)
         throw InvalidArgumentException(result.error.error_string);
+
+      if(result.error.error == result.error.TIMEOUT_ERROR)
+        throw TimeoutException(result.error.error_string);
 
       throw TransformException(result.error.error_string);
     }
