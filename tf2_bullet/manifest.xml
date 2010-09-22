@@ -1,0 +1,20 @@
+<package>
+  <description brief="tf2_bullet">
+
+     tf2_bullet
+
+  </description>
+  <author>Wim Meeussen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tf2_bullet</url>
+  <depend package="tf2_cpp"/>
+  <depend package="bullet"/>
+
+ <export>
+    <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp"/>
+  </export>
+
+</package>
+
+

@@ -29,55 +29,32 @@
 
 /** \author Wim Meeussen */
 
+#ifndef TF2_BULLET_H
+#define TF2_BULLET_H
 
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <tf2_cpp/transform_listener.h>
-#include <ros/ros.h>
+#include <tf2_cpp/buffer.h>
+#include <LinearMath/btTransform.h>
 
 
-int main(int argc, char** argv)
+namespace tf2
 {
-  ros::init(argc, argv, "bla");
-  ros::NodeHandle n;
-  tf2::Buffer tf_buffer;
-  tf2::TransformListener listener(tf_buffer);
-  ros::Duration(2.0).sleep();
-
-  // Vector3Stamped
-  geometry_msgs::Vector3Stamped v1, res;
-  v1.vector.x = 1;
-  v1.vector.y = 2;
-  v1.vector.z = 3;
-  v1.header.stamp = ros::Time::now();
-  v1.header.frame_id = "r_forearm_link";
-  
-  std::cout << tf_buffer.transform(v1, "head_pan_link", ros::Time(), "base_link", ros::Duration(3.0)) << std::endl;
-  std::cout << tf_buffer.transform(v1, "torso_lift_link", ros::Duration(3.0)) << std::endl;
+    
+btTransform transformToBullet(const geometry_msgs::TransformStamped& t)
+  {
+    return btTransform(btQuaternion(t.transform.rotation.x, t.transform.rotation.y, 
+				    t.transform.rotation.z, t.transform.rotation.w),
+		       btVector3(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z));
+  }
 
 
-  // PointStamped
-  geometry_msgs::PointStamped v2;
-  v2.point.x = 1;
-  v2.point.y = 2;
-  v2.point.z = 3;
-  v2.header.stamp = ros::Time::now();
-  v2.header.frame_id = "wimpie";
-
-  tf_buffer.transform(v2, "blo", ros::Time::now(), "fixed_frame", ros::Duration(3.0));
-  tf_buffer.transform(v2, "blo", ros::Duration(3.0));
-
-  // PoseStamped
-  geometry_msgs::PoseStamped v3;
-  v3.pose.position.x = 1;
-  v3.pose.position.y = 2;
-  v3.pose.position.z = 3;
-  v3.pose.orientation.x = 1;
-  v3.header.stamp = ros::Time::now();
-  v3.header.frame_id = "wimpie";
-
-  tf_buffer.transform(v3, "blo", ros::Time::now(), "fixed_frame", ros::Duration(3.0));
-  tf_buffer.transform(v3, "blo", ros::Duration(3.0));
+// this method needs to be implemented by client library developers
+template <>
+  void doTransform(const tf2::Stamped<btVector3>& t_in, tf2::Stamped<btVector3>& t_out, const geometry_msgs::TransformStamped& transform)
+  {
+    t_out = tf2::Stamped<btVector3>(transformToBullet(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+  }
 
 
-  return 0;
-}
+} // namespace
+
+#endif // TF2_BULLET_H

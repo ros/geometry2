@@ -31,22 +31,24 @@
 
 
 #include <tf2_kdl/tf2_kdl.h>
+#include <tf2_cpp/transform_listener.h>
 #include <ros/ros.h>
-
+#include <kdl/frames_io.hpp>
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "bla");
-  ros::Time::init();
+  ros::NodeHandle n;
+  tf2::Buffer tf_buffer;
+  tf2::TransformListener listener(tf_buffer);
+  ros::Duration(2.0).sleep();
 
   KDL::Vector v1(1,2,3);
-  tf2::Buffer tf_buffer;
+  std::cout << tf_buffer.transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "head_pan_link"),
+				   "r_forearm_link", ros::Time::now(),
+				   "base_link", ros::Duration(3.0)) << std::endl;
 
-  KDL::Vector v3 = tf_buffer.transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "bla"),
-				       "blo", ros::Time::now(),
-				       "fixed_frame", ros::Duration(3.0));
-
-  KDL::Vector v2 = tf_buffer.transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "bla"), 
-				       "blo", ros::Duration(3.0));
+  std::cout << tf_buffer.transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "head_pan_link"), 
+				   "torso_lift_link", ros::Duration(3.0)) << std::endl;
   return 0;
 }
