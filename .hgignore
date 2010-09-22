@@ -10,3 +10,4 @@ syntax: regexp
 .*/srv_gen/.*
 .*/msg/lisp/.*
 .*/srv/lisp/.*
+.*/bin/.*
