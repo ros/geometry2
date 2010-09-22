@@ -32,7 +32,7 @@
 #ifndef TF2_KDL_H
 #define TF2_KDL_H
 
-#include <tf2_cpp/tf2_cpp_core.h>
+#include <tf2_cpp/buffer.h>
 #include <kdl/frames.hpp>
 
 

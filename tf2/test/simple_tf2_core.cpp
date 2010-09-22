@@ -28,7 +28,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <tf2/tf2_core.h>
+#include <tf2/buffer_core.h>
 #include <sys/time.h>
 #include <ros/ros.h>
 #include "LinearMath/btVector3.h"
@@ -57,7 +57,7 @@ using namespace tf;
 
 TEST(tf2, setTransform)
 {
-  tf2::TF2Core tfc;
+  tf2::BufferCore tfc;
   geometry_msgs::TransformStamped st;
   EXPECT_FALSE(tfc.setTransform(st, "foo"));
   

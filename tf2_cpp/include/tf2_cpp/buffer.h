@@ -29,24 +29,20 @@
 
 /** \author Wim Meeussen */
 
-#ifndef TF2_CPP_TFCORE_H
-#define TF2_CPP_TFCORE_H
+#ifndef TF2_BUFFER_H
+#define TF2_BUFFER_H
 
-#include <tf2_cpp/tf2_cpp.h>
-#include <tf2/tf2_core.h>
+#include <tf2_cpp/buffer_interface.h>
+#include <tf2/buffer_core.h>
 
 
 namespace tf2
 {
 
-  // extend the BufferCore class and the BufferInterface class                                                                                                                      
-  class Buffer: public BufferCore, public BufferInterface
+  // extend the BufferInterface class                                                                                                                      
+  class Buffer: public BufferInterface
   {
   public:
-    Buffer()
-      : buffer_core_(BufferCore())
-      {}
-
     virtual geometry_msgs::TransformStamped 
       lookupTransform(const std::string& source_frame, const std::string& target_frame,
 		      const ros::Time& time, const ros::Duration timeout = ros::Duration(0.0)) const
@@ -58,7 +54,7 @@ namespace tf2
 	  if (ros::Time::now() >= start_time + timeout){
 	    std::stringstream s;
 	    s << "Tried for " << timeout.toSec() << " seconds  to transform between " 
-	      << getFrameId(t_in) << " and " << target_frame << " at time " << getTimestamp(t_in).toSec();
+	      << source_frame << " and " << target_frame << " at time " << time.toSec();
 	    throw(TimeoutException(s.str().c_str()));
 	  }
 	  ros::Duration(0.01).sleep();

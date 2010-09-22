@@ -32,7 +32,7 @@
 #ifndef TF2_CPP_H
 #define TF2_CPP_H
 
-#include <tf2/tf2_core.h>
+#include <tf2/buffer_core.h>
 #include <tf2/transform_datatypes.h>
 #include <tf2/exceptions.h>
 #include <geometry_msgs/TransformStamped.h>

@@ -40,7 +40,7 @@ int main(int argc, char** argv)
   ros::Time::init();
 
   KDL::Vector v1(1,2,3);
-  tf2::TF2Cpp* tf_cpp = new tf2::TF2CppCore();
-  KDL::Vector v2 = tf_cpp->transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "bla"), "blo", ros::Duration(3.0));
+  tf2::Buffer tf_buffer;
+  KDL::Vector v2 = tf_buffer.transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "bla"), "blo", ros::Duration(3.0));
   return 0;
 }
