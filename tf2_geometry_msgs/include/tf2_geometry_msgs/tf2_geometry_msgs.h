@@ -49,30 +49,23 @@ KDL::Frame transformToKDL(const geometry_msgs::TransformStamped& t)
   }
 
 
+/********************/
+/** Vector3Stamped **/
+/********************/
 
 // method to extract timestamp from object
 template <>
-  const ros::Time& getTimestamp(const geometry_msgs::Vector3Stamped& t)
-  {
-    return t.header.stamp;
-  }
+  const ros::Time& getTimestamp(const geometry_msgs::Vector3Stamped& t) {return t.header.stamp;}
   
-
 // method to extract frame id from object
 template <>
-  const std::string& getFrameId(const geometry_msgs::Vector3Stamped& t)
-  {
-    return t.header.frame_id;
-  }
-   
-
-
+  const std::string& getFrameId(const geometry_msgs::Vector3Stamped& t) {return t.header.frame_id;}
 
 // this method needs to be implemented by client library developers
 template <>
   void doTransform(const geometry_msgs::Vector3Stamped& t_in, geometry_msgs::Vector3Stamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform) * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z), 
+    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform).M * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z), 
 								transform.header.stamp, transform.header.frame_id);
     t_out.vector.x = v_out[0];
     t_out.vector.y = v_out[1];
@@ -81,6 +74,32 @@ template <>
     t_out.header.frame_id = v_out.frame_id_;
   }
 
+
+
+/******************/
+/** PointStamped **/
+/******************/
+
+// method to extract timestamp from object
+template <>
+  const ros::Time& getTimestamp(const geometry_msgs::PointStamped& t)  {return t.header.stamp;}
+
+// method to extract frame id from object
+template <>
+  const std::string& getFrameId(const geometry_msgs::PointStamped& t)  {return t.header.frame_id;}
+
+// this method needs to be implemented by client library developers
+template <>
+  void doTransform(const geometry_msgs::PointStamped& t_in, geometry_msgs::PointStamped& t_out, const geometry_msgs::TransformStamped& transform)
+  {
+    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform) * KDL::Vector(t_in.point.x, t_in.point.y, t_in.point.z), 
+								transform.header.stamp, transform.header.frame_id);
+    t_out.point.x = v_out[0];
+    t_out.point.y = v_out[1];
+    t_out.point.z = v_out[2];
+    t_out.header.stamp = v_out.stamp_;
+    t_out.header.frame_id = v_out.frame_id_;
+  }
 
 
 } // namespace
