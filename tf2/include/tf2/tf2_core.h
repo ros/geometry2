@@ -29,8 +29,8 @@
 
 /** \author Tully Foote */
 
-#ifndef TF2_TF_CORE_H
-#define TF2_TF_CORE_H
+#ifndef TF2_CORE_H
+#define TF2_CORE_H
 
 #include <iostream>
 #include <iomanip>
@@ -121,7 +121,7 @@ public:
    */
   geometry_msgs::TransformStamped 
     lookupTransform(const std::string& target_frame, const std::string& source_frame,
-		    const ros::Time& time, ros::Duration timeout = ros::Duration(0.0)) const;
+		    const ros::Time& time) const;
   /** \brief Get the transform between two frames by frame ID assuming fixed frame.
    * \param target_frame The frame to which data should be transformed
    * \param target_time The time to which the data should be transformed. (0 will get the latest)
@@ -136,7 +136,7 @@ public:
   geometry_msgs::TransformStamped
     lookupTransform(const std::string& target_frame, const ros::Time& target_time,
 		    const std::string& source_frame, const ros::Time& source_time,
-		    const std::string& fixed_frame, ros::Duration timeout = ros::Duration(0.0)) const;
+		    const std::string& fixed_frame) const;
   
   /** \brief Lookup the twist of the tracking_frame with respect to the observation frame in the reference_frame using the reference point
    * \param tracking_frame The frame to track
@@ -161,8 +161,7 @@ public:
   geometry_msgs::TwistStamped 
     lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, const std::string& reference_frame,
 		const tf::Point & reference_point, const std::string& reference_point_frame, 
-		const ros::Time& time, const ros::Duration& averaging_interval, 
-		ros::Duration timeout = ros::Duration(0.0)) const;
+		const ros::Time& time, const ros::Duration& averaging_interval) const;
 
   /** \brief lookup the twist of the tracking frame with respect to the observational frame 
    * 
@@ -176,20 +175,8 @@ public:
 
   geometry_msgs::TwistStamped 
     lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, 
-		const ros::Time& time, const ros::Duration& averaging_interval,
-		ros::Duration timeout = ros::Duration(0.0)) const;
+		const ros::Time& time, const ros::Duration& averaging_interval) const;
 
-  /** \brief Block until a transform is possible or it times out
-   * \param target_frame The frame into which to transform
-   * \param source_frame The frame from which to transform
-   * \param time The time at which to transform
-   * \param timeout How long to block before failing
-   * \param polling_sleep_duration How often to retest if failed
-   * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
-   */
-  bool waitForTransform(const std::string& target_frame, const std::string& source_frame,
-                        const ros::Time& time,  
-                        std::string* error_msg = NULL) const;
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
    * \param source_frame The frame from which to transform
@@ -199,8 +186,7 @@ public:
    * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
    */
   bool canTransform(const std::string& target_frame, const std::string& source_frame,
-                    const ros::Time& time, const ros::Duration& timeout,
-                    std::string* error_msg = NULL, const ros::Duration& polling_sleep_duration = ros::Duration(0.01)) const;
+                    const ros::Time& time, std::string* error_msg = NULL) const;
   
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -214,11 +200,10 @@ public:
    */
   bool canTransform(const std::string& target_frame, const ros::Time& target_time,
                     const std::string& source_frame, const ros::Time& source_time,
-                    const std::string& fixed_frame, const ros::Duration& timeout,
-                    std::string* error_msg = NULL, ros::Duration timeout = ros::Duration(0.0)) const;
+                    const std::string& fixed_frame, std::string* error_msg = NULL) const;
   
   
 }
 
 }
-#endif //TF2_TF_CORE_H
+#endif //TF2_CORE_H
