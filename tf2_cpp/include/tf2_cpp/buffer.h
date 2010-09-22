@@ -55,6 +55,18 @@ namespace tf2
 		    const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0)) const;
 
 
+    // can transform with timeout, simple api
+    virtual bool
+      canTransform(const std::string& target_frame, const std::string& source_frame, 
+		   const ros::Time& target_time, const ros::Duration timeout = ros::Duration(0.0)) const;
+    
+    // can transform with timeout, advanced api
+    virtual bool
+      canTransform(const std::string& target_frame, const ros::Time& target_time,
+		   const std::string& source_frame, const ros::Time& source_time,
+		   const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0)) const;
+
+
   private:
     BufferCore buffer_core_;
 

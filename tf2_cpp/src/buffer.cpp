@@ -39,20 +39,8 @@ geometry_msgs::TransformStamped
 Buffer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
 			const ros::Time& time, const ros::Duration timeout) const
 {
-  // poll for transform if timeout is set
-  if (timeout != ros::Duration(0.0)){
-    ros::Time start_time = ros::Time::now();
-    while (!buffer_core_.canTransform(target_frame, source_frame, time)){
-      if (ros::Time::now() >= start_time + timeout){
-	std::stringstream s;
-	s << "Tried for " << timeout.toSec() << " seconds  to transform between " 
-	  << source_frame << " and " << target_frame << " at time " << time.toSec();
-	throw(TimeoutException(s.str().c_str()));
-      }
-      ros::Duration(0.01).sleep();
-    }
-  }
-      // look up the transform
+  if (timeout != ros::Duration(0.0))
+    canTransform(target_frame, source_frame, time, timeout);
   return buffer_core_.lookupTransform(target_frame, source_frame, time);
 }
 
@@ -62,24 +50,43 @@ Buffer::lookupTransform(const std::string& target_frame, const ros::Time& target
 			const std::string& source_frame, const ros::Time& source_time,
 			const std::string& fixed_frame, const ros::Duration timeout) const
 {
+  if (timeout != ros::Duration(0.0))
+    canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout);
+  return buffer_core_.lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame);
+}
+
+
+bool
+Buffer::canTransform(const std::string& target_frame, const std::string& source_frame, 
+		     const ros::Time& time, const ros::Duration timeout) const
+{
   // poll for transform if timeout is set
   if (timeout != ros::Duration(0.0)){
     ros::Time start_time = ros::Time::now();
-    while (!buffer_core_.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame)){
-      if (ros::Time::now() >= start_time + timeout){
-	std::stringstream s;
-	s << "Tried for " << timeout.toSec() << " seconds  to transform between " 
-	  << source_frame << " and " << fixed_frame << " at time " << source_time.toSec()
-	  << " and between " << target_frame << " and " << fixed_frame << " at time " 
-	  << target_time.toSec();
-	throw(TimeoutException(s.str().c_str()));
-      }
+    while (ros::Time::now() < start_time + timeout && 
+	   !buffer_core_.canTransform(target_frame, source_frame, time))
       ros::Duration(0.01).sleep();
-    }
   }
-  // look up the transform
-  return buffer_core_.lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame);
+  return buffer_core_.canTransform(target_frame, source_frame, time);
 }
+
+    
+bool
+Buffer::canTransform(const std::string& target_frame, const ros::Time& target_time,
+		     const std::string& source_frame, const ros::Time& source_time,
+		     const std::string& fixed_frame, const ros::Duration timeout) const
+{
+  // poll for transform if timeout is set
+  if (timeout != ros::Duration(0.0)){
+    ros::Time start_time = ros::Time::now();
+    while (ros::Time::now() < start_time + timeout && 
+	   !buffer_core_.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame))
+      ros::Duration(0.01).sleep();
+  }
+  return buffer_core_.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame);
+}
+
+
 
 
 }
