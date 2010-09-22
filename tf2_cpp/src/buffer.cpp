@@ -40,7 +40,7 @@ Buffer::lookupTransform(const std::string& target_frame, const std::string& sour
 			const ros::Time& time, const ros::Duration timeout) const
 {
   canTransform(target_frame, source_frame, time, timeout);
-  return BufferCore::lookupTransform(target_frame, source_frame, time);
+  return lookupTransform(target_frame, source_frame, time);
 }
 
 
@@ -50,7 +50,7 @@ Buffer::lookupTransform(const std::string& target_frame, const ros::Time& target
 			const std::string& fixed_frame, const ros::Duration timeout) const
 {
   canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout);
-  return BufferCore::lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame);
+  return lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame);
 }
 
 
@@ -61,9 +61,9 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
   // poll for transform if timeout is set
   ros::Time start_time = ros::Time::now();
   while (ros::Time::now() < start_time + timeout && 
-	 !BufferCore::canTransform(target_frame, source_frame, time))
+	 !canTransform(target_frame, source_frame, time))
     ros::Duration(0.01).sleep();
-  return BufferCore::canTransform(target_frame, source_frame, time, errstr);
+  return canTransform(target_frame, source_frame, time, errstr);
 }
 
     
@@ -75,9 +75,9 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
   // poll for transform if timeout is set
   ros::Time start_time = ros::Time::now();
   while (ros::Time::now() < start_time + timeout && 
-	 !BufferCore::canTransform(target_frame, target_time, source_frame, source_time, fixed_frame))
+	 !canTransform(target_frame, target_time, source_frame, source_time, fixed_frame))
     ros::Duration(0.01).sleep();
-  return BufferCore::canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
+  return canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
 }
 
 

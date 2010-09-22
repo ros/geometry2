@@ -43,6 +43,9 @@ namespace tf2
   class Buffer: public BufferInterface, public BufferCore
   {
   public:
+    using BufferCore::lookupTransform;
+    using BufferCore::canTransform;
+
     // lookup with timeout, simple api
     virtual geometry_msgs::TransformStamped 
       lookupTransform(const std::string& target_frame, const std::string& source_frame,
