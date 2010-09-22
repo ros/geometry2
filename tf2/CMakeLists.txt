@@ -13,7 +13,7 @@ rosbuild_init()
 rosbuild_add_boost_directories()
 
 #set the default path for built executables to the "bin" directory
-#set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
@@ -33,11 +33,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 rosbuild_add_library(tf2 src/cache.cpp src/buffer_core.cpp)
 rosbuild_link_boost(tf2 thread signals)
 
-rosbuild_add_gtest(test/cache_unittest test/cache_unittest.cpp)
-target_link_libraries(test/cache_unittest tf2)
+rosbuild_add_gtest(test_cache_unittest test/cache_unittest.cpp)
+target_link_libraries(test_cache_unittest tf2)
 
 #rosbuild_add_gtest(test/tf2_core test/tf2_core_unittest.cpp)
 #target_link_libraries(test/tf2_core tf2)
 
-rosbuild_add_gtest(test/simple test/simple_tf2_core.cpp)
-target_link_libraries(test/simple tf2)
+rosbuild_add_gtest(test_simple test/simple_tf2_core.cpp)
+target_link_libraries(test_simple tf2)
