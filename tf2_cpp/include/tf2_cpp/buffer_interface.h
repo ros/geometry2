@@ -75,13 +75,14 @@ class BufferInterface
 public:
 
   // lookup transform with timeout, simple api
-  virtual void lookupTransform(const std::string& source_frame, const std::string& target_frame, 
-			       const ros::Time& target_time, const ros::Duration timeout = ros::Duration(0.0)) = 0;
+  virtual geometry_msgs::TransformStamped
+    lookupTransform(const std::string& source_frame, const std::string& target_frame, 
+		    const ros::Time& target_time, const ros::Duration timeout = ros::Duration(0.0)) const = 0;
 
 
   // Transform, simple api, with pre-allocation
   template <class T>
-    T& transform(const T& t_in, T& t_out, const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0))
+    T& transform(const T& t_in, T& t_out, const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     // do the transform
     doTransform(t_in, t_out, lookupTransform(target_frame, getFrameId(t_in), getTimestamp(t_in), timeout));
@@ -91,7 +92,7 @@ public:
 
   // transform, simple api, no pre-allocation
   template <class T>
-    T transform(const T& t_in, const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0))
+    T transform(const T& t_in, const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     T t_out;
     return transform(t_in, t_out, target_frame, timeout);
