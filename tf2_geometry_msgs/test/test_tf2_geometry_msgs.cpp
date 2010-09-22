@@ -38,7 +38,9 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "bla");
   ros::Time::init();
+  tf2::Buffer tf_buffer;
 
+  // Vector3Stamped
   geometry_msgs::Vector3Stamped v1;
   v1.vector.x = 1;
   v1.vector.y = 2;
@@ -46,12 +48,22 @@ int main(int argc, char** argv)
   v1.header.stamp = ros::Time::now();
   v1.header.frame_id = "wimpie";
 
-  tf2::Buffer tf_buffer;
-  geometry_msgs::Vector3Stamped v3 = tf_buffer.transform(v1,
-							 "blo", ros::Time::now(),
-							 "fixed_frame", ros::Duration(3.0));
+  tf_buffer.transform(v1, "blo", ros::Time::now(), "fixed_frame", ros::Duration(3.0));
+  tf_buffer.transform(v1, "blo", ros::Duration(3.0));
 
-  geometry_msgs::Vector3Stamped v2 = tf_buffer.transform(v1,
-							 "blo", ros::Duration(3.0));
+
+  // PointStamped
+  geometry_msgs::PointStamped v2;
+  v2.point.x = 1;
+  v2.point.y = 2;
+  v2.point.z = 3;
+  v2.header.stamp = ros::Time::now();
+  v2.header.frame_id = "wimpie";
+
+  tf_buffer.transform(v2, "blo", ros::Time::now(), "fixed_frame", ros::Duration(3.0));
+  tf_buffer.transform(v2, "blo", ros::Duration(3.0));
+
+
+
   return 0;
 }
