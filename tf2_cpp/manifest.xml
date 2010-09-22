@@ -1,15 +1,15 @@
 <package>
-  <description brief="tf_cpp">
+  <description brief="tf2_cpp">
 
-     tf_cpp
+     tf2_cpp
 
   </description>
   <author>Wim Meeussen</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/tf_cpp</url>
+  <url>http://ros.org/wiki/tf2_cpp</url>
+  <depend package="tf2"/>
   <depend package="roscpp"/>
-  <depend package="tf_core"/>
 
 </package>
 
