@@ -29,8 +29,8 @@
 
 /** \author Tully Foote */
 
-#ifndef TF_TRANSFORMLISTENER_H
-#define TF_TRANSFORMLISTENER_H
+#ifndef TF2_TRANSFORMLISTENER_H
+#define TF2_TRANSFORMLISTENER_H
 
 #include "sensor_msgs/PointCloud.h"
 #include "std_msgs/Empty.h"
@@ -39,10 +39,11 @@
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
 
-#include "tf/FrameGraph.h" //frame graph service
+#include "tf2/buffer.h"
+
 #include "boost/thread.hpp"
 
-namespace tf{
+namespace tf2{
 
 /** \brief Get the tf_prefix from the parameter server
  * \param nh The node handle to use to lookup the parameter.
@@ -58,35 +59,17 @@ inline std::string getPrefixParam(ros::NodeHandle & nh) {
   return return_val;
 }
 
-/** \brief resolve names 
- * \deprecated Use TransformListener::remap  instead */
-std::string remap(const std::string& frame_id) __attribute__((deprecated));
 
-/** \brief This class inherits from Transformer and automatically subscribes to ROS transform messages */
-class TransformListener : public Transformer { //subscribes to message and automatically stores incoming data
+class TransformListener 
+{
 
 public:
   /**@brief Constructor for transform listener
    * \param max_cache_time How long to store transform information */
-  TransformListener(tf2:, bool spin_thread = true);
+  TransformListener(tf2::Buffer& buffer, bool spin_thread = true);
 
-  /**
-   * \brief Alternate constructor for transform listener
-   * \param nh The NodeHandle to use for any ROS interaction
-   * \param max_cache_time How long to store transform information
-   */
-  TransformListener(const ros::NodeHandle& nh,
-                    ros::Duration max_cache_time = ros::Duration(DEFAULT_CACHE_TIME), bool spin_thread = true);
-  
   ~TransformListener();
 
-    ///\todo move to high precision laser projector class  void projectAndTransformLaserScan(const sensor_msgs::LaserScan& scan_in, sensor_msgs::PointCloud& pcout);
-
-  bool getFrames(tf::FrameGraph::Request& req, tf::FrameGraph::Response& res) 
-  {
-    res.dot_graph = allFramesAsDot();
-    return true;
-  }
 
   /* \brief Resolve frame_name into a frame_id using tf_prefix parameter */
   std::string resolve(const std::string& frame_name)
@@ -95,8 +78,6 @@ public:
   };
 
 private:
-  /// last time
-  ros::Time last_update_ros_time_;
 
   /// Initialize this transform listener, subscribing, advertising services, etc.
   void init();
@@ -105,15 +86,14 @@ private:
   /// Callback function for ros message subscriptoin
   void subscription_callback(const tf::tfMessageConstPtr& msg);
 
-  /// clear the cached data
-  std_msgs::Empty empty_;
-  ros::ServiceServer tf_frames_srv_;
-
-
   ros::CallbackQueue tf_message_callback_queue_;
   boost::thread* dedicated_listener_thread_;
   ros::NodeHandle node_;
-  ros::Subscriber message_subscriber_tf_, reset_time_subscriber_;
+  ros::Subscriber message_subscriber_tf_;
+  tf2::Buffer buffer_;
+ 
+  /// last time
+  ros::Time last_update_ros_time_;
 
   void dedicatedListenerThread()
   {
