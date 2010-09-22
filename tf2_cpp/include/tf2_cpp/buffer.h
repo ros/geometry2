@@ -44,13 +44,13 @@ namespace tf2
   {
   public:
     virtual geometry_msgs::TransformStamped 
-      lookupTransform(const std::string& source_frame, const std::string& target_frame,
+      lookupTransform(const std::string& target_frame, const std::string& source_frame,
 		      const ros::Time& time, const ros::Duration timeout = ros::Duration(0.0)) const
     {
       // poll for transform if timeout is set
       if (timeout != ros::Duration(0.0)){
 	ros::Time start_time = ros::Time::now();
-	while (!buffer_core_.canTransform(source_frame, target_frame, time)){
+	while (!buffer_core_.canTransform(target_frame, source_frame, time)){
 	  if (ros::Time::now() >= start_time + timeout){
 	    std::stringstream s;
 	    s << "Tried for " << timeout.toSec() << " seconds  to transform between " 
@@ -61,7 +61,7 @@ namespace tf2
 	}
       }
       // look up the transform
-      return buffer_core_.lookupTransform(source_frame, target_frame, time);
+      return buffer_core_.lookupTransform(target_frame, source_frame, time);
     }
 
   private:

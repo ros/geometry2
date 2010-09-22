@@ -76,7 +76,7 @@ public:
 
   // lookup transform with timeout, simple api
   virtual geometry_msgs::TransformStamped
-    lookupTransform(const std::string& source_frame, const std::string& target_frame, 
+    lookupTransform(const std::string& target_frame, const std::string& source_frame, 
 		    const ros::Time& target_time, const ros::Duration timeout = ros::Duration(0.0)) const = 0;
 
 
