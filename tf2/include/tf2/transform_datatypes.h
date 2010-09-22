@@ -73,6 +73,12 @@ class Stamped : public T{
   Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id) :
     T (input), stamp_ ( timestamp ), frame_id_ (frame_id){ } ;
   
+  /** Copy Constructor */
+  Stamped(const Stamped<T>& s):
+    T (s),
+    stamp_(s.stamp_),
+    frame_id_(s.frame_id_) {}
+  
   /** Set the data element */
   void setData(const T& input){*static_cast<T*>(this) = input;};
 };
