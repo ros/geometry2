@@ -29,12 +29,14 @@
 
 /** \author Wim Meeussen */
 
-#ifndef TF2_KDL_H
-#define TF2_KDL_H
+#ifndef TF2_GEOMETRY_MSGS_H
+#define TF2_GEOMETRY_MSGS_H
 
 #include <tf2_cpp/buffer.h>
+#include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <kdl/frames.hpp>
-
 
 namespace tf2
 {
@@ -47,36 +49,40 @@ KDL::Frame transformToKDL(const geometry_msgs::TransformStamped& t)
   }
 
 
-// this method needs to be implemented by client library developers
+
+// method to extract timestamp from object
 template <>
-  void doTransform(const tf2::Stamped<KDL::Vector>& t_in, tf2::Stamped<KDL::Vector>& t_out, const geometry_msgs::TransformStamped& transform)
+  const ros::Time& getTimestamp(const geometry_msgs::Vector3Stamped& t)
   {
-    t_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+    return t.header.stamp;
   }
+  
+
+// method to extract frame id from object
+template <>
+  const std::string& getFrameId(const geometry_msgs::Vector3Stamped& t)
+  {
+    return t.header.frame_id;
+  }
+   
+
+
 
 // this method needs to be implemented by client library developers
 template <>
-  void doTransform(const tf2::Stamped<KDL::Twist>& t_in, tf2::Stamped<KDL::Twist>& t_out, const geometry_msgs::TransformStamped& transform)
+  void doTransform(const geometry_msgs::Vector3Stamped& t_in, geometry_msgs::Vector3Stamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    t_out = tf2::Stamped<KDL::Twist>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
-  }
-
-// this method needs to be implemented by client library developers
-template <>
-  void doTransform(const tf2::Stamped<KDL::Wrench>& t_in, tf2::Stamped<KDL::Wrench>& t_out, const geometry_msgs::TransformStamped& transform)
-  {
-    t_out = tf2::Stamped<KDL::Wrench>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
-  }
-
-// this method needs to be implemented by client library developers
-template <>
-  void doTransform(const tf2::Stamped<KDL::Frame>& t_in, tf2::Stamped<KDL::Frame>& t_out, const geometry_msgs::TransformStamped& transform)
-  {
-    t_out = tf2::Stamped<KDL::Frame>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform) * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z), 
+								transform.header.stamp, transform.header.frame_id);
+    t_out.vector.x = v_out[0];
+    t_out.vector.y = v_out[1];
+    t_out.vector.z = v_out[2];
+    t_out.header.stamp = v_out.stamp_;
+    t_out.header.frame_id = v_out.frame_id_;
   }
 
 
 
 } // namespace
 
-#endif // TF2_KDL_H
+#endif // TF2_GEOMETRY_MSGS_H
