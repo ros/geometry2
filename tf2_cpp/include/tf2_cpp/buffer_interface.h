@@ -79,10 +79,21 @@ public:
     lookupTransform(const std::string& target_frame, const std::string& source_frame, 
 		    const ros::Time& target_time, const ros::Duration timeout = ros::Duration(0.0)) const = 0;
 
+  // lookup transform with timeout, advanced api
+  virtual geometry_msgs::TransformStamped 
+    lookupTransform(const std::string& target_frame, const ros::Time& target_time,
+		    const std::string& source_frame, const ros::Time& source_time,
+		    const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0)) const = 0;
+
+
+
+
+
 
   // Transform, simple api, with pre-allocation
   template <class T>
-    T& transform(const T& t_in, T& t_out, const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
+    T& transform(const T& t_in, T& t_out, 
+		 const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     // do the transform
     doTransform(t_in, t_out, lookupTransform(target_frame, getFrameId(t_in), getTimestamp(t_in), timeout));
@@ -92,10 +103,35 @@ public:
 
   // transform, simple api, no pre-allocation
   template <class T>
-    T transform(const T& t_in, const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
+    T transform(const T& t_in, 
+		const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     T t_out;
     return transform(t_in, t_out, target_frame, timeout);
+  }
+
+  // Transform, advanced api, with pre-allocation
+  template <class T>
+    T& transform(const T& t_in, T& t_out, 
+		 const std::string& target_frame, const ros::Time& target_time,
+		 const std::string& fixed_frame, ros::Duration timeout=ros::Duration(0.0)) const
+  {
+    // do the transform
+    doTransform(t_in, t_out, lookupTransform(target_frame, target_time, 
+					     getFrameId(t_in), getTimestamp(t_in), 
+					     fixed_frame, timeout));
+    return t_out;
+  }
+
+
+  // transform, simple api, no pre-allocation
+  template <class T>
+    T& transform(const T& t_in, 
+		 const std::string& target_frame, const ros::Time& target_time,
+		 const std::string& fixed_frame, ros::Duration timeout=ros::Duration(0.0)) const
+  {
+    T t_out;
+    return transform(t_in, t_out, target_frame, target_time, fixed_frame, timeout);
   }
 
 

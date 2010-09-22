@@ -41,6 +41,10 @@ int main(int argc, char** argv)
 
   KDL::Vector v1(1,2,3);
   tf2::Buffer tf_buffer;
-  KDL::Vector v2 = tf_buffer.transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "bla"), "blo", ros::Duration(3.0));
+  KDL::Vector v2 = tf_buffer.transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "bla"), 
+				       "blo", ros::Duration(3.0));
+  KDL::Vector v3 = tf_buffer.transform(tf2::Stamped<KDL::Vector>(v1, ros::Time::now(), "bla"),
+				       "blo", ros::Time::now(),
+				       "fixed_frame", ros::Duration(3.0));
   return 0;
 }
