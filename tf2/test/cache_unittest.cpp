@@ -28,7 +28,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <tf/tf.h>
+#include <tf2/time_cache.h>
 #include <sys/time.h>
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
@@ -42,7 +42,7 @@ void seed_rand()
   srand(temp_time_struct.tv_usec);
 };
 
-using namespace tf;
+using namespace tf2;
 
 
 TEST(TimeCache, Repeatability)
@@ -51,7 +51,7 @@ TEST(TimeCache, Repeatability)
 
   seed_rand();
   
-  tf::TimeCache  cache;
+  tf2::TimeCache  cache;
   std::vector<double> values(runs);
 
   TransformStorage stor;
@@ -88,7 +88,7 @@ TEST(TimeCache, RepeatabilityReverseInsertOrder)
 
   seed_rand();
   
-  tf::TimeCache  cache;
+  tf2::TimeCache  cache;
   std::vector<double> values(runs);
 
   TransformStorage stor;
@@ -123,7 +123,7 @@ TEST(TimeCache, RepeatabilityRandomInsertOrder)
 
   seed_rand();
   
-  tf::TimeCache  cache;
+  tf2::TimeCache  cache;
   double my_vals[] = {13,2,5,4,9,7,3,11,15,14,12,1,6,10,0,8};
   std::vector<double> values (my_vals, my_vals + sizeof(my_vals)/sizeof(double)); 
   unsigned int runs = values.size();
@@ -160,7 +160,7 @@ TEST(TimeCache, ZeroAtFront)
 
   seed_rand();
   
-  tf::TimeCache  cache;
+  tf2::TimeCache  cache;
   std::vector<double> values(runs);
 
   TransformStorage stor;
@@ -221,7 +221,7 @@ TEST(TimeCache, CartesianInterpolation)
   double epsilon = 1e-6;
   seed_rand();
   
-  tf::TimeCache  cache;
+  tf2::TimeCache  cache;
   std::vector<double> xvalues(2);
   std::vector<double> yvalues(2);
   std::vector<double> zvalues(2);
@@ -271,7 +271,7 @@ TEST(TimeCache, ReparentingInterpolationProtection)
   double epsilon = 1e-6;
   uint64_t offset = 555;
 
-  tf::TimeCache cache;
+  tf2::TimeCache cache;
   std::vector<double> xvalues(2);
   std::vector<double> yvalues(2);
   std::vector<double> zvalues(2);
@@ -324,7 +324,7 @@ TEST(TimeCache, CartesianExtrapolation)
   double epsilon = 1e-5;
   seed_rand();
   
-  tf::TimeCache  cache;
+  tf2::TimeCache  cache;
   std::vector<double> xvalues(2);
   std::vector<double> yvalues(2);
   std::vector<double> zvalues(2);
@@ -398,7 +398,7 @@ TEST(TimeCache, AngularInterpolation)
   double epsilon = 1e-6;
   seed_rand();
   
-  tf::TimeCache  cache;
+  tf2::TimeCache  cache;
   std::vector<double> yawvalues(2);
   std::vector<double> pitchvalues(2);
   std::vector<double> rollvalues(2);
