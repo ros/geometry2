@@ -31,40 +31,48 @@
 
 #include "tf2/tf2_core.h"
 
+//legacy
 #include "tf/tf.h"
+#include "tf/transform_datatypes.h"
 
+using namespace tf2;
 
-TFCore::TFCore(ros::Duration cache_time): old_tf_(true, cache_time)
+TF2Core::TF2Core(ros::Duration cache_time): old_tf_(true, cache_time)
 {
 
 }
 
-void TFCore::clear()
+TF2Core::~TF2Core()
+{
+
+}
+
+void TF2Core::clear()
 {
   old_tf_.clear();
 }
 
-bool TFCore::setTransform(geometry_msgs::TransformStamped& transform, const std::string& authority)
+bool TF2Core::setTransform(const geometry_msgs::TransformStamped& transform, const std::string& authority)
 {
   tf::StampedTransform tf_transform;
-  tf::TransformStampedMsgToTF(transform, tf_transform);
-  old_tf_.setTransform(tf_transform, authority);
+  tf::transformStampedMsgToTF(transform, tf_transform);
+  return old_tf_.setTransform(tf_transform, authority);
 };
 
 
-geometry_msgs::TransformStamped TFCore::lookupTransform(const std::string& target_frame, 
+geometry_msgs::TransformStamped TF2Core::lookupTransform(const std::string& target_frame, 
                                                         const std::string& source_frame,
                                                         const ros::Time& time) const
 {
   tf::StampedTransform t;
   old_tf_.lookupTransform(target_frame, source_frame, time, t);
   geometry_msgs::TransformStamped output;
-  tf::TransformStampedTFToMsg(t, output);
+  tf::transformStampedTFToMsg(t, output);
   return output;
 };
 
                                                        
-geometry_msgs::TransformStamped TFCore::lookupTransform(const std::string& target_frame, 
+geometry_msgs::TransformStamped TF2Core::lookupTransform(const std::string& target_frame, 
                                                         const ros::Time& target_time,
                                                         const std::string& source_frame,
                                                         const ros::Time& source_time,
@@ -73,53 +81,49 @@ geometry_msgs::TransformStamped TFCore::lookupTransform(const std::string& targe
   tf::StampedTransform t;
   old_tf_.lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame, t);
   geometry_msgs::TransformStamped output;
-  tf::TransformStampedTFToMsg(t, output);
+  tf::transformStampedTFToMsg(t, output);
   return output;
 };
 
 
 
 
-geometry_msgs::TwistStamped TFCore::lookupTwist(const std::string& tracking_frame, 
-                                                const std::string& observation_frame, 
-                                                const ros::Time& time, 
-                                                const ros::Duration& averaging_interval) const
+geometry_msgs::Twist TF2Core::lookupTwist(const std::string& tracking_frame, 
+                                          const std::string& observation_frame, 
+                                          const ros::Time& time, 
+                                          const ros::Duration& averaging_interval) const
 {
-  tf::StampedTwise t;
+  geometry_msgs::Twist t;
   old_tf_.lookupTwist(tracking_frame, observation_frame, 
                       time, averaging_interval, t);
-  geometry_msgs::TransformStamped output;
-  tf::TwistStampedTFToMsg(t, output);
-  return output;
+  return t;
 };
 
-geometry_msgs::TwistStamped TFCore::lookupTwist(const std::string& tracking_frame, 
-                                                const std::string& observation_frame, 
-                                                const std::string& reference_frame,
-                                                const tf::Point & reference_point, 
-                                                const std::string& reference_point_frame, 
-                                                const ros::Time& time, 
-                                                const ros::Duration& averaging_interval) const
+geometry_msgs::Twist TF2Core::lookupTwist(const std::string& tracking_frame, 
+                                          const std::string& observation_frame, 
+                                          const std::string& reference_frame,
+                                          const tf::Point & reference_point, 
+                                          const std::string& reference_point_frame, 
+                                          const ros::Time& time, 
+                                          const ros::Duration& averaging_interval) const
 {
-  tf::StampedTwise t;
+  geometry_msgs::Twist t;
   old_tf_.lookupTwist(tracking_frame, observation_frame, reference_frame, reference_point, reference_point_frame,
                       time, averaging_interval, t);
-  geometry_msgs::TransformStamped output;
-  tf::TwistStampedTFToMsg(t, output);
-  return output;
+  return t;
 };
 
 
 
-bool TFCore::canTransform(const std::string& target_frame, const std::string& source_frame,
-                          const ros::Time& time, std::string* error_msg = NULL) const
+bool TF2Core::canTransform(const std::string& target_frame, const std::string& source_frame,
+                           const ros::Time& time, std::string* error_msg) const
 {
   return old_tf_.canTransform(target_frame, source_frame, time, error_msg);
 }
 
-bool TFCore::canTransform(const std::string& target_frame, const ros::Time& target_time,
+bool TF2Core::canTransform(const std::string& target_frame, const ros::Time& target_time,
                           const std::string& source_frame, const ros::Time& source_time,
-                          const std::string& fixed_frame, std::string* error_msg = NULL) const
+                          const std::string& fixed_frame, std::string* error_msg) const
 {
   return old_tf_.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, error_msg);
 }

@@ -34,12 +34,12 @@
 
 #include <string>
 
-#include "ros/Time.h"
-//#include "geometry_msgs/TwistStamped.h"
-//#include "geometry_msgs/TransformStamped.h"
-class geometry_msgs::TwistStamped;
-class geometry_msgs::TransformStamped;
-class tf::Transformer; // migration temporary
+#include "ros/duration.h"
+#include "ros/time.h"
+#include "geometry_msgs/TwistStamped.h"
+#include "geometry_msgs/TransformStamped.h"
+
+#include "tf/tf.h"
 
 namespace tf2
 {
@@ -62,7 +62,7 @@ namespace tf2
  *
  * All function calls which pass frame ids can potentially throw the exception tf::LookupException
  */
-class TFCore
+class TF2Core
 {
 public:
   /************* Constants ***********************/
@@ -73,8 +73,8 @@ public:
    * \param cache_time How long to keep a history of transforms in nanoseconds
    *
    */
-  TFCore(ros::Duration cache_time_ = ros::Duration(DEFAULT_CACHE_TIME));
-  virtual ~TFCore(void);
+  TF2Core(ros::Duration cache_time_ = ros::Duration(DEFAULT_CACHE_TIME));
+  virtual ~TF2Core(void);
 
   /** \brief Clear all data */
   void clear();
@@ -136,7 +136,7 @@ public:
    * New in geometry 1.1
    */
 
-  geometry_msgs::TwistStamped 
+  geometry_msgs::Twist
     lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, const std::string& reference_frame,
 		const tf::Point & reference_point, const std::string& reference_point_frame, 
 		const ros::Time& time, const ros::Duration& averaging_interval) const;
@@ -151,7 +151,7 @@ public:
    * New in geometry 1.1
    */
 
-  geometry_msgs::TwistStamped 
+  geometry_msgs::Twist
     lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, 
 		const ros::Time& time, const ros::Duration& averaging_interval) const;
 
@@ -191,7 +191,7 @@ private:
 
   //Using tf for now will be replaced fully
   tf::Transformer old_tf_;
-}
-
+};
+  
 }
 #endif //TF2_CORE_H
