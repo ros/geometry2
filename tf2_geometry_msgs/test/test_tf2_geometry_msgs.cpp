@@ -31,25 +31,28 @@
 
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_cpp/transform_listener.h>
 #include <ros/ros.h>
 
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "bla");
-  ros::Time::init();
+  ros::NodeHandle n;
+  ros::Duration(2.0).sleep();
   tf2::Buffer tf_buffer;
+  tf2::TransformListener listener(tf_buffer);
 
   // Vector3Stamped
-  geometry_msgs::Vector3Stamped v1;
+  geometry_msgs::Vector3Stamped v1, res;
   v1.vector.x = 1;
   v1.vector.y = 2;
   v1.vector.z = 3;
   v1.header.stamp = ros::Time::now();
-  v1.header.frame_id = "wimpie";
-
-  tf_buffer.transform(v1, "blo", ros::Time::now(), "fixed_frame", ros::Duration(3.0));
-  tf_buffer.transform(v1, "blo", ros::Duration(3.0));
+  v1.header.frame_id = "r_forearm_link";
+  
+  std::cout << tf_buffer.transform(v1, "head_pan_link", ros::Time(), "base_link", ros::Duration(3.0)) << std::endl;
+  std::cout << tf_buffer.transform(v1, "torso_lift_link", ros::Duration(3.0)) << std::endl;
 
 
   // PointStamped
