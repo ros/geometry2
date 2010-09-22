@@ -31,6 +31,12 @@
 
 #include "tf2/time_cache.h"
 
+#include "tf2/transform_datatypes.h"
+#include "tf2/exceptions.h"
+
+#include "LinearMath/btTransform.h"
+
+
 using namespace tf2;
 
 TimeCache::TimeCache(bool interpolating , ros::Duration  max_storage_time,
