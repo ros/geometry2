@@ -29,52 +29,76 @@
 
 /** \author Wim Meeussen */
 
-#ifndef TF2_KDL_H
-#define TF2_KDL_H
+#ifndef TF2_CPP_H
+#define TF2_CPP_H
 
-#include <tf2_cpp/tf2_cpp_core.h>
-#include <kdl/frames.hpp>
-
+#include <tf2/tf2_core.h>
+#include <tf2/transform_datatypes.h>
+#include <tf2/exceptions.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <sstream>
 
 namespace tf2
 {
     
-KDL::Frame transformToKDL(const geometry_msgs::TransformStamped& t)
-  {
-    return KDL::Frame(KDL::Rotation::Quaternion(t.transform.rotation.x, t.transform.rotation.y, 
-						t.transform.rotation.z, t.transform.rotation.w),
-		      KDL::Vector(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z));
-  }
-
-
 // this method needs to be implemented by client library developers
-template <>
-  void doTransform(const tf2::Stamped<KDL::Vector>& t_in, tf2::Stamped<KDL::Vector>& t_out, const geometry_msgs::TransformStamped& transform)
+template <class T>
+  void doTransform(const T& t_in, T& t_out, const geometry_msgs::TransformStamped& transform);
+
+// method to extract timestamp from object
+template <class T>
+  const ros::Time& getTimestamp(const T& t);
+
+// method to extract frame id from object
+template <class T>
+  const std::string& getFrameId(const T& t);
+
+// method to extract timestamp from stamped object
+template <class P>
+  const ros::Time& getTimestamp(const tf2::Stamped<P>& t)
   {
-    t_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+    return t.stamp_;
   }
 
-// this method needs to be implemented by client library developers
-template <>
-  void doTransform(const tf2::Stamped<KDL::Twist>& t_in, tf2::Stamped<KDL::Twist>& t_out, const geometry_msgs::TransformStamped& transform)
+// method to extract frame id from object
+template <class P>
+  const std::string& getFrameId(const tf2::Stamped<P>& t)
   {
-    t_out = tf2::Stamped<KDL::Twist>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+    return t.frame_id_;
   }
 
-// this method needs to be implemented by client library developers
-template <>
-  void doTransform(const tf2::Stamped<KDL::Wrench>& t_in, tf2::Stamped<KDL::Wrench>& t_out, const geometry_msgs::TransformStamped& transform)
+
+
+// extend the TFCore class and the TFCpp class
+class BufferInterface
+{
+public:
+
+  // lookup transform with timeout, simple api
+  virtual void lookupTransform(const std::string& source_frame, const std::string& target_frame, 
+			       const ros::Time& target_time, const ros::Duration timeout = ros::Duration(0.0)) = 0;
+
+
+  // Transform, simple api, with pre-allocation
+  template <class T>
+    T& transform(const T& t_in, T& t_out, const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0))
   {
-    t_out = tf2::Stamped<KDL::Wrench>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+    // do the transform
+    doTransform(t_in, t_out, lookupTransform(target_frame, getFrameId(t_in), getTimestamp(t_in), timeout));
+    return t_out;
   }
 
-// this method needs to be implemented by client library developers
-template <>
-  void doTransform(const tf2::Stamped<KDL::Frame>& t_in, tf2::Stamped<KDL::Frame>& t_out, const geometry_msgs::TransformStamped& transform)
+
+  // transform, simple api, no pre-allocation
+  template <class T>
+    T transform(const T& t_in, const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0))
   {
-    t_out = tf2::Stamped<KDL::Frame>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+    T t_out;
+    return transform(t_in, t_out, target_frame, timeout);
   }
 
+
+ }; // class
 
 
 } // namespace
