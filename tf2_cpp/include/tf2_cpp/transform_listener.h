@@ -45,21 +45,6 @@
 
 namespace tf2{
 
-/** \brief Get the tf_prefix from the parameter server
- * \param nh The node handle to use to lookup the parameter.
- * \return The tf_prefix value for this NodeHandle 
- */
-inline std::string getPrefixParam(ros::NodeHandle & nh) {
-  std::string param; 
-  if (!nh.searchParam("tf_prefix", param)) 
-    return ""; 
-  
-  std::string return_val;
-  nh.getParam(param, return_val);
-  return return_val;
-}
-
-
 class TransformListener 
 {
 

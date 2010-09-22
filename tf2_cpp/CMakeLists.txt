@@ -29,3 +29,7 @@ rosbuild_add_library(${PROJECT_NAME} src/buffer.cpp src/transform_listener.cpp)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+rosbuild_add_executable(test_listener test/listener_unittest.cpp)
+target_link_libraries(test_listener ${PROJECT_NAME})
+rosbuild_add_gtest_build_flags(test_listener)
+rosbuild_add_rostest(test/transform_listener_unittest.launch)

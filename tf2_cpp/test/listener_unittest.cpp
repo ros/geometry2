@@ -56,6 +56,8 @@ using namespace tf2;
 
 TEST(tf2_cpp_transform, transform_listener)
 {
+  tf2::Buffer buffer;
+  tf2::TransformListener tfl(buffer);
   
 
 }
