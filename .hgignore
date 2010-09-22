@@ -2,3 +2,10 @@ syntax: regexp
 .*/build/.*
 ^bullet/lib
 ^bullet/include
+.*\.so
+.*~
+.*src/.*/msg/_.*
+.*src/.*/srv/_.*
+.*/msg_gen/.*
+.*/msg/lisp/.*
+.*/srv/lisp/.*
