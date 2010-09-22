@@ -102,8 +102,28 @@ namespace tf2
         //make sure to pass the result to the client
         //even failed transforms are considered a success
         //since the request was successfully processed
-        info.handle.setSucceeded(result);
         active_goals_.erase(it);
+        info.handle.setSucceeded(result);
+      }
+      else
+        ++it;
+    }
+  }
+
+  void BufferServer::cancelCB(GoalHandle gh)
+  {
+    boost::mutex::scoped_lock l(mutex_);
+    //we need to find the goal in the list and remove it... also setting it as canceled
+    //if its not in the list, we won't do anything since it will have already been set
+    //as completed
+    for(std::list<GoalInfo>::iterator it = active_goals_.begin(); it != active_goals_.end();)
+    {
+      GoalInfo& info = *it;
+      if(info.handle == gh)
+      {
+        active_goals_.erase(it);
+        info.handle.setCanceled();
+        return;
       }
       else
         ++it;
