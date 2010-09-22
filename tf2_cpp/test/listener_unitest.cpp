@@ -28,10 +28,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <tf2/buffer_core.h>
+#include <tf2_cpp/transform_listener.h>
 #include <sys/time.h>
-#include <ros/ros.h>
-#include "LinearMath/btVector3.h"
+
 
 void seed_rand()
 {
@@ -53,31 +52,19 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 }
 
 
-using namespace tf;
+using namespace tf2;
 
-TEST(tf2, setTransformFail)
+TEST(tf2_cpp_transform, transform_listener)
 {
-  tf2::BufferCore tfc;
-  geometry_msgs::TransformStamped st;
-  EXPECT_FALSE(tfc.setTransform(st, "authority1"));
   
+
 }
 
-TEST(tf2, setTransformValid)
-{
-  tf2::BufferCore tfc;
-  geometry_msgs::TransformStamped st;
-  st.header.frame_id = "foo";
-  st.header.stamp = ros::Time(1.0);
-  st.child_frame_id = "child";
-  st.transform.rotation.w = 1;
-  EXPECT_TRUE(tfc.setTransform(st, "authority1"));
-  
-}
+
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::Time::init(); //needed for ros::TIme::now()
-  ros::init(argc, argv, "tf_unittest");
+  ros::init(argc, argv, "transform_listener_unittest");
   return RUN_ALL_TESTS();
 }
