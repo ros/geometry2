@@ -59,6 +59,17 @@ namespace tf2
             const std::string& source_frame, const ros::Time& source_time,
             const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0)) const;
 
+      // can transform with timeout, simple api
+      virtual bool
+        canTransform(const std::string& target_frame, const std::string& source_frame, 
+            const ros::Time& time, const ros::Duration timeout = ros::Duration(0.0), std::string* errstr = NULL) const;
+
+      // can transform with timeout, advanced api
+      virtual bool
+        canTransform(const std::string& target_frame, const ros::Time& target_time,
+            const std::string& source_frame, const ros::Time& source_time,
+            const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0), std::string* errstr = NULL) const;
+
     private:
       geometry_msgs::TransformStamped processGoal(const tf2_msgs::LookupTransformGoal& goal) const;
       geometry_msgs::TransformStamped processResult(const tf2_msgs::LookupTransformResult& result) const;

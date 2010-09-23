@@ -128,4 +128,37 @@ namespace tf2
 
     return result.transform;
   }
+
+  bool BufferClient::canTransform(const std::string& target_frame, const std::string& source_frame, 
+        const ros::Time& time, const ros::Duration timeout, std::string* errstr) const
+  {
+    try
+    {
+      lookupTransform(target_frame, source_frame, time, timeout);
+      return true;
+    }
+    catch(tf2::TransformException& ex)
+    {
+      if(errstr)
+        *errstr = ex.what();
+      return false;
+    }
+  }
+
+  bool BufferClient::canTransform(const std::string& target_frame, const ros::Time& target_time,
+        const std::string& source_frame, const ros::Time& source_time,
+        const std::string& fixed_frame, const ros::Duration timeout, std::string* errstr) const
+  {
+    try
+    {
+      lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout);
+      return true;
+    }
+    catch(tf2::TransformException& ex)
+    {
+      if(errstr)
+        *errstr = ex.what();
+      return false;
+    }
+  }
 };
