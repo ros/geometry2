@@ -8,8 +8,10 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tf2_py</url>
+
   <depend package="rospy"/>
   <depend package="tf2"/>
+  <depend package="geometry_msgs"/>
 
 </package>
 

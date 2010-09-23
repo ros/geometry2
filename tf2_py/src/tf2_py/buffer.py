@@ -29,9 +29,9 @@
 
 import roslib; roslib.load_manifest('tf2_py')
 import rospy
+import buffer_core
 
-
-class Buffer():
+class Buffer(buffer_core.BufferCore):
     def __init__(self):
         self.registration = TransformRegistration()
         
@@ -40,25 +40,28 @@ class Buffer():
     def transform(self, object_stamped, target_frame, timeout=rospy.Duration(0.0)):
         do_transform = self.registration.get(type(object_stamped))
         if not do_transform:
-            raise TypeException('Type %s if not loaded or supported'%type(object_stamped))
-        return do_transform(object_stamped, lookupTransform(target_frame, object_stamped.header.frame_id,
-                                                            object_stamped.header.stamp, timeout))
+            raise TypeException('Type %s if not loaded or supported'%str(type(object_stamped)))
+        return do_transform(object_stamped, self.lookupTransform(target_frame, object_stamped.header.frame_id,
+                                                                 object_stamped.header.stamp, timeout))
     
     # simple api
     def lookupTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
-        canTransform(target_frame, source_frame, time, timeout)
-        return buffer_core.lookupTransform(target_frame, source_frame, time)
+        self.canTransform(target_frame, source_frame, time, timeout)
+        return self.lookupTransformCore(target_frame, source_frame, time)
 
 
     # simple api
     def canTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         start_time = rospy.Time.now()
         while (rospy.Time.now() < start_time + timeout and 
-               not buffer_core.canTransform(target_frame, source_frame, time)):
+               not self.canTransformCore(target_frame, source_frame, time)):
             rospy.Duration(0.05).sleep()
-        return buffer_core.canTransform(target_frame, source_frame, time)
+        return self.canTransformCore(target_frame, source_frame, time)
     
 
+def Stamped(obj, frame_id, stamp):
+    obj.header = roslib.msg._Header.Header(frame_id=frame_id, stamp=stamp)
+    return obj
 
 class TypeException(Exception):
     def __init__(self, errstr):
@@ -69,11 +72,14 @@ class TypeException(Exception):
 class TransformRegistration():
     __type_map = {}
     
+    def print_me(self):
+        print TransformRegistration.__type_map
+
     def add(self, key, callback):
-        __type_map[key] = callback
+        TransformRegistration.__type_map[key] = callback
 
     def get(self, key):
-        if not key in __type_map:
+        if not key in TransformRegistration.__type_map:
             return None
         else:
-            return __type_map[key]
+            return TransformRegistration.__type_map[key]
