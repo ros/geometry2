@@ -55,7 +55,7 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 
 using namespace tf;
 
-TEST(tf, setTransformNoInsertOnSelfTransform)
+TEST(BufferCoresetTransform, NoInsertOnSelfTransform)
 {
   tf2::BufferCore mBC;
   geometry_msgs::TransformStamped ts;
@@ -65,7 +65,7 @@ TEST(tf, setTransformNoInsertOnSelfTransform)
   EXPECT_FALSE(mBC.setTransform(ts, "authority"));
 }
 
-TEST(tf, setTransformNoInsertWithNan)
+TEST(BufferCoresetTransform, NoInsertWithNan)
 {
   tf2::BufferCore mBC;
   geometry_msgs::TransformStamped ts;
@@ -80,7 +80,7 @@ TEST(tf, setTransformNoInsertWithNan)
 
 }
 
-TEST(tf, setTransformNoInsertWithNoFrameID)
+TEST(BufferCoresetTransform, NoInsertWithNoFrameID)
 {
   tf2::BufferCore mBC;
   geometry_msgs::TransformStamped ts;
@@ -90,7 +90,7 @@ TEST(tf, setTransformNoInsertWithNoFrameID)
   EXPECT_FALSE(mBC.setTransform(ts, "authority"));
 }
 
-TEST(tf, setTransformNoInsertWithNoParentID)
+TEST(BufferCoresetTransform, NoInsertWithNoParentID)
 {
   tf2::BufferCore mBC;
   geometry_msgs::TransformStamped ts;
@@ -1351,87 +1351,61 @@ TEST(tf, assertQuaternionMsgValid)
   */
 }
 
-TEST(data, StampedOperatorEqualEqual)
-{
-  tf::Pose pose0, pose1, pose0a;
-  pose0.setIdentity();
-  pose0a.setIdentity();
-  pose1.setIdentity();
-  pose1.setOrigin(btVector3(1, 0, 0));
-  tf::Stamped<tf::Pose> stamped_pose_reference(pose0a, ros::Time(), "frame_id");
-  tf::Stamped<tf::Pose> stamped_pose0A(pose0, ros::Time(), "frame_id");
-  EXPECT_TRUE(stamped_pose0A == stamped_pose_reference); // Equal
-  tf::Stamped<tf::Pose> stamped_pose0B(pose0, ros::Time(), "frame_id_not_equal");
-  EXPECT_FALSE(stamped_pose0B == stamped_pose_reference); // Different Frame id
-  tf::Stamped<tf::Pose> stamped_pose0C(pose0, ros::Time(1.0), "frame_id");
-  EXPECT_FALSE(stamped_pose0C == stamped_pose_reference); // Different Time
-  tf::Stamped<tf::Pose> stamped_pose0D(pose0, ros::Time(1.0), "frame_id_not_equal");
-  EXPECT_FALSE(stamped_pose0D == stamped_pose_reference); // Different frame id and time
-  tf::Stamped<tf::Pose> stamped_pose0E(pose1, ros::Time(), "frame_id_not_equal");
-  EXPECT_FALSE(stamped_pose0E == stamped_pose_reference); // Different pose, frame id
-  tf::Stamped<tf::Pose> stamped_pose0F(pose1, ros::Time(1.0), "frame_id");
-  EXPECT_FALSE(stamped_pose0F == stamped_pose_reference); // Different pose, time
-  tf::Stamped<tf::Pose> stamped_pose0G(pose1, ros::Time(1.0), "frame_id_not_equal");
-  EXPECT_FALSE(stamped_pose0G == stamped_pose_reference); // Different pose, frame id and time
-  tf::Stamped<tf::Pose> stamped_pose0H(pose1, ros::Time(), "frame_id");
-  EXPECT_FALSE(stamped_pose0H == stamped_pose_reference); // Different pose
 
-}
-
-TEST(data, StampedTransformOperatorEqualEqual)
+TEST(tf2_stamped, OperatorEqualEqual)
 {
-  tf::Transform transform0, transform1, transform0a;
+  btTransform transform0, transform1, transform0a;
   transform0.setIdentity();
   transform0a.setIdentity();
   transform1.setIdentity();
   transform1.setOrigin(btVector3(1, 0, 0));
-  tf::StampedTransform stamped_transform_reference(transform0a, ros::Time(), "frame_id", "child_frame_id");
-  tf::StampedTransform stamped_transform0A(transform0, ros::Time(), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform_reference(transform0a, ros::Time(), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform0A(transform0, ros::Time(), "frame_id", "child_frame_id");
   EXPECT_TRUE(stamped_transform0A == stamped_transform_reference); // Equal
-  tf::StampedTransform stamped_transform0B(transform0, ros::Time(), "frame_id_not_equal", "child_frame_id");
+  tf2::StampedTransform stamped_transform0B(transform0, ros::Time(), "frame_id_not_equal", "child_frame_id");
   EXPECT_FALSE(stamped_transform0B == stamped_transform_reference); // Different Frame id
-  tf::StampedTransform stamped_transform0C(transform0, ros::Time(1.0), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform0C(transform0, ros::Time(1.0), "frame_id", "child_frame_id");
   EXPECT_FALSE(stamped_transform0C == stamped_transform_reference); // Different Time
-  tf::StampedTransform stamped_transform0D(transform0, ros::Time(1.0), "frame_id_not_equal", "child_frame_id");
+  tf2::StampedTransform stamped_transform0D(transform0, ros::Time(1.0), "frame_id_not_equal", "child_frame_id");
   EXPECT_FALSE(stamped_transform0D == stamped_transform_reference); // Different frame id and time
-  tf::StampedTransform stamped_transform0E(transform1, ros::Time(), "frame_id_not_equal", "child_frame_id");
+  tf2::StampedTransform stamped_transform0E(transform1, ros::Time(), "frame_id_not_equal", "child_frame_id");
   EXPECT_FALSE(stamped_transform0E == stamped_transform_reference); // Different transform, frame id
-  tf::StampedTransform stamped_transform0F(transform1, ros::Time(1.0), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform0F(transform1, ros::Time(1.0), "frame_id", "child_frame_id");
   EXPECT_FALSE(stamped_transform0F == stamped_transform_reference); // Different transform, time
-  tf::StampedTransform stamped_transform0G(transform1, ros::Time(1.0), "frame_id_not_equal", "child_frame_id");
+  tf2::StampedTransform stamped_transform0G(transform1, ros::Time(1.0), "frame_id_not_equal", "child_frame_id");
   EXPECT_FALSE(stamped_transform0G == stamped_transform_reference); // Different transform, frame id and time
-  tf::StampedTransform stamped_transform0H(transform1, ros::Time(), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform0H(transform1, ros::Time(), "frame_id", "child_frame_id");
   EXPECT_FALSE(stamped_transform0H == stamped_transform_reference); // Different transform
 
 
   //Different child_frame_id
-  tf::StampedTransform stamped_transform1A(transform0, ros::Time(), "frame_id", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1A(transform0, ros::Time(), "frame_id", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1A == stamped_transform_reference); // Equal
-  tf::StampedTransform stamped_transform1B(transform0, ros::Time(), "frame_id_not_equal", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1B(transform0, ros::Time(), "frame_id_not_equal", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1B == stamped_transform_reference); // Different Frame id
-  tf::StampedTransform stamped_transform1C(transform0, ros::Time(1.0), "frame_id", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1C(transform0, ros::Time(1.0), "frame_id", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1C == stamped_transform_reference); // Different Time
-  tf::StampedTransform stamped_transform1D(transform0, ros::Time(1.0), "frame_id_not_equal", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1D(transform0, ros::Time(1.0), "frame_id_not_equal", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1D == stamped_transform_reference); // Different frame id and time
-  tf::StampedTransform stamped_transform1E(transform1, ros::Time(), "frame_id_not_equal", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1E(transform1, ros::Time(), "frame_id_not_equal", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1E == stamped_transform_reference); // Different transform, frame id
-  tf::StampedTransform stamped_transform1F(transform1, ros::Time(1.0), "frame_id", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1F(transform1, ros::Time(1.0), "frame_id", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1F == stamped_transform_reference); // Different transform, time
-  tf::StampedTransform stamped_transform1G(transform1, ros::Time(1.0), "frame_id_not_equal", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1G(transform1, ros::Time(1.0), "frame_id_not_equal", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1G == stamped_transform_reference); // Different transform, frame id and time
-  tf::StampedTransform stamped_transform1H(transform1, ros::Time(), "frame_id", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1H(transform1, ros::Time(), "frame_id", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1H == stamped_transform_reference); // Different transform
 
 }
 
-TEST(data, StampedOperatorEqual)
+TEST(tf2_stamped, OperatorEqual)
 {
- tf::Pose pose0, pose1, pose0a;
+  btTransform pose0, pose1, pose0a;
   pose0.setIdentity();
   pose1.setIdentity();
   pose1.setOrigin(btVector3(1, 0, 0));
-  tf::Stamped<tf::Pose> stamped_pose0(pose0, ros::Time(), "frame_id");
-  tf::Stamped<tf::Pose> stamped_pose1(pose1, ros::Time(1.0), "frame_id_not_equal");
+  tf2::Stamped<btTransform> stamped_pose0(pose0, ros::Time(), "frame_id");
+  tf2::Stamped<btTransform> stamped_pose1(pose1, ros::Time(1.0), "frame_id_not_equal");
   EXPECT_FALSE(stamped_pose1 == stamped_pose0);
   stamped_pose1 = stamped_pose0;
   EXPECT_TRUE(stamped_pose1 == stamped_pose0);
