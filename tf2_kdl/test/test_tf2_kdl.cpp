@@ -37,6 +37,33 @@
 
 
 tf2::Buffer tf_buffer;
+static const double EPS = 1e-3;
+
+TEST(TfDKL, Frame)
+{
+  tf2::Stamped<KDL::Frame> v1(KDL::Frame(KDL::Rotation::RPY(M_PI, 0, 0), KDL::Vector(1,2,3)), ros::Time(2.0), "A");
+
+
+  // simple api
+  KDL::Frame v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
+  EXPECT_NEAR(v_simple.p[0], -9, EPS);
+  EXPECT_NEAR(v_simple.p[1], 18, EPS);
+  EXPECT_NEAR(v_simple.p[2], 27, EPS);
+  double r, p, y;
+  v_simple.M.GetRPY(r, p, y);
+  EXPECT_NEAR(r, 0.0, EPS);
+  EXPECT_NEAR(p, 0.0, EPS);
+  EXPECT_NEAR(y, 0.0, EPS);
+  
+
+  // advanced api
+  KDL::Frame v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
+					       "A", ros::Duration(3.0));
+  EXPECT_NEAR(v_advanced.p[0], -9, EPS);
+  EXPECT_NEAR(v_advanced.p[1], 18, EPS);
+  EXPECT_NEAR(v_advanced.p[2], 27, EPS);
+}
+
 
 
 TEST(TfDKL, Vector)
@@ -46,16 +73,16 @@ TEST(TfDKL, Vector)
 
   // simple api
   KDL::Vector v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
-  EXPECT_EQ(v_simple[0], -9);
-  EXPECT_EQ(v_simple[1], 18);
-  EXPECT_EQ(v_simple[2], 27);
+  EXPECT_NEAR(v_simple[0], -9, EPS);
+  EXPECT_NEAR(v_simple[1], 18, EPS);
+  EXPECT_NEAR(v_simple[2], 27, EPS);
 
   // advanced api
   KDL::Vector v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
 					       "A", ros::Duration(3.0));
-  EXPECT_EQ(v_simple[0], -9);
-  EXPECT_EQ(v_simple[1], 18);
-  EXPECT_EQ(v_simple[2], 27);
+  EXPECT_NEAR(v_advanced[0], -9, EPS);
+  EXPECT_NEAR(v_advanced[1], 18, EPS);
+  EXPECT_NEAR(v_advanced[2], 27, EPS);
 }
 
 

@@ -36,19 +36,27 @@
 #include <gtest/gtest.h>
 
 
-  /*
-  // btTransform
-  btTransform t1(btQuaternion(1,0,0,0));
-  std::cout << tf_buffer.transform(tf2::Stamped<btTransform>(t1, ros::Time::now(), "head_pan_link"),
-				   "r_forearm_link", ros::Time(),
-				   "base_link", ros::Duration(3.0)).getOrigin().getY() << std::endl;
-
-  std::cout << tf_buffer.transform(tf2::Stamped<btTransform>(t1, ros::Time(), "head_pan_link"), 
-				   "torso_lift_link", ros::Duration(3.0)).getOrigin().getY() << std::endl;
-  */
-
-
 tf2::Buffer tf_buffer;
+static const double EPS = 1e-3;
+
+TEST(TfBullet, Transform)
+{
+  tf2::Stamped<btTransform> v1(btTransform(btQuaternion(1,0,0,0), btVector3(1,2,3)), ros::Time(2.0), "A");
+
+  // simple api
+  btTransform v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
+  EXPECT_NEAR(v_simple.getOrigin().getX(), -9, EPS);
+  EXPECT_NEAR(v_simple.getOrigin().getY(), 18, EPS);
+  EXPECT_NEAR(v_simple.getOrigin().getZ(), 27, EPS);
+
+  // advanced api
+  btTransform v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
+					       "B", ros::Duration(3.0));
+  EXPECT_NEAR(v_advanced.getOrigin().getX(), -9, EPS);
+  EXPECT_NEAR(v_advanced.getOrigin().getY(), 18, EPS);
+  EXPECT_NEAR(v_advanced.getOrigin().getZ(), 27, EPS);
+}
+
 
 
 TEST(TfBullet, Vector)
@@ -57,17 +65,18 @@ TEST(TfBullet, Vector)
 
   // simple api
   btVector3 v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
-  EXPECT_EQ(v_simple.getX(), -9);
-  EXPECT_EQ(v_simple.getY(), 18);
-  EXPECT_EQ(v_simple.getZ(), 27);
+  EXPECT_NEAR(v_simple.getX(), -9, EPS);
+  EXPECT_NEAR(v_simple.getY(), 18, EPS);
+  EXPECT_NEAR(v_simple.getZ(), 27, EPS);
 
   // advanced api
   btVector3 v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
   					     "B", ros::Duration(3.0));
-  EXPECT_EQ(v_simple.getX(), -9);
-  EXPECT_EQ(v_simple.getY(), 18);
-  EXPECT_EQ(v_simple.getZ(), 27);
+  EXPECT_NEAR(v_advanced.getX(), -9, EPS);
+  EXPECT_NEAR(v_advanced.getY(), 18, EPS);
+  EXPECT_NEAR(v_advanced.getZ(), 27, EPS);
 }
+
 
 
 int main(int argc, char **argv){
