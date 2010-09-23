@@ -33,25 +33,10 @@
 #include <tf2_bullet/tf2_bullet.h>
 #include <tf2_cpp/transform_listener.h>
 #include <ros/ros.h>
+#include <gtest/gtest.h>
 
 
-int main(int argc, char** argv)
-{
-  ros::init(argc, argv, "bla");
-  ros::NodeHandle n;
-  tf2::Buffer tf_buffer;
-  tf2::TransformListener listener(tf_buffer);
-  ros::Duration(2.0).sleep();
-
-  // btVector3
-  btVector3 v1(1,2,3);
-  std::cout << tf_buffer.transform(tf2::Stamped<btVector3>(v1, ros::Time::now(), "head_pan_link"),
-				   "r_forearm_link", ros::Time(),
-				   "base_link", ros::Duration(3.0)) << std::endl;
-
-  std::cout << tf_buffer.transform(tf2::Stamped<btVector3>(v1, ros::Time(), "head_pan_link"), 
-				   "torso_lift_link", ros::Duration(3.0)) << std::endl;
-
+  /*
   // btTransform
   btTransform t1(btQuaternion(1,0,0,0));
   std::cout << tf_buffer.transform(tf2::Stamped<btTransform>(t1, ros::Time::now(), "head_pan_link"),
@@ -60,6 +45,46 @@ int main(int argc, char** argv)
 
   std::cout << tf_buffer.transform(tf2::Stamped<btTransform>(t1, ros::Time(), "head_pan_link"), 
 				   "torso_lift_link", ros::Duration(3.0)).getOrigin().getY() << std::endl;
+  */
 
-  return 0;
+
+tf2::Buffer tf_buffer;
+
+
+TEST(TfBullet, Vector)
+{
+  tf2::Stamped<btVector3>  v1(btVector3(1,2,3), ros::Time(2.0), "A");
+
+  // simple api
+  btVector3 v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
+  EXPECT_EQ(v_simple.getX(), -9);
+  EXPECT_EQ(v_simple.getY(), 18);
+  EXPECT_EQ(v_simple.getZ(), 27);
+
+  // advanced api
+  btVector3 v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
+  					     "B", ros::Duration(3.0));
+  EXPECT_EQ(v_simple.getX(), -9);
+  EXPECT_EQ(v_simple.getY(), 18);
+  EXPECT_EQ(v_simple.getZ(), 27);
+}
+
+
+int main(int argc, char **argv){
+  testing::InitGoogleTest(&argc, argv);
+  ros::init(argc, argv, "test");
+  ros::NodeHandle n;
+
+  // populate buffer
+  geometry_msgs::TransformStamped t;
+  t.transform.translation.x = 10;
+  t.transform.translation.y = 20;
+  t.transform.translation.z = 30;
+  t.transform.rotation.x = 1;
+  t.header.stamp = ros::Time(2.0);
+  t.header.frame_id = "A";
+  t.child_frame_id = "B";
+  tf_buffer.setTransform(t, "test");
+
+  return RUN_ALL_TESTS();
 }
