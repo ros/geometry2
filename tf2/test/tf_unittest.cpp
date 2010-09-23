@@ -115,7 +115,7 @@ TEST(tf, ListOneInverse)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
   }
 
@@ -125,7 +125,7 @@ TEST(tf, ListOneInverse)
   for ( uint64_t i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "child");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "child");
 
     try{
     Stamped<Pose> outpose;
@@ -159,9 +159,9 @@ TEST(tf, ListTwoInverse)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
-    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "child", "grandchild");
+    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "child", "grandchild");
     mTR.setTransform(tranStamped2);
   }
 
@@ -171,7 +171,7 @@ TEST(tf, ListTwoInverse)
   for ( unsigned int i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "grandchild");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "grandchild");
 
     try{
     Stamped<Pose> outpose;
@@ -206,7 +206,7 @@ TEST(tf, ListOneForward)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
   }
 
@@ -216,7 +216,7 @@ TEST(tf, ListOneForward)
   for ( uint64_t i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "my_parent");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "my_parent");
 
     try{
     Stamped<Pose> outpose;
@@ -250,9 +250,9 @@ TEST(tf, ListTwoForward)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
-    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "child", "grandchild");
+    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "child", "grandchild");
     mTR.setTransform(tranStamped2);
   }
 
@@ -262,7 +262,7 @@ TEST(tf, ListTwoForward)
   for ( unsigned int i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "my_parent");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "my_parent");
 
     try{
     Stamped<Pose> outpose;
@@ -296,9 +296,9 @@ TEST(tf, TransformThrougRoot)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(1000 + i*100),  "my_parent", "childA");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(1000 + i*100),  "my_parent", "childA");
     mTR.setTransform(tranStamped);
-    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(1000 + i*100),  "my_parent", "childB");
+    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(1000 + i*100),  "my_parent", "childB");
     mTR.setTransform(tranStamped2);
   }
 
@@ -308,7 +308,7 @@ TEST(tf, TransformThrougRoot)
   for ( unsigned int i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000 + i*100), "childA");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000 + i*100), "childA");
 
     try{
     Stamped<Pose> outpose;
@@ -342,9 +342,9 @@ TEST(tf, TransformThroughNO_PARENT)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parentA", "childA");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parentA", "childA");
     mTR.setTransform(tranStamped);
-    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parentB", "childB");
+    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parentB", "childB");
     mTR.setTransform(tranStamped2);
   }
 
@@ -354,7 +354,7 @@ TEST(tf, TransformThroughNO_PARENT)
   for ( unsigned int i = 0; i < runs ; i++ )
 
   {
-    Stamped<btTransform> inpose (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "childA");
+    Stamped<btTransform> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "childA");
     bool exception_thrown = false;
 
     try{
@@ -403,7 +403,7 @@ TEST(tf, getParent)
 
   for (uint64_t i = 0; i <  children.size(); i++)
     {
-      StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10), parents[i], children[i]);
+      StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10), parents[i], children[i]);
       mTR.setTransform(tranStamped);
     }
 
@@ -441,14 +441,14 @@ TEST(tf, NO_PARENT_SET)
 
   for (uint64_t i = 0; i <  children.size(); i++)
     {
-      StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10),  parents[i], children[i]);
+      StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10),  parents[i], children[i]);
       mTR.setTransform(tranStamped);
     }
 
   //std::cout << mTR.allFramesAsString() << std::endl;
 
 
-  Stamped<btTransform> inpose (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10), "a");
+  Stamped<btTransform> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10), "a");
   Stamped<btTransform> outpose;
   outpose.setIdentity(); //to make sure things are getting mutated
   mTR.transformPose("a",inpose, outpose);
@@ -471,7 +471,7 @@ TEST(tf, Exceptions)
  EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(10000000)));
  try 
  {
-   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10000000) , "me"), outpose);
+   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000000) , "me"), outpose);
    EXPECT_FALSE("ConnectivityException Not Thrown");   
  }
  catch ( tf::LookupException &ex)
@@ -484,13 +484,13 @@ TEST(tf, Exceptions)
    EXPECT_FALSE("Other Exception Caught");
  }
  
- mTR.setTransform( StampedTransform(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(100000), "parent", "me"));
+ mTR.setTransform( StampedTransform(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(100000), "parent", "me"));
 
  //Extrapolation not valid with one value
  EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(200000)));
  try 
  {
-   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "me"), outpose);
+   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "me"), outpose);
    EXPECT_TRUE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -504,14 +504,14 @@ TEST(tf, Exceptions)
  }
  
 
- mTR.setTransform( StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(300000), "parent", "me"));
+ mTR.setTransform( StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(300000), "parent", "me"));
 
  //NO Extration when Interpolating
  //inverse list
  EXPECT_TRUE(mTR.canTransform("parent", "me", ros::Time().fromNSec(200000)));
  try 
  {
-   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "me"), outpose);
+   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "me"), outpose);
    EXPECT_TRUE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -530,7 +530,7 @@ TEST(tf, Exceptions)
  EXPECT_TRUE(mTR.canTransform("me", "parent", ros::Time().fromNSec(200000)));
  try 
  {
-   mTR.transformPose("me",Stamped<Pose>(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "parent"), outpose);
+   mTR.transformPose("me",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "parent"), outpose);
    EXPECT_TRUE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -549,7 +549,7 @@ TEST(tf, Exceptions)
  EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(1000)));
  try 
  {
-   mTR.transformPose("parent",Stamped<Pose> (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000) , "me"), outpose);
+   mTR.transformPose("parent",Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000) , "me"), outpose);
    EXPECT_FALSE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -565,7 +565,7 @@ TEST(tf, Exceptions)
  EXPECT_FALSE(mTR.canTransform("me", "parent", ros::Time().fromNSec(1000)));
  try 
  {
-   mTR.transformPose("me",Stamped<Pose> (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000) , "parent"), outpose);
+   mTR.transformPose("me",Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000) , "parent"), outpose);
    EXPECT_FALSE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -586,7 +586,7 @@ TEST(tf, Exceptions)
  EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(350000)));
  try 
  {
-   mTR.transformPose("parent", Stamped<Pose> (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(350000) , "me"), outpose);
+   mTR.transformPose("parent", Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(350000) , "me"), outpose);
    EXPECT_FALSE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -603,7 +603,7 @@ TEST(tf, Exceptions)
  EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(350000)));
  try 
  {
-   mTR.transformPose("me", Stamped<Pose> (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(350000) , "parent"), outpose);
+   mTR.transformPose("me", Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(350000) , "parent"), outpose);
    EXPECT_FALSE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -629,18 +629,18 @@ TEST(tf, NoExtrapolationExceptionFromParent)
   
 
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000), "parent", "a"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000), "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent", "a"));
   
   
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "b"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent", "b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent", "b"));
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent", "parent"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent's parent", "parent's parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent", "parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent's parent", "parent's parent"));
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent's parent", "parent"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent's parent's parent", "parent's parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent's parent", "parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent's parent's parent", "parent's parent"));
 
   Stamped<Point> output;
 
@@ -665,9 +665,9 @@ TEST(tf, ExtrapolationFromOneValue)
   
 
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "a"));
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent", "parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent", "parent"));
 
 
   Stamped<Point> output;
@@ -724,7 +724,7 @@ TEST(tf, ExtrapolationFromOneValue)
   
   EXPECT_TRUE(excepted);
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(20000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(20000),  "parent", "a"));
 
   excepted = false;
   try
@@ -745,8 +745,8 @@ TEST(tf, ExtrapolationFromOneValue)
 TEST(tf, getLatestCommonTime)
 {
   tf::Transformer mTR(true);
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "a"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(2000),  "parent's parent", "parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(2000),  "parent's parent", "parent"));
   
   //simple case
   ros::Time t;
@@ -758,15 +758,15 @@ TEST(tf, getLatestCommonTime)
   EXPECT_EQ(t, ros::Time());
 
   //testing with update
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(3000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(3000),  "parent", "a"));
   mTR.getLatestCommonTime("a", "parent's parent",t, NULL);
   EXPECT_EQ(t, ros::Time().fromNSec(2000));
 
   //longer chain
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "parent", "b"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(3000),  "b", "c"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(9000),  "c", "d"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(5000),  "f", "e"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "parent", "b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(3000),  "b", "c"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(9000),  "c", "d"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(5000),  "f", "e"));
 
   //shared parent
   mTR.getLatestCommonTime("a", "b",t, NULL);
@@ -1190,7 +1190,7 @@ TEST(tf, getFrameStrings)
   Transformer mTR;
 
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "/parent", "/b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "/parent", "/b"));
   std::vector <std::string> frames_string;
   mTR.getFrameStrings(frames_string);
   ASSERT_EQ(frames_string.size(), (unsigned)2);
@@ -1198,7 +1198,7 @@ TEST(tf, getFrameStrings)
   EXPECT_STREQ(frames_string[1].c_str(), std::string("/parent").c_str());
 
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,1,0), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "/frame", "/other"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "/frame", "/other"));
   
   mTR.getFrameStrings(frames_string);
   ASSERT_EQ(frames_string.size(), (unsigned)4);
