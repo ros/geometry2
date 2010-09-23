@@ -43,11 +43,11 @@ class Buffer(buffer_core.BufferCore):
                                                                  object_stamped.header.stamp, timeout))
     
     # transform, advanced api
-    def transform(self, object_stamped, target_frame, target_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def transformFull(self, object_stamped, target_frame, target_time, fixed_frame, timeout=rospy.Duration(0.0)):
         do_transform = self.registration.get(type(object_stamped))
-        return do_transform(object_stamped, self.lookupTransform(target_frame, target_time,
-                                                                 object_stamped.header.frame_id, object_stamped.header.stamp, 
-                                                                 fixed_frame, timeout))
+        return do_transform(object_stamped, self.lookupTransformFull(target_frame, target_time,
+                                                                     object_stamped.header.frame_id, object_stamped.header.stamp, 
+                                                                     fixed_frame, timeout))
 
     # lookup, simple api 
     def lookupTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
@@ -55,9 +55,9 @@ class Buffer(buffer_core.BufferCore):
         return self.lookupTransformCore(target_frame, source_frame, time)
 
     # lookup, advanced api 
-    def lookupTransform(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
-        self.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
-        return self.lookupTransformCore(target_frame, target_time, source_frame, source_time, fixed_frame)
+    def lookupTransformFull(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+        self.canTransformFull(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
+        return self.lookupTransformFullCore(target_frame, target_time, source_frame, source_time, fixed_frame)
 
 
     # can, simple api
@@ -69,12 +69,12 @@ class Buffer(buffer_core.BufferCore):
         return self.canTransformCore(target_frame, source_frame, time)
     
     # can, advanced api
-    def canTransform(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def canTransformFull(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
         start_time = rospy.Time.now()
         while (rospy.Time.now() < start_time + timeout and 
-               not self.canTransformCore(target_frame, target_time, source_frame, source_time, fixed_frame)):
+               not self.canTransformFullCore(target_frame, target_time, source_frame, source_time, fixed_frame)):
             rospy.Duration(0.05).sleep()
-        return self.canTransformCore(target_frame, target_time, source_frame, source_time, fixed_frame)
+        return self.canTransformFullCore(target_frame, target_time, source_frame, source_time, fixed_frame)
 
 
 def Stamped(obj, frame_id, stamp):
