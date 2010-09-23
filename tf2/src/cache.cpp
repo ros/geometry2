@@ -39,9 +39,8 @@
 
 using namespace tf2;
 
-TimeCache::TimeCache(bool interpolating , ros::Duration  max_storage_time,
+TimeCache::TimeCache( ros::Duration  max_storage_time,
                      ros::Duration max_extrapolation_time):
-  interpolating_(interpolating),
   max_storage_time_(max_storage_time),
   max_extrapolation_time_(max_extrapolation_time)
 {};
@@ -63,7 +62,7 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns f
   }
   else if (num_nodes == 2)
   {
-    if(interpolating_ && ( p_temp_1.frame_id_num_ == p_temp_2.frame_id_num_) ) // if we're interpolating and haven't reparented
+    if( p_temp_1.frame_id_num_ == p_temp_2.frame_id_num_) 
     {
       interpolate(p_temp_1, p_temp_2, time, data_out);
       data_out.mode_ = mode;

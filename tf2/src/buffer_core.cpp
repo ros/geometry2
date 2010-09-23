@@ -202,3 +202,78 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
 {
   return old_tf_.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, error_msg);
 }
+
+
+tf2::TimeCache* BufferCore::getFrame(unsigned int frame_id) const
+{
+  if (frame_id == 0) /// @todo check larger values too
+    return NULL;
+  else
+    return frames_[frame_id];
+};
+
+unsigned int BufferCore::lookupFrameNumber(const std::string& frameid_str) const
+{
+  unsigned int retval = 0;
+  boost::mutex::scoped_lock(frame_mutex_);
+  std::map<std::string, unsigned int>::const_iterator map_it = frameIDs_.find(frameid_str);
+  if (map_it == frameIDs_.end())
+  {
+    std::stringstream ss;
+    ss << "Frame id " << frameid_str << " does not exist!";
+    throw tf::LookupException(ss.str());
+  }
+  else
+    retval = map_it->second;
+  return retval;
+};
+
+unsigned int BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_str)
+{
+  unsigned int retval = 0;
+  boost::mutex::scoped_lock(frame_mutex_);
+  std::map<std::string, unsigned int>::iterator map_it = frameIDs_.find(frameid_str);
+  if (map_it == frameIDs_.end())
+  {
+    retval = frames_.size();
+    frameIDs_[frameid_str] = retval;
+    frames_.push_back( new TimeCache(cache_time, max_extrapolation_distance_));
+    frameIDs_reverse.push_back(frameid_str);
+  }
+  else
+    retval = frameIDs_[frameid_str];
+  return retval;
+};
+
+std::string BufferCore::lookupFrameString(unsigned int frame_id_num) const
+  {
+    if (frame_id_num >= frameIDs_reverse.size())
+    {
+      std::stringstream ss;
+      ss << "Reverse lookup of frame id " << frame_id_num << " failed!";
+      throw tf2::LookupException(ss.str());
+    }
+    else
+      return frameIDs_reverse[frame_id_num];
+
+  };
+
+
+/*
+btTransform BufferCore::computeTransformFromList(const TransformLists & lists) const
+{
+  btTransform retTrans;
+  retTrans.setIdentity();
+  ///@todo change these to iterators
+  for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
+    {
+      retTrans *= (lists.inverseTransforms[lists.inverseTransforms.size() -1 - i]); //Reverse to get left multiply
+    }
+  for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
+    {
+      retTrans = (lists.forwardTransforms[lists.forwardTransforms.size() -1 - i]).inverse() * retTrans; //Do this list backwards(from backwards) for it was generated traveling the wrong way
+    }
+
+  return retTrans;
+}
+*/

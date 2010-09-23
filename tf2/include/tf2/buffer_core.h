@@ -39,10 +39,22 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "geometry_msgs/TransformStamped.h"
 
+#include "tf2/time_cache.h"
+//////////////////////////backwards startup for porting
 #include "tf/tf.h"
 
 namespace tf2
 {
+
+/** \brief An internal representation of transform chains
+ *
+ * This struct is how the list of transforms are stored before being passed to computeTransformFromList. */
+typedef struct
+{
+  std::vector<TransformStorage > inverseTransforms;
+  std::vector<TransformStorage > forwardTransforms;
+} TransformLists;
+
 
 /** \brief A Class which provides coordinate transforms between any two frames in a system.
  *
@@ -189,6 +201,65 @@ public:
 
 private:
 
+
+  /******************** Internal Storage ****************/
+  
+  /** \brief The pointers to potential frames that the tree can be made of.
+   * The frames will be dynamically allocated at run time when set the first time. */
+  std::vector< TimeCache*> frames_;
+  /** \brief A mutex to protect testing and allocating new frames on the above vector. */
+  boost::mutex frame_mutex_;
+
+  /** \brief A map from string frame ids to unsigned int */
+  std::map<std::string, unsigned int> frameIDs_;
+  /** \brief A map from unsigned int frame_id_numbers to string for debugging and output */
+  std::vector<std::string> frameIDs_reverse;
+  /** \brief A map to lookup the most recent authority for a given frame */
+  std::map<unsigned int, std::string> frame_authority_;
+
+
+  /// How long to cache transform history
+  ros::Duration cache_time;
+
+  /// whether or not to allow extrapolation
+  ros::Duration max_extrapolation_distance_;
+
+
+
+  /************************* Internal Functions ****************************/
+
+  /** \brief An accessor to get a frame, which will throw an exception if the frame is no there.
+   * \param frame_number The frameID of the desired Reference Frame
+   *
+   * This is an internal function which will get the pointer to the frame associated with the frame id
+   * Possible Exception: tf::LookupException
+   */
+  TimeCache* getFrame(unsigned int frame_number) const;
+
+  /// String to number for frame lookup with dynamic allocation of new frames
+  unsigned int lookupFrameNumber(const std::string& frameid_str) const;
+
+  /// String to number for frame lookup with dynamic allocation of new frames
+  unsigned int lookupOrInsertFrameNumber(const std::string& frameid_str);
+
+  ///Number to string frame lookup may throw LookupException if number invalid
+  std::string lookupFrameString(unsigned int frame_id_num) const;
+
+  /** Find the list of connected frames necessary to connect two different frames */
+  /******
+  int lookupLists(unsigned int target_frame, ros::Time time, unsigned int source_frame, TransformLists & lists, std::string* error_string) const;
+
+  bool test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
+  bool test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
+  bool test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
+  bool test_extrapolation(const ros::Time& target_time, const TransformLists& t_lists, std::string * error_string) const;
+  */
+  /** Compute the transform based on the list of frames */
+  //  btTransform computeTransformFromList(const TransformLists & list) const;
+
+
+
+  /////////////////////////////////// Backwards hack for quick startup /////////////////////////
   //Using tf for now will be replaced fully
   tf::Transformer old_tf_;
 };
