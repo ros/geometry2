@@ -11,3 +11,4 @@ syntax: regexp
 .*/msg/lisp/.*
 .*/srv/lisp/.*
 .*/bin/.*
+^build
