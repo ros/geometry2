@@ -9,7 +9,14 @@ import tf2_kdl
 
 def main():
     b = tf2_py.Buffer()
-    print b.lookupTransform('a','b', rospy.Time(0), rospy.Duration(2.0))
+    t = TransformStamped()
+    t.transform.translation.x = 1
+    t.transform.rotation.x = 1
+    t.header.stamp = rospy.Time(2.0)
+    t.header.frame_id = 'a'
+    t.child_frame_id = 'b'
+    b.setTransform(t)
+    print b.lookupTransform('a','b', rospy.Time(2.0), rospy.Duration(2.0))
 
     v = PyKDL.Vector(1,2,3)
     print b.transform(tf2_py.Stamped(v, 'a', rospy.Time(2)), 'b')
