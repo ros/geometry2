@@ -39,7 +39,7 @@
 tf2::Buffer tf_buffer;
 static const double EPS = 1e-3;
 
-TEST(TfDKL, Frame)
+TEST(TfKDL, Frame)
 {
   tf2::Stamped<KDL::Frame> v1(KDL::Frame(KDL::Rotation::RPY(M_PI, 0, 0), KDL::Vector(1,2,3)), ros::Time(2.0), "A");
 
@@ -62,11 +62,16 @@ TEST(TfDKL, Frame)
   EXPECT_NEAR(v_advanced.p[0], -9, EPS);
   EXPECT_NEAR(v_advanced.p[1], 18, EPS);
   EXPECT_NEAR(v_advanced.p[2], 27, EPS);
+  v_advanced.M.GetRPY(r, p, y);
+  EXPECT_NEAR(r, 0.0, EPS);
+  EXPECT_NEAR(p, 0.0, EPS);
+  EXPECT_NEAR(y, 0.0, EPS);
+
 }
 
 
 
-TEST(TfDKL, Vector)
+TEST(TfKDL, Vector)
 {
   tf2::Stamped<KDL::Vector> v1(KDL::Vector(1,2,3), ros::Time(2.0), "A");
 
