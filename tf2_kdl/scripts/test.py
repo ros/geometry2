@@ -5,6 +5,7 @@ import rospy
 import PyKDL
 import tf2_py
 import tf2_kdl
+from geometry_msgs.msg import TransformStamped
 
 
 def main():
@@ -15,7 +16,7 @@ def main():
     t.header.stamp = rospy.Time(2.0)
     t.header.frame_id = 'a'
     t.child_frame_id = 'b'
-    b.setTransform(t)
+    b.setTransform(t, 'eitan_rocks')
     print b.lookupTransform('a','b', rospy.Time(2.0), rospy.Duration(2.0))
 
     v = PyKDL.Vector(1,2,3)
