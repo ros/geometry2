@@ -102,7 +102,7 @@ namespace tf2
         //make sure to pass the result to the client
         //even failed transforms are considered a success
         //since the request was successfully processed
-        active_goals_.erase(it);
+        it = active_goals_.erase(it);
         info.handle.setSucceeded(result);
       }
       else
@@ -121,7 +121,7 @@ namespace tf2
       GoalInfo& info = *it;
       if(info.handle == gh)
       {
-        active_goals_.erase(it);
+        it = active_goals_.erase(it);
         info.handle.setCanceled();
         return;
       }
@@ -135,27 +135,55 @@ namespace tf2
     //we'll accept all goals we get
     gh.setAccepted();
 
-    //we can do a quick check here to see if the transform is valid
-    if(canTransform(gh))
-    {
-      try
-      {
-        tf2_msgs::LookupTransformResult result;
-        result.transform = lookupTransform(gh);
-        gh.setSucceeded(result);
-        return;
-      }
-      catch(tf2::TransformException& ex)
-      {
-        ROS_WARN("Got an error looking up a transform after canTransform returned true. There is a race here, but this warning should be rare");
-      }
-    }
-
     //if the transform isn't immediately available, we'll push it onto our list to check
     //along with the time that the goal will end
     GoalInfo goal_info;
     goal_info.handle = gh;
     goal_info.end_time = ros::Time::now() + gh.getGoal()->timeout;
+
+    //we can do a quick check here to see if the transform is valid
+    //we'll also do this if the end time has been reached 
+    if(canTransform(gh) || goal_info.end_time <= ros::Time::now())
+    {
+      tf2_msgs::LookupTransformResult result;
+      try
+      {
+        result.transform = lookupTransform(gh);
+      }
+      catch (tf2::ConnectivityException &ex)
+      {
+        result.error.error = result.error.CONNECTIVITY_ERROR;
+        result.error.error_string = ex.what();
+      }
+      catch (tf2::LookupException &ex)
+      {
+        result.error.error = result.error.LOOKUP_ERROR;
+        result.error.error_string = ex.what();
+      }
+      catch (tf2::ExtrapolationException &ex)
+      {
+        result.error.error = result.error.EXTRAPOLATION_ERROR;
+        result.error.error_string = ex.what();
+      }
+      catch (tf2::InvalidArgumentException &ex)
+      {
+        result.error.error = result.error.INVALID_ARGUMENT_ERROR;
+        result.error.error_string = ex.what();
+      }
+      catch (tf2::TimeoutException &ex)
+      {
+        result.error.error = result.error.TIMEOUT_ERROR;
+        result.error.error_string = ex.what();
+      }
+      catch (tf2::TransformException &ex)
+      {
+        result.error.error = result.error.TRANSFORM_ERROR;
+        result.error.error_string = ex.what();
+      }
+
+      gh.setSucceeded(result);
+      return;
+    }
 
     boost::mutex::scoped_lock l(mutex_);
     active_goals_.push_back(goal_info);
