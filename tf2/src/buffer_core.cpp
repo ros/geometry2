@@ -31,6 +31,7 @@
 
 #include "tf2/buffer_core.h"
 #include "tf2/exceptions.h"
+#include "tf2_msgs/TF2Error.h"
 //legacy
 #include "tf/tf.h"
 #include "tf/transform_datatypes.h"
@@ -259,6 +260,314 @@ std::string BufferCore::lookupFrameString(unsigned int frame_id_num) const
   };
 
 
+int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned int source_frame, TransformLists& lists, std::string * error_string) const
+{
+  /*  timeval tempt;
+  gettimeofday(&tempt,NULL);
+  std::cerr << "Looking up list at " <<tempt.tv_sec * 1000000ULL + tempt.tv_usec << std::endl;
+  */
+
+  ///\todo add fixed frame support
+
+  //Clear lists before operating
+  lists.forwardTransforms.clear();
+  lists.inverseTransforms.clear();
+  //  TransformLists mTfLs;
+  if (target_frame == source_frame)
+    return 0;  //Don't do anythign if we're not going anywhere
+
+  TransformStorage temp;
+
+  unsigned int frame = source_frame;
+  unsigned int counter = 0;  //A counter to keep track of how deep we've descended
+  unsigned int last_inverse;
+  if (getFrame(frame) == NULL) //Test if source frame exists this will throw a lookup error if it does not (inside the loop it will be caught)
+  {
+    if (error_string) *error_string = "Source frame '"+lookupFrameString(frame)+"' does not exist is tf tree.";
+    return tf2_msgs::TF2Error::LOOKUP_ERROR;//throw LookupException("Frame didn't exist");
+  }
+  while (true)
+    {
+      //      printf("getting data from %d:%s \n", frame, lookupFrameString(frame).c_str());
+
+      TimeCache* pointer = getFrame(frame);
+      ROS_ASSERT(pointer);
+
+      if (! pointer->getData(time, temp))
+      {
+        last_inverse = frame;
+        // this is thrown when there is no data
+        break;
+      }
+
+      //break if parent is NO_PARENT (0)
+      if (frame == 0)
+      {
+        last_inverse = frame;
+        break;
+      }
+      lists.inverseTransforms.push_back(temp);
+
+      frame = temp.frame_id_num_;
+
+
+      /* Check if we've gone too deep.  A loop in the tree would cause this */
+      if (counter++ > MAX_GRAPH_DEPTH)
+      {
+        if (error_string)
+        {
+          std::stringstream ss;
+          ss<<"The tf tree is invalid because it contains a loop." << std::endl
+            << allFramesAsString() << std::endl;
+          *error_string =ss.str();
+        }
+        return tf2_msgs::TF2Error::LOOKUP_ERROR;
+        //        throw(LookupException(ss.str()));
+      }
+    }
+  /*
+    timeval tempt2;
+  gettimeofday(&tempt2,NULL);
+  std::cerr << "Side A " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
+  */
+  frame = target_frame;
+  counter = 0;
+  unsigned int last_forward;
+  if (getFrame(frame) == NULL)
+  {
+    if (error_string) *error_string = "Target frame '"+lookupFrameString(frame)+"' does not exist is tf tree.";
+    return tf2_msgs::TF2Error::LOOKUP_ERROR;
+  }//throw LookupException("fixme");; //Test if source frame exists this will throw a lookup error if it does not (inside the loop it will be caught)
+  while (true)
+    {
+
+      TimeCache* pointer = getFrame(frame);
+      ROS_ASSERT(pointer);
+
+
+      if(!  pointer->getData(time, temp))
+      {
+        last_forward = frame;
+        break;
+      }
+
+      //break if parent is NO_PARENT (0)
+      if (frame == 0)
+      {
+        last_forward = frame;
+        break;
+      }
+      //      std::cout << "pushing back" << temp.frame_id_ << std::endl;
+      lists.forwardTransforms.push_back(temp);
+      frame = temp.frame_id_num_;
+
+      /* Check if we've gone too deep.  A loop in the tree would cause this*/
+      if (counter++ > MAX_GRAPH_DEPTH){
+        if (error_string)
+        {
+          std::stringstream ss;
+          ss<<"The tf tree is invalid because it contains a loop." << std::endl
+            << allFramesAsString() << std::endl;
+          *error_string = ss.str();
+        }
+        return tf2_msgs::TF2Error::LOOKUP_ERROR;//throw(LookupException(ss.str()));
+      }
+    }
+  /*
+  gettimeofday(&tempt2,NULL);
+  std::cerr << "Side B " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
+  */
+
+  std::string connectivity_error("Could not find a connection between '"+lookupFrameString(target_frame)+"' and '"+
+                                 lookupFrameString(source_frame)+"' because they are not part of the same tree."+
+                                 "Tf has two or more unconnected trees.");
+  /* Check the zero length cases*/
+  if (lists.inverseTransforms.size() == 0)
+  {
+    if (lists.forwardTransforms.size() == 0) //If it's going to itself it's already been caught
+    {
+      if (error_string) *error_string = connectivity_error;
+      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+    }
+
+    if (last_forward != source_frame)  //\todo match with case A
+    {
+      if (error_string) *error_string = connectivity_error;
+      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+    }
+    else return 0;
+  }
+
+  if (lists.forwardTransforms.size() == 0)
+  {
+    if (lists.inverseTransforms.size() == 0)  //If it's going to itself it's already been caught
+    {//\todo remove THis is the same as case D
+      if (error_string) *error_string = connectivity_error;
+      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+    }
+
+    try
+    {
+      if (lookupFrameNumber(lists.inverseTransforms.back().header.frame_id) != target_frame)
+      {
+        if (error_string) *error_string = connectivity_error;
+        return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+    }
+    else return 0;
+    }
+    catch (tf::LookupException & ex)
+    {
+      if (error_string) *error_string = ex.what();
+      return tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  }
+
+
+  /* Make sure the end of the search shares a parent. */
+  if (last_forward != last_inverse)
+  {
+    if (error_string) *error_string = connectivity_error;
+    return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+  }
+  /* Make sure that we don't have a no parent at the top */
+  try
+  {
+    if (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id) == 0 || lookupFrameNumber( lists.forwardTransforms.back().child_frame_id) == 0)
+    {
+      //if (error_string) *error_string = "NO_PARENT at top of tree";
+      if (error_string) *error_string = connectivity_error;
+      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+    }
+
+    /*
+      gettimeofday(&tempt2,NULL);
+      std::cerr << "Base Cases done" <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
+    */
+
+    while (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id) == lookupFrameNumber(lists.forwardTransforms.back().child_frame_id))
+    {
+      lists.inverseTransforms.pop_back();
+      lists.forwardTransforms.pop_back();
+
+      // Make sure we don't go beyond the beginning of the list.
+      // (The while statement above doesn't fail if you hit the beginning of the list,
+      // which happens in the zero distance case.)
+      if (lists.inverseTransforms.size() == 0 || lists.forwardTransforms.size() == 0)
+	break;
+    }
+  }
+  catch (tf::LookupException & ex)
+  {
+    if (error_string) *error_string = ex.what();
+    return tf2_msgs::TF2Error::LOOKUP_ERROR;
+  }  /*
+       gettimeofday(&tempt2,NULL);
+       std::cerr << "Done looking up list " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
+     */
+  return 0;
+
+  }
+
+
+bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
+{
+  std::stringstream ss;
+  ss << std::fixed;
+  ss.precision(3);
+
+  if (tr.mode_ == ONE_VALUE)
+  {
+    if (tr.header.stamp - target_time > max_extrapolation_distance_ || target_time - tr.header.stamp > max_extrapolation_distance_)
+    {
+      if (error_string) {
+        ss << "You requested a transform at time " << (target_time).toSec() 
+           << ",\n but the tf buffer only contains a single transform " 
+           << "at time " << tr.header.stamp.toSec() << ".\n";
+        if ( max_extrapolation_distance_ > ros::Duration(0))
+        {
+          ss << "The tf extrapollation distance is set to " 
+             << (max_extrapolation_distance_).toSec() <<" seconds.\n";
+        }
+        *error_string = ss.str();
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+
+bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
+{
+  std::stringstream ss;
+  ss << std::fixed;
+  ss.precision(3);
+
+  if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.header.stamp - target_time > max_extrapolation_distance_)
+  {
+    if (error_string) {
+      ss << "Extrapolating into the past.  You requested a transform at time " << target_time.toSec() << " seconds \n"
+         << "but the tf buffer only has a history of until " << tr.header.stamp.toSec()  << " seconds.\n";
+      if ( max_extrapolation_distance_ > ros::Duration(0))
+      {
+        ss << "The tf extrapollation distance is set to " 
+           << (max_extrapolation_distance_).toSec() <<" seconds.\n";
+      }
+      *error_string = ss.str();
+    }
+    return true;
+  }
+  return false;
+}
+
+
+bool BufferCore::test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
+{
+  std::stringstream ss;
+  ss << std::fixed;
+  ss.precision(3);
+
+  if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time - tr.header.stamp > max_extrapolation_distance_)
+  {
+    if (error_string){
+      ss << "Extrapolating into the future.  You requested a transform that is at time" << target_time.toSec() << " seconds, \n"
+         << "but the most recent transform in the tf buffer is at " << tr.header.stamp.toSec() << " seconds.\n";
+      if ( max_extrapolation_distance_ > ros::Duration(0))
+      {
+        ss << "The tf extrapollation distance is set to " 
+           << (max_extrapolation_distance_).toSec() <<" seconds.\n";
+      }
+      *error_string = ss.str();
+    }
+    return true;
+  }
+  return false;
+}
+
+
+bool BufferCore::test_extrapolation(const ros::Time& target_time, const TransformLists& lists, std::string * error_string) const
+{
+  std::stringstream ss;
+  ss << std::fixed;
+  ss.precision(3);
+  for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
+  {
+    if (test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string)) return true;
+    if (test_extrapolation_past(target_time, lists.inverseTransforms[i], error_string)) return true;
+    if (test_extrapolation_future(target_time, lists.inverseTransforms[i], error_string)) return true;
+  }
+
+  for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
+  {
+    if (test_extrapolation_one_value(target_time, lists.forwardTransforms[i], error_string)) return true;
+    if (test_extrapolation_past(target_time, lists.forwardTransforms[i], error_string)) return true;
+    if (test_extrapolation_future(target_time, lists.forwardTransforms[i], error_string)) return true;
+  }
+
+  return false;
+}
+
+
 
 btTransform BufferCore::computeTransformFromList(const TransformLists & lists) const
 {
@@ -277,3 +586,26 @@ btTransform BufferCore::computeTransformFromList(const TransformLists & lists) c
   return retTrans;
 }
 
+std::string BufferCore::allFramesAsString() const
+{
+  std::stringstream mstream;
+  boost::mutex::scoped_lock(frame_mutex_);
+
+  TransformStorage temp;
+
+
+
+  //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
+  for (unsigned int counter = 1; counter < frames_.size(); counter ++)
+  {
+    unsigned int frame_id_num;
+    if(  getFrame(counter)->getData(ros::Time(), temp))
+      frame_id_num = temp.frame_id_num_;
+    else
+    {
+      frame_id_num = 0;
+    }
+    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num] << "." <<std::endl;
+  }
+  return mstream.str();
+}

@@ -11,6 +11,7 @@
   <depend package="tf"/>
   <depend package="bullet"/>
   <depend package="geometry_msgs"/>
+  <depend package="tf2_msgs"/>
 
  <export>
     <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf2"/>
