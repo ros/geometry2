@@ -45,7 +45,7 @@ class BufferCore():
         return t
 
     # advanced api
-    def lookupTransformCore(self, target_frame, target_time,
+    def lookupTransformFullCore(self, target_frame, target_time,
                             source_frame, source_time, fixed_frame):
         t = TransformStamped()
         t.transform.translation.x = 1
@@ -61,7 +61,7 @@ class BufferCore():
         return True    
 
     # advanced api
-    def canTransformCore(self, target_frame, target_time,
+    def canTransformFullCore(self, target_frame, target_time,
                          source_frame, source_time, fixed_frame):
         return True    
 
