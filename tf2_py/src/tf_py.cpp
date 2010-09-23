@@ -56,7 +56,7 @@ struct buffer_core_t {
 static PyTypeObject buffer_core_Type = {
   PyObject_HEAD_INIT(&PyType_Type)
   0,                               /*size*/
-  "_tf.BufferCore",                /*name*/
+  "_tf2.BufferCore",                /*name*/
   sizeof(buffer_core_t),           /*basicsize*/
 };
 
@@ -130,7 +130,7 @@ static PyObject *allFramesAsString(PyObject *self, PyObject *args)
 }
 */
 
-static PyObject *canTransform(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *canTransformCore(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *target_frame, *source_frame;
@@ -145,7 +145,7 @@ static PyObject *canTransform(PyObject *self, PyObject *args, PyObject *kw)
   return Py_BuildValue("bs", can_transform, error_msg.c_str());
 }
 
-static PyObject *canTransformFull(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *canTransformFullCore(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *target_frame, *source_frame, *fixed_frame;
@@ -224,7 +224,7 @@ static PyObject *getLatestCommonTime(PyObject *self, PyObject *args, PyObject *k
 }
 */
 
-static PyObject *lookupTransform(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *lookupTransformCore(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *target_frame, *source_frame;
@@ -243,7 +243,7 @@ static PyObject *lookupTransform(PyObject *self, PyObject *args, PyObject *kw)
       rotation.x, rotation.y, rotation.z, rotation.w);
 }
 
-static PyObject *lookupTransformFull(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *lookupTransformFullCore(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *target_frame, *source_frame, *fixed_frame;
@@ -269,7 +269,7 @@ static PyObject *lookupTransformFull(PyObject *self, PyObject *args, PyObject *k
       rotation.x, rotation.y, rotation.z, rotation.w);
 }
 
-static PyObject *lookupTwist(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *lookupTwistCore(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *tracking_frame, *observation_frame;
@@ -287,7 +287,7 @@ static PyObject *lookupTwist(PyObject *self, PyObject *args, PyObject *kw)
       twist.angular.x, twist.angular.y, twist.angular.z);
 }
 
-static PyObject *lookupTwistFull(PyObject *self, PyObject *args)
+static PyObject *lookupTwistFullCore(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *tracking_frame, *observation_frame, *reference_frame, *reference_point_frame;
@@ -375,17 +375,17 @@ static struct PyMethodDef buffer_core_methods[] =
   //{"allFramesAsDot", allFramesAsDot, METH_VARARGS},
   //{"allFramesAsString", allFramesAsString, METH_VARARGS},
   {"setTransform", setTransform, METH_VARARGS},
-  {"canTransform", (PyCFunction)canTransform, METH_KEYWORDS},
-  {"canTransformFull", (PyCFunction)canTransformFull, METH_KEYWORDS},
+  {"canTransformCore", (PyCFunction)canTransformCore, METH_KEYWORDS},
+  {"canTransformFullCore", (PyCFunction)canTransformFullCore, METH_KEYWORDS},
   //{"chain", (PyCFunction)chain, METH_KEYWORDS},
   {"clear", (PyCFunction)clear, METH_KEYWORDS},
   //{"frameExists", (PyCFunction)frameExists, METH_VARARGS},
   //{"getFrameStrings", (PyCFunction)getFrameStrings, METH_VARARGS},
   //{"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
-  {"lookupTransform", (PyCFunction)lookupTransform, METH_KEYWORDS},
-  {"lookupTransformFull", (PyCFunction)lookupTransformFull, METH_KEYWORDS},
-  {"lookupTwist", (PyCFunction)lookupTwist, METH_KEYWORDS},
-  {"lookupTwistFull", lookupTwistFull, METH_VARARGS},
+  {"lookupTransformCore", (PyCFunction)lookupTransformCore, METH_KEYWORDS},
+  {"lookupTransformFullCore", (PyCFunction)lookupTransformFullCore, METH_KEYWORDS},
+  {"lookupTwistCore", (PyCFunction)lookupTwistCore, METH_KEYWORDS},
+  {"lookupTwistFullCore", lookupTwistFullCore, METH_VARARGS},
   //{"getTFPrefix", (PyCFunction)getTFPrefix, METH_VARARGS},
   {NULL,          NULL}
 };
@@ -395,7 +395,7 @@ static PyMethodDef module_methods[] = {
   {NULL, NULL, NULL},
 };
 
-extern "C" void init_tf()
+extern "C" void init_tf2()
 {
   PyObject *item, *m, *d;
 

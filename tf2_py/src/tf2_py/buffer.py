@@ -29,10 +29,11 @@
 
 import roslib; roslib.load_manifest('tf2_py')
 import rospy
-import buffer_core
+import tf2_py
 
-class Buffer(buffer_core.BufferCore):
+class Buffer(tf2_py.BufferCore):
     def __init__(self):
+        tf2_py.BufferCore.__init__(self)
         self.registration = TransformRegistration()
         
 

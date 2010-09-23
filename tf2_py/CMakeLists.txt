@@ -28,7 +28,7 @@ rosbuild_check_for_sse()
 link_libraries(${PYTHON_LIBRARIES})
 rosbuild_add_library(tf_py src/tf_py.cpp)
 find_package(PythonLibs REQUIRED)
-set_target_properties(tf_py PROPERTIES OUTPUT_NAME tf PREFIX "_" SUFFIX ".so")
+set_target_properties(tf_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
 # target_link_libraries(tf_py tf)
 rosbuild_add_compile_flags(tf_py -g -Wno-missing-field-initializers)
 rosbuild_add_compile_flags(tf_py ${SSE_FLAGS}) #conditionally adds sse flags if available
