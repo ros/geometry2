@@ -345,13 +345,14 @@ unsigned int BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_st
   std::map<std::string, unsigned int>::iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
+    frames_.push_back( new TimeCache(cache_time, max_extrapolation_distance_));
     retval = frames_.size();
     frameIDs_[frameid_str] = retval;
-    frames_.push_back( new TimeCache(cache_time, max_extrapolation_distance_));
     frameIDs_reverse.push_back(frameid_str);
   }
   else
     retval = frameIDs_[frameid_str];
+
   return retval;
 };
 
