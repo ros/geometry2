@@ -61,6 +61,7 @@ TEST(tf2_cpp, buffer_client)
   }
   catch(tf2::TransformException& ex)
   {
+    ROS_ERROR("Failed to transform: %s", ex.what());
   }
 } 
 
