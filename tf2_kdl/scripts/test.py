@@ -6,14 +6,22 @@ import PyKDL
 import tf2_py
 import tf2_kdl
 
-tf2_py.TransformRegistration().print_me()
 
 def main():
     b = tf2_py.Buffer()
     print b.lookupTransform('a','b', rospy.Time(0), rospy.Duration(2.0))
+
     v = PyKDL.Vector(1,2,3)
     print b.transform(tf2_py.Stamped(v, 'a', rospy.Time(2)), 'b')
 
+    f = PyKDL.Frame(PyKDL.Rotation.RPY(1,2,3), PyKDL.Vector(1,2,3))
+    print b.transform(tf2_py.Stamped(f, 'a', rospy.Time(2)), 'b')
+
+    t = PyKDL.Twist(PyKDL.Vector(1,2,3), PyKDL.Vector(4,5,6))
+    print b.transform(tf2_py.Stamped(t, 'a', rospy.Time(2)), 'b')
+
+    w = PyKDL.Wrench(PyKDL.Vector(1,2,3), PyKDL.Vector(4,5,6))
+    print b.transform(tf2_py.Stamped(w, 'a', rospy.Time(2)), 'b')
 
 
 if __name__ == '__main__':

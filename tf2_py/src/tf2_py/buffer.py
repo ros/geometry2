@@ -36,21 +36,31 @@ class Buffer(buffer_core.BufferCore):
         self.registration = TransformRegistration()
         
 
-    # transform simple api
+    # transform, simple api
     def transform(self, object_stamped, target_frame, timeout=rospy.Duration(0.0)):
         do_transform = self.registration.get(type(object_stamped))
-        if not do_transform:
-            raise TypeException('Type %s if not loaded or supported'%str(type(object_stamped)))
         return do_transform(object_stamped, self.lookupTransform(target_frame, object_stamped.header.frame_id,
                                                                  object_stamped.header.stamp, timeout))
     
-    # simple api
+    # transform, advanced api
+    def transform(self, object_stamped, target_frame, target_time, fixed_frame, timeout=rospy.Duration(0.0)):
+        do_transform = self.registration.get(type(object_stamped))
+        return do_transform(object_stamped, self.lookupTransform(target_frame, target_time,
+                                                                 object_stamped.header.frame_id, object_stamped.header.stamp, 
+                                                                 fixed_frame, timeout))
+
+    # lookup, simple api 
     def lookupTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         self.canTransform(target_frame, source_frame, time, timeout)
         return self.lookupTransformCore(target_frame, source_frame, time)
 
+    # lookup, advanced api 
+    def lookupTransform(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+        self.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
+        return self.lookupTransformCore(target_frame, target_time, source_frame, source_time, fixed_frame)
 
-    # simple api
+
+    # can, simple api
     def canTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         start_time = rospy.Time.now()
         while (rospy.Time.now() < start_time + timeout and 
@@ -58,6 +68,14 @@ class Buffer(buffer_core.BufferCore):
             rospy.Duration(0.05).sleep()
         return self.canTransformCore(target_frame, source_frame, time)
     
+    # can, advanced api
+    def canTransform(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+        start_time = rospy.Time.now()
+        while (rospy.Time.now() < start_time + timeout and 
+               not self.canTransformCore(target_frame, target_time, source_frame, source_time, fixed_frame)):
+            rospy.Duration(0.05).sleep()
+        return self.canTransformCore(target_frame, target_time, source_frame, source_time, fixed_frame)
+
 
 def Stamped(obj, frame_id, stamp):
     obj.header = roslib.msg._Header.Header(frame_id=frame_id, stamp=stamp)
@@ -80,6 +98,6 @@ class TransformRegistration():
 
     def get(self, key):
         if not key in TransformRegistration.__type_map:
-            return None
+            raise TypeException('Type %s if not loaded or supported'%key)
         else:
             return TransformRegistration.__type_map[key]
