@@ -57,35 +57,47 @@ using namespace tf;
 
 TEST(tf, setTransformNoInsertOnSelfTransform)
 {
-  tf::Transformer mTR(true);
-  StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10.0), "same_frame", "same_frame");
-  EXPECT_FALSE(mTR.setTransform(tranStamped));
+  tf2::BufferCore mBC;
+  geometry_msgs::TransformStamped ts;
+  ts.transform.rotation.w =1;
+  ts.header.frame_id = "same_frame";
+  ts.child_frame_id = "same_frame";
+  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
 }
 
 TEST(tf, setTransformNoInsertWithNan)
 {
-  tf::Transformer mTR(true);
-  StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10.0), "same_frame", "other_frame");
-  EXPECT_TRUE(mTR.setTransform(tranStamped));
+  tf2::BufferCore mBC;
+  geometry_msgs::TransformStamped ts;
+  ts.transform.rotation.w =1;
+  ts.header.frame_id = "same_frame";
+  ts.child_frame_id = "other_frame";
+  EXPECT_TRUE(mBC.setTransform(ts, "authority"));
 
-  tranStamped.setOrigin(tf::Point(1.0,1.0,0.0/0.0));
-  EXPECT_TRUE(std::isnan(tranStamped.getOrigin().z()));
-  EXPECT_FALSE(mTR.setTransform(tranStamped));
+  ts.transform.translation.x = 0.0/0.0;
+  EXPECT_TRUE(std::isnan(ts.transform.translation.x));
+  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
 
 }
 
 TEST(tf, setTransformNoInsertWithNoFrameID)
 {
-  tf::Transformer mTR(true);
-  StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10.0), "parent_frame", "");
-  EXPECT_FALSE(mTR.setTransform(tranStamped));
+  tf2::BufferCore mBC;
+  geometry_msgs::TransformStamped ts;
+  ts.transform.rotation.w =1;
+  ts.header.frame_id = "";
+  ts.child_frame_id = "same_frame";
+  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
 }
 
 TEST(tf, setTransformNoInsertWithNoParentID)
 {
-  tf::Transformer mTR(true);
-  StampedTransform tranStamped(btTransform(btQuaternion(0,0,0), btVector3(0,0,0)), ros::Time().fromNSec(10.0), "", "my_frame");
-  EXPECT_FALSE(mTR.setTransform(tranStamped));
+  tf2::BufferCore mBC;
+  geometry_msgs::TransformStamped ts;
+  ts.transform.rotation.w =1;
+  ts.header.frame_id = "same_frame";
+  ts.child_frame_id = "";
+  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
 }
 
 TEST(tf, TransformTransformsCartesian)
