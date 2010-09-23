@@ -1,0 +1,16 @@
+<package>
+  <description brief="tf2_py">
+
+     tf2_py
+
+  </description>
+  <author>Wim Meeussen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tf2_py</url>
+  <depend package="rospy"/>
+  <depend package="tf2"/>
+
+</package>
+
+
