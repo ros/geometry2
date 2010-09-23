@@ -12,6 +12,10 @@
   <depend package="tf2_cpp"/>
   <depend package="kdl"/>
 
+ <export>
+    <cpp cflags="-I${prefix}/include"/>    
+ </export>
+
 </package>
 
 
