@@ -27,4 +27,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 rosbuild_add_executable(test_kdl test/test_tf2_kdl.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+rosbuild_add_gtest_build_flags(test_kdl)
+
+rosbuild_add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
+
