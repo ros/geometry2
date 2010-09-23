@@ -97,6 +97,7 @@ BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
   frameIDs_["NO_PARENT"] = 0;
   frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
   frameIDs_reverse.push_back("NO_PARENT");
+  tf_prefix_ = "";
 
   return;
 }
