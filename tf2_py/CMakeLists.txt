@@ -16,15 +16,20 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_PATH})
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+# Check for SSE
+rosbuild_check_for_sse()
+
+# Dynamic linking with tf worked OK, except for exception propagation, which failed in the unit test.
+# so build with the objects directly instead.
+
+link_libraries(${PYTHON_LIBRARIES})
+rosbuild_add_library(tf_py src/tf_py.cpp)
+find_package(PythonLibs REQUIRED)
+set_target_properties(tf_py PROPERTIES OUTPUT_NAME tf PREFIX "_" SUFFIX ".so")
+# target_link_libraries(tf_py tf)
+rosbuild_add_compile_flags(tf_py -g -Wno-missing-field-initializers)
+rosbuild_add_compile_flags(tf_py ${SSE_FLAGS}) #conditionally adds sse flags if available
+#rosbuild_add_pyunit(test/testPython.py)
