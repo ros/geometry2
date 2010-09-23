@@ -37,6 +37,18 @@ class BufferCore():
     # simple api
     def lookupTransformCore(self, target_frame, source_frame, time):
         t = TransformStamped()
+        t.transform.translation.x = 1
+        t.transform.rotation.x = 1
+        t.header.stamp = time
+        t.header.frame_id = target_frame
+        t.child_frame_id = source_frame
+        return t
+
+    # advanced api
+    def lookupTransformCore(self, target_frame, target_time,
+                            source_frame, source_time, fixed_frame):
+        t = TransformStamped()
+        t.transform.translation.x = 1
         t.transform.rotation.x = 1
         t.header.stamp = time
         t.header.frame_id = target_frame
@@ -46,5 +58,10 @@ class BufferCore():
 
     # simple api
     def canTransformCore(self, target_frame, source_frame, time):
+        return True    
+
+    # advanced api
+    def canTransformCore(self, target_frame, target_time,
+                         source_frame, source_time, fixed_frame):
         return True    
 
