@@ -68,8 +68,7 @@ class TimeCache
   static const int64_t DEFAULT_MAX_EXTRAPOLATION_TIME = 0LL; //!< default max extrapolation of 0 nanoseconds \todo remove and make not optional??
 
 
-  TimeCache(bool interpolating = true, 
-            ros::Duration  max_storage_time = ros::Duration().fromNSec(DEFAULT_MAX_STORAGE_TIME),
+  TimeCache(ros::Duration  max_storage_time = ros::Duration().fromNSec(DEFAULT_MAX_STORAGE_TIME),
             ros::Duration  max_extrapolation_time = ros::Duration().fromNSec(DEFAULT_MAX_EXTRAPOLATION_TIME));
 
   bool getData(ros::Time time, TransformStorage & data_out); //returns false if data unavailable (should be thrown as lookup exception
@@ -92,7 +91,6 @@ class TimeCache
 private:
   std::list<TransformStorage > storage_;
 
-  bool interpolating_;
   ros::Duration max_storage_time_;
   ros::Duration max_extrapolation_time_;
 
