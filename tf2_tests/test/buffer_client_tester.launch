@@ -1,4 +1,4 @@
 <launch>
-  <node name="test_buffer_server" pkg="tf2_tests" type="test_buffer_server" />
-  <test test-name="test_buffer_client_test" pkg="tf2_tests" type="test_buffer_client" />
+  <node name="test_buffer_server" pkg="tf2_tests" type="test_buffer_server" output="screen" />
+  <test test-name="test_buffer_client_test" pkg="tf2_tests" type="test_buffer_client" args="--text" />
 </launch>

@@ -41,7 +41,7 @@
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "buffer_client_test");
+  ros::init(argc, argv, "buffer_server_test");
   tf2::Buffer buffer;
   tf2::TransformListener tfl(buffer);
   tf2::BufferServer server(buffer, "tf_action");
