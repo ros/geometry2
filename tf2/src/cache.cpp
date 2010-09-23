@@ -88,7 +88,7 @@ bool TimeCache::insertData(const TransformStorage& new_data)
     
     if(storage_it != storage_.end())
     {
-      if (storage_it->stamp_ > new_data.stamp_ + max_storage_time_)
+      if (storage_it->header.stamp > new_data.header.stamp + max_storage_time_)
       {
         return false;
       }
@@ -97,7 +97,7 @@ bool TimeCache::insertData(const TransformStorage& new_data)
     
     while(storage_it != storage_.end())
     {
-      if (storage_it->stamp_ <= new_data.stamp_)
+      if (storage_it->header.stamp <= new_data.header.stamp)
         break;
       storage_it++;
     }
@@ -137,7 +137,7 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
   std::list<TransformStorage >::iterator storage_it = storage_.begin();
   while(storage_it != storage_.end())
   {
-    if (storage_it->stamp_ <= target_time)
+    if (storage_it->header.stamp <= target_time)
       break;
     storage_it++;
   }
@@ -152,8 +152,8 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
     {
       std::stringstream ss;
       ss << "Extrapolation Too Far in the future: target_time = "<< (target_time).toSec() <<", closest data at "
-         << (one.stamp_).toSec() << " and " << (two.stamp_).toSec() <<" which are farther away than max_extrapolation_time "
-         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.stamp_).toSec()<< " and " << (target_time - two.stamp_).toSec() <<" respectively.";
+         << (one.header.stamp).toSec() << " and " << (two.header.stamp).toSec() <<" which are farther away than max_extrapolation_time "
+         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.header.stamp).toSec()<< " and " << (target_time - two.header.stamp).toSec() <<" respectively.";
       throw ExtrapolationException(ss.str());
     }
     */
@@ -167,13 +167,13 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
     two = *(--storage_it);
     mode = EXTRAPOLATE_BACK;
     /*
-      time_diff = target_time - one.stamp_;
+      time_diff = target_time - one.header.stamp;
     if (time_diff < ros::Duration()-max_extrapolation_time_) //Guarenteed in the past ///\todo check negative sign
     {
       std::stringstream ss;
       ss << "Extrapolation Too Far in the past: target_time = "<< (target_time).toSec() <<", closest data at "
-         << (one.stamp_).toSec() << " and " << (two.stamp_).toSec() <<" which are farther away than max_extrapolation_time "
-         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.stamp_).toSec()<< " and " << (target_time - two.stamp_).toSec() <<" respectively."; //sign flip since in the past
+         << (one.header.stamp).toSec() << " and " << (two.header.stamp).toSec() <<" which are farther away than max_extrapolation_time "
+         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.header.stamp).toSec()<< " and " << (target_time - two.header.stamp).toSec() <<" respectively."; //sign flip since in the past
       throw ExtrapolationException(ss.str());
     }
     */
@@ -193,27 +193,40 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
 { 
 
   // Check for zero distance case 
-  if( two.stamp_ == one.stamp_ )
+  if( two.header.stamp == one.header.stamp )
   {
     output = two;
     return;    
   }
   //Calculate the ratio
-  btScalar ratio = ((time - one.stamp_).toSec()) / ((two.stamp_ - one.stamp_).toSec());
+  btScalar ratio = ((time - one.header.stamp).toSec()) / ((two.header.stamp - one.header.stamp).toSec());
   
   //Interpolate translation
   btVector3 v(0,0,0); //initialzed to fix uninitialized warning, not actually necessary
-  v.setInterpolate3(one.getOrigin(), two.getOrigin(), ratio);
-  output.setOrigin(v);
+  v.setInterpolate3(btVector3(one.transform.translation.x, one.transform.translation.y, one.transform.translation.z), btVector3(two.transform.translation.x, two.transform.translation.y, two.transform.translation.z), ratio);
+  output.transform.translation.x = v.getX();
+  output.transform.translation.y = v.getY();
+  output.transform.translation.z = v.getZ();
   
   //Interpolate rotation
-  btQuaternion q1,q2;
-  one.getBasis().getRotation(q1);
-  two.getBasis().getRotation(q2);
-  output.setRotation(slerp( q1, q2 , ratio));
-  output.stamp_ = one.stamp_;
-  output.frame_id_ = one.frame_id_;
-  output.child_frame_id_ = one.child_frame_id_;
+  btQuaternion q1(one.transform.rotation.x, 
+                  one.transform.rotation.y, 
+                  one.transform.rotation.z, 
+                  one.transform.rotation.w);
+  
+  btQuaternion q2(two.transform.rotation.x, 
+                  two.transform.rotation.y, 
+                  two.transform.rotation.z, 
+                  two.transform.rotation.w);
+  btQuaternion out;
+  out = slerp( q1, q2 , ratio);
+  output.transform.rotation.x = out.getX();
+  output.transform.rotation.y = out.getY();
+  output.transform.rotation.z = out.getZ();
+  output.transform.rotation.w = out.getW();
+  output.header.stamp = one.header.stamp;
+  output.header.frame_id = one.header.frame_id;
+  output.child_frame_id = one.child_frame_id;
   output.frame_id_num_ = one.frame_id_num_;
 };
 
@@ -226,21 +239,21 @@ ros::Time TimeCache::getLatestTimestamp()
 {   
   boost::mutex::scoped_lock lock(storage_lock_); 
   if (storage_.empty()) return ros::Time(); //empty list case
-  return storage_.front().stamp_; 
+  return storage_.front().header.stamp; 
 };
 
 ros::Time TimeCache::getOldestTimestamp() 
 {   
   boost::mutex::scoped_lock lock(storage_lock_); 
   if (storage_.empty()) return ros::Time(); //empty list case
-  return storage_.back().stamp_; 
+  return storage_.back().header.stamp; 
 };
 
 void TimeCache::pruneList()
 {
-  ros::Time latest_time = storage_.begin()->stamp_;
+  ros::Time latest_time = storage_.begin()->header.stamp;
   
-  while(!storage_.empty() && storage_.back().stamp_ + max_storage_time_ < latest_time)
+  while(!storage_.empty() && storage_.back().header.stamp + max_storage_time_ < latest_time)
   {
     storage_.pop_back();
   }

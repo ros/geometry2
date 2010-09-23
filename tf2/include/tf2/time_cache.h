@@ -36,6 +36,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "tf2/transform_datatypes.h"
+#include "geometry_msgs/TransformStamped.h"
 
 #include <sstream>
 
@@ -44,11 +45,11 @@ namespace tf2
 enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_FORWARD };
 
 /** \brief Storage for transforms and their parent */
-class  TransformStorage : public StampedTransform
+class  TransformStorage : public geometry_msgs::TransformStamped
 {
 public:
   TransformStorage(){};
-  TransformStorage(const StampedTransform& data, unsigned int frame_id_num): StampedTransform(data), frame_id_num_(frame_id_num){};
+  TransformStorage(const geometry_msgs::TransformStamped& data, unsigned int frame_id_num): geometry_msgs::TransformStamped(data), frame_id_num_(frame_id_num){};
   unsigned int frame_id_num_;
   ExtrapolationMode mode_;
 };
