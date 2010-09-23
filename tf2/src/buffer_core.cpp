@@ -93,7 +93,12 @@ std::string tf::resolve(const std::string& prefix, const std::string& frame_name
 
 BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
 {
+  max_extrapolation_distance_.fromNSec(DEFAULT_MAX_EXTRAPOLATION_DISTANCE);
+  frameIDs_["NO_PARENT"] = 0;
+  frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
+  frameIDs_reverse.push_back("NO_PARENT");
 
+  return;
 }
 
 BufferCore::~BufferCore()
@@ -345,8 +350,8 @@ unsigned int BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_st
   std::map<std::string, unsigned int>::iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
-    frames_.push_back( new TimeCache(cache_time, max_extrapolation_distance_));
     retval = frames_.size();
+    frames_.push_back( new TimeCache(cache_time, max_extrapolation_distance_));
     frameIDs_[frameid_str] = retval;
     frameIDs_reverse.push_back(frameid_str);
   }
