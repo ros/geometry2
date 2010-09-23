@@ -30,10 +30,11 @@
 /** \author Tully Foote */
 
 #include "tf2/buffer_core.h"
-
+#include "tf2/exceptions.h"
 //legacy
 #include "tf/tf.h"
 #include "tf/transform_datatypes.h"
+
 
 using namespace tf2;
 
@@ -64,11 +65,30 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
                                                         const std::string& source_frame,
                                                         const ros::Time& time) const
 {
-  tf::StampedTransform t;
-  old_tf_.lookupTransform(target_frame, source_frame, time, t);
-  geometry_msgs::TransformStamped output;
-  tf::transformStampedTFToMsg(t, output);
-  return output;
+  try
+  {
+    tf::StampedTransform t;
+    old_tf_.lookupTransform(target_frame, source_frame, time, t);
+    geometry_msgs::TransformStamped output;
+    tf::transformStampedTFToMsg(t, output);
+    return output;
+  }
+  catch (tf::LookupException& ex)
+  {
+    throw tf2::LookupException(ex.what());
+  }
+  catch (tf::ConnectivityException& ex)
+  {
+    throw tf2::ConnectivityException(ex.what());
+  }
+  catch (tf::ExtrapolationException& ex)
+  {
+    throw tf2::ExtrapolationException(ex.what());
+  }
+  catch (tf::InvalidArgument& ex)
+  {
+    throw tf2::InvalidArgumentException(ex.what());
+  }
 };
 
                                                        
@@ -78,12 +98,30 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
                                                         const ros::Time& source_time,
                                                         const std::string& fixed_frame) const
 {
-  tf::StampedTransform t;
+  try
+  {
+tf::StampedTransform t;
   old_tf_.lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame, t);
   geometry_msgs::TransformStamped output;
   tf::transformStampedTFToMsg(t, output);
   return output;
-};
+  }
+  catch (tf::LookupException& ex)
+  {
+    throw tf2::LookupException(ex.what());
+  }
+  catch (tf::ConnectivityException& ex)
+  {
+    throw tf2::ConnectivityException(ex.what());
+  }
+  catch (tf::ExtrapolationException& ex)
+  {
+    throw tf2::ExtrapolationException(ex.what());
+  }
+  catch (tf::InvalidArgument& ex)
+  {
+    throw tf2::InvalidArgumentException(ex.what());
+  }};
 
 
 
@@ -93,10 +131,29 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
                                           const ros::Time& time, 
                                           const ros::Duration& averaging_interval) const
 {
+  try
+  {
   geometry_msgs::Twist t;
   old_tf_.lookupTwist(tracking_frame, observation_frame, 
                       time, averaging_interval, t);
   return t;
+  }
+  catch (tf::LookupException& ex)
+  {
+    throw tf2::LookupException(ex.what());
+  }
+  catch (tf::ConnectivityException& ex)
+  {
+    throw tf2::ConnectivityException(ex.what());
+  }
+  catch (tf::ExtrapolationException& ex)
+  {
+    throw tf2::ExtrapolationException(ex.what());
+  }
+  catch (tf::InvalidArgument& ex)
+  {
+    throw tf2::InvalidArgumentException(ex.what());
+  }
 };
 
 geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame, 
@@ -107,10 +164,28 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
                                           const ros::Time& time, 
                                           const ros::Duration& averaging_interval) const
 {
+  try{
   geometry_msgs::Twist t;
   old_tf_.lookupTwist(tracking_frame, observation_frame, reference_frame, reference_point, reference_point_frame,
                       time, averaging_interval, t);
   return t;
+  }
+  catch (tf::LookupException& ex)
+  {
+    throw tf2::LookupException(ex.what());
+  }
+  catch (tf::ConnectivityException& ex)
+  {
+    throw tf2::ConnectivityException(ex.what());
+  }
+  catch (tf::ExtrapolationException& ex)
+  {
+    throw tf2::ExtrapolationException(ex.what());
+  }
+  catch (tf::InvalidArgument& ex)
+  {
+    throw tf2::InvalidArgumentException(ex.what());
+  }
 };
 
 
