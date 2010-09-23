@@ -55,6 +55,8 @@ typedef struct
   std::vector<TransformStorage > forwardTransforms;
 } TransformLists;
 
+/** \brief resolve tf names */
+std::string resolve(const std::string& prefix, const std::string& frame_name);
 
 /** \brief A Class which provides coordinate transforms between any two frames in a system.
  *
@@ -225,7 +227,8 @@ private:
   /// whether or not to allow extrapolation
   ros::Duration max_extrapolation_distance_;
 
-
+  /// Used as default remapping argument
+  std::string tf_prefix_;
 
   /************************* Internal Functions ****************************/
 
