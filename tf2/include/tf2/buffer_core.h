@@ -255,8 +255,25 @@ private:
   bool test_extrapolation(const ros::Time& target_time, const TransformLists& t_lists, std::string * error_string) const;
   */
   /** Compute the transform based on the list of frames */
-  //  btTransform computeTransformFromList(const TransformLists & list) const;
+  btTransform computeTransformFromList(const TransformLists & list) const;
 
+
+  /** \brief convert Transform msg to Transform */
+  static inline btTransform transformMsgToBT(const geometry_msgs::Transform& msg)
+  {btTransform bt(Quaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), Vector3(msg.translation.x, msg.translation.y, msg.translation.z)); return bt;};
+  /** \brief convert Transform to Transform msg*/
+  static inline geometry_msgs::Transform transformBTToMsg(const Transform& bt)
+  {
+    geometry_msgs::Transform msg; 
+    msg.translation.x = bt.getOrigin().getX();
+    msg.translation.y = bt.getOrigin().getY();
+    msg.translation.z = bt.getOrigin().getZ();
+    msg.rotation.x = bt.getRotation().getX();
+    msg.rotation.y = bt.getRotation().getY();
+    msg.rotation.z = bt.getRotation().getZ();
+    msg.rotation.w = bt.getRotation().getW();
+    return msg;
+  }
 
 
   /////////////////////////////////// Backwards hack for quick startup /////////////////////////

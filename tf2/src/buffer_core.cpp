@@ -259,7 +259,7 @@ std::string BufferCore::lookupFrameString(unsigned int frame_id_num) const
   };
 
 
-/*
+
 btTransform BufferCore::computeTransformFromList(const TransformLists & lists) const
 {
   btTransform retTrans;
@@ -267,13 +267,13 @@ btTransform BufferCore::computeTransformFromList(const TransformLists & lists) c
   ///@todo change these to iterators
   for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
     {
-      retTrans *= (lists.inverseTransforms[lists.inverseTransforms.size() -1 - i]); //Reverse to get left multiply
+      retTrans *= transformMsgToBT((lists.inverseTransforms[lists.inverseTransforms.size() -1 - i]).transform); //Reverse to get left multiply
     }
   for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
     {
-      retTrans = (lists.forwardTransforms[lists.forwardTransforms.size() -1 - i]).inverse() * retTrans; //Do this list backwards(from backwards) for it was generated traveling the wrong way
+      retTrans = transformMsgToBT((lists.forwardTransforms[lists.forwardTransforms.size() -1 - i]).transform).inverse() * retTrans; //Do this list backwards(from backwards) for it was generated traveling the wrong way
     }
 
   return retTrans;
 }
-*/
+
