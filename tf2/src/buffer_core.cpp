@@ -136,37 +136,10 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
 
 
 geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame, 
-                                                        const std::string& source_frame,
-                                                        const ros::Time& time) const
+                                                            const std::string& source_frame,
+                                                            const ros::Time& time) const
 {
   geometry_msgs::TransformStamped output_transform;
-
-  //// OLD
-  try
-  {
-    tf::StampedTransform t;
-    old_tf_.lookupTransform(target_frame, source_frame, time, t);
-    tf::transformStampedTFToMsg(t, output_transform);
-    return output_transform;
-  }
-  catch (tf::LookupException& ex)
-  {
-    throw tf2::LookupException(ex.what());
-  }
-  catch (tf::ConnectivityException& ex)
-  {
-    throw tf2::ConnectivityException(ex.what());
-  }
-  catch (tf::ExtrapolationException& ex)
-  {
-    throw tf2::ExtrapolationException(ex.what());
-  }
-  catch (tf::InvalidArgument& ex)
-  {
-    throw tf2::InvalidArgumentException(ex.what());
-  }
-
-  //// NEW
 
   // Short circuit if zero length transform to allow lookups on non existant links
   if (source_frame == target_frame)
@@ -239,7 +212,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   output_transform.header.stamp = temp_time;
   output_transform.header.frame_id = target_frame;
   output_transform.child_frame_id = source_frame;
-
+  return output_transform;
 };
 
                                                        
