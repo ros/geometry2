@@ -395,55 +395,9 @@ TEST(tf, TransformThroughNO_PARENT)
 }
 
 
-TEST(tf, getParent)
-{
-  
-  std::vector<std::string> children;
-  std::vector<std::string> parents;
-
-  children.push_back("a");
-  parents.push_back("c");
-
-  children.push_back("b");
-  parents.push_back("c");
-
-  children.push_back("c");
-  parents.push_back("e");
-
-  children.push_back("d");
-  parents.push_back("e");
-
-  children.push_back("e");
-  parents.push_back("f");
-
-  children.push_back("f");
-  parents.push_back("j");
-
-  tf::Transformer mTR(true);
-
-  for (uint64_t i = 0; i <  children.size(); i++)
-    {
-      StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10), parents[i], children[i]);
-      mTR.setTransform(tranStamped);
-    }
-
-  //std::cout << mTR.allFramesAsString() << std::endl;
-
-  std::string output;
-  for  (uint64_t i = 0; i <  children.size(); i++)
-    {
-      EXPECT_TRUE(mTR.getParent(children[i], ros::Time().fromNSec(10), output));
-      EXPECT_STREQ(tf::resolve("",parents[i]).c_str(), output.c_str());
-    }
-  
-  EXPECT_FALSE(mTR.getParent("j", ros::Time().fromNSec(10), output));
-
-  EXPECT_FALSE(mTR.getParent("no_value", ros::Time().fromNSec(10), output));
-  
-}
 
 
-TEST(tf, NO_PARENT_SET)
+TEST(BufferClient_lookupTransform, NO_PARENT_SET)
 {
   double epsilon = 1e-6;
   
@@ -454,27 +408,31 @@ TEST(tf, NO_PARENT_SET)
 
   children.push_back("b");
   parents.push_back("a");
-  children.push_back("a");
-  parents.push_back("NO_PARENT");
 
-  tf::Transformer mTR(true);
+  tf2::BufferCore mBC;
 
   for (uint64_t i = 0; i <  children.size(); i++)
     {
-      StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10),  parents[i], children[i]);
-      mTR.setTransform(tranStamped);
+      geometry_msgs::TransformStamped ts;
+      setIdentity(ts.transform);
+      ts.header.stamp = ros::Time().fromNSec(10);
+      ts.header.frame_id = parents[i];
+      ts.child_frame_id = children[i];
+      mBC.setTransform(ts, "authority");
     }
 
   //std::cout << mTR.allFramesAsString() << std::endl;
 
 
-  Stamped<btTransform> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10), "a");
-  Stamped<btTransform> outpose;
-  outpose.setIdentity(); //to make sure things are getting mutated
-  mTR.transformPose("a",inpose, outpose);
-  EXPECT_NEAR(outpose.getOrigin().x(), 0, epsilon);
-  EXPECT_NEAR(outpose.getOrigin().y(), 0, epsilon);
-  EXPECT_NEAR(outpose.getOrigin().z(), 0, epsilon);
+  geometry_msgs::TransformStamped outpose = mBC.lookupTransform("a", "a", ros::Time().fromNSec(10));
+  EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
+
   
 }
 
