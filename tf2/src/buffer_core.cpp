@@ -44,7 +44,16 @@ using namespace tf2;
 // Thanks to Rob for pointing out the right way to do this.
 const double tf2::BufferCore::DEFAULT_CACHE_TIME;
 
-
+void setIdentity(geometry_msgs::Transform& tx)
+{
+  tx.translation.x = 0;
+  tx.translation.y = 0;
+  tx.translation.z = 0;
+  tx.rotation.x = 0;
+  tx.rotation.y = 0;
+  tx.rotation.z = 0;
+  tx.rotation.w = 1;
+}
 
 BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
 {
@@ -130,13 +139,15 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
                                                         const std::string& source_frame,
                                                         const ros::Time& time) const
 {
+  geometry_msgs::TransformStamped output_transform;
+
+  //// OLD
   try
   {
     tf::StampedTransform t;
     old_tf_.lookupTransform(target_frame, source_frame, time, t);
-    geometry_msgs::TransformStamped output;
-    tf::transformStampedTFToMsg(t, output);
-    return output;
+    tf::transformStampedTFToMsg(t, output_transform);
+    return output_transform;
   }
   catch (tf::LookupException& ex)
   {
@@ -154,6 +165,81 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   {
     throw tf2::InvalidArgumentException(ex.what());
   }
+
+  //// NEW
+
+  // Short circuit if zero length transform to allow lookups on non existant links
+  if (source_frame == target_frame)
+  {
+    setIdentity(output_transform.transform);
+
+
+    output_transform.header.stamp = time;
+    /*    if (time == ros::Time())
+      output_transform.header.stamp = ros::Time(ros::TIME_MAX); ///\todo review what this should be
+    else
+      output_transform.header.stamp  = time;
+    */
+
+    output_transform.child_frame_id = source_frame;
+    output_transform.header.frame_id = target_frame;
+    return output_transform;
+  }
+
+  //  printf("Mapped Source: %s \nMapped Target: %s\n", source_frame.c_str(), target_frame.c_str());
+  int retval = tf2_msgs::TF2Error::NO_ERROR;
+  ros::Time temp_time;
+  std::string error_string;
+  //If getting the latest get the latest common time
+  if (time == ros::Time())
+    retval = getLatestCommonTime(target_frame, source_frame, temp_time, &error_string);
+  else
+    temp_time = time;
+
+  TransformLists t_list;
+
+  if (retval == tf2_msgs::TF2Error::NO_ERROR)
+    try
+    {
+      retval = lookupLists(lookupFrameNumber( target_frame), temp_time, lookupFrameNumber( source_frame), t_list, &error_string);
+    }
+    catch (tf::LookupException &ex)
+    {
+      error_string = ex.what();
+      retval = tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  if (retval != tf2_msgs::TF2Error::NO_ERROR)
+  {
+    std::stringstream ss;
+    ss << " When trying to transform between " << source_frame << " and " << target_frame <<".";
+    if (retval == tf2_msgs::TF2Error::LOOKUP_ERROR)
+      throw LookupException(error_string + ss.str());
+    if (retval == tf2_msgs::TF2Error::CONNECTIVITY_ERROR)
+      throw ConnectivityException(error_string + ss.str());
+  }
+
+  if (test_extrapolation(temp_time, t_list, &error_string))
+    {
+    std::stringstream ss;
+    if (time == ros::Time())// Using latest common time if we extrapolate this means that one of the links is out of date
+    {
+      ss << "Could not find a common time " << source_frame << " and " << target_frame <<".";
+      throw ConnectivityException(ss.str());
+    }
+    else
+    {
+      ss << " When trying to transform between " << source_frame << " and " << target_frame <<"."<< std::endl;
+      throw ExtrapolationException(error_string + ss.str());
+    }
+    }
+
+
+  btTransform output = computeTransformFromList(t_list);
+  tf2::transformTF2ToMsg(output, output_transform.transform);
+  output_transform.header.stamp = temp_time;
+  output_transform.header.frame_id = target_frame;
+  output_transform.child_frame_id = source_frame;
+
 };
 
                                                        
@@ -674,3 +760,47 @@ std::string BufferCore::allFramesAsString() const
   }
   return mstream.str();
 }
+
+int BufferCore::getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time & time, std::string * error_string) const
+{
+
+  time = ros::Time(ros::TIME_MAX);
+  int retval;
+  TransformLists lists;
+  try
+  {
+    retval = lookupLists(lookupFrameNumber(dest), ros::Time(), lookupFrameNumber(source), lists, error_string);
+  }
+  catch (tf::LookupException &ex)
+  {
+    time = ros::Time();
+    if (error_string) *error_string = ex.what();
+    return tf2_msgs::TF2Error::LOOKUP_ERROR;
+  }
+  if (retval == tf2_msgs::TF2Error::NO_ERROR)
+  {
+    //Set time to latest timestamp of frameid in case of target and source frame id are the same
+    if (lists.inverseTransforms.size() == 0 && lists.forwardTransforms.size() == 0)
+    {
+      time = ros::Time(); ///\todo review was now();
+      return retval;
+    }
+
+    for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
+    {
+      if (time > lists.inverseTransforms[i].header.stamp)
+        time = lists.inverseTransforms[i].header.stamp;
+    }
+    for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
+    {
+      if (time > lists.forwardTransforms[i].header.stamp)
+        time = lists.forwardTransforms[i].header.stamp;
+    }
+
+  }
+  else
+    time.fromSec(0);
+
+  return retval;
+};
+
