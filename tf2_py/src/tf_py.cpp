@@ -44,6 +44,7 @@
   } while (0)
 
 static PyObject *pModulerospy = NULL;
+static PyObject *pModulegeometrymsgs = NULL;
 static PyObject *tf2_exception = NULL;
 static PyObject *tf2_connectivityexception = NULL, *tf2_lookupexception = NULL, *tf2_extrapolationexception = NULL, 
                 *tf2_invalidargumentexception = NULL, *tf2_timeoutexception = NULL;
@@ -66,6 +67,104 @@ static PyObject *PyObject_BorrowAttrString(PyObject* o, const char *name)
     if (r != NULL)
       Py_DECREF(r);
     return r;
+}
+
+static PyObject *transform_converter(const geometry_msgs::TransformStamped* transform)
+{
+  printf("Called\n");
+
+  PyObject *pclass, *pargs, *pinst = NULL;
+  pclass = PyObject_GetAttrString(pModulegeometrymsgs, "TransformStamped");
+  Py_DECREF(pModulegeometrymsgs);
+  if(pclass == NULL)
+  {
+    printf("Can't get geometry_msgs.msg.TransformedStamped\n");
+    return NULL;
+  }
+
+  pargs = Py_BuildValue("()");
+  if(pargs == NULL)
+  {
+    printf("Can't build argument list\n");
+    return NULL;
+  }
+
+  pinst = PyEval_CallObject(pclass, pargs);
+  Py_DECREF(pclass);
+  Py_DECREF(pargs);
+  if(pinst == NULL)
+  {
+    printf("Can't create class\n");
+    return NULL;
+  }
+
+  //we need to convert the time to python
+  PyObject *rospy_time = PyObject_GetAttrString(pModulerospy, "Time");
+  PyObject *args = Py_BuildValue("ii", transform->header.stamp.sec, transform->header.stamp.nsec);
+  PyObject *time_obj = PyObject_CallObject(rospy_time, args);
+  Py_DECREF(args);
+  Py_DECREF(rospy_time);
+
+  PyObject* pheader = PyObject_GetAttrString(pinst, "header");
+
+  int ret_code = PyObject_SetAttrString(pheader, "stamp", time_obj);
+  Py_DECREF(time_obj);
+
+  if(ret_code < 0)
+  {
+    printf("Can't set time\n");
+    return NULL;
+  }
+
+  PyObject *frame_id = PyString_FromString((transform->header.frame_id).c_str());
+  PyObject_SetAttrString(pheader, "frame_id", frame_id);
+  Py_DECREF(pheader);
+  Py_DECREF(frame_id);
+
+  PyObject *ptransform = PyObject_GetAttrString(pinst, "transform");
+
+  PyObject *ptranslation = PyObject_GetAttrString(ptransform, "translation");
+  PyObject *protation = PyObject_GetAttrString(ptransform, "rotation");
+  Py_DECREF(ptransform);
+
+  PyObject *val = PyString_FromString((transform->child_frame_id).c_str());
+  PyObject_SetAttrString(pinst, "child_frame_id", val);
+
+  val = PyFloat_FromDouble(transform->transform.translation.x);
+  PyObject_SetAttrString(ptranslation, "x", val);
+  Py_DECREF(val);
+
+  val = PyFloat_FromDouble(transform->transform.translation.y);
+  PyObject_SetAttrString(ptranslation, "y", val);
+  Py_DECREF(val);
+
+  val = PyFloat_FromDouble(transform->transform.translation.z);
+  PyObject_SetAttrString(ptranslation, "z", val);
+  Py_DECREF(val);
+
+  Py_DECREF(ptranslation);
+
+  val = PyFloat_FromDouble(transform->transform.rotation.x);
+  PyObject_SetAttrString(protation, "x", val);
+  Py_DECREF(val);
+
+  val = PyFloat_FromDouble(transform->transform.rotation.y);
+  PyObject_SetAttrString(protation, "y", val);
+  Py_DECREF(val);
+
+  val = PyFloat_FromDouble(transform->transform.rotation.z);
+  PyObject_SetAttrString(protation, "z", val);
+  Py_DECREF(val);
+
+  val = PyFloat_FromDouble(transform->transform.rotation.w);
+  PyObject_SetAttrString(protation, "w", val);
+  Py_DECREF(val);
+
+  Py_DECREF(protation);
+
+  printf("Made object\n");
+
+  return pinst;
 }
 
 static int rostime_converter(PyObject *obj, ros::Time *rt)
@@ -238,9 +337,10 @@ static PyObject *lookupTransformCore(PyObject *self, PyObject *args, PyObject *k
   geometry_msgs::Vector3 origin = transform.transform.translation;
   geometry_msgs::Quaternion rotation = transform.transform.rotation;
   //TODO: Create a converter that will actually return a python message
-  return Py_BuildValue("(ddd)(dddd)",
-      origin.x, origin.y, origin.z,
-      rotation.x, rotation.y, rotation.z, rotation.w);
+  return Py_BuildValue("O&", transform_converter, &transform);
+  //return Py_BuildValue("(ddd)(dddd)",
+  //    origin.x, origin.y, origin.z,
+  //    rotation.x, rotation.y, rotation.z, rotation.w);
 }
 
 static PyObject *lookupTransformFullCore(PyObject *self, PyObject *args, PyObject *kw)
@@ -264,9 +364,7 @@ static PyObject *lookupTransformFullCore(PyObject *self, PyObject *args, PyObjec
   geometry_msgs::Vector3 origin = transform.transform.translation;
   geometry_msgs::Quaternion rotation = transform.transform.rotation;
   //TODO: Create a converter that will actually return a python message
-  return Py_BuildValue("(ddd)(dddd)",
-      origin.x, origin.y, origin.z,
-      rotation.x, rotation.y, rotation.z, rotation.w);
+  return Py_BuildValue("O&", transform_converter, &transform);
 }
 
 static PyObject *lookupTwistCore(PyObject *self, PyObject *args, PyObject *kw)
@@ -416,6 +514,13 @@ extern "C" void init_tf2()
 #endif
 
   pModulerospy = PyImport_Import(item= PyString_FromString("rospy")); Py_DECREF(item);
+  pModulegeometrymsgs = PyImport_ImportModule("geometry_msgs.msg");
+
+  if(pModulegeometrymsgs == NULL)
+  {
+    printf("Cannot load geometry_msgs module");
+    return;
+  }
 
   buffer_core_Type.tp_alloc = PyType_GenericAlloc;
   buffer_core_Type.tp_new = PyType_GenericNew;
