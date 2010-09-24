@@ -44,52 +44,16 @@ using namespace tf2;
 // Thanks to Rob for pointing out the right way to do this.
 const double tf2::BufferCore::DEFAULT_CACHE_TIME;
 
-
-std::string assert_resolved(const std::string& prefix, const std::string& frame_id)
+void setIdentity(geometry_msgs::Transform& tx)
 {
-  if (frame_id.size() > 0)
-    if (frame_id[0] != '/')
-      ROS_DEBUG("TF operating on not fully resolved frame id %s, resolving using local prefix %s", frame_id.c_str(), prefix.c_str());
-  return tf::resolve(prefix, frame_id);
-};
-
-std::string tf::resolve(const std::string& prefix, const std::string& frame_name)
-{
-  //  printf ("resolveping prefix:%s with frame_name:%s\n", prefix.c_str(), frame_name.c_str());
-  if (frame_name.size() > 0)
-    if (frame_name[0] == '/')
-    {
-      return frame_name;
-    }
-  if (prefix.size() > 0)
-  {
-    if (prefix[0] == '/')
-    {
-      std::string composite = prefix;
-      composite.append("/");
-      composite.append(frame_name);
-      return composite;
-    }
-    else
-    {
-      std::string composite;
-      composite = "/";
-      composite.append(prefix);
-      composite.append("/");
-      composite.append(frame_name);
-      return composite;
-    }
-
-  }
-  else
- {
-    std::string composite;
-    composite = "/";
-    composite.append(frame_name);
-    return composite;
-  }
-};
-
+  tx.translation.x = 0;
+  tx.translation.y = 0;
+  tx.translation.z = 0;
+  tx.rotation.x = 0;
+  tx.rotation.y = 0;
+  tx.rotation.z = 0;
+  tx.rotation.w = 1;
+}
 
 BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
 {
@@ -97,7 +61,6 @@ BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
   frameIDs_["NO_PARENT"] = 0;
   frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
   frameIDs_reverse.push_back("NO_PARENT");
-  tf_prefix_ = "";
 
   return;
 }
@@ -110,65 +73,71 @@ BufferCore::~BufferCore()
 void BufferCore::clear()
 {
   old_tf_.clear();
+
+
+  boost::mutex::scoped_lock(frame_mutex_);
+  if ( frames_.size() > 1 )
+  {
+    for (std::vector< TimeCache*>::iterator  cache_it = frames_.begin() + 1; cache_it != frames_.end(); ++cache_it)
+    {
+      (*cache_it)->clearList();
+    }
+  }
+  
 }
 
-bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform, const std::string& authority)
+bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_in, const std::string& authority)
 {
 
   /////BACKEARDS COMPATABILITY 
   tf::StampedTransform tf_transform;
-  tf::transformStampedMsgToTF(transform, tf_transform);
+  tf::transformStampedMsgToTF(transform_in, tf_transform);
   if  (!old_tf_.setTransform(tf_transform, authority))
   {
     printf("Warning old setTransform Failed but was not caught\n");
   }
 
   /////// New implementation
-  geometry_msgs::TransformStamped mapped_transform = transform;
-  mapped_transform.child_frame_id = assert_resolved(tf_prefix_, transform.child_frame_id);
-  mapped_transform.header.frame_id = assert_resolved(tf_prefix_, transform.header.frame_id);
-
- 
   bool error_exists = false;
-  if (mapped_transform.child_frame_id == mapped_transform.header.frame_id)
+  if (transform_in.child_frame_id == transform_in.header.frame_id)
   {
-    ROS_ERROR("TF_SELF_TRANSFORM: Ignoring transform from authority \"%s\" with frame_id and child_frame_id  \"%s\" because they are the same",  authority.c_str(), mapped_transform.child_frame_id.c_str());
+    ROS_ERROR("TF_SELF_TRANSFORM: Ignoring transform from authority \"%s\" with frame_id and child_frame_id  \"%s\" because they are the same",  authority.c_str(), transform_in.child_frame_id.c_str());
     error_exists = true;
   }
 
-  if (mapped_transform.child_frame_id == "/")//empty frame id will be mapped to "/"
+  if ((transform_in.child_frame_id == "/") | (transform_in.child_frame_id == ""))//empty frame id will be mapped to "/"
   {
     ROS_ERROR("TF_NO_CHILD_FRAME_ID: Ignoring transform from authority \"%s\" because child_frame_id not set ", authority.c_str());
     error_exists = true;
   }
 
-  if (mapped_transform.header.frame_id == "/")//empty parent id will be mapped to "/"
+  if ((transform_in.header.frame_id == "/") | (transform_in.header.frame_id == ""))//empty parent id will be mapped to "/"
   {
-    ROS_ERROR("TF_NO_FRAME_ID: Ignoring transform with child_frame_id \"%s\"  from authority \"%s\" because frame_id not set", mapped_transform.child_frame_id.c_str(), authority.c_str());
+    ROS_ERROR("TF_NO_FRAME_ID: Ignoring transform with child_frame_id \"%s\"  from authority \"%s\" because frame_id not set", transform_in.child_frame_id.c_str(), authority.c_str());
     error_exists = true;
   }
 
-  if (std::isnan(mapped_transform.transform.translation.x) || std::isnan(mapped_transform.transform.translation.y) || std::isnan(mapped_transform.transform.translation.z)||
-      std::isnan(mapped_transform.transform.rotation.x) ||       std::isnan(mapped_transform.transform.rotation.y) ||       std::isnan(mapped_transform.transform.rotation.z) ||       std::isnan(mapped_transform.transform.rotation.w))
+  if (std::isnan(transform_in.transform.translation.x) || std::isnan(transform_in.transform.translation.y) || std::isnan(transform_in.transform.translation.z)||
+      std::isnan(transform_in.transform.rotation.x) ||       std::isnan(transform_in.transform.rotation.y) ||       std::isnan(transform_in.transform.rotation.z) ||       std::isnan(transform_in.transform.rotation.w))
   {
     ROS_ERROR("TF_NAN_INPUT: Ignoring transform for child_frame_id \"%s\" from authority \"%s\" because of a nan value in the transform (%f %f %f) (%f %f %f %f)",
-              mapped_transform.child_frame_id.c_str(), authority.c_str(),
-              mapped_transform.transform.translation.x, mapped_transform.transform.translation.y, mapped_transform.transform.translation.z,
-              mapped_transform.transform.rotation.x, mapped_transform.transform.rotation.y, mapped_transform.transform.rotation.z, mapped_transform.transform.rotation.w
+              transform_in.child_frame_id.c_str(), authority.c_str(),
+              transform_in.transform.translation.x, transform_in.transform.translation.y, transform_in.transform.translation.z,
+              transform_in.transform.rotation.x, transform_in.transform.rotation.y, transform_in.transform.rotation.z, transform_in.transform.rotation.w
               );
     error_exists = true;
   }
 
   if (error_exists)
     return false;
-  unsigned int frame_number = lookupOrInsertFrameNumber(mapped_transform.child_frame_id);
-  if (getFrame(frame_number)->insertData(TransformStorage(mapped_transform, lookupOrInsertFrameNumber(mapped_transform.header.frame_id))))
+  unsigned int frame_number = lookupOrInsertFrameNumber(transform_in.child_frame_id);
+  if (getFrame(frame_number)->insertData(TransformStorage(transform_in, lookupOrInsertFrameNumber(transform_in.header.frame_id))))
   {
     frame_authority_[frame_number] = authority;
   }
   else
   {
-    ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", mapped_transform.child_frame_id.c_str(), mapped_transform.header.stamp.toSec(), authority.c_str());
+    ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", transform_in.child_frame_id.c_str(), transform_in.header.stamp.toSec(), authority.c_str());
     return false;
   }
 
@@ -178,33 +147,83 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform, 
 
 
 geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame, 
-                                                        const std::string& source_frame,
-                                                        const ros::Time& time) const
+                                                            const std::string& source_frame,
+                                                            const ros::Time& time) const
 {
-  try
+  geometry_msgs::TransformStamped output_transform;
+
+  // Short circuit if zero length transform to allow lookups on non existant links
+  if (source_frame == target_frame)
   {
-    tf::StampedTransform t;
-    old_tf_.lookupTransform(target_frame, source_frame, time, t);
-    geometry_msgs::TransformStamped output;
-    tf::transformStampedTFToMsg(t, output);
-    return output;
+    setIdentity(output_transform.transform);
+
+
+    output_transform.header.stamp = time;
+    /*    if (time == ros::Time())
+      output_transform.header.stamp = ros::Time(ros::TIME_MAX); ///\todo review what this should be
+    else
+      output_transform.header.stamp  = time;
+    */
+
+    output_transform.child_frame_id = source_frame;
+    output_transform.header.frame_id = target_frame;
+    return output_transform;
   }
-  catch (tf::LookupException& ex)
+
+  //  printf("Mapped Source: %s \nMapped Target: %s\n", source_frame.c_str(), target_frame.c_str());
+  int retval = tf2_msgs::TF2Error::NO_ERROR;
+  ros::Time temp_time;
+  std::string error_string;
+  //If getting the latest get the latest common time
+  if (time == ros::Time())
+    retval = getLatestCommonTime(target_frame, source_frame, temp_time, &error_string);
+  else
+    temp_time = time;
+
+  TransformLists t_list;
+
+  if (retval == tf2_msgs::TF2Error::NO_ERROR)
+    try
+    {
+      retval = lookupLists(lookupFrameNumber( target_frame), temp_time, lookupFrameNumber( source_frame), t_list, &error_string);
+    }
+    catch (tf::LookupException &ex)
+    {
+      error_string = ex.what();
+      retval = tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  if (retval != tf2_msgs::TF2Error::NO_ERROR)
   {
-    throw tf2::LookupException(ex.what());
+    std::stringstream ss;
+    ss << " When trying to transform between " << source_frame << " and " << target_frame <<".";
+    if (retval == tf2_msgs::TF2Error::LOOKUP_ERROR)
+      throw LookupException(error_string + ss.str());
+    if (retval == tf2_msgs::TF2Error::CONNECTIVITY_ERROR)
+      throw ConnectivityException(error_string + ss.str());
   }
-  catch (tf::ConnectivityException& ex)
-  {
-    throw tf2::ConnectivityException(ex.what());
-  }
-  catch (tf::ExtrapolationException& ex)
-  {
-    throw tf2::ExtrapolationException(ex.what());
-  }
-  catch (tf::InvalidArgument& ex)
-  {
-    throw tf2::InvalidArgumentException(ex.what());
-  }
+
+  if (test_extrapolation(temp_time, t_list, &error_string))
+    {
+    std::stringstream ss;
+    if (time == ros::Time())// Using latest common time if we extrapolate this means that one of the links is out of date
+    {
+      ss << "Could not find a common time " << source_frame << " and " << target_frame <<".";
+      throw ConnectivityException(ss.str());
+    }
+    else
+    {
+      ss << " When trying to transform between " << source_frame << " and " << target_frame <<"."<< std::endl;
+      throw ExtrapolationException(error_string + ss.str());
+    }
+    }
+
+
+  btTransform output = computeTransformFromList(t_list);
+  tf2::transformTF2ToMsg(output, output_transform.transform);
+  output_transform.header.stamp = temp_time;
+  output_transform.header.frame_id = target_frame;
+  output_transform.child_frame_id = source_frame;
+  return output_transform;
 };
 
                                                        
@@ -214,30 +233,20 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
                                                         const ros::Time& source_time,
                                                         const std::string& fixed_frame) const
 {
-  try
-  {
-tf::StampedTransform t;
-  old_tf_.lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame, t);
+
   geometry_msgs::TransformStamped output;
-  tf::transformStampedTFToMsg(t, output);
+  geometry_msgs::TransformStamped temp1 =  lookupTransform(fixed_frame, source_frame, source_time);
+  geometry_msgs::TransformStamped temp2 =  lookupTransform(target_frame, fixed_frame, target_time);
+  
+  btTransform bt1, bt2;
+  tf2::transformMsgToTF2(temp1.transform, bt1);
+  tf2::transformMsgToTF2(temp2.transform, bt2);
+  tf2::transformTF2ToMsg(bt2*bt1, output.transform);
+  output.header.stamp = temp2.header.stamp;
+  output.header.frame_id = target_frame;
+  output.child_frame_id = source_frame;
   return output;
-  }
-  catch (tf::LookupException& ex)
-  {
-    throw tf2::LookupException(ex.what());
-  }
-  catch (tf::ConnectivityException& ex)
-  {
-    throw tf2::ConnectivityException(ex.what());
-  }
-  catch (tf::ExtrapolationException& ex)
-  {
-    throw tf2::ExtrapolationException(ex.what());
-  }
-  catch (tf::InvalidArgument& ex)
-  {
-    throw tf2::InvalidArgumentException(ex.what());
-  }};
+};
 
 
 
@@ -725,3 +734,47 @@ std::string BufferCore::allFramesAsString() const
   }
   return mstream.str();
 }
+
+int BufferCore::getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time & time, std::string * error_string) const
+{
+
+  time = ros::Time(ros::TIME_MAX);
+  int retval;
+  TransformLists lists;
+  try
+  {
+    retval = lookupLists(lookupFrameNumber(dest), ros::Time(), lookupFrameNumber(source), lists, error_string);
+  }
+  catch (tf::LookupException &ex)
+  {
+    time = ros::Time();
+    if (error_string) *error_string = ex.what();
+    return tf2_msgs::TF2Error::LOOKUP_ERROR;
+  }
+  if (retval == tf2_msgs::TF2Error::NO_ERROR)
+  {
+    //Set time to latest timestamp of frameid in case of target and source frame id are the same
+    if (lists.inverseTransforms.size() == 0 && lists.forwardTransforms.size() == 0)
+    {
+      time = ros::Time(); ///\todo review was now();
+      return retval;
+    }
+
+    for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
+    {
+      if (time > lists.inverseTransforms[i].header.stamp)
+        time = lists.inverseTransforms[i].header.stamp;
+    }
+    for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
+    {
+      if (time > lists.forwardTransforms[i].header.stamp)
+        time = lists.forwardTransforms[i].header.stamp;
+    }
+
+  }
+  else
+    time.fromSec(0);
+
+  return retval;
+};
+
