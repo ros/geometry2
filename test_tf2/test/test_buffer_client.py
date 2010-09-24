@@ -34,7 +34,36 @@
 #* 
 #* Author: Eitan Marder-Eppstein
 #***********************************************************
-from buffer import *
-from buffer_client import *
-from transform_listener import *
-from transform_broadcaster import *
+PKG = 'test_tf2'
+import roslib; roslib.load_manifest(PKG)
+
+import sys
+import unittest
+
+import tf2
+import tf2_py
+import tf2_geometry_msgs
+from geometry_msgs.msg import PointStamped
+import rospy
+
+class TestBufferClient(unittest.TestCase):
+    def test_buffer_client(self):
+        client = tf2_py.BufferClient("tf_action")
+        rospy.sleep(rospy.Duration(3.0))
+
+        p1 = PointStamped()
+        p1.header.frame_id = "a"
+        p1.header.stamp = rospy.Time(0.0)
+        p1.point.x = 0.0
+        p1.point.y = 0.0
+        p1.point.z = 0.0
+
+        try:
+            p2 = client.transform(p1, "b")
+            rospy.loginfo("p1: %s, p2: %s" % (p1, p2))
+        except tf2.TransformException as e:
+            rospy.logerr("%s" % e.value)
+
+if __name__ == '__main__':
+    import rostest
+    rostest.rosrun(PKG, 'test_buffer_client', TestBufferClient)
