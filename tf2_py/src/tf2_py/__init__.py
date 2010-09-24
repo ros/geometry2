@@ -34,6 +34,7 @@
 #* 
 #* Author: Eitan Marder-Eppstein
 #***********************************************************
+from buffer_interface import *
 from buffer import *
 from transform_listener import *
 from transform_broadcaster import *
