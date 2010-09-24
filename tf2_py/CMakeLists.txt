@@ -15,21 +15,3 @@ rosbuild_init()
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_PATH})
-
-# Check for SSE
-rosbuild_check_for_sse()
-
-# Dynamic linking with tf worked OK, except for exception propagation, which failed in the unit test.
-# so build with the objects directly instead.
-
-link_libraries(${PYTHON_LIBRARIES})
-rosbuild_add_library(tf2_py src/tf2_py.cpp)
-find_package(PythonLibs REQUIRED)
-set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
-# target_link_libraries(tf2_py tf)
-rosbuild_add_compile_flags(tf2_py -g -Wno-missing-field-initializers)
-rosbuild_add_compile_flags(tf2_py ${SSE_FLAGS}) #conditionally adds sse flags if available
-#rosbuild_add_pyunit(test/testPython.py)
