@@ -11,6 +11,7 @@
 
   <depend package="rospy"/>
   <depend package="tf2"/>
+  <depend package="tf2_msgs"/>
   <depend package="geometry_msgs"/>
 
 </package>

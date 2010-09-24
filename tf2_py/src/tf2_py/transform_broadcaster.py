@@ -31,7 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import rospy
-from tf2_msgs.msg import tfMessage
+from tf2_msgs.msg import TFMessage
 from geometry_msgs.msg import TransformStamped
 
 
@@ -41,11 +41,11 @@ class TransformBroadcaster:
     """
 
     def __init__(self):
-        self.pub_tf = rospy.Publisher("/tf", tfMessage)
+        self.pub_tf = rospy.Publisher("/tf", TFMessage)
 
     def sendTransform(self, transform):
         if not isinstance(transform, list):
             transform = [transform]
-        self.pub_tf.publish(tfMessage(transform))
+        self.pub_tf.publish(TFMessage(transform))
 
 
