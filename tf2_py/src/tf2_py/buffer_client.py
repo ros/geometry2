@@ -39,12 +39,14 @@ import roslib; roslib.load_manifest(PKG)
 import rospy
 import actionlib
 import tf2
+import tf2_py
 
 from tf2_msgs.msg import LookupTransformAction, LookupTransformGoal
 from actionlib_msgs.msg import GoalStatus
 
-class BufferClient:
+class BufferClient(tf2_py.BufferInterface):
     def __init__(self, ns, check_frequency = 10.0, timeout_padding = rospy.Duration.from_sec(2.0)):
+        tf2_py.BufferInterface.__init__(self)
         self.client = actionlib.SimpleActionClient(ns, LookupTransformAction)
         self.check_frequency = check_frequency
         self.timeout_padding = timeout_padding

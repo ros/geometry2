@@ -30,8 +30,11 @@
 import roslib; roslib.load_manifest('tf2_py')
 import rospy
 import tf2
+import tf2_py
 
 class BufferInterface:
+    def __init__(self):
+        self.registration = tf2_py.TransformRegistration()
 
     # transform, simple api
     def transform(self, object_stamped, target_frame, timeout=rospy.Duration(0.0)):
