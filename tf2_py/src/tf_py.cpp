@@ -71,11 +71,8 @@ static PyObject *PyObject_BorrowAttrString(PyObject* o, const char *name)
 
 static PyObject *transform_converter(const geometry_msgs::TransformStamped* transform)
 {
-  printf("Called\n");
-
   PyObject *pclass, *pargs, *pinst = NULL;
   pclass = PyObject_GetAttrString(pModulegeometrymsgs, "TransformStamped");
-  Py_DECREF(pModulegeometrymsgs);
   if(pclass == NULL)
   {
     printf("Can't get geometry_msgs.msg.TransformedStamped\n");
@@ -106,63 +103,29 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
   Py_DECREF(rospy_time);
 
   PyObject* pheader = PyObject_GetAttrString(pinst, "header");
-
-  int ret_code = PyObject_SetAttrString(pheader, "stamp", time_obj);
+  PyObject_SetAttrString(pheader, "stamp", time_obj);
   Py_DECREF(time_obj);
 
-  if(ret_code < 0)
-  {
-    printf("Can't set time\n");
-    return NULL;
-  }
-
-  PyObject *frame_id = PyString_FromString((transform->header.frame_id).c_str());
-  PyObject_SetAttrString(pheader, "frame_id", frame_id);
+  PyObject_SetAttrString(pheader, "frame_id", PyString_FromString((transform->header.frame_id).c_str()));
   Py_DECREF(pheader);
-  Py_DECREF(frame_id);
 
   PyObject *ptransform = PyObject_GetAttrString(pinst, "transform");
-
   PyObject *ptranslation = PyObject_GetAttrString(ptransform, "translation");
   PyObject *protation = PyObject_GetAttrString(ptransform, "rotation");
   Py_DECREF(ptransform);
 
-  PyObject *val = PyString_FromString((transform->child_frame_id).c_str());
-  PyObject_SetAttrString(pinst, "child_frame_id", val);
+  PyObject_SetAttrString(pinst, "child_frame_id", PyString_FromString((transform->child_frame_id).c_str()));
 
-  val = PyFloat_FromDouble(transform->transform.translation.x);
-  PyObject_SetAttrString(ptranslation, "x", val);
-  Py_DECREF(val);
-
-  val = PyFloat_FromDouble(transform->transform.translation.y);
-  PyObject_SetAttrString(ptranslation, "y", val);
-  Py_DECREF(val);
-
-  val = PyFloat_FromDouble(transform->transform.translation.z);
-  PyObject_SetAttrString(ptranslation, "z", val);
-  Py_DECREF(val);
-
+  PyObject_SetAttrString(ptranslation, "x", PyFloat_FromDouble(transform->transform.translation.x));
+  PyObject_SetAttrString(ptranslation, "y", PyFloat_FromDouble(transform->transform.translation.y));
+  PyObject_SetAttrString(ptranslation, "z", PyFloat_FromDouble(transform->transform.translation.z));
   Py_DECREF(ptranslation);
 
-  val = PyFloat_FromDouble(transform->transform.rotation.x);
-  PyObject_SetAttrString(protation, "x", val);
-  Py_DECREF(val);
-
-  val = PyFloat_FromDouble(transform->transform.rotation.y);
-  PyObject_SetAttrString(protation, "y", val);
-  Py_DECREF(val);
-
-  val = PyFloat_FromDouble(transform->transform.rotation.z);
-  PyObject_SetAttrString(protation, "z", val);
-  Py_DECREF(val);
-
-  val = PyFloat_FromDouble(transform->transform.rotation.w);
-  PyObject_SetAttrString(protation, "w", val);
-  Py_DECREF(val);
-
+  PyObject_SetAttrString(protation, "x", PyFloat_FromDouble(transform->transform.rotation.x));
+  PyObject_SetAttrString(protation, "y", PyFloat_FromDouble(transform->transform.rotation.y));
+  PyObject_SetAttrString(protation, "z", PyFloat_FromDouble(transform->transform.rotation.z));
+  PyObject_SetAttrString(protation, "w", PyFloat_FromDouble(transform->transform.rotation.w));
   Py_DECREF(protation);
-
-  printf("Made object\n");
 
   return pinst;
 }
