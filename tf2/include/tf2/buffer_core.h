@@ -98,7 +98,7 @@ public:
   /** \brief Add transform information to the tf data structure
    * \param transform The transform to store
    * \param authority The source of the information for this transform
-   * returns true unless an error occured
+   * \return True unless an error occured
    */
   bool setTransform(const geometry_msgs::TransformStamped& transform, const std::string & authority);
 
@@ -108,25 +108,27 @@ public:
    * \param target_frame The frame to which data should be transformed
    * \param source_frame The frame where the data originated
    * \param time The time at which the value of the transform is desired. (0 will get the latest)
-   * \param transform The transform reference to fill.  
+   * \return The transform between the frames
    *
-   * Possible exceptions tf::LookupException, tf::ConnectivityException,
-   * tf::MaxDepthException, tf::ExtrapolationException
+   * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
+   * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
   geometry_msgs::TransformStamped 
     lookupTransform(const std::string& target_frame, const std::string& source_frame,
 		    const ros::Time& time) const;
+
   /** \brief Get the transform between two frames by frame ID assuming fixed frame.
    * \param target_frame The frame to which data should be transformed
    * \param target_time The time to which the data should be transformed. (0 will get the latest)
    * \param source_frame The frame where the data originated
    * \param source_time The time at which the source_frame should be evaluated. (0 will get the latest)
    * \param fixed_frame The frame in which to assume the transform is constant in time. 
-   * \param transform The transform reference to fill.  
+   * \return The transform between the frames
    *
-   * Possible exceptions tf::LookupException, tf::ConnectivityException,
-   * tf::MaxDepthException, tf::ExtrapolationException
+   * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
+   * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
+
   geometry_msgs::TransformStamped
     lookupTransform(const std::string& target_frame, const ros::Time& target_time,
 		    const std::string& source_frame, const ros::Time& source_time,
@@ -140,14 +142,15 @@ public:
    * \param reference_point_frame The frame_id in which the reference point is expressed
    * \param time The time at which to get the velocity
    * \param duration The period over which to average
-   * \param twist The twist output
+   * \return twist The twist output
    * 
    * This will compute the average velocity on the interval 
    * (time - duration/2, time+duration/2). If that is too close to the most
    * recent reading, in which case it will shift the interval up to
-   * duration/2 to prevent extrapolation.  Possible exceptions
-   * tf::LookupException, tf::ConnectivityException,
-   * tf::MaxDepthException, tf::ExtrapolationException
+   * duration/2 to prevent extrapolation.
+   *
+   * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
+   * tf2::ExtrapolationException, tf2::InvalidArgumentException
    * 
    * New in geometry 1.1
    */
@@ -163,6 +166,9 @@ public:
    * lookupTwist with it assumed that the reference point is the
    * origin of the tracking frame, and the reference frame is the
    * observation frame.  
+   *
+   * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
+   * tf2::ExtrapolationException, tf2::InvalidArgumentException
    * 
    * New in geometry 1.1
    */
@@ -175,9 +181,8 @@ public:
    * \param target_frame The frame into which to transform
    * \param source_frame The frame from which to transform
    * \param time The time at which to transform
-   * \param timeout How long to block before failing
-   * \param polling_sleep_duration How often to retest if failed
    * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
+   * \return True if the transform is possible, false otherwise 
    */
   bool canTransform(const std::string& target_frame, const std::string& source_frame,
                     const ros::Time& time, std::string* error_msg = NULL) const;
@@ -188,21 +193,13 @@ public:
    * \param source_frame The frame from which to transform
    * \param source_time The time from which to transform
    * \param fixed_frame The frame in which to treat the transform as constant in time
-   * \param timeout How long to block before failing
-   * \param polling_sleep_duration How often to retest if failed
    * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
+   * \return True if the transform is possible, false otherwise 
    */
   bool canTransform(const std::string& target_frame, const ros::Time& target_time,
                     const std::string& source_frame, const ros::Time& source_time,
                     const std::string& fixed_frame, std::string* error_msg = NULL) const;
   
-
-
-
-
-
-
-
 private:
 
 
