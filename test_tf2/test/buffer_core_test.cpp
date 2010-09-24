@@ -463,7 +463,7 @@ TEST(BufferClient_lookupTransform, i_configuration)
   rostest::Permuter permuter;
 
   std::vector<ros::Time> times;
-  times.push_back(ros::Time().fromNSec(10));
+  times.push_back(ros::Time(1.0));
   times.push_back(ros::Time(10.0));
   times.push_back(ros::Time(0.0));
   permuter.addOptionSet(times, &eval_time);
@@ -484,10 +484,12 @@ TEST(BufferClient_lookupTransform, i_configuration)
 
   while  (permuter.step())
   {
+
     tf2::BufferCore mBC;
     setupTree(mBC, "i", eval_time);
 
     geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
+    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
     EXPECT_EQ(outpose.header.stamp, eval_time);
     EXPECT_EQ(outpose.header.frame_id, source_frame);
     EXPECT_EQ(outpose.child_frame_id, target_frame);
@@ -517,10 +519,16 @@ TEST(BufferClient_lookupTransform, i_configuration)
     {
       EXPECT_NEAR(outpose.transform.translation.x, 2, epsilon);
     }
-    else if (source_frame == "a" && target_frame =="c")
+    else if (source_frame == "c" && target_frame =="a")
     {
       EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
     }
+    else
+    {
+      EXPECT_FALSE("Shouldn't get here");
+      printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
+    }
+    
   }
 }
 
