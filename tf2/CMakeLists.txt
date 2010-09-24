@@ -63,6 +63,3 @@ target_link_libraries(test_cache_unittest tf2)
 
 rosbuild_add_gtest(test_simple test/simple_tf2_core.cpp)
 target_link_libraries(test_simple tf2)
-
-rosbuild_add_gtest(test_tf2 test/tf_unittest.cpp)
-target_link_libraries(test_tf2 tf2)
