@@ -13,6 +13,8 @@
   <depend package="tf2"/>
   <depend package="tf2_msgs"/>
   <depend package="geometry_msgs"/>
+  <depend package="actionlib"/>
+  <depend package="actionlib_msgs"/>
 
 </package>
 
