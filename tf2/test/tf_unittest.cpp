@@ -55,49 +55,69 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 
 using namespace tf;
 
-TEST(BufferCoresetTransform, NoInsertOnSelfTransform)
+void setIdentity(geometry_msgs::Transform& trans) 
 {
-  tf2::BufferCore mBC;
-  geometry_msgs::TransformStamped ts;
-  ts.transform.rotation.w =1;
-  ts.header.frame_id = "same_frame";
-  ts.child_frame_id = "same_frame";
-  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
+  trans.translation.x = 0;
+  trans.translation.y = 0;
+  trans.translation.z = 0;
+  trans.rotation.x = 0;
+  trans.rotation.y = 0;
+  trans.rotation.z = 0;
+  trans.rotation.w = 1;
 }
 
-TEST(BufferCoresetTransform, NoInsertWithNan)
+TEST(BufferCore_setTransform, NoInsertOnSelfTransform)
 {
   tf2::BufferCore mBC;
-  geometry_msgs::TransformStamped ts;
-  ts.transform.rotation.w =1;
-  ts.header.frame_id = "same_frame";
-  ts.child_frame_id = "other_frame";
-  EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+  geometry_msgs::TransformStamped tranStamped;
+  setIdentity(tranStamped.transform);
+  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.frame_id = "same_frame";
+  tranStamped.child_frame_id = "same_frame";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
+}
 
-  ts.transform.translation.x = 0.0/0.0;
-  EXPECT_TRUE(std::isnan(ts.transform.translation.x));
-  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
+TEST(BufferCore_setTransform, NoInsertWithNan)
+{
+  tf2::BufferCore mBC;
+  geometry_msgs::TransformStamped tranStamped;
+  setIdentity(tranStamped.transform);
+  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.frame_id = "same_frame";
+  tranStamped.child_frame_id = "other_frame";
+  EXPECT_TRUE(mBC.setTransform(tranStamped, "authority"));
+  tranStamped.transform.translation.x = 0.0/0.0;
+  EXPECT_TRUE(std::isnan(tranStamped.transform.translation.x));
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
 
 }
 
-TEST(BufferCoresetTransform, NoInsertWithNoFrameID)
+TEST(BufferCore_setTransform, NoInsertWithNoFrameID)
 {
   tf2::BufferCore mBC;
-  geometry_msgs::TransformStamped ts;
-  ts.transform.rotation.w =1;
-  ts.header.frame_id = "";
-  ts.child_frame_id = "same_frame";
-  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
+  geometry_msgs::TransformStamped tranStamped;
+  setIdentity(tranStamped.transform);
+  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.frame_id = "same_frame";
+  tranStamped.child_frame_id = "";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
+  tranStamped.child_frame_id = "/";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
+
 }
 
-TEST(BufferCoresetTransform, NoInsertWithNoParentID)
+TEST(BufferCore_setTransform, NoInsertWithNoParentID)
 {
   tf2::BufferCore mBC;
-  geometry_msgs::TransformStamped ts;
-  ts.transform.rotation.w =1;
-  ts.header.frame_id = "same_frame";
-  ts.child_frame_id = "";
-  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
+  geometry_msgs::TransformStamped tranStamped;
+  setIdentity(tranStamped.transform);
+  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.frame_id = "";
+  tranStamped.child_frame_id = "some_frame";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
+
+  tranStamped.header.frame_id = "/";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
 }
 
 
@@ -115,7 +135,7 @@ TEST(tf, ListOneInverse)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped (btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
   }
 
