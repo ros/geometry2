@@ -73,6 +73,17 @@ BufferCore::~BufferCore()
 void BufferCore::clear()
 {
   old_tf_.clear();
+
+
+  boost::mutex::scoped_lock(frame_mutex_);
+  if ( frames_.size() > 1 )
+  {
+    for (std::vector< TimeCache*>::iterator  cache_it = frames_.begin() + 1; cache_it != frames_.end(); ++cache_it)
+    {
+      (*cache_it)->clearList();
+    }
+  }
+  
 }
 
 bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_in, const std::string& authority)
