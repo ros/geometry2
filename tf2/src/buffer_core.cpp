@@ -45,51 +45,6 @@ using namespace tf2;
 const double tf2::BufferCore::DEFAULT_CACHE_TIME;
 
 
-std::string assert_resolved(const std::string& prefix, const std::string& frame_id)
-{
-  if (frame_id.size() > 0)
-    if (frame_id[0] != '/')
-      ROS_DEBUG("TF operating on not fully resolved frame id %s, resolving using local prefix %s", frame_id.c_str(), prefix.c_str());
-  return tf::resolve(prefix, frame_id);
-};
-
-std::string tf::resolve(const std::string& prefix, const std::string& frame_name)
-{
-  //  printf ("resolveping prefix:%s with frame_name:%s\n", prefix.c_str(), frame_name.c_str());
-  if (frame_name.size() > 0)
-    if (frame_name[0] == '/')
-    {
-      return frame_name;
-    }
-  if (prefix.size() > 0)
-  {
-    if (prefix[0] == '/')
-    {
-      std::string composite = prefix;
-      composite.append("/");
-      composite.append(frame_name);
-      return composite;
-    }
-    else
-    {
-      std::string composite;
-      composite = "/";
-      composite.append(prefix);
-      composite.append("/");
-      composite.append(frame_name);
-      return composite;
-    }
-
-  }
-  else
- {
-    std::string composite;
-    composite = "/";
-    composite.append(frame_name);
-    return composite;
-  }
-};
-
 
 BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
 {
@@ -97,7 +52,6 @@ BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
   frameIDs_["NO_PARENT"] = 0;
   frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
   frameIDs_reverse.push_back("NO_PARENT");
-  tf_prefix_ = "";
 
   return;
 }
@@ -112,63 +66,58 @@ void BufferCore::clear()
   old_tf_.clear();
 }
 
-bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform, const std::string& authority)
+bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_in, const std::string& authority)
 {
 
   /////BACKEARDS COMPATABILITY 
   tf::StampedTransform tf_transform;
-  tf::transformStampedMsgToTF(transform, tf_transform);
+  tf::transformStampedMsgToTF(transform_in, tf_transform);
   if  (!old_tf_.setTransform(tf_transform, authority))
   {
     printf("Warning old setTransform Failed but was not caught\n");
   }
 
   /////// New implementation
-  geometry_msgs::TransformStamped mapped_transform = transform;
-  mapped_transform.child_frame_id = assert_resolved(tf_prefix_, transform.child_frame_id);
-  mapped_transform.header.frame_id = assert_resolved(tf_prefix_, transform.header.frame_id);
-
- 
   bool error_exists = false;
-  if (mapped_transform.child_frame_id == mapped_transform.header.frame_id)
+  if (transform_in.child_frame_id == transform_in.header.frame_id)
   {
-    ROS_ERROR("TF_SELF_TRANSFORM: Ignoring transform from authority \"%s\" with frame_id and child_frame_id  \"%s\" because they are the same",  authority.c_str(), mapped_transform.child_frame_id.c_str());
+    ROS_ERROR("TF_SELF_TRANSFORM: Ignoring transform from authority \"%s\" with frame_id and child_frame_id  \"%s\" because they are the same",  authority.c_str(), transform_in.child_frame_id.c_str());
     error_exists = true;
   }
 
-  if (mapped_transform.child_frame_id == "/")//empty frame id will be mapped to "/"
+  if ((transform_in.child_frame_id == "/") | (transform_in.child_frame_id == ""))//empty frame id will be mapped to "/"
   {
     ROS_ERROR("TF_NO_CHILD_FRAME_ID: Ignoring transform from authority \"%s\" because child_frame_id not set ", authority.c_str());
     error_exists = true;
   }
 
-  if (mapped_transform.header.frame_id == "/")//empty parent id will be mapped to "/"
+  if ((transform_in.header.frame_id == "/") | (transform_in.header.frame_id == ""))//empty parent id will be mapped to "/"
   {
-    ROS_ERROR("TF_NO_FRAME_ID: Ignoring transform with child_frame_id \"%s\"  from authority \"%s\" because frame_id not set", mapped_transform.child_frame_id.c_str(), authority.c_str());
+    ROS_ERROR("TF_NO_FRAME_ID: Ignoring transform with child_frame_id \"%s\"  from authority \"%s\" because frame_id not set", transform_in.child_frame_id.c_str(), authority.c_str());
     error_exists = true;
   }
 
-  if (std::isnan(mapped_transform.transform.translation.x) || std::isnan(mapped_transform.transform.translation.y) || std::isnan(mapped_transform.transform.translation.z)||
-      std::isnan(mapped_transform.transform.rotation.x) ||       std::isnan(mapped_transform.transform.rotation.y) ||       std::isnan(mapped_transform.transform.rotation.z) ||       std::isnan(mapped_transform.transform.rotation.w))
+  if (std::isnan(transform_in.transform.translation.x) || std::isnan(transform_in.transform.translation.y) || std::isnan(transform_in.transform.translation.z)||
+      std::isnan(transform_in.transform.rotation.x) ||       std::isnan(transform_in.transform.rotation.y) ||       std::isnan(transform_in.transform.rotation.z) ||       std::isnan(transform_in.transform.rotation.w))
   {
     ROS_ERROR("TF_NAN_INPUT: Ignoring transform for child_frame_id \"%s\" from authority \"%s\" because of a nan value in the transform (%f %f %f) (%f %f %f %f)",
-              mapped_transform.child_frame_id.c_str(), authority.c_str(),
-              mapped_transform.transform.translation.x, mapped_transform.transform.translation.y, mapped_transform.transform.translation.z,
-              mapped_transform.transform.rotation.x, mapped_transform.transform.rotation.y, mapped_transform.transform.rotation.z, mapped_transform.transform.rotation.w
+              transform_in.child_frame_id.c_str(), authority.c_str(),
+              transform_in.transform.translation.x, transform_in.transform.translation.y, transform_in.transform.translation.z,
+              transform_in.transform.rotation.x, transform_in.transform.rotation.y, transform_in.transform.rotation.z, transform_in.transform.rotation.w
               );
     error_exists = true;
   }
 
   if (error_exists)
     return false;
-  unsigned int frame_number = lookupOrInsertFrameNumber(mapped_transform.child_frame_id);
-  if (getFrame(frame_number)->insertData(TransformStorage(mapped_transform, lookupOrInsertFrameNumber(mapped_transform.header.frame_id))))
+  unsigned int frame_number = lookupOrInsertFrameNumber(transform_in.child_frame_id);
+  if (getFrame(frame_number)->insertData(TransformStorage(transform_in, lookupOrInsertFrameNumber(transform_in.header.frame_id))))
   {
     frame_authority_[frame_number] = authority;
   }
   else
   {
-    ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", mapped_transform.child_frame_id.c_str(), mapped_transform.header.stamp.toSec(), authority.c_str());
+    ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", transform_in.child_frame_id.c_str(), transform_in.header.stamp.toSec(), authority.c_str());
     return false;
   }
 
