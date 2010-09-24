@@ -4,10 +4,11 @@
      test_tf2
 
   </description>
-  <author>Eitan Marder-Eppstein</author>
+  <author>Tully Foote, Eitan Marder-Eppstein</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/test_tf2</url>
+  <depend package="rostest"/>
   <depend package="tf2"/>
   <depend package="tf2_bullet"/>
   <depend package="tf2_cpp"/>
