@@ -1,0 +1,32 @@
+#!/usr/bin/python
+
+import roslib; roslib.load_manifest('tf2_geometry_msgs')
+import rospy
+import PyKDL
+import tf2_py
+import tf2_geometry_msgs
+from geometry_msgs.msg import TransformStamped, PointStamped
+
+
+def main():
+    b = tf2_py.Buffer()
+    t = TransformStamped()
+    t.transform.translation.x = 1
+    t.transform.rotation.x = 1
+    t.header.stamp = rospy.Time(2.0)
+    t.header.frame_id = 'a'
+    t.child_frame_id = 'b'
+    b.setTransform(t, 'eitan_rocks')
+    print b.lookupTransform('a','b', rospy.Time(2.0), rospy.Duration(2.0))
+
+    v = PointStamped()
+    v.header.stamp = rospy.Time(2)
+    v.header.frame_id = 'a'
+    v.point.x = 1
+    v.point.y = 2
+    v.point.z = 3
+    print b.transform(v, 'b')
+
+if __name__ == '__main__':
+    rospy.init_node('wim')
+    main()
