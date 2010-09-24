@@ -5,7 +5,7 @@ import rospy
 import PyKDL
 import tf2_py
 import tf2_geometry_msgs
-from geometry_msgs.msg import TransformStamped, PointStamped
+from geometry_msgs.msg import TransformStamped, PointStamped, Vector3Stamped
 
 
 def main():
