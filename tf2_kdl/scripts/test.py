@@ -7,7 +7,6 @@ import tf2_py
 import tf2_kdl
 from geometry_msgs.msg import TransformStamped
 
-
 def main():
     b = tf2_py.Buffer()
     t = TransformStamped()
