@@ -12,3 +12,5 @@ syntax: regexp
 .*/srv/lisp/.*
 .*/bin/.*
 ^build
+^kdl/include
+^eigen/include
