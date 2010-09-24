@@ -27,6 +27,23 @@ def main():
     v.point.z = 3
     print b.transform(v, 'b')
 
+    v = Vector3Stamped()
+    v.header.stamp = rospy.Time(2)
+    v.header.frame_id = 'a'
+    v.vector.x = 1
+    v.vector.y = 2
+    v.vector.z = 3
+    print b.transform(v, 'b')
+
+    v = PoseStamped()
+    v.header.stamp = rospy.Time(2)
+    v.header.frame_id = 'a'
+    v.pose.position.x = 1
+    v.pose.position.y = 2
+    v.pose.position.z = 3
+    v.pose.orientation.x = 1
+    print b.transform(v, 'b')
+
 if __name__ == '__main__':
     rospy.init_node('wim')
     main()

@@ -52,3 +52,29 @@ def doTransformPoint(point, transform):
     return res
 tf2_py.TransformRegistration().add(PointStamped, doTransformPoint)
 
+
+# Vector3Stamped
+def doTransformVector3(vector3, transform):
+    p = transformToKDL(transform) * PyKDL.Vector(vector3.vector.x, vector3.vector.y, vector3.vector.z)
+    res = Vector3Stamped()
+    res.vector.x = p[0]
+    res.vector.y = p[1]
+    res.vector.z = p[2]
+    res.header = transform.header
+    return res
+tf2_py.TransformRegistration().add(Vector3Stamped, doTransformVector3)
+
+
+# PoseStamped
+def doTransformPose(pose, transform):
+    f = transformToKDL(transform) * PyKDL.Frame(PyKDL.Rotation.Quaternion(pose.pose.orientation.x, pose.pose.orientation.y,
+                                                                          pose.pose.orientation.z, pose.pose.orientation.w),
+                                                PyKDL.Vector(pose.pose.position.x, pose.pose.position.y, pose.pose.position.z))
+    res = PoseStamped()
+    res.pose.position.x = f.p[0]
+    res.pose.position.y = f.p[1]
+    res.pose.position.z = f.p[2]
+    (res.pose.orientation.x, res.pose.orientation.y, res.pose.orientation.z, res.pose.orientation.w) = f.M.GetQuaternion()
+    res.header = transform.header
+    return res
+tf2_py.TransformRegistration().add(PoseStamped, doTransformPose)
