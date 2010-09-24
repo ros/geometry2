@@ -1,0 +1,16 @@
+<package>
+  <description brief="test_tf2">
+
+     test_tf2
+
+  </description>
+  <author>Tully Foote</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/test_tf2</url>
+  <depend package="rostest"/>
+  <depend package="tf2"/>
+
+</package>
+
+
