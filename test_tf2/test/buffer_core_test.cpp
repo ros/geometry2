@@ -32,6 +32,7 @@
 #include <sys/time.h>
 #include <ros/ros.h>
 #include "LinearMath/btVector3.h"
+#include "rostest/permuter.h"
 
 void seed_rand()
 {
@@ -70,6 +71,7 @@ void setIdentity(geometry_msgs::Transform& trans)
 void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & time, const ros::Duration& interpolation_space = ros::Duration())
 {
 
+  mBC.clear();
 
   if (mode == "i")
   {
@@ -452,49 +454,74 @@ TEST(tf, TransformThroughNO_PARENT)
 
 
 
-TEST(BufferClient_lookupTransform, i_configuration_fixed_time_no_interpolation)
+TEST(BufferClient_lookupTransform, i_configuration)
 {
   double epsilon = 1e-6;
   
   ros::Time eval_time = ros::Time().fromNSec(10);
+
+  rostest::Permuter permuter;
+
+  std::vector<ros::Time> times;
+  times.push_back(ros::Time().fromNSec(10));
+  times.push_back(ros::Time(10.0));
+  times.push_back(ros::Time(0.0));
+  permuter.addOptionSet(times, &eval_time);
+
+  std::vector<std::string> source_frames;
+  source_frames.push_back("a");
+  source_frames.push_back("b");
+  source_frames.push_back("c");
+  std::string source_frame;
+  permuter.addOptionSet(source_frames, &source_frame);
   
-  tf2::BufferCore mBC;
-  setupTree(mBC, "i", eval_time);
+  std::vector<std::string> target_frames;
+  target_frames.push_back("a");
+  target_frames.push_back("b");
+  target_frames.push_back("c");
+  std::string target_frame;
+  permuter.addOptionSet(target_frames, &target_frame);
 
-  //Zero distance
-  geometry_msgs::TransformStamped outpose = mBC.lookupTransform("a", "a", eval_time);
-  EXPECT_EQ(outpose.header.stamp, eval_time);
-  EXPECT_EQ(outpose.header.frame_id, "a");
-  EXPECT_EQ(outpose.child_frame_id, "a");
-  EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
-  EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
-  EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-  EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
-  EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
-  EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
-  EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
-  outpose = mBC.lookupTransform("b", "b", eval_time);
-  EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
-  outpose = mBC.lookupTransform("c", "c", eval_time);
-  EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+  while  (permuter.step())
+  {
+    tf2::BufferCore mBC;
+    setupTree(mBC, "i", eval_time);
 
-  //Forward
-  outpose = mBC.lookupTransform("a", "b", eval_time);
-  EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
-  outpose = mBC.lookupTransform("b", "c", eval_time);
-  EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
-  outpose = mBC.lookupTransform("a", "c", eval_time);
-  EXPECT_NEAR(outpose.transform.translation.x, 2, epsilon);
-  
-
-  //Backward
-  outpose = mBC.lookupTransform("b", "a", eval_time);
-  EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
-  outpose = mBC.lookupTransform("c", "b", eval_time);
-  EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
-  outpose = mBC.lookupTransform("c", "a", eval_time);
-  EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
-
+    geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
+    EXPECT_EQ(outpose.header.stamp, eval_time);
+    EXPECT_EQ(outpose.header.frame_id, source_frame);
+    EXPECT_EQ(outpose.child_frame_id, target_frame);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
+    
+    //Zero distance
+    if (source_frame == target_frame)
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    }
+    else if (source_frame == "a" && target_frame =="b" ||
+             source_frame == "b" && target_frame =="c")
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    }
+    else if (source_frame == "b" && target_frame =="a" ||
+             source_frame == "c" && target_frame =="b")
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    }
+    else if (source_frame == "a" && target_frame =="c")
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, 2, epsilon);
+    }
+    else if (source_frame == "a" && target_frame =="c")
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
+    }
+  }
 }
 
 
