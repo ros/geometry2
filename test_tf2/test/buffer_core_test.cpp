@@ -91,7 +91,11 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
       geometry_msgs::TransformStamped ts;
       setIdentity(ts.transform);
       ts.transform.translation.x = 1;
-      ts.header.stamp = time - (interpolation_space * .5);
+      if (time > ros::Time() + (interpolation_space * .5))
+        ts.header.stamp = time - (interpolation_space * .5);
+      else
+        ts.header.stamp = ros::Time();
+            
       ts.header.frame_id = parents[i];
       ts.child_frame_id = children[i];
       EXPECT_TRUE(mBC.setTransform(ts, "authority"));
@@ -458,7 +462,7 @@ TEST(BufferClient_lookupTransform, i_configuration)
 {
   double epsilon = 1e-6;
   
-  ros::Time eval_time = ros::Time().fromNSec(10);
+
 
   rostest::Permuter permuter;
 
@@ -466,7 +470,15 @@ TEST(BufferClient_lookupTransform, i_configuration)
   times.push_back(ros::Time(1.0));
   times.push_back(ros::Time(10.0));
   times.push_back(ros::Time(0.0));
+  ros::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
+
+  std::vector<ros::Duration> durations;
+  durations.push_back(ros::Duration(1.0));
+  durations.push_back(ros::Duration(0.001));
+  durations.push_back(ros::Duration(0.1));
+  ros::Duration interpolation_space;
+  //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> source_frames;
   source_frames.push_back("a");
@@ -486,7 +498,7 @@ TEST(BufferClient_lookupTransform, i_configuration)
   {
 
     tf2::BufferCore mBC;
-    setupTree(mBC, "i", eval_time);
+    setupTree(mBC, "i", eval_time, interpolation_space);
 
     geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
     //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
