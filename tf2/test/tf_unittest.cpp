@@ -55,49 +55,124 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 
 using namespace tf;
 
-TEST(BufferCoresetTransform, NoInsertOnSelfTransform)
+void setIdentity(geometry_msgs::Transform& trans) 
 {
-  tf2::BufferCore mBC;
-  geometry_msgs::TransformStamped ts;
-  ts.transform.rotation.w =1;
-  ts.header.frame_id = "same_frame";
-  ts.child_frame_id = "same_frame";
-  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
+  trans.translation.x = 0;
+  trans.translation.y = 0;
+  trans.translation.z = 0;
+  trans.rotation.x = 0;
+  trans.rotation.y = 0;
+  trans.rotation.z = 0;
+  trans.rotation.w = 1;
 }
 
-TEST(BufferCoresetTransform, NoInsertWithNan)
+
+void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & time, const ros::Duration& interpolation_space = ros::Duration())
+{
+
+
+  if (mode == "i")
+  {
+    std::vector<std::string> children;
+    std::vector<std::string> parents;
+    
+
+    
+    children.push_back("b");
+    parents.push_back("a");
+    children.push_back("c");
+    parents.push_back("b");
+    
+    
+    for (uint64_t i = 0; i <  children.size(); i++)
+    {
+      geometry_msgs::TransformStamped ts;
+      setIdentity(ts.transform);
+      ts.transform.translation.x = 1;
+      ts.header.stamp = time - (interpolation_space * .5);
+      ts.header.frame_id = parents[i];
+      ts.child_frame_id = children[i];
+      EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+      if (interpolation_space > ros::Duration())
+      {
+        ts.header.stamp = time + interpolation_space * .5;
+        EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+      
+      }
+    }
+  }
+  else if (mode == "yl")
+  {
+
+  }
+
+  else if (mode == "yr")
+  {
+
+  }
+  else if (mode == "v")
+  {
+
+  }
+
+  else if (mode == "w")
+  {
+
+  }  
+}
+
+TEST(BufferCore_setTransform, NoInsertOnSelfTransform)
 {
   tf2::BufferCore mBC;
-  geometry_msgs::TransformStamped ts;
-  ts.transform.rotation.w =1;
-  ts.header.frame_id = "same_frame";
-  ts.child_frame_id = "other_frame";
-  EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+  geometry_msgs::TransformStamped tranStamped;
+  setIdentity(tranStamped.transform);
+  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.frame_id = "same_frame";
+  tranStamped.child_frame_id = "same_frame";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
+}
 
-  ts.transform.translation.x = 0.0/0.0;
-  EXPECT_TRUE(std::isnan(ts.transform.translation.x));
-  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
+TEST(BufferCore_setTransform, NoInsertWithNan)
+{
+  tf2::BufferCore mBC;
+  geometry_msgs::TransformStamped tranStamped;
+  setIdentity(tranStamped.transform);
+  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.frame_id = "same_frame";
+  tranStamped.child_frame_id = "other_frame";
+  EXPECT_TRUE(mBC.setTransform(tranStamped, "authority"));
+  tranStamped.transform.translation.x = 0.0/0.0;
+  EXPECT_TRUE(std::isnan(tranStamped.transform.translation.x));
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
 
 }
 
-TEST(BufferCoresetTransform, NoInsertWithNoFrameID)
+TEST(BufferCore_setTransform, NoInsertWithNoFrameID)
 {
   tf2::BufferCore mBC;
-  geometry_msgs::TransformStamped ts;
-  ts.transform.rotation.w =1;
-  ts.header.frame_id = "";
-  ts.child_frame_id = "same_frame";
-  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
+  geometry_msgs::TransformStamped tranStamped;
+  setIdentity(tranStamped.transform);
+  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.frame_id = "same_frame";
+  tranStamped.child_frame_id = "";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
+  tranStamped.child_frame_id = "/";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
+
 }
 
-TEST(BufferCoresetTransform, NoInsertWithNoParentID)
+TEST(BufferCore_setTransform, NoInsertWithNoParentID)
 {
   tf2::BufferCore mBC;
-  geometry_msgs::TransformStamped ts;
-  ts.transform.rotation.w =1;
-  ts.header.frame_id = "same_frame";
-  ts.child_frame_id = "";
-  EXPECT_FALSE(mBC.setTransform(ts, "authority"));
+  geometry_msgs::TransformStamped tranStamped;
+  setIdentity(tranStamped.transform);
+  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.frame_id = "";
+  tranStamped.child_frame_id = "some_frame";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
+
+  tranStamped.header.frame_id = "/";
+  EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
 }
 
 
@@ -115,7 +190,7 @@ TEST(tf, ListOneInverse)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped (btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
   }
 
@@ -375,87 +450,51 @@ TEST(tf, TransformThroughNO_PARENT)
 }
 
 
-TEST(tf, getParent)
-{
-  
-  std::vector<std::string> children;
-  std::vector<std::string> parents;
-
-  children.push_back("a");
-  parents.push_back("c");
-
-  children.push_back("b");
-  parents.push_back("c");
-
-  children.push_back("c");
-  parents.push_back("e");
-
-  children.push_back("d");
-  parents.push_back("e");
-
-  children.push_back("e");
-  parents.push_back("f");
-
-  children.push_back("f");
-  parents.push_back("j");
-
-  tf::Transformer mTR(true);
-
-  for (uint64_t i = 0; i <  children.size(); i++)
-    {
-      StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10), parents[i], children[i]);
-      mTR.setTransform(tranStamped);
-    }
-
-  //std::cout << mTR.allFramesAsString() << std::endl;
-
-  std::string output;
-  for  (uint64_t i = 0; i <  children.size(); i++)
-    {
-      EXPECT_TRUE(mTR.getParent(children[i], ros::Time().fromNSec(10), output));
-      EXPECT_STREQ(tf::resolve("",parents[i]).c_str(), output.c_str());
-    }
-  
-  EXPECT_FALSE(mTR.getParent("j", ros::Time().fromNSec(10), output));
-
-  EXPECT_FALSE(mTR.getParent("no_value", ros::Time().fromNSec(10), output));
-  
-}
 
 
-TEST(tf, NO_PARENT_SET)
+TEST(BufferClient_lookupTransform, i_configuration_fixed_time_no_interpolation)
 {
   double epsilon = 1e-6;
   
-  std::vector<std::string> children;
-  std::vector<std::string> parents;
-
-
-
-  children.push_back("b");
-  parents.push_back("a");
-  children.push_back("a");
-  parents.push_back("NO_PARENT");
-
-  tf::Transformer mTR(true);
-
-  for (uint64_t i = 0; i <  children.size(); i++)
-    {
-      StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10),  parents[i], children[i]);
-      mTR.setTransform(tranStamped);
-    }
-
-  //std::cout << mTR.allFramesAsString() << std::endl;
-
-
-  Stamped<btTransform> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10), "a");
-  Stamped<btTransform> outpose;
-  outpose.setIdentity(); //to make sure things are getting mutated
-  mTR.transformPose("a",inpose, outpose);
-  EXPECT_NEAR(outpose.getOrigin().x(), 0, epsilon);
-  EXPECT_NEAR(outpose.getOrigin().y(), 0, epsilon);
-  EXPECT_NEAR(outpose.getOrigin().z(), 0, epsilon);
+  ros::Time eval_time = ros::Time().fromNSec(10);
   
+  tf2::BufferCore mBC;
+  setupTree(mBC, "i", eval_time);
+
+  //Zero distance
+  geometry_msgs::TransformStamped outpose = mBC.lookupTransform("a", "a", eval_time);
+  EXPECT_EQ(outpose.header.stamp, eval_time);
+  EXPECT_EQ(outpose.header.frame_id, "a");
+  EXPECT_EQ(outpose.child_frame_id, "a");
+  EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
+  outpose = mBC.lookupTransform("b", "b", eval_time);
+  EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+  outpose = mBC.lookupTransform("c", "c", eval_time);
+  EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+
+  //Forward
+  outpose = mBC.lookupTransform("a", "b", eval_time);
+  EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+  outpose = mBC.lookupTransform("b", "c", eval_time);
+  EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+  outpose = mBC.lookupTransform("a", "c", eval_time);
+  EXPECT_NEAR(outpose.transform.translation.x, 2, epsilon);
+  
+
+  //Backward
+  outpose = mBC.lookupTransform("b", "a", eval_time);
+  EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+  outpose = mBC.lookupTransform("c", "b", eval_time);
+  EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+  outpose = mBC.lookupTransform("c", "a", eval_time);
+  EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
+
 }
 
 

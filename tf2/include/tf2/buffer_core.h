@@ -55,9 +55,6 @@ typedef struct
   std::vector<TransformStorage > forwardTransforms;
 } TransformLists;
 
-/** \brief resolve tf names */
-std::string resolve(const std::string& prefix, const std::string& frame_name);
-
 /** \brief A Class which provides coordinate transforms between any two frames in a system.
  *
  * This class provides a simple interface to allow recording and lookup of
@@ -225,9 +222,6 @@ private:
   /// whether or not to allow extrapolation
   ros::Duration max_extrapolation_distance_;
 
-  /// Used as default remapping argument
-  std::string tf_prefix_;
-
   /************************* Internal Functions ****************************/
 
   /** \brief An accessor to get a frame, which will throw an exception if the frame is no there.
@@ -264,6 +258,9 @@ private:
    */
   std::string allFramesAsString() const;
 
+  /**@brief Return the latest rostime which is common across the spanning set
+   * zero if fails to cross */
+  int getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time& time, std::string * error_string) const;
 
   /** \brief convert Transform msg to Transform */
   static inline btTransform transformMsgToBT(const geometry_msgs::Transform& msg)
