@@ -35,7 +35,7 @@ import tf2_py
 class Buffer(tf2.BufferCore, tf2_py.BufferInterface):
     def __init__(self):
         tf2.BufferCore.__init__(self)
-        self.registration = tf2_py.TransformRegistration()
+        tf2_py.BufferInterface.__init__(self)
         
     # lookup, simple api 
     def lookupTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
