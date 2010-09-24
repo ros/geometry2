@@ -461,7 +461,7 @@ extern "C" void init_tf2()
   PyObject *item, *m, *d;
 
 #if PYTHON_API_VERSION >= 1007
-  tf2_exception = PyErr_NewException((char*)"tf2.Exception", NULL, NULL);
+  tf2_exception = PyErr_NewException((char*)"tf2.TransformException", NULL, NULL);
   tf2_connectivityexception = PyErr_NewException((char*)"tf2.ConnectivityException", tf2_exception, NULL);
   tf2_lookupexception = PyErr_NewException((char*)"tf2.LookupException", tf2_exception, NULL);
   tf2_extrapolationexception = PyErr_NewException((char*)"tf2.ExtrapolationException", tf2_exception, NULL);
@@ -496,7 +496,7 @@ extern "C" void init_tf2()
   m = Py_InitModule("_tf2", module_methods);
   PyModule_AddObject(m, "BufferCore", (PyObject *)&buffer_core_Type);
   d = PyModule_GetDict(m);
-  PyDict_SetItemString(d, "Exception", tf2_exception);
+  PyDict_SetItemString(d, "TransformException", tf2_exception);
   PyDict_SetItemString(d, "ConnectivityException", tf2_connectivityexception);
   PyDict_SetItemString(d, "LookupException", tf2_lookupexception);
   PyDict_SetItemString(d, "ExtrapolationException", tf2_extrapolationexception);
