@@ -222,30 +222,20 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
                                                         const ros::Time& source_time,
                                                         const std::string& fixed_frame) const
 {
-  try
-  {
-tf::StampedTransform t;
-  old_tf_.lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame, t);
+
   geometry_msgs::TransformStamped output;
-  tf::transformStampedTFToMsg(t, output);
+  geometry_msgs::TransformStamped temp1 =  lookupTransform(fixed_frame, source_frame, source_time);
+  geometry_msgs::TransformStamped temp2 =  lookupTransform(target_frame, fixed_frame, target_time);
+  
+  btTransform bt1, bt2;
+  tf2::transformMsgToTF2(temp1.transform, bt1);
+  tf2::transformMsgToTF2(temp2.transform, bt2);
+  tf2::transformTF2ToMsg(bt2*bt1, output.transform);
+  output.header.stamp = temp2.header.stamp;
+  output.header.frame_id = target_frame;
+  output.child_frame_id = source_frame;
   return output;
-  }
-  catch (tf::LookupException& ex)
-  {
-    throw tf2::LookupException(ex.what());
-  }
-  catch (tf::ConnectivityException& ex)
-  {
-    throw tf2::ConnectivityException(ex.what());
-  }
-  catch (tf::ExtrapolationException& ex)
-  {
-    throw tf2::ExtrapolationException(ex.what());
-  }
-  catch (tf::InvalidArgument& ex)
-  {
-    throw tf2::InvalidArgumentException(ex.what());
-  }};
+};
 
 
 
