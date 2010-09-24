@@ -12,6 +12,7 @@
   <depend package="tf2"/>
   <depend package="tf2_bullet"/>
   <depend package="tf2_cpp"/>
+  <depend package="tf2_py"/>
   <depend package="tf2_geometry_msgs"/>
   <depend package="tf2_kdl"/>
   <depend package="tf2_msgs"/>

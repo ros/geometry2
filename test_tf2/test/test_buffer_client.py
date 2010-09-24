@@ -62,8 +62,9 @@ class TestBufferClient(unittest.TestCase):
             p2 = client.transform(p1, "b")
             rospy.loginfo("p1: %s, p2: %s" % (p1, p2))
         except tf2.TransformException as e:
-            rospy.logerr("%s" % e.value)
+            rospy.logerr("%s" % e)
 
 if __name__ == '__main__':
+    rospy.init_node("test_buffer_client")
     import rostest
     rostest.rosrun(PKG, 'test_buffer_client', TestBufferClient)
