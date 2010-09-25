@@ -38,12 +38,16 @@ from tf2_msgs.srv import FrameGraph,FrameGraphResponse
 class TransformListener():
     def __init__(self, buffer):
         self.listenerthread = TransformListenerThread(buffer)
+        self.listenerthread.setDaemon(True)
+        self.listenerthread.start()
 
 
 class TransformListenerThread(threading.Thread):
     def __init__(self, buffer):
-        threading.Thread.__init__(self)
         self.buffer = buffer
+        threading.Thread.__init__(self)
+
+
 
     def run(self):
         rospy.Subscriber("/tf", TFMessage, self.callback)
