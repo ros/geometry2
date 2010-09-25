@@ -36,7 +36,7 @@
 #include <gtest/gtest.h>
 
 
-tf2::Buffer tf_buffer;
+tf2::Buffer* tf_buffer;
 static const double EPS = 1e-3;
 
 TEST(TfKDL, Frame)
@@ -45,7 +45,7 @@ TEST(TfKDL, Frame)
 
 
   // simple api
-  KDL::Frame v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
+  KDL::Frame v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
   EXPECT_NEAR(v_simple.p[0], -9, EPS);
   EXPECT_NEAR(v_simple.p[1], 18, EPS);
   EXPECT_NEAR(v_simple.p[2], 27, EPS);
@@ -57,7 +57,7 @@ TEST(TfKDL, Frame)
   
 
   // advanced api
-  KDL::Frame v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
+  KDL::Frame v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
 					       "A", ros::Duration(3.0));
   EXPECT_NEAR(v_advanced.p[0], -9, EPS);
   EXPECT_NEAR(v_advanced.p[1], 18, EPS);
@@ -77,13 +77,13 @@ TEST(TfKDL, Vector)
 
 
   // simple api
-  KDL::Vector v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
+  KDL::Vector v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
   EXPECT_NEAR(v_simple[0], -9, EPS);
   EXPECT_NEAR(v_simple[1], 18, EPS);
   EXPECT_NEAR(v_simple[2], 27, EPS);
 
   // advanced api
-  KDL::Vector v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
+  KDL::Vector v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
 					       "A", ros::Duration(3.0));
   EXPECT_NEAR(v_advanced[0], -9, EPS);
   EXPECT_NEAR(v_advanced[1], 18, EPS);
@@ -95,6 +95,8 @@ int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "test");
   ros::NodeHandle n;
+  
+  tf_buffer = new tf2::Buffer();
 
   // populate buffer
   geometry_msgs::TransformStamped t;
@@ -105,7 +107,9 @@ int main(int argc, char **argv){
   t.header.stamp = ros::Time(2.0);
   t.header.frame_id = "A";
   t.child_frame_id = "B";
-  tf_buffer.setTransform(t, "test");
+  tf_buffer->setTransform(t, "test");
 
-  return RUN_ALL_TESTS();
+  bool retval = RUN_ALL_TESTS();
+  delete tf_buffer;
+  return retval;
 }
