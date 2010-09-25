@@ -57,7 +57,7 @@ TransformListener::~TransformListener()
 
 void TransformListener::init()
 {
-  message_subscriber_tf_ = node_.subscribe<tf::tfMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1)); ///\todo magic number
+  message_subscriber_tf_ = node_.subscribe<tf2_msgs::TFMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1)); ///\todo magic number
   
   
   ros::NodeHandle local_nh("~");
@@ -68,7 +68,7 @@ void TransformListener::init()
 void TransformListener::initWithThread()
 {
   using_dedicated_thread_ = true;
-  ros::SubscribeOptions ops_tf = ros::SubscribeOptions::create<tf::tfMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
+  ros::SubscribeOptions ops_tf = ros::SubscribeOptions::create<tf2_msgs::TFMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
     
   message_subscriber_tf_ = node_.subscribe(ops_tf);
   
@@ -80,7 +80,7 @@ void TransformListener::initWithThread()
 
 
 
-void TransformListener::subscription_callback(const tf::tfMessageConstPtr& msg)
+void TransformListener::subscription_callback(const tf2_msgs::TFMessageConstPtr& msg)
 {
   ros::Duration ros_diff = ros::Time::now() - last_update_ros_time_;
   float ros_dt = ros_diff.toSec();
@@ -93,7 +93,7 @@ void TransformListener::subscription_callback(const tf::tfMessageConstPtr& msg)
 
   last_update_ros_time_ = ros::Time::now();
 
-  const tf::tfMessage& msg_in = *msg;
+  const tf2_msgs::TFMessage& msg_in = *msg;
   for (unsigned int i = 0; i < msg_in.transforms.size(); i++)
   {
     std::map<std::string, std::string>* msg_header_map = msg_in.__connection_header.get();
