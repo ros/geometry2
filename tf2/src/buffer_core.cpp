@@ -395,10 +395,13 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
                           const std::string& source_frame, const ros::Time& source_time,
                           const std::string& fixed_frame, std::string* error_msg) const
 {
-  warnFrameId("canTransform argument target_frame", target_frame);
-  warnFrameId("canTransform argument source_frame", source_frame);
-  warnFrameId("canTransform argument source_frame", fixed_frame);
-  return old_tf_.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, error_msg);
+  if (warnFrameId("canTransform argument target_frame", target_frame))
+    return false;
+  if (warnFrameId("canTransform argument source_frame", source_frame))
+    return false;
+  if (warnFrameId("canTransform argument source_frame", fixed_frame))
+    return false;
+  return canTransform(target_frame, fixed_frame, target_time) && canTransform(fixed_frame, source_frame, source_time, error_msg);
 }
 
 
