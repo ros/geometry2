@@ -53,7 +53,6 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 }
 
 
-using namespace tf;
 
 TEST(tf2, setTransformFail)
 {

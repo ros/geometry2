@@ -329,7 +329,7 @@ static PyObject *lookupTransformFullCore(PyObject *self, PyObject *args, PyObjec
   //TODO: Create a converter that will actually return a python message
   return Py_BuildValue("O&", transform_converter, &transform);
 }
-
+/*
 static PyObject *lookupTwistCore(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
@@ -373,7 +373,7 @@ static PyObject *lookupTwistFullCore(PyObject *self, PyObject *args)
       twist.linear.x, twist.linear.y, twist.linear.z,
       twist.angular.x, twist.angular.y, twist.angular.z);
 }
-
+*/
 static PyObject *setTransform(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
@@ -445,8 +445,8 @@ static struct PyMethodDef buffer_core_methods[] =
   //{"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
   {"lookupTransformCore", (PyCFunction)lookupTransformCore, METH_KEYWORDS},
   {"lookupTransformFullCore", (PyCFunction)lookupTransformFullCore, METH_KEYWORDS},
-  {"lookupTwistCore", (PyCFunction)lookupTwistCore, METH_KEYWORDS},
-  {"lookupTwistFullCore", lookupTwistFullCore, METH_VARARGS},
+  //{"lookupTwistCore", (PyCFunction)lookupTwistCore, METH_KEYWORDS},
+  //{"lookupTwistFullCore", lookupTwistFullCore, METH_VARARGS},
   //{"getTFPrefix", (PyCFunction)getTFPrefix, METH_VARARGS},
   {NULL,          NULL}
 };
