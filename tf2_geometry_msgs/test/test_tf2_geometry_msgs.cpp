@@ -36,7 +36,7 @@
 #include <gtest/gtest.h>
 
 
-tf2::Buffer tf_buffer;
+tf2::Buffer* tf_buffer;
 static const double EPS = 1e-3;
 
 
@@ -51,7 +51,7 @@ TEST(TfGeometry, Frame)
   v1.header.frame_id = "A";
 
   // simple api
-  geometry_msgs::PoseStamped v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
+  geometry_msgs::PoseStamped v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
   EXPECT_NEAR(v_simple.pose.position.x, -9, EPS);
   EXPECT_NEAR(v_simple.pose.position.y, 18, EPS);
   EXPECT_NEAR(v_simple.pose.position.z, 27, EPS);
@@ -62,7 +62,7 @@ TEST(TfGeometry, Frame)
   
 
   // advanced api
-  geometry_msgs::PoseStamped v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
+  geometry_msgs::PoseStamped v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
 							      "A", ros::Duration(3.0));
   EXPECT_NEAR(v_advanced.pose.position.x, -9, EPS);
   EXPECT_NEAR(v_advanced.pose.position.y, 18, EPS);
@@ -85,13 +85,13 @@ TEST(TfGeometry, Vector)
   v1.header.frame_id = "A";
 
   // simple api
-  geometry_msgs::Vector3Stamped v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
+  geometry_msgs::Vector3Stamped v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
   EXPECT_NEAR(v_simple.vector.x, 1, EPS);
   EXPECT_NEAR(v_simple.vector.y, -2, EPS);
   EXPECT_NEAR(v_simple.vector.z, -3, EPS);
 
   // advanced api
-  geometry_msgs::Vector3Stamped v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
+  geometry_msgs::Vector3Stamped v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
 								 "A", ros::Duration(3.0));
   EXPECT_NEAR(v_advanced.vector.x, 1, EPS);
   EXPECT_NEAR(v_advanced.vector.y, -2, EPS);
@@ -109,13 +109,13 @@ TEST(TfGeometry, Point)
   v1.header.frame_id = "A";
 
   // simple api
-  geometry_msgs::PointStamped v_simple = tf_buffer.transform(v1, "B", ros::Duration(2.0));
+  geometry_msgs::PointStamped v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
   EXPECT_NEAR(v_simple.point.x, -9, EPS);
   EXPECT_NEAR(v_simple.point.y, 18, EPS);
   EXPECT_NEAR(v_simple.point.z, 27, EPS);
 
   // advanced api
-  geometry_msgs::PointStamped v_advanced = tf_buffer.transform(v1, "B", ros::Time(2.0),
+  geometry_msgs::PointStamped v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
 								 "A", ros::Duration(3.0));
   EXPECT_NEAR(v_advanced.point.x, -9, EPS);
   EXPECT_NEAR(v_advanced.point.y, 18, EPS);
@@ -128,6 +128,8 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "test");
   ros::NodeHandle n;
 
+  tf_buffer = new tf2::Buffer();
+
   // populate buffer
   geometry_msgs::TransformStamped t;
   t.transform.translation.x = 10;
@@ -137,9 +139,11 @@ int main(int argc, char **argv){
   t.header.stamp = ros::Time(2.0);
   t.header.frame_id = "A";
   t.child_frame_id = "B";
-  tf_buffer.setTransform(t, "test");
+  tf_buffer->setTransform(t, "test");
 
-  return RUN_ALL_TESTS();
+  bool ret = RUN_ALL_TESTS();
+  delete tf_buffer;
+  return ret;
 }
 
 
