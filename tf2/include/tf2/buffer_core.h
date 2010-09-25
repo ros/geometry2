@@ -197,7 +197,15 @@ public:
                     const std::string& source_frame, const ros::Time& source_time,
                     const std::string& fixed_frame, std::string* error_msg = NULL) const;
 
+  /** \brief A way to see what frames have been cached in yaml format
+   * Useful for debugging tools
+   */
   std::string allFramesAsYAML() const;
+
+  /** \brief A way to see what frames have been cached
+   * Useful for debugging
+   */
+  std::string allFramesAsString() const;
   
 private:
 
@@ -254,11 +262,6 @@ private:
   /** Compute the transform based on the list of frames */
   btTransform computeTransformFromList(const TransformLists & list) const;
 
-
-  /** \brief A way to see what frames have been cached
-   * Useful for debugging
-   */
-  std::string allFramesAsString() const;
 
   /**@brief Return the latest rostime which is common across the spanning set
    * zero if fails to cross */
