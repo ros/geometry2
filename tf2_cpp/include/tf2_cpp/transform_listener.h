@@ -32,10 +32,8 @@
 #ifndef TF2_TRANSFORMLISTENER_H
 #define TF2_TRANSFORMLISTENER_H
 
-#include "sensor_msgs/PointCloud.h"
 #include "std_msgs/Empty.h"
-#include "tf/tfMessage.h"
-#include "tf/tf.h"
+#include "tf2_msgs/TFMessage.h"
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
 
@@ -62,7 +60,7 @@ private:
   void initWithThread();
 
   /// Callback function for ros message subscriptoin
-  void subscription_callback(const tf::tfMessageConstPtr& msg);
+  void subscription_callback(const tf2_msgs::TFMessageConstPtr& msg);
 
   ros::CallbackQueue tf_message_callback_queue_;
   boost::thread* dedicated_listener_thread_;

@@ -41,7 +41,7 @@
 
 #include "tf2/time_cache.h"
 //////////////////////////backwards startup for porting
-#include "tf/tf.h"
+//#include "tf/tf.h"
 
 namespace tf2
 {
@@ -151,12 +151,12 @@ public:
    * 
    * New in geometry 1.1
    */
-
+  /*
   geometry_msgs::Twist
     lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, const std::string& reference_frame,
 		const tf::Point & reference_point, const std::string& reference_point_frame, 
 		const ros::Time& time, const ros::Duration& averaging_interval) const;
-
+  */
   /** \brief lookup the twist of the tracking frame with respect to the observational frame 
    * 
    * This is a simplified version of
@@ -169,11 +169,11 @@ public:
    * 
    * New in geometry 1.1
    */
-
+  /*
   geometry_msgs::Twist
     lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, 
 		const ros::Time& time, const ros::Duration& averaging_interval) const;
-
+  */
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
    * \param source_frame The frame from which to transform
@@ -287,7 +287,7 @@ private:
 
   /////////////////////////////////// Backwards hack for quick startup /////////////////////////
   //Using tf for now will be replaced fully
-  tf::Transformer old_tf_;
+  //  tf::Transformer old_tf_;
 };
   
 }

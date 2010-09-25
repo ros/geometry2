@@ -33,8 +33,8 @@
 #include "tf2/exceptions.h"
 #include "tf2_msgs/TF2Error.h"
 //legacy
-#include "tf/tf.h"
-#include "tf/transform_datatypes.h"
+//#include "tf/tf.h"
+//#include "tf/transform_datatypes.h"
 
 
 using namespace tf2;
@@ -108,7 +108,7 @@ void validateFrameId(const std::string& function_name_arg, const std::string& fr
   }
 };
 
-BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
+BufferCore::BufferCore(ros::Duration cache_time)//: old_tf_(true, cache_time)
 {
   max_extrapolation_distance_.fromNSec(DEFAULT_MAX_EXTRAPOLATION_DISTANCE);
   frameIDs_["NO_PARENT"] = 0;
@@ -125,7 +125,7 @@ BufferCore::~BufferCore()
 
 void BufferCore::clear()
 {
-  old_tf_.clear();
+  //old_tf_.clear();
 
 
   boost::mutex::scoped_lock(frame_mutex_);
@@ -143,12 +143,12 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
 {
 
   /////BACKEARDS COMPATABILITY 
-  tf::StampedTransform tf_transform;
+  /* tf::StampedTransform tf_transform;
   tf::transformStampedMsgToTF(transform_in, tf_transform);
   if  (!old_tf_.setTransform(tf_transform, authority))
   {
     printf("Warning old setTransform Failed but was not caught\n");
-  }
+    }*/
 
   /////// New implementation
   geometry_msgs::TransformStamped stripped = transform_in;
@@ -316,7 +316,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
 
 
 
-
+/*
 geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame, 
                                           const std::string& observation_frame, 
                                           const ros::Time& time, 
@@ -378,7 +378,7 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
     throw tf2::InvalidArgumentException(ex.what());
   }
 };
-
+*/
 
 
 bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
@@ -407,7 +407,7 @@ bool BufferCore::canTransform(const std::string& target_frame, const std::string
   {
     retval = lookupLists(lookupFrameNumber( target_frame), local_time, lookupFrameNumber( source_frame), t_list, error_msg);
   }
-  catch (tf::LookupException &ex)
+  catch (tf2::LookupException &ex)
   {
     return false;
   }

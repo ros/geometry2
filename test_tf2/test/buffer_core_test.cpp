@@ -55,8 +55,6 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 }
 
 
-using namespace tf;
-
 void setIdentity(geometry_msgs::Transform& trans) 
 {
   trans.translation.x = 0;
@@ -200,7 +198,7 @@ TEST(BufferCore_setTransform, NoInsertWithNoParentID)
   EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
 }
 
-
+/*
 TEST(tf, ListOneInverse)
 {
   unsigned int runs = 4;
@@ -474,7 +472,7 @@ TEST(tf, TransformThroughNO_PARENT)
   
 }
 
-
+*/
 
 
 TEST(BufferClient_lookupTransform, i_configuration)
@@ -673,7 +671,7 @@ TEST(BufferClient_canTransform, invalid_arguments)
 
 };
 
-
+/*
 TEST(tf, Exceptions)
 {
 
@@ -1519,13 +1517,13 @@ TEST(tf, assertQuaternionValid)
   EXPECT_TRUE(expectInvalidQuaternion(q));
 
   EXPECT_THROW(tf::assertQuaternionValid(q), tf::InvalidArgument);
-  /*    Waiting for gtest 1.1 or later
-    EXPECT_NO_THROW(tf::assertQuaternionValid(q));
-  q.setX(0);
-  EXPECT_THROW(tf::assertQuaternionValid(q), tf::InvalidArgument);
-  q.setY(1);
-  EXPECT_NO_THROW(tf::assertQuaternionValid(q));
-  */
+  //    Waiting for gtest 1.1 or later
+  //  EXPECT_NO_THROW(tf::assertQuaternionValid(q));
+  //q.setX(0);
+  //EXPECT_THROW(tf::assertQuaternionValid(q), tf::InvalidArgument);
+  //q.setY(1);
+  //EXPECT_NO_THROW(tf::assertQuaternionValid(q));
+  
 }
 TEST(tf, assertQuaternionMsgValid)
 {
@@ -1557,15 +1555,15 @@ TEST(tf, assertQuaternionMsgValid)
   EXPECT_TRUE(expectInvalidQuaternion(q));
 
 
-  /*    Waiting for gtest 1.1 or later
-    EXPECT_NO_THROW(tf::assertQuaternionValid(q));
-  q.x = 0);
-  EXPECT_THROW(tf::assertQuaternionValid(q), tf::InvalidArgument);
-  q.y = 1);
-  EXPECT_NO_THROW(tf::assertQuaternionValid(q));
-  */
-}
+  //    Waiting for gtest 1.1 or later
+  //  EXPECT_NO_THROW(tf::assertQuaternionValid(q));
+  //q.x = 0);
+  //EXPECT_THROW(tf::assertQuaternionValid(q), tf::InvalidArgument);
+  //q.y = 1);
+  //EXPECT_NO_THROW(tf::assertQuaternionValid(q));
 
+}
+  */
 
 TEST(tf2_stamped, OperatorEqualEqual)
 {
