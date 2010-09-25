@@ -844,3 +844,50 @@ int BufferCore::getLatestCommonTime(const std::string& source, const std::string
   return retval;
 };
 
+std::string BufferCore::allFramesAsYAML() const
+{
+  std::stringstream mstream;
+  boost::mutex::scoped_lock(frame_mutex_);
+
+  TransformStorage temp;
+
+  if (frames_.size() ==1)
+    mstream <<"[]";
+
+  mstream.precision(3);
+  mstream.setf(std::ios::fixed,std::ios::floatfield);
+    
+   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
+  for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
+  {
+    unsigned int frame_id_num;
+    if(  getFrame(counter)->getData(ros::Time(), temp))
+      frame_id_num = temp.frame_id_num_;
+    else
+    {
+      frame_id_num = 0;
+    }
+    if (frame_id_num != 0)
+    {
+      std::string authority = "no recorded authority";
+      std::map<unsigned int, std::string>::const_iterator it = frame_authority_.find(counter);
+      if (it != frame_authority_.end())
+        authority = it->second;
+
+      double rate = getFrame(counter)->getListLength() / std::max((getFrame(counter)->getLatestTimestamp().toSec() -
+                                                                   getFrame(counter)->getOldestTimestamp().toSec() ), 0.0001);
+
+      mstream << std::fixed; //fixed point notation
+      mstream.precision(3); //3 decimal places
+      mstream << frameIDs_reverse[counter] << ":" << std::endl;
+      mstream << "\tparent:" << frameIDs_reverse[frame_id_num] << std::endl;
+      mstream << "\tbroadcaster:'" << authority << "'" << std::endl;
+      mstream << "\trate:" << rate << std::endl;
+      mstream << "\tmost_recent_transform" << (getFrame(counter)->getLatestTimestamp()).toSec() << std::endl;
+      mstream << "\toldest_transform:" << (getFrame(counter)->getOldestTimestamp()).toSec() << std::endl;
+      mstream << "\tbuffer_length:" << (getFrame(counter)->getLatestTimestamp()-getFrame(counter)->getOldestTimestamp()).toSec() << std::endl;
+    }
+  }
+  return mstream.str();
+}
+

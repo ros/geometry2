@@ -1,0 +1,23 @@
+branch1:
+  parent: 'root'
+  broadcaster: 'eitan'  
+  rate: 20
+  most_recent_transform: 2.0
+  oldest_transform: 7.0
+  buffer_length: 7.0
+
+branch2:
+  parent: 'root'
+  broadcaster: 'wim'  
+  rate: 30
+  most_recent_transform: 1.0
+  oldest_transform: 5.0
+  buffer_length: 2.0
+
+branch3:
+  parent: 'branch2'
+  broadcaster: 'wim'  
+  rate: 30
+  most_recent_transform: 1.0
+  oldest_transform: 5.0
+  buffer_length: 2.0
