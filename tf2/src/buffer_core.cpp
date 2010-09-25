@@ -72,20 +72,24 @@ std::string stripSlash(const std::string& in)
 };
 
 
-void warnFrameId(const std::string& function_name_arg, const std::string& frame_id)
+bool warnFrameId(const std::string& function_name_arg, const std::string& frame_id)
 {
+  bool retval = false;
   if (frame_id.size() == 0)
   {
     std::stringstream ss;
     ss << "Invalid argument passed to "<< function_name_arg <<" in tf2 frame_ids cannot be empty";
     ROS_WARN("%s",ss.str().c_str());
+    retval = true;
   }
   if (startsWithSlash(frame_id))
   {
     std::stringstream ss;
     ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
     ROS_WARN("%s",ss.str().c_str());
+    retval = true;
   }
+  return retval;
 };
 
 void validateFrameId(const std::string& function_name_arg, const std::string& frame_id)
@@ -380,8 +384,10 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
 bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
                            const ros::Time& time, std::string* error_msg) const
 {
-  warnFrameId("canTransform argument target_frame", target_frame);
-  warnFrameId("canTransform argument source_frame", source_frame);
+  if (warnFrameId("canTransform argument target_frame", target_frame))
+    return false;
+  if (warnFrameId("canTransform argument source_frame", source_frame))
+    return false;
   return old_tf_.canTransform(target_frame, source_frame, time, error_msg);
 }
 
