@@ -37,7 +37,7 @@ from tf2_msgs.srv import FrameGraph
 import tf2_py
 
 def main():
-    rospy.init_node('tf2_debug')
+    rospy.init_node('view_frames')
     
     # listen to tf for 5 seconds
     rospy.loginfo('Listening to tf data during 5 seconds...')
@@ -47,8 +47,8 @@ def main():
     rospy.sleep(5.0)
 
     rospy.loginfo('Generating graph in frames.pdf file...')
-    rospy.wait_for_service('~tf_frames')
-    srv = rospy.ServiceProxy('~tf_frames', FrameGraph)
+    rospy.wait_for_service('~tf2_frames')
+    srv = rospy.ServiceProxy('~tf2_frames', FrameGraph)
     data = yaml.load(srv().frame_yaml)
     with open('frames.gv', 'w') as f:
         f.write(generate_dot(data))
