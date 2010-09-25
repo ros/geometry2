@@ -1,0 +1,10 @@
+root:
+  rate: 10
+  broadcaster: 'wim'
+  parent: None
+
+branch1:
+  rate: 20
+  broadcaster: 'eitan'  
+  parent: 'root'
+
