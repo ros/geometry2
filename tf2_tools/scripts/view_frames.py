@@ -61,7 +61,7 @@ def generate_dot(data):
     dot = 'digraph G {\n'
     for el in data: 
         map = data[el]
-        dot += '"'+el+'" -> "'+map['parent']+'"'
+        dot += '"'+map['parent']+'" -> "'+el+'"'
         dot += '[label=" '
         dot += 'Broadcaster: '+map['broadcaster']+'\\n'
         dot += 'Average rate: '+str(map['rate'])+'\\n'
@@ -75,7 +75,6 @@ def generate_dot(data):
     dot += ' subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";\n'
     dot += '"Recorded at time: '+str(rospy.Time.now().to_sec())+'"[ shape=plaintext ] ;\n'
     dot += '}->"'+root+'";\n}'
-    print dot
     return dot
 
 
