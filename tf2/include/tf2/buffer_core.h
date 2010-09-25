@@ -196,6 +196,8 @@ public:
   bool canTransform(const std::string& target_frame, const ros::Time& target_time,
                     const std::string& source_frame, const ros::Time& source_time,
                     const std::string& fixed_frame, std::string* error_msg = NULL) const;
+
+  std::string allFramesAsYAML() const;
   
 private:
 
