@@ -34,6 +34,8 @@
 
 #include <tf2_cpp/buffer_interface.h>
 #include <tf2/buffer_core.h>
+#include <tf2_msgs/FrameGraph.h>
+#include <ros/ros.h>
 
 
 namespace tf2
@@ -45,6 +47,8 @@ namespace tf2
   public:
     using BufferCore::lookupTransform;
     using BufferCore::canTransform;
+
+    Buffer(ros::Duration cache_time = ros::Duration(BufferCore::DEFAULT_CACHE_TIME), bool debug = true);
 
     /** \brief Get the transform between two frames by frame ID.
      * \param target_frame The frame to which data should be transformed
@@ -104,6 +108,15 @@ namespace tf2
       canTransform(const std::string& target_frame, const ros::Time& target_time,
 		   const std::string& source_frame, const ros::Time& source_time,
 		   const std::string& fixed_frame, const ros::Duration timeout, std::string* errstr = NULL) const;
+
+  private:
+    bool getFrames(tf2_msgs::FrameGraph::Request& req, tf2_msgs::FrameGraph::Response& res) 
+    {
+      res.frame_yaml = allFramesAsYAML();
+      return true;
+    }
+
+    ros::ServiceServer frames_server_;
 
   }; // class 
   

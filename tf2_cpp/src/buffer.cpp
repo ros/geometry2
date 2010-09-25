@@ -35,6 +35,15 @@
 namespace tf2
 {
 
+Buffer::Buffer(ros::Duration cache_time, bool debug) : BufferCore(cache_time)
+{
+  if(debug && !ros::service::exists("~tf_frames", false))
+  {
+    ros::NodeHandle n("~");
+    frames_server_ = n.advertiseService("tf_frames", &Buffer::getFrames, this);
+  }
+}
+
 geometry_msgs::TransformStamped 
 Buffer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
 			const ros::Time& time, const ros::Duration timeout) const
