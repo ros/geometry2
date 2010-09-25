@@ -14,3 +14,4 @@ syntax: regexp
 ^build
 ^kdl/include
 ^eigen/include
+.*\.pyc
