@@ -28,17 +28,56 @@
 
 # author: Wim Meeussen
 
-import roslib; roslib.load_manifest('tf2')
+import roslib; roslib.load_manifest('tf2_tools')
 import rospy
 import tf2
 import yaml
+import subprocess
 from tf2_msgs.srv import FrameGraph
-
+import tf2_py
 
 def main():
-    data = yaml.load(open('example.yaml'))
-    for element in data:
-        print data[element]
+    rospy.init_node('tf2_debug')
+    
+    # listen to tf for 5 seconds
+    rospy.loginfo('Listening to tf data during 5 seconds...')
+    rospy.sleep(0.00001)
+    buffer = tf2_py.Buffer()
+    listener = tf2_py.TransformListener(buffer)
+    rospy.sleep(5.0)
+
+    rospy.loginfo('Generating graph in frames.pdf file...')
+    rospy.wait_for_service('~tf_frames')
+    srv = rospy.ServiceProxy('~tf_frames', FrameGraph)
+    data = yaml.load(srv().frame_yaml)
+    with open('frames.gv', 'w') as f:
+        f.write(generate_dot(data))
+    subprocess.Popen('dot -Tpdf frames.gv -o frames.pdf'.split(' ')).communicate()
+
+def generate_dot(data):
+    if len(data) == 0:
+        return 'digraph G { "No tf data received" }'
+
+    dot = 'digraph G {\n'
+    for el in data: 
+        map = data[el]
+        dot += '"'+el+'" -> "'+map['parent']+'"'
+        dot += '[label=" '
+        dot += 'Broadcaster: '+map['broadcaster']+'\\n'
+        dot += 'Average rate: '+str(map['rate'])+'\\n'
+        dot += 'Buffer length: '+str(map['buffer_length'])+'\\n' 
+        dot += 'Most recent transform: '+str(map['most_recent_transform'])+'\\n'
+        dot += 'Oldest transform: '+str(map['oldest_transform'])+'\\n'
+        dot += '"];\n'
+        if not map['parent'] in data:
+            root = map['parent']
+    dot += 'edge [style=invis];\n'
+    dot += ' subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";\n'
+    dot += '"Recorded at time: '+str(rospy.Time.now().to_sec())+'"[ shape=plaintext ] ;\n'
+    dot += '}->"'+root+'";\n}'
+    print dot
+    return dot
+
 
 if __name__ == '__main__':
     main()

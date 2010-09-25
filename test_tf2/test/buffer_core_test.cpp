@@ -29,6 +29,7 @@
 
 #include <gtest/gtest.h>
 #include <tf2/buffer_core.h>
+#include "tf2/exceptions.h"
 #include <sys/time.h>
 #include <ros/ros.h>
 #include "LinearMath/btVector3.h"
@@ -535,13 +536,13 @@ TEST(BufferClient_lookupTransform, i_configuration)
     {
       EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
     }
-    else if (source_frame == "a" && target_frame =="b" ||
-             source_frame == "b" && target_frame =="c")
+    else if ((source_frame == "a" && target_frame =="b") ||
+             (source_frame == "b" && target_frame =="c"))
     {
       EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
     }
-    else if (source_frame == "b" && target_frame =="a" ||
-             source_frame == "c" && target_frame =="b")
+    else if ((source_frame == "b" && target_frame =="a") ||
+             (source_frame == "c" && target_frame =="b"))
     {
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
     }
@@ -634,6 +635,43 @@ TEST(BufferClient_lookupTransform, one_link_configuration)
     
   }
 }
+
+TEST(BufferClient_lookupTransform, invalid_arguments)
+{
+  tf2::BufferCore mBC;
+  
+  setupTree(mBC, "i", ros::Time(1.0));
+  
+  EXPECT_NO_THROW(mBC.lookupTransform("b", "a", ros::Time()));
+
+  //Empty frame_id
+  EXPECT_THROW(mBC.lookupTransform("", "a", ros::Time()), tf2::InvalidArgumentException);
+  EXPECT_THROW(mBC.lookupTransform("b", "", ros::Time()), tf2::InvalidArgumentException);
+
+  //frame_id with /
+  EXPECT_THROW(mBC.lookupTransform("/b", "a", ros::Time()), tf2::InvalidArgumentException);
+  EXPECT_THROW(mBC.lookupTransform("b", "/a", ros::Time()), tf2::InvalidArgumentException);
+
+};
+
+TEST(BufferClient_canTransform, invalid_arguments)
+{
+  tf2::BufferCore mBC;
+
+  setupTree(mBC, "i", ros::Time(1.0));
+  
+  EXPECT_TRUE(mBC.canTransform("b", "a", ros::Time()));
+  
+  
+  //Empty frame_id
+  EXPECT_FALSE(mBC.canTransform("", "a", ros::Time()));
+  EXPECT_FALSE(mBC.canTransform("b", "", ros::Time()));
+
+  //frame_id with /
+  EXPECT_FALSE(mBC.canTransform("/b", "a", ros::Time()));
+  EXPECT_FALSE(mBC.canTransform("b", "/a", ros::Time()));
+
+};
 
 
 TEST(tf, Exceptions)
@@ -1480,7 +1518,7 @@ TEST(tf, assertQuaternionValid)
   q.setZ(sqrt(2.0)/2.0 - 0.01);
   EXPECT_TRUE(expectInvalidQuaternion(q));
 
-
+  EXPECT_THROW(tf::assertQuaternionValid(q), tf::InvalidArgument);
   /*    Waiting for gtest 1.1 or later
     EXPECT_NO_THROW(tf::assertQuaternionValid(q));
   q.setX(0);
