@@ -31,11 +31,21 @@ import roslib; roslib.load_manifest('tf2_py')
 import rospy
 import tf2
 import tf2_py
+from tf2_msgs.srv import FrameGraph, FrameGraphResponse
 
 class Buffer(tf2.BufferCore, tf2_py.BufferInterface):
-    def __init__(self):
-        tf2.BufferCore.__init__(self)
+    def __init__(self, cache_time = None, debug = True):
+        if cache_time != None:
+            tf2.BufferCore.__init__(self, cache_time)
+        else:
+            tf2.BufferCore.__init__(self)
         tf2_py.BufferInterface.__init__(self)
+
+        if debug:
+            self.frame_server = rospy.Service('~tf_frames', FrameGraph, self.__get_frames)
+
+    def __get_frames(self, req):
+       return FrameGraphResponse(self.allFramesAsYAML()) 
         
     # lookup, simple api 
     def lookupTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):

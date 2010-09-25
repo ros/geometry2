@@ -178,19 +178,19 @@ static PyObject *getTFPrefix(PyObject *self, PyObject *args)
   tf::Transformer *t = ((transformer_t*)self)->t;
   return PyString_FromString(t->getTFPrefix().c_str());
 }
+*/
 
-static PyObject *allFramesAsDot(PyObject *self, PyObject *args)
+static PyObject *allFramesAsYAML(PyObject *self, PyObject *args)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
-  return PyString_FromString(t->allFramesAsDot().c_str());
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  return PyString_FromString(bc->allFramesAsYAML().c_str());
 }
 
 static PyObject *allFramesAsString(PyObject *self, PyObject *args)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
-  return PyString_FromString(t->allFramesAsString().c_str());
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  return PyString_FromString(bc->allFramesAsString().c_str());
 }
-*/
 
 static PyObject *canTransformCore(PyObject *self, PyObject *args, PyObject *kw)
 {
@@ -433,8 +433,8 @@ static PyObject *getFrameStrings(PyObject *self, PyObject *args)
 
 static struct PyMethodDef buffer_core_methods[] =
 {
-  //{"allFramesAsDot", allFramesAsDot, METH_VARARGS},
-  //{"allFramesAsString", allFramesAsString, METH_VARARGS},
+  {"allFramesAsYAML", allFramesAsYAML, METH_VARARGS},
+  {"allFramesAsString", allFramesAsString, METH_VARARGS},
   {"setTransform", setTransform, METH_VARARGS},
   {"canTransformCore", (PyCFunction)canTransformCore, METH_KEYWORDS},
   {"canTransformFullCore", (PyCFunction)canTransformFullCore, METH_KEYWORDS},

@@ -48,6 +48,12 @@ namespace tf2
     using BufferCore::lookupTransform;
     using BufferCore::canTransform;
 
+    /**
+     * @brief  Constructor for a Buffer object
+     * @param cache_time How long to keep a history of transforms
+     * @param debug Whether to advertise the view_frames service that exposes debugging information from the buffer
+     * @return 
+     */
     Buffer(ros::Duration cache_time = ros::Duration(BufferCore::DEFAULT_CACHE_TIME), bool debug = true);
 
     /** \brief Get the transform between two frames by frame ID.
