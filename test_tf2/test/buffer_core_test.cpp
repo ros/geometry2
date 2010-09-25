@@ -125,7 +125,25 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
   {
 
   }  
+  else if (mode == "1")
+  {
+    geometry_msgs::TransformStamped ts;
+    setIdentity(ts.transform);
+    ts.transform.translation.x = 1;
+    if (time > ros::Time() + (interpolation_space * .5))
+      ts.header.stamp = time - (interpolation_space * .5);
+    else
+      ts.header.stamp = ros::Time();
+    
+    ts.header.frame_id = "a";
+    ts.child_frame_id = "b";
+    EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+    
+  }  
+  else
+    EXPECT_FALSE("Undefined mode for tree setup.  Test harness improperly setup.");
 }
+
 
 TEST(BufferCore_setTransform, NoInsertOnSelfTransform)
 {
@@ -534,6 +552,79 @@ TEST(BufferClient_lookupTransform, i_configuration)
     else if (source_frame == "c" && target_frame =="a")
     {
       EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
+    }
+    else
+    {
+      EXPECT_FALSE("Shouldn't get here");
+      printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
+    }
+    
+  }
+}
+TEST(BufferClient_lookupTransform, one_link_configuration)
+{
+  double epsilon = 1e-6;
+  
+
+
+  rostest::Permuter permuter;
+
+  std::vector<ros::Time> times;
+  times.push_back(ros::Time(1.0));
+  times.push_back(ros::Time(10.0));
+  times.push_back(ros::Time(0.0));
+  ros::Time eval_time;
+  permuter.addOptionSet(times, &eval_time);
+
+  std::vector<ros::Duration> durations;
+  durations.push_back(ros::Duration(1.0));
+  durations.push_back(ros::Duration(0.001));
+  durations.push_back(ros::Duration(0.1));
+  ros::Duration interpolation_space;
+  //  permuter.addOptionSet(durations, &interpolation_space);
+
+  std::vector<std::string> source_frames;
+  source_frames.push_back("a");
+  source_frames.push_back("b");
+  std::string source_frame;
+  permuter.addOptionSet(source_frames, &source_frame);
+  
+  std::vector<std::string> target_frames;
+  target_frames.push_back("a");
+  target_frames.push_back("b");
+  std::string target_frame;
+  permuter.addOptionSet(target_frames, &target_frame);
+
+  while  (permuter.step())
+  {
+
+    tf2::BufferCore mBC;
+    setupTree(mBC, "1", eval_time, interpolation_space);
+
+    geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
+    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
+    EXPECT_EQ(outpose.header.stamp, eval_time);
+    EXPECT_EQ(outpose.header.frame_id, source_frame);
+    EXPECT_EQ(outpose.child_frame_id, target_frame);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
+    
+    //Zero distance
+    if (source_frame == target_frame)
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    }
+    else if (source_frame == "a" && target_frame =="b")
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    }
+    else if (source_frame == "b" && target_frame =="a")
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
     }
     else
     {
