@@ -13,7 +13,7 @@
   <depend package="geometry_msgs"/>
   <depend package="tf2_msgs"/>
 
-  <!-- For Python Binding Time Support and debugging scripts -->
+  <!-- For Python Binding Time Support -->
   <depend package="rospy"/>
 
  <export>
