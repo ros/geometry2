@@ -42,7 +42,13 @@ class Buffer(tf2.BufferCore, tf2_py.BufferInterface):
         tf2_py.BufferInterface.__init__(self)
 
         if debug:
-            self.frame_server = rospy.Service('~tf_frames', FrameGraph, self.__get_frames)
+            #TODO: Find out some elegant way to check if this service exists before advertising it
+            self.frame_server = rospy.Service('~tf2_frames', FrameGraph, self.__get_frames)
+            #try:
+            #    #TODO: DIRTY HACK... TALK TO KEN ABOUT CHECKING IF A SERVICE EXISTS
+            #    rospy.wait_for_service('~tf2_frames', 0.000000000001)
+            #except rospy.ROSException:   
+            #    self.frame_server = rospy.Service('~tf2_frames', FrameGraph, self.__get_frames)
 
     def __get_frames(self, req):
        return FrameGraphResponse(self.allFramesAsYAML()) 

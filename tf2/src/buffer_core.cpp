@@ -885,13 +885,13 @@ std::string BufferCore::allFramesAsYAML() const
 
       mstream << std::fixed; //fixed point notation
       mstream.precision(3); //3 decimal places
-      mstream << frameIDs_reverse[counter] << ":" << std::endl;
-      mstream << "\tparent:" << frameIDs_reverse[frame_id_num] << std::endl;
-      mstream << "\tbroadcaster:'" << authority << "'" << std::endl;
-      mstream << "\trate:" << rate << std::endl;
-      mstream << "\tmost_recent_transform" << (getFrame(counter)->getLatestTimestamp()).toSec() << std::endl;
-      mstream << "\toldest_transform:" << (getFrame(counter)->getOldestTimestamp()).toSec() << std::endl;
-      mstream << "\tbuffer_length:" << (getFrame(counter)->getLatestTimestamp()-getFrame(counter)->getOldestTimestamp()).toSec() << std::endl;
+      mstream << frameIDs_reverse[counter] << ": " << std::endl;
+      mstream << "\tparent: " << frameIDs_reverse[frame_id_num] << std::endl;
+      mstream << "\tbroadcaster: '" << authority << "'" << std::endl;
+      mstream << "\trate: " << rate << std::endl;
+      mstream << "\tmost_recent_transform: " << (getFrame(counter)->getLatestTimestamp()).toSec() << std::endl;
+      mstream << "\toldest_transform: " << (getFrame(counter)->getOldestTimestamp()).toSec() << std::endl;
+      mstream << "\tbuffer_length: " << (getFrame(counter)->getLatestTimestamp()-getFrame(counter)->getOldestTimestamp()).toSec() << std::endl;
     }
   }
   return mstream.str();

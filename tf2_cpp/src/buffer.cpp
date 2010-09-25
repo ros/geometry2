@@ -37,10 +37,10 @@ namespace tf2
 
 Buffer::Buffer(ros::Duration cache_time, bool debug) : BufferCore(cache_time)
 {
-  if(debug && !ros::service::exists("~tf_frames", false))
+  if(debug && !ros::service::exists("~tf2_frames", false))
   {
     ros::NodeHandle n("~");
-    frames_server_ = n.advertiseService("tf_frames", &Buffer::getFrames, this);
+    frames_server_ = n.advertiseService("tf2_frames", &Buffer::getFrames, this);
   }
 }
 
