@@ -388,7 +388,51 @@ bool BufferCore::canTransform(const std::string& target_frame, const std::string
     return false;
   if (warnFrameId("canTransform argument source_frame", source_frame))
     return false;
-  return old_tf_.canTransform(target_frame, source_frame, time, error_msg);
+
+  ros::Time local_time = time;
+
+  //break out early if no op transform
+  if (source_frame == target_frame) return true;
+
+  if (local_time == ros::Time())
+    if (getLatestCommonTime(source_frame, target_frame, local_time, error_msg) != tf2_msgs::TF2Error::NO_ERROR) // set time if zero
+    {
+      return false;
+    }
+  
+  TransformLists t_list;
+  ///\todo check return
+  int retval;
+  try
+  {
+    retval = lookupLists(lookupFrameNumber( target_frame), local_time, lookupFrameNumber( source_frame), t_list, error_msg);
+  }
+  catch (tf::LookupException &ex)
+  {
+    return false;
+  }
+  
+
+
+  ///\todo WRITE HELPER FUNCITON TO RETHROW
+  if (retval != tf2_msgs::TF2Error::NO_ERROR)
+  {
+    if (retval == tf2_msgs::TF2Error::LOOKUP_ERROR)
+    {
+      return false;
+    }
+    if (retval == tf2_msgs::TF2Error::CONNECTIVITY_ERROR)
+    {
+      return false;
+    }
+  }
+
+  if (test_extrapolation(local_time, t_list, error_msg))
+    {
+      return false;
+    }
+
+  return true;
 }
 
 bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& target_time,
