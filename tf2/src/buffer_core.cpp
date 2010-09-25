@@ -55,15 +55,53 @@ void setIdentity(geometry_msgs::Transform& tx)
   tx.rotation.w = 1;
 }
 
+bool startsWithSlash(const std::string& frame_id)
+{
+  if (frame_id.size() > 0)
+    if (frame_id[0] == '/')
+      return true;
+  return false;
+}
+
 std::string stripSlash(const std::string& in)
 {
   std::string out = in;
-  if (out.size() > 0)
-  {
-    if (out[0] == '/')
-      out.erase(0,1);
-  }
+  if (startsWithSlash(in))
+    out.erase(0,1);
   return out;
+};
+
+
+void warnFrameId(const std::string& function_name_arg, const std::string& frame_id)
+{
+  if (frame_id.size() == 0)
+  {
+    std::stringstream ss;
+    ss << "Invalid argument passed to "<< function_name_arg <<" in tf2 frame_ids cannot be empty";
+    ROS_WARN("%s",ss.str().c_str());
+  }
+  if (startsWithSlash(frame_id))
+  {
+    std::stringstream ss;
+    ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
+    ROS_WARN("%s",ss.str().c_str());
+  }
+};
+
+void validateFrameId(const std::string& function_name_arg, const std::string& frame_id)
+{
+  if (frame_id.size() == 0)
+  {
+    std::stringstream ss;
+    ss << "Invalid argument passed to "<< function_name_arg <<" in tf2 frame_ids cannot be empty";
+    throw tf2::InvalidArgumentException(ss.str().c_str());
+  }
+  if (startsWithSlash(frame_id))
+  {
+    std::stringstream ss;
+    ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
+    throw tf2::InvalidArgumentException(ss.str().c_str());
+  }
 };
 
 BufferCore::BufferCore(ros::Duration cache_time): old_tf_(true, cache_time)
@@ -169,6 +207,10 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
                                                             const std::string& source_frame,
                                                             const ros::Time& time) const
 {
+  validateFrameId("lookupTransform argument target_frame", target_frame);
+  validateFrameId("lookupTransform argument source_frame", source_frame);
+  
+
   geometry_msgs::TransformStamped output_transform;
   // Short circuit if zero length transform to allow lookups on non existant links
   if (source_frame == target_frame)
@@ -250,6 +292,9 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
                                                         const ros::Time& source_time,
                                                         const std::string& fixed_frame) const
 {
+  validateFrameId("lookupTransform argument target_frame", target_frame);
+  validateFrameId("lookupTransform argument source_frame", source_frame);
+  validateFrameId("lookupTransform argument source_frame", fixed_frame);
 
   geometry_msgs::TransformStamped output;
   geometry_msgs::TransformStamped temp1 =  lookupTransform(fixed_frame, source_frame, source_time);
@@ -335,6 +380,8 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
 bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
                            const ros::Time& time, std::string* error_msg) const
 {
+  warnFrameId("canTransform argument target_frame", target_frame);
+  warnFrameId("canTransform argument source_frame", source_frame);
   return old_tf_.canTransform(target_frame, source_frame, time, error_msg);
 }
 
@@ -342,6 +389,9 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
                           const std::string& source_frame, const ros::Time& source_time,
                           const std::string& fixed_frame, std::string* error_msg) const
 {
+  warnFrameId("canTransform argument target_frame", target_frame);
+  warnFrameId("canTransform argument source_frame", source_frame);
+  warnFrameId("canTransform argument source_frame", fixed_frame);
   return old_tf_.canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, error_msg);
 }
 
