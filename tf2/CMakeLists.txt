@@ -30,6 +30,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+include_directories (src/bt) 
+
+
 #CPP Libraries
 rosbuild_add_library(tf2 src/cache.cpp src/buffer_core.cpp)
 rosbuild_link_boost(tf2 thread signals)
