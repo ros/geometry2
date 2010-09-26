@@ -1563,7 +1563,7 @@ TEST(tf, assertQuaternionMsgValid)
   //EXPECT_NO_THROW(tf::assertQuaternionValid(q));
 
 }
-  */
+
 
 TEST(tf2_stamped, OperatorEqualEqual)
 {
@@ -1624,7 +1624,7 @@ TEST(tf2_stamped, OperatorEqual)
   EXPECT_TRUE(stamped_pose1 == stamped_pose0);
 
 }
-
+  */
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::Time::init(); //needed for ros::TIme::now()

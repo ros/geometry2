@@ -269,9 +269,9 @@ private:
 
   /** \brief convert Transform msg to Transform */
   static inline btTransform transformMsgToBT(const geometry_msgs::Transform& msg)
-  {btTransform bt(Quaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), Vector3(msg.translation.x, msg.translation.y, msg.translation.z)); return bt;};
+  {btTransform bt(btQuaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), btVector3(msg.translation.x, msg.translation.y, msg.translation.z)); return bt;};
   /** \brief convert Transform to Transform msg*/
-  static inline geometry_msgs::Transform transformBTToMsg(const Transform& bt)
+  static inline geometry_msgs::Transform transformBTToMsg(const btTransform& bt)
   {
     geometry_msgs::Transform msg; 
     msg.translation.x = bt.getOrigin().getX();
