@@ -30,8 +30,6 @@
 /** \author Tully Foote */
 
 #include "tf2/time_cache.h"
-
-#include "tf2/transform_datatypes.h"
 #include "tf2/exceptions.h"
 
 #include "LinearMath/btTransform.h"

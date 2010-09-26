@@ -35,7 +35,6 @@
 #include <list>
 #include <boost/thread/mutex.hpp>
 
-#include "tf2/transform_datatypes.h"
 #include "geometry_msgs/TransformStamped.h"
 
 #include <sstream>

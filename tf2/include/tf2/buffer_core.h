@@ -38,6 +38,7 @@
 #include "ros/time.h"
 #include "geometry_msgs/TwistStamped.h"
 #include "geometry_msgs/TransformStamped.h"
+#include "LinearMath/btTransform.h"
 
 #include "tf2/time_cache.h"
 //////////////////////////backwards startup for porting
