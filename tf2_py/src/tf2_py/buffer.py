@@ -32,6 +32,7 @@ import rospy
 import tf2
 import tf2_py
 from tf2_msgs.srv import FrameGraph, FrameGraphResponse
+import rosgraph.masterapi
 
 class Buffer(tf2.BufferCore, tf2_py.BufferInterface):
     def __init__(self, cache_time = None, debug = True):
@@ -42,13 +43,12 @@ class Buffer(tf2.BufferCore, tf2_py.BufferInterface):
         tf2_py.BufferInterface.__init__(self)
 
         if debug:
-            #TODO: Find out some elegant way to check if this service exists before advertising it
-            self.frame_server = rospy.Service('~tf2_frames', FrameGraph, self.__get_frames)
-            #try:
-            #    #TODO: DIRTY HACK... TALK TO KEN ABOUT CHECKING IF A SERVICE EXISTS
-            #    rospy.wait_for_service('~tf2_frames', 0.000000000001)
-            #except rospy.ROSException:   
-            #    self.frame_server = rospy.Service('~tf2_frames', FrameGraph, self.__get_frames)
+            #Check to see if the service has already been advertised in this node
+            try:
+                m =  rosgraph.masterapi.Master(rospy.get_name())
+                m.lookupService('~tf2_frames')
+            except (rosgraph.masterapi.Error, rosgraph.masterapi.Failure):   
+                self.frame_server = rospy.Service('~tf2_frames', FrameGraph, self.__get_frames)
 
     def __get_frames(self, req):
        return FrameGraphResponse(self.allFramesAsYAML()) 
