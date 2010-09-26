@@ -44,6 +44,23 @@ using namespace tf2;
 // Thanks to Rob for pointing out the right way to do this.
 const double tf2::BufferCore::DEFAULT_CACHE_TIME;
 
+/** \brief convert Transform msg to Transform */
+void transformMsgToTF2(const geometry_msgs::Transform& msg, btTransform& bt)
+{bt = btTransform(btQuaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), btVector3(msg.translation.x, msg.translation.y, msg.translation.z));};
+
+/** \brief convert Transform to Transform msg*/
+void transformTF2ToMsg(const btTransform& bt, geometry_msgs::Transform& msg)
+{
+  msg.translation.x = bt.getOrigin().x();
+  msg.translation.y = bt.getOrigin().y();
+  msg.translation.z = bt.getOrigin().z();
+  msg.rotation.x = bt.getRotation().x();
+  msg.rotation.y = bt.getRotation().y();
+  msg.rotation.z = bt.getRotation().z();
+  msg.rotation.w = bt.getRotation().w();
+};
+
+
 void setIdentity(geometry_msgs::Transform& tx)
 {
   tx.translation.x = 0;
@@ -282,7 +299,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
 
 
   btTransform output = computeTransformFromList(t_list);
-  tf2::transformTF2ToMsg(output, output_transform.transform);
+  transformTF2ToMsg(output, output_transform.transform);
   output_transform.header.stamp = temp_time;
   output_transform.header.frame_id = target_frame;
   output_transform.child_frame_id = source_frame;
@@ -305,9 +322,9 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   geometry_msgs::TransformStamped temp2 =  lookupTransform(target_frame, fixed_frame, target_time);
   
   btTransform bt1, bt2;
-  tf2::transformMsgToTF2(temp1.transform, bt1);
-  tf2::transformMsgToTF2(temp2.transform, bt2);
-  tf2::transformTF2ToMsg(bt2*bt1, output.transform);
+  transformMsgToTF2(temp1.transform, bt1);
+  transformMsgToTF2(temp2.transform, bt2);
+  transformTF2ToMsg(bt2*bt1, output.transform);
   output.header.stamp = temp2.header.stamp;
   output.header.frame_id = target_frame;
   output.child_frame_id = source_frame;

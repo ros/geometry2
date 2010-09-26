@@ -209,12 +209,6 @@ static inline void pointStampedTF2ToMsg(const Stamped<btVector3>& bt, geometry_m
 {pointTF2ToMsg(bt, msg.point); msg.header.stamp = bt.stamp_; msg.header.frame_id = bt.frame_id_;};
 
 
-/** \brief convert Transform msg to Transform */
-static inline void transformMsgToTF2(const geometry_msgs::Transform& msg, btTransform& bt)
-{bt = btTransform(btQuaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), btVector3(msg.translation.x, msg.translation.y, msg.translation.z));};
-/** \brief convert Transform to Transform msg*/
-static inline void transformTF2ToMsg(const btTransform& bt, geometry_msgs::Transform& msg)
-{vector3TF2ToMsg(bt.getOrigin(), msg.translation);  quaternionTF2ToMsg(bt.getRotation(), msg.rotation);};
 
 /** \brief convert TransformStamped msg to tf2::StampedTransform */
 /*static inline void transformStampedMsgToTF2(const geometry_msgs::TransformStamped & msg, StampedTransform& bt)
