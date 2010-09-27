@@ -16,8 +16,8 @@ def main():
     t.header.stamp = rospy.Time(2.0)
     t.header.frame_id = 'a'
     t.child_frame_id = 'b'
-    b.setTransform(t, 'eitan_rocks')
-    print b.lookupTransform('a','b', rospy.Time(2.0), rospy.Duration(2.0))
+    b.set_transform(t, 'eitan_rocks')
+    print b.lookup_transform('a','b', rospy.Time(2.0), rospy.Duration(2.0))
 
     v = PointStamped()
     v.header.stamp = rospy.Time(2)

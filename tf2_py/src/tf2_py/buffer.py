@@ -51,32 +51,32 @@ class Buffer(tf2.BufferCore, tf2_py.BufferInterface):
                 self.frame_server = rospy.Service('~tf2_frames', FrameGraph, self.__get_frames)
 
     def __get_frames(self, req):
-       return FrameGraphResponse(self.allFramesAsYAML()) 
+       return FrameGraphResponse(self.all_frames_as_yaml()) 
         
     # lookup, simple api 
-    def lookupTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
-        self.canTransform(target_frame, source_frame, time, timeout)
-        return self.lookupTransformCore(target_frame, source_frame, time)
+    def lookup_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+        self.can_transform(target_frame, source_frame, time, timeout)
+        return self.lookup_transform_core(target_frame, source_frame, time)
 
     # lookup, advanced api 
-    def lookupTransformFull(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
-        self.canTransformFull(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
-        return self.lookupTransformFullCore(target_frame, target_time, source_frame, source_time, fixed_frame)
+    def lookup_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+        self.can_transform_full(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
+        return self.lookup_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
 
 
     # can, simple api
-    def canTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+    def can_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         start_time = rospy.Time.now()
         while (rospy.Time.now() < start_time + timeout and 
-               not self.canTransformCore(target_frame, source_frame, time)):
+               not self.can_transform_core(target_frame, source_frame, time)):
             rospy.Duration(0.05).sleep()
-        return self.canTransformCore(target_frame, source_frame, time)
+        return self.can_transform_core(target_frame, source_frame, time)
     
     # can, advanced api
-    def canTransformFull(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def can_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
         start_time = rospy.Time.now()
         while (rospy.Time.now() < start_time + timeout and 
-               not self.canTransformFullCore(target_frame, target_time, source_frame, source_time, fixed_frame)):
+               not self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)):
             rospy.Duration(0.05).sleep()
-        return self.canTransformFullCore(target_frame, target_time, source_frame, source_time, fixed_frame)
+        return self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
 

@@ -32,7 +32,7 @@ import PyKDL
 import rospy
 import tf2_py
 
-def transformToKDL(t):
+def transform_to_kdl(t):
     return PyKDL.Frame(PyKDL.Rotation.Quaternion(t.transform.rotation.x, t.transform.rotation.y,
                                                  t.transform.rotation.z, t.transform.rotation.w),
                        PyKDL.Vector(t.transform.translation.x, 
@@ -41,33 +41,33 @@ def transformToKDL(t):
 
 
 # Frame
-def doTransformFrame(frame, transform):
-    res = transformToKDL(transform) * frame
+def do_transform_frame(frame, transform):
+    res = transform_to_kdl(transform) * frame
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(PyKDL.Frame, doTransformFrame)
+tf2_py.TransformRegistration().add(PyKDL.Frame, do_transform_frame)
 
 
 # Vector
-def doTransformVector(vector, transform):
-    res = transformToKDL(transform) * vector
+def do_transform_vector(vector, transform):
+    res = transform_to_kdl(transform) * vector
     res.header = transform.header
     return res
 
-tf2_py.TransformRegistration().add(PyKDL.Vector, doTransformVector)
+tf2_py.TransformRegistration().add(PyKDL.Vector, do_transform_vector)
 
 
 # Twist
-def doTransformTwist(twist, transform):
-    res = transformToKDL(transform) * twist
+def do_transform_twist(twist, transform):
+    res = transform_to_kdl(transform) * twist
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(PyKDL.Twist, doTransformTwist)
+tf2_py.TransformRegistration().add(PyKDL.Twist, do_transform_twist)
 
 
 # Wrench
-def doTransformWrench(wrench, transform):
-    res = transformToKDL(transform) * wrench
+def do_transform_wrench(wrench, transform):
+    res = transform_to_kdl(transform) * wrench
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(PyKDL.Wrench, doTransformWrench)
+tf2_py.TransformRegistration().add(PyKDL.Wrench, do_transform_wrench)

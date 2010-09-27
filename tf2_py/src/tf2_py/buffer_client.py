@@ -52,7 +52,7 @@ class BufferClient(tf2_py.BufferInterface):
         self.timeout_padding = timeout_padding
 
     # lookup, simple api 
-    def lookupTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+    def lookup_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         goal = LookupTransformGoal()
         goal.target_frame = target_frame;
         goal.source_frame = source_frame;
@@ -63,7 +63,7 @@ class BufferClient(tf2_py.BufferInterface):
         return self.__process_goal(goal)
 
     # lookup, advanced api 
-    def lookupTransformFull(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def lookup_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
         goal = LookupTransformGoal()
         goal.target_frame = target_frame;
         goal.source_frame = source_frame;
@@ -76,18 +76,18 @@ class BufferClient(tf2_py.BufferInterface):
         return self.__process_goal(goal)
 
     # can, simple api
-    def canTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+    def can_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         try:
-            self.lookupTransform(target_frame, source_frame, time, timeout)
+            self.lookup_transform(target_frame, source_frame, time, timeout)
             return True
         except tf2.TransformException:
             return False
 
     
     # can, advanced api
-    def canTransformFull(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def can_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
         try:
-            self.lookupTransformFull(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
+            self.lookup_transform_full(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
             return True
         except tf2.TransformException:
             return False

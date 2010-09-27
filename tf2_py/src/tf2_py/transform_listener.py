@@ -33,7 +33,6 @@ import rospy
 import tf2_py
 import threading
 from tf2_msgs.msg import TFMessage
-from tf2_msgs.srv import FrameGraph,FrameGraphResponse
 
 class TransformListener():
     def __init__(self, buffer):
@@ -51,13 +50,9 @@ class TransformListenerThread(threading.Thread):
 
     def run(self):
         rospy.Subscriber("/tf", TFMessage, self.callback)
-        frame_graph_server = rospy.Service('~tf_frames', FrameGraph, self.frame_graph_service)
         rospy.spin()
 
     def callback(self, data):
         who = data._connection_header.get('callerid', "default_authority")
         for transform in data.transforms:
-            self.buffer.setTransform(transform, who)
-
-    def frame_graph_service(self, req):
-        return FrameGraphResponse(self.buffer.allFramesAsDot())
+            self.buffer.set_transform(transform, who)

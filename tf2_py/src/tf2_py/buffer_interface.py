@@ -39,30 +39,30 @@ class BufferInterface:
     # transform, simple api
     def transform(self, object_stamped, target_frame, timeout=rospy.Duration(0.0)):
         do_transform = self.registration.get(type(object_stamped))
-        return do_transform(object_stamped, self.lookupTransform(target_frame, object_stamped.header.frame_id,
+        return do_transform(object_stamped, self.lookup_transform(target_frame, object_stamped.header.frame_id,
                                                                  object_stamped.header.stamp, timeout))
     
     # transform, advanced api
-    def transformFull(self, object_stamped, target_frame, target_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def transform_full(self, object_stamped, target_frame, target_time, fixed_frame, timeout=rospy.Duration(0.0)):
         do_transform = self.registration.get(type(object_stamped))
-        return do_transform(object_stamped, self.lookupTransformFull(target_frame, target_time,
+        return do_transform(object_stamped, self.lookup_transform_full(target_frame, target_time,
                                                                      object_stamped.header.frame_id, object_stamped.header.stamp, 
                                                                      fixed_frame, timeout))
 
     # lookup, simple api 
-    def lookupTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+    def lookup_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         raise NotImplementedException()        
 
     # lookup, advanced api 
-    def lookupTransformFull(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def lookup_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
         raise NotImplementedException()        
 
     # can, simple api
-    def canTransform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+    def can_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         raise NotImplementedException()        
     
     # can, advanced api
-    def canTransformFull(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def can_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
         raise NotImplementedException()        
 
 
