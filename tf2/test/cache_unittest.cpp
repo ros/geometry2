@@ -32,15 +32,31 @@
 #include <sys/time.h>
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btMatrix3x3.h"
+#include <stdexcept>
 
+std::vector<double> values;
+unsigned int step = 0;
 
 void seed_rand()
 {
-  //Seed random number generator with current microseond count
-  timeval temp_time_struct;
-  gettimeofday(&temp_time_struct,NULL);
-  srand(temp_time_struct.tv_usec);
+  for (unsigned int i = 0; i < 1000; i++)
+  {
+    int pseudo_rand = std::floor(i * M_PI);
+    values.push_back(( pseudo_rand % 100)/50.0 - 1.0);
+    //printf("Seeding with %f\n", values.back());
+  }
 };
+
+
+double get_rand() 
+{ 
+  if (values.size() == 0) throw std::runtime_error("you need to call seed_rand first");
+  if (step >= values.size()) 
+    step = 0;
+  else
+    step++;
+  return values[step];
+}
 
 using namespace tf2;
 
@@ -69,7 +85,7 @@ TEST(TimeCache, Repeatability)
   
   for ( uint64_t i = 1; i < runs ; i++ )
   {
-    values[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+    values[i] = 10.0 * ((double) get_rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     std::stringstream ss;
     ss << values[i];
     stor.header.frame_id = ss.str();
@@ -106,7 +122,7 @@ TEST(TimeCache, RepeatabilityReverseInsertOrder)
   
   for ( int i = runs -1; i >= 0 ; i-- )
   {
-    values[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+    values[i] = 10.0 * get_rand();
     std::stringstream ss;
     ss << values[i];
     stor.header.frame_id = ss.str();
@@ -142,7 +158,7 @@ TEST(TimeCache, RepeatabilityRandomInsertOrder)
   setIdentity(stor.transform); 
   for ( uint64_t i = 0; i <runs ; i++ )
   {
-    values[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+    values[i] = 10.0 * get_rand();
     std::stringstream ss;
     ss << values[i];
     stor.header.frame_id = ss.str();
@@ -178,7 +194,7 @@ TEST(TimeCache, ZeroAtFront)
   
   for ( uint64_t i = 1; i < runs ; i++ )
   {
-    values[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+    values[i] = 10.0 * get_rand();
     std::stringstream ss;
     ss << values[i];
     stor.header.frame_id = ss.str();
@@ -228,7 +244,7 @@ TEST(TimeCache, ZeroAtFront)
 TEST(TimeCache, CartesianInterpolation)
 {
   uint64_t runs = 100;
-  double epsilon = 1e-6;
+  double epsilon = 2e-6;
   seed_rand();
   
   tf2::TimeCache  cache;
@@ -246,9 +262,9 @@ TEST(TimeCache, CartesianInterpolation)
 
     for (uint64_t step = 0; step < 2 ; step++)
     {
-      xvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-      yvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-      zvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+      xvalues[step] = 10.0 * get_rand();
+      yvalues[step] = 10.0 * get_rand();
+      zvalues[step] = 10.0 * get_rand();
     
       stor.transform.translation.x = xvalues[step];
       stor.transform.translation.y = yvalues[step];
@@ -265,6 +281,10 @@ TEST(TimeCache, CartesianInterpolation)
       double x_out = stor.transform.translation.x;
       double y_out = stor.transform.translation.y;
       double z_out = stor.transform.translation.z;
+      //      printf("pose %d, %f %f %f, expected %f %f %f\n", pos, x_out, y_out, z_out, 
+      //       xvalues[0] + (xvalues[1] - xvalues[0]) * (double)pos/100.,
+      //       yvalues[0] + (yvalues[1] - yvalues[0]) * (double)pos/100.0,
+      //       zvalues[0] + (xvalues[1] - zvalues[0]) * (double)pos/100.0);
       EXPECT_NEAR(xvalues[0] + (xvalues[1] - xvalues[0]) * (double)pos/100.0, x_out, epsilon);
       EXPECT_NEAR(yvalues[0] + (yvalues[1] - yvalues[0]) * (double)pos/100.0, y_out, epsilon);
       EXPECT_NEAR(zvalues[0] + (zvalues[1] - zvalues[0]) * (double)pos/100.0, z_out, epsilon);
@@ -293,9 +313,9 @@ TEST(TimeCache, ReparentingInterpolationProtection)
 
   for (uint64_t step = 0; step < 2 ; step++)
   {
-    xvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-    yvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-    zvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+    xvalues[step] = 10.0 * get_rand();
+    yvalues[step] = 10.0 * get_rand();
+    zvalues[step] = 10.0 * get_rand();
     
     stor.transform.translation.x = xvalues[step];
     stor.transform.translation.y = yvalues[step];
@@ -353,9 +373,9 @@ TEST(TimeCache, CartesianExtrapolation)
 
     for (uint64_t step = 0; step < 2 ; step++)
     {
-      xvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-      yvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-      zvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+      xvalues[step] = 10.0 * get_rand();
+      yvalues[step] = 10.0 * get_rand();
+      zvalues[step] = 10.0 * get_rand();
     
       stor.transform.translation.x = xvalues[step];
       stor.transform.translation.y = yvalues[step];
@@ -395,9 +415,9 @@ TEST(Bullet, Slerp)
   
   for (uint64_t i = 0 ; i < runs ; i++)
   {
-    q2.setEuler(1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX,
-                1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX,
-                1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX);
+    q2.setEuler(1.0 * get_rand(),
+                1.0 * get_rand(),
+                1.0 * get_rand());
     
     
     btQuaternion q3 = slerp(q1,q2,0.5);
@@ -430,9 +450,9 @@ TEST(TimeCache, AngularInterpolation)
 
     for (uint64_t step = 0; step < 2 ; step++)
     {
-      yawvalues[step] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX / 100.0;
-      pitchvalues[step] = 0;//10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-      rollvalues[step] = 0;//10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+      yawvalues[step] = 10.0 * get_rand() / 100.0;
+      pitchvalues[step] = 0;//10.0 * get_rand();
+      rollvalues[step] = 0;//10.0 * get_rand();
       quats[step].setRPY(yawvalues[step], pitchvalues[step], rollvalues[step]);
       stor.transform.rotation.x = quats[step].getX();
       stor.transform.rotation.y = quats[step].getY();
