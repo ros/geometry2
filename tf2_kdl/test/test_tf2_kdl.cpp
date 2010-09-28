@@ -90,6 +90,22 @@ TEST(TfKDL, Vector)
   EXPECT_NEAR(v_advanced[2], 27, EPS);
 }
 
+TEST(TfKDL, ConvertVector)
+{
+  tf2::Stamped<KDL::Vector> v(KDL::Vector(1,2,3), ros::Time(), "my_frame");
+
+  tf2::Stamped<KDL::Vector> v1 = v;
+  tf2::convert(v1, v1);
+
+  EXPECT_EQ(v, v1);
+
+  tf2::Stamped<KDL::Vector> v2(KDL::Vector(3,4,5), ros::Time(), "my_frame2");
+  tf2::convert(v1, v2);
+
+  EXPECT_EQ(v, v2);
+  EXPECT_EQ(v1, v2);
+}
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);

@@ -51,6 +51,9 @@ class BufferClient(tf2_py.BufferInterface):
         self.check_frequency = check_frequency
         self.timeout_padding = timeout_padding
 
+    def wait_for_server(self, timeout = rospy.Duration()):
+        return self.client.wait_for_server(timeout)
+
     # lookup, simple api 
     def lookup_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
         goal = LookupTransformGoal()

@@ -40,10 +40,25 @@
 
 namespace tf2
 {
+
+template <class A, class B>
+  void convert(const A& a, B& b)
+  {
+    printf("In double type convert\n");
+    fromMsg(toMsg(a), b);
+  }
+
+template <class A>
+  void convert(const A& a1, A& a2)
+  {
+    printf("In single type convert\n");
+    if(&a1 != &a2)
+      a2 = a1;
+  }
     
 // this method needs to be implemented by client library developers
 template <class T>
-  void doTransform(const T& t_in, T& t_out, const geometry_msgs::TransformStamped& transform);
+  void doTransform(const T& in, T& out, const geometry_msgs::TransformStamped& transform);
 
 // method to extract timestamp from object
 template <class T>
@@ -135,46 +150,68 @@ public:
 
   // Transform, simple api, with pre-allocation
   template <class T>
-    T& transform(const T& t_in, T& t_out, 
+    T& transform(const T& in, T& out, 
 		 const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     // do the transform
-    doTransform(t_in, t_out, lookupTransform(target_frame, getFrameId(t_in), getTimestamp(t_in), timeout));
-    return t_out;
+    doTransform(in, out, lookupTransform(target_frame, getFrameId(in), getTimestamp(in), timeout));
+    return out;
   }
 
 
   // transform, simple api, no pre-allocation
   template <class T>
-    T transform(const T& t_in, 
+    T transform(const T& in, 
 		const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
-    T t_out;
-    return transform(t_in, t_out, target_frame, timeout);
+    T out;
+    return transform(in, out, target_frame, timeout);
+  }
+
+  //transform, simple api, different types, pre-allocation
+  template <class A, class B>
+    B& transform(const A& in, B& out,
+        const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
+  {
+    A copy = transform(in, target_frame, timeout);
+    convert(copy, out);
+    return out;
   }
 
   // Transform, advanced api, with pre-allocation
   template <class T>
-    T& transform(const T& t_in, T& t_out, 
+    T& transform(const T& in, T& out, 
 		 const std::string& target_frame, const ros::Time& target_time,
 		 const std::string& fixed_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     // do the transform
-    doTransform(t_in, t_out, lookupTransform(target_frame, target_time, 
-					     getFrameId(t_in), getTimestamp(t_in), 
+    doTransform(in, out, lookupTransform(target_frame, target_time, 
+					     getFrameId(in), getTimestamp(in), 
 					     fixed_frame, timeout));
-    return t_out;
+    return out;
   }
 
 
   // transform, simple api, no pre-allocation
   template <class T>
-    T& transform(const T& t_in, 
+    T& transform(const T& in, 
 		 const std::string& target_frame, const ros::Time& target_time,
 		 const std::string& fixed_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
-    T t_out;
-    return transform(t_in, t_out, target_frame, target_time, fixed_frame, timeout);
+    T out;
+    return transform(in, out, target_frame, target_time, fixed_frame, timeout);
+  }
+
+  // Transform, advanced api, different types, with pre-allocation
+  template <class A, class B>
+    B& transform(const A& in, B& out, 
+		 const std::string& target_frame, const ros::Time& target_time,
+		 const std::string& fixed_frame, ros::Duration timeout=ros::Duration(0.0)) const
+  {
+    // do the transform
+    A copy = transform(in, target_frame, target_time, fixed_frame, timeout);
+    convert(copy, out);
+    return out;
   }
 
 

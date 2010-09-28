@@ -41,7 +41,7 @@
 namespace tf2
 {
     
-KDL::Frame transformToKDL(const geometry_msgs::TransformStamped& t)
+KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
   {
     return KDL::Frame(KDL::Rotation::Quaternion(t.transform.rotation.x, t.transform.rotation.y, 
 						t.transform.rotation.z, t.transform.rotation.w),
@@ -65,7 +65,7 @@ template <>
 template <>
   void doTransform(const geometry_msgs::Vector3Stamped& t_in, geometry_msgs::Vector3Stamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform).M * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z), 
+    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(gmTransformToKDL(transform).M * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z), 
 								transform.header.stamp, transform.header.frame_id);
     t_out.vector.x = v_out[0];
     t_out.vector.y = v_out[1];
@@ -92,7 +92,7 @@ template <>
 template <>
   void doTransform(const geometry_msgs::PointStamped& t_in, geometry_msgs::PointStamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform) * KDL::Vector(t_in.point.x, t_in.point.y, t_in.point.z), 
+    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(gmTransformToKDL(transform) * KDL::Vector(t_in.point.x, t_in.point.y, t_in.point.z), 
 								transform.header.stamp, transform.header.frame_id);
     t_out.point.x = v_out[0];
     t_out.point.y = v_out[1];
@@ -121,7 +121,7 @@ template <>
     KDL::Vector v(t_in.pose.position.x, t_in.pose.position.y, t_in.pose.position.z);
     KDL::Rotation r = KDL::Rotation::Quaternion(t_in.pose.orientation.x, t_in.pose.orientation.y, t_in.pose.orientation.z, t_in.pose.orientation.w);
 
-    tf2::Stamped<KDL::Frame> v_out = tf2::Stamped<KDL::Frame>(transformToKDL(transform) * KDL::Frame(r, v),
+    tf2::Stamped<KDL::Frame> v_out = tf2::Stamped<KDL::Frame>(gmTransformToKDL(transform) * KDL::Frame(r, v),
 							      transform.header.stamp, transform.header.frame_id);
     t_out.pose.position.x = v_out.p[0];
     t_out.pose.position.y = v_out.p[1];

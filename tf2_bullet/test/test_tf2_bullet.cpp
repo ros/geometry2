@@ -77,6 +77,22 @@ TEST(TfBullet, Vector)
   EXPECT_NEAR(v_advanced.getZ(), 27, EPS);
 }
 
+TEST(TfBullet, ConvertVector)
+{
+  btVector3 v(1,2,3);
+
+  btVector3 v1 = v;
+  tf2::convert(v1, v1);
+
+  EXPECT_EQ(v, v1);
+
+  btVector3 v2(3,4,5);
+  tf2::convert(v1, v2);
+
+  EXPECT_EQ(v, v2);
+  EXPECT_EQ(v1, v2);
+}
+
 
 
 int main(int argc, char **argv){

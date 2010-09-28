@@ -34,6 +34,7 @@
 
 #include <tf2_cpp/buffer.h>
 #include <LinearMath/btTransform.h>
+#include <geometry_msgs/PointStamped.h>
 
 
 namespace tf2
@@ -53,6 +54,27 @@ template <>
   {
     t_out = tf2::Stamped<btVector3>(transformToBullet(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
+
+//convert to vector message
+geometry_msgs::PointStamped toMsg(const tf2::Stamped<btVector3>& in)
+{
+  geometry_msgs::PointStamped msg;
+  msg.header.stamp = in.stamp_;
+  msg.header.frame_id = in.frame_id_;
+  msg.point.x = in[0];
+  msg.point.y = in[1];
+  msg.point.z = in[2];
+  return msg;
+}
+
+void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<btVector3>& out)
+{
+  out.stamp_ = msg.header.stamp;
+  out.frame_id_ = msg.header.frame_id;
+  out[0] = msg.point.x;
+  out[1] = msg.point.y;
+  out[2] = msg.point.z;
+}
 
 
 // this method needs to be implemented by client library developers

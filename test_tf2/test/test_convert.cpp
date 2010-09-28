@@ -35,75 +35,29 @@
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
 #include <gtest/gtest.h>
-#include <tf2_cpp/buffer_client.h>
-#include <ros/ros.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_cpp/buffer_interface.h>
 #include <tf2_kdl/tf2_kdl.h>
 #include <tf2_bullet/tf2_bullet.h>
+#include <ros/ros.h>
 
-static const double EPS = 1e-3;
-
-TEST(tf2_cpp, buffer_client)
+TEST(tf2Convert, kdlToBullet)
 {
-  tf2::BufferClient client("tf_action");
+  tf2::Stamped<btVector3> b(btVector3(1,2,3), ros::Time(), "my_frame");
 
-  //make sure that things are set up
-  client.waitForServer();
+  tf2::Stamped<btVector3> b1 = b;
+  tf2::Stamped<KDL::Vector> k1;
+  tf2::convert(b1, k1);
 
-  geometry_msgs::PointStamped p1;
-  p1.header.frame_id = "a";
-  p1.header.stamp = ros::Time();
-  p1.point.x = 0.0;
-  p1.point.y = 0.0;
-  p1.point.z = 0.0;
+  tf2::Stamped<btVector3> b2;
+  tf2::convert(k1, b2);
 
-  try
-  {
-    geometry_msgs::PointStamped p2 = client.transform(p1, "b");
-    ROS_INFO("p1: (%.2f, %.2f, %.2f), p2: (%.2f, %.2f, %.2f)", p1.point.x,
-        p1.point.y, p1.point.z, p2.point.x, p2.point.y, p2.point.z);
-
-    EXPECT_NEAR(p2.point.x, -5.0, EPS);
-    EXPECT_NEAR(p2.point.y, -6.0, EPS);
-    EXPECT_NEAR(p2.point.z, -7.0, EPS);
-  }
-  catch(tf2::TransformException& ex)
-  {
-    ROS_ERROR("Failed to transform: %s", ex.what());
-  }
-} 
-
-TEST(tf2_cpp, buffer_client_different_types)
-{
-  tf2::BufferClient client("tf_action");
-
-  //make sure that things are set up
-  client.waitForServer();
-
-  tf2::Stamped<KDL::Vector> k1(KDL::Vector(0, 0, 0), ros::Time(), "a");
-
-  try
-  {
-    tf2::Stamped<btVector3> b1;
-    client.transform(k1, b1, "b");
-    ROS_INFO_STREAM("Bullet: (" << b1[0] << ", " << b1[1] << ", " << b1[2] << ")");
-    ROS_INFO_STREAM("KDL: (" << k1[0] << ", " << k1[1] << ", " << k1[2] << ")");
-    EXPECT_NEAR(b1[0], -5.0, EPS);
-    EXPECT_NEAR(b1[1], -6.0, EPS);
-    EXPECT_NEAR(b1[2], -7.0, EPS);
-    EXPECT_EQ(b1.frame_id_, "b");
-    EXPECT_EQ(k1.frame_id_, "a");
-  }
-  catch(tf2::TransformException& ex)
-  {
-    ROS_ERROR("Failed to transform: %s", ex.what());
-  }
+  EXPECT_EQ(b, b2);
+  EXPECT_EQ(b1, b2);
 } 
 
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "buffer_client_test");
   return RUN_ALL_TESTS();
 }
 
