@@ -125,7 +125,7 @@ void validateFrameId(const std::string& function_name_arg, const std::string& fr
   }
 };
 
-BufferCore::BufferCore(ros::Duration cache_time)//: old_tf_(true, cache_time)
+BufferCore::BufferCore(ros::Duration cache_time) : cache_time_(cache_time)//: old_tf_(true, cache_time)
 {
   max_extrapolation_distance_.fromNSec(DEFAULT_MAX_EXTRAPOLATION_DISTANCE);
   frameIDs_["NO_PARENT"] = 0;
@@ -498,7 +498,7 @@ unsigned int BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_st
   if (map_it == frameIDs_.end())
   {
     retval = frames_.size();
-    frames_.push_back( new TimeCache(cache_time, max_extrapolation_distance_));
+    frames_.push_back( new TimeCache(cache_time_, max_extrapolation_distance_));
     frameIDs_[frameid_str] = retval;
     frameIDs_reverse.push_back(frameid_str);
   }

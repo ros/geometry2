@@ -228,7 +228,7 @@ private:
 
 
   /// How long to cache transform history
-  ros::Duration cache_time;
+  ros::Duration cache_time_;
 
   /// whether or not to allow extrapolation
   ros::Duration max_extrapolation_distance_;
