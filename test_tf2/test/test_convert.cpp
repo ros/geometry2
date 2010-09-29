@@ -42,6 +42,8 @@
 
 TEST(tf2Convert, kdlToBullet)
 {
+  double epsilon = 1e-9;
+
   tf2::Stamped<btVector3> b(btVector3(1,2,3), ros::Time(), "my_frame");
 
   tf2::Stamped<btVector3> b1 = b;
@@ -51,8 +53,19 @@ TEST(tf2Convert, kdlToBullet)
   tf2::Stamped<btVector3> b2;
   tf2::convert(k1, b2);
 
-  EXPECT_EQ(b, b2);
-  EXPECT_EQ(b1, b2);
+  EXPECT_EQ(b.frame_id_, b2.frame_id_);
+  EXPECT_NEAR(b.stamp_.toSec(), b2.stamp_.toSec(), epsilon);
+  EXPECT_NEAR(b.x(), b2.x(), epsilon);
+  EXPECT_NEAR(b.y(), b2.y(), epsilon);
+  EXPECT_NEAR(b.z(), b2.z(), epsilon);
+
+
+  EXPECT_EQ(b1.frame_id_, b2.frame_id_);
+  EXPECT_NEAR(b1.stamp_.toSec(), b2.stamp_.toSec(), epsilon);
+  EXPECT_NEAR(b1.x(), b2.x(), epsilon);
+  EXPECT_NEAR(b1.y(), b2.y(), epsilon);
+  EXPECT_NEAR(b1.z(), b2.z(), epsilon);
+
 } 
 
 int main(int argc, char** argv)
