@@ -31,6 +31,7 @@ import roslib; roslib.load_manifest('tf2_kdl')
 import PyKDL
 import rospy
 import tf2_py
+from geometry_msgs.msg import PointStamped
 
 def transform_to_kdl(t):
     return PyKDL.Frame(PyKDL.Rotation.Quaternion(t.transform.rotation.x, t.transform.rotation.y,
@@ -38,14 +39,6 @@ def transform_to_kdl(t):
                        PyKDL.Vector(t.transform.translation.x, 
                                     t.transform.translation.y, 
                                     t.transform.translation.z))
-
-
-# Frame
-def do_transform_frame(frame, transform):
-    res = transform_to_kdl(transform) * frame
-    res.header = transform.header
-    return res
-tf2_py.TransformRegistration().add(PyKDL.Frame, do_transform_frame)
 
 
 # Vector
@@ -56,6 +49,33 @@ def do_transform_vector(vector, transform):
 
 tf2_py.TransformRegistration().add(PyKDL.Vector, do_transform_vector)
 
+def to_msg_vector(vector):
+    msg = PointStamped()
+    msg.header = vector.header
+    msg.point.x = vector[0]
+    msg.point.y = vector[1]
+    msg.point.z = vector[2]
+    return msg
+
+tf2_py.ConvertRegistration().add_to_msg(PyKDL.Vector, to_msg_vector)
+
+def from_msg_vector(msg):
+    vector = PyKDL.Vector(msg.point.x, msg.point.y, msg.point.z)
+    return tf2_py.Stamped(vector, msg.header.stamp, msg.header.frame_id)
+
+tf2_py.ConvertRegistration().add_from_msg(PyKDL.Vector, from_msg_vector)
+
+def convert_vector(vector):
+    return tf2_py.Stamped(PyKDL.Vector(vector), vector.header.stamp, vector.header.frame_id)
+
+tf2_py.ConvertRegistration().add_convert((PyKDL.Vector, PyKDL.Vector), convert_vector)
+
+# Frame
+def do_transform_frame(frame, transform):
+    res = transform_to_kdl(transform) * frame
+    res.header = transform.header
+    return res
+tf2_py.TransformRegistration().add(PyKDL.Frame, do_transform_frame)
 
 # Twist
 def do_transform_twist(twist, transform):

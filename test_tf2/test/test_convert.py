@@ -42,48 +42,25 @@ import unittest
 
 import tf2
 import tf2_py
-import tf2_kdl
 import tf2_geometry_msgs
 from geometry_msgs.msg import PointStamped
 import rospy
+import tf2_kdl
 import PyKDL
 
-class TestBufferClient(unittest.TestCase):
-    def test_buffer_client(self):
-        client = tf2_py.BufferClient("tf_action")
-        client.wait_for_server()
-
-        p1 = PointStamped()
-        p1.header.frame_id = "a"
-        p1.header.stamp = rospy.Time(0.0)
-        p1.point.x = 0.0
-        p1.point.y = 0.0
-        p1.point.z = 0.0
-
-        try:
-            p2 = client.transform(p1, "b")
-            rospy.loginfo("p1: %s, p2: %s" % (p1, p2))
-        except tf2.TransformException as e:
-            rospy.logerr("%s" % e)
-
-    def test_transform_type(self):
-        client = tf2_py.BufferClient("tf_action")
-        client.wait_for_server()
-
-        p1 = PointStamped()
-        p1.header.frame_id = "a"
-        p1.header.stamp = rospy.Time(0.0)
-        p1.point.x = 0.0
-        p1.point.y = 0.0
-        p1.point.z = 0.0
-
-        try:
-            p2 = client.transform(p1, "b", new_type = PyKDL.Vector)
-            rospy.loginfo("p1: %s, p2: %s" % (str(p1), str(p2)))
-        except tf2.TransformException as e:
-            rospy.logerr("%s" % e)
+class TestConvert(unittest.TestCase):
+    def test_convert(self):
+        p = tf2_py.Stamped(PyKDL.Vector(1, 2, 3), rospy.Time(), 'my_frame')
+        print p
+        msg = tf2_py.convert(p, PointStamped) 
+        print msg
+        p2 = tf2_py.convert(msg, PyKDL.Vector)
+        print p2
+        p2[0] = 100
+        print p
+        print p2
+        print p2.header
 
 if __name__ == '__main__':
-    rospy.init_node("test_buffer_client")
     import rostest
-    rostest.rosrun(PKG, 'test_buffer_client', TestBufferClient)
+    rostest.unitrun(PKG, 'test_buffer_client', TestConvert)
