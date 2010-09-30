@@ -57,24 +57,33 @@ import os
 
 import rosgraph.masterapi
 
+from tf2_tools.frame_viewer_panel import FrameViewerPanel
 
 class FrameViewerFrame(wx.Frame):
     def __init__(self, tf_interface):
         wx.Frame.__init__(self, None, -1, "Frame Viewer", size=(1024,768))
 
-        self.tf_interface = tf_interface
+        self.viewer = FrameViewerPanel(self, tf_interface)
 
+        # Create menu
         menubar = wx.MenuBar()
         file = wx.Menu()
-
         file.Append(101, '&Load', 'Load a frame_viewer snapshot')
         file.Append(102, '&Save', 'Save a frame_viewer snapshot')
         menubar.Append(file, '&File')
-
         self.SetMenuBar(menubar)
+       
         wx.EVT_MENU(self, 101, self.onLoad)
         wx.EVT_MENU(self, 102, self.onSave)
 
+    def onLoad(self, event): print wx.LoadFileSelector("TF Snapshot", ".tf")
+    def onSave(self, event): print wx.SaveFileSelector("TF Snapshot", ".tf")
+
+class FrameViewer(wx.Panel):
+    def __init__(self, parent, tf_interface):
+        wx.Panel.__init__(self, parent, -1)
+
+        self.tf_interface = tf_interface
 
         self.needs_refresh = False
         self.new_info_text = None
@@ -156,8 +165,6 @@ class FrameViewerFrame(wx.Frame):
         nb.AddPage(self.info_win, "Info")
         nb.AddPage(echo_panel, "TF Echo")
 
-
-
         # Set content splitter
         #self.content_splitter.SplitHorizontally(nb, viewer, 120)
         self.content_splitter.SplitVertically(nb, viewer, 300)
@@ -166,7 +173,27 @@ class FrameViewerFrame(wx.Frame):
         self.SetSizer(vbox)
         self.Center()
 
+        self.timer = wx.Timer(self)
+
         self.Bind(wx.EVT_IDLE, self.OnIdle)
+        self.Bind(wx.EVT_TIMER, lambda event: self.update_tf_data(), self.timer)
+        self.widget.register_select_callback(self.select_cb)
+
+        self.timer.Start(1000)
+
+    def select_cb(self, target, event):
+        if event.ButtonDown(wx.MOUSE_BTN_LEFT) and target.url is not None:
+            self.tf_interface.set_detail(target.url)
+
+    def update_tf_data(self):
+        self.tf_interface.update_data(self.namespace)
+
+        dotcode = self.tf_interface.get_dot()
+        frame_list = self.tf_interface.get_frame_list()
+        self.to_frame.SetItems(frame_list)
+        self.from_frame.SetItems(frame_list)
+        self.set_info_text(yaml.dump(self.tf_interface.get_info(), default_flow_style=False))
+        wx.CallAfter(self.set_dotcode, dotcode)
 
     def onRefresh(self, event):
         list = ['local']
@@ -185,16 +212,6 @@ class FrameViewerFrame(wx.Frame):
         print "source"
         print type(event)
         print event.GetEventObject().GetValue()
-
-    def onLoad(self, event):
-        print wx.LoadFileSelector("TF Snapshot", ".tf")
-
-    def onSave(self, event):
-        print wx.SaveFileSelector("TF Snapshot", ".tf")
-
-    def register_select_cb(self, callback):
-        #Register mouse event callback for widget
-        self.widget.register_select_callback(callback)
 
     def set_dotcode(self, dotcode):
         self.widget.set_dotcode(dotcode, None)
@@ -268,11 +285,14 @@ class TFInterface:
         return self.generate_dot(self.data)
 
     def get_info(self):
-        if self.selected_child != None:
+        if self.selected_child:
             return self.data[self.selected_child]
         return ""
 
     def get_frame_list(self):
+        if not self.data:
+            return []
+
         l = self.data.keys()
 
         #we also need to find the root of the tree
@@ -280,6 +300,7 @@ class TFInterface:
             map = self.data[el]
             if not map['parent'] in self.data:
                 l.append(map['parent'])
+
         l.sort()
         return l
 
@@ -323,32 +344,10 @@ class TFInterface:
 class FrameViewerApp(wx.App):
     def __init__(self):
         wx.App.__init__(self)
-        #self.update_tf_data()
-        self.frame.register_select_cb(self.select_cb)
-
-    def select_cb(self, target, event):
-        if event.ButtonDown(wx.MOUSE_BTN_LEFT) and target.url != None:
-            self.tf_interface.set_detail(target.url)
-
-    def update_tf_data_event(self, event):
-        self.update_tf_data()
-
-    def update_tf_data(self):
-        self.tf_interface.update_data(self.frame.namespace)
-        dotcode = self.tf_interface.get_dot()
-        frame_list = self.tf_interface.get_frame_list()
-        self.frame.to_frame.SetItems(frame_list)
-        self.frame.from_frame.SetItems(frame_list)
-        self.frame.set_info_text(yaml.dump(self.tf_interface.get_info(), default_flow_style=False))
-        wx.CallAfter(self.frame.set_dotcode, dotcode)
 
     def OnInit(self):
         self.tf_interface = TFInterface()
         self.frame = FrameViewerFrame(self.tf_interface)
-        self.timer = wx.Timer(self.frame)
-        self.frame.Bind(wx.EVT_TIMER, self.update_tf_data_event, self.timer)
-        self.timer.Start(1000)
-
         self.frame.Show()
         return True
 
