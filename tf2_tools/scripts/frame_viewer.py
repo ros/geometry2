@@ -55,10 +55,14 @@ from tf2_msgs.srv import FrameGraph, FrameGraphResponse
 import tf2_py
 import os
 
+import rosgraph.masterapi
+
 
 class FrameViewerFrame(wx.Frame):
-    def __init__(self):
+    def __init__(self, tf_interface):
         wx.Frame.__init__(self, None, -1, "Frame Viewer", size=(1024,768))
+
+        self.tf_interface = tf_interface
 
         menubar = wx.MenuBar()
         file = wx.Menu()
@@ -101,10 +105,13 @@ class FrameViewerFrame(wx.Frame):
         toolbar.AddControl(wx.StaticText(toolbar,-1,"Graph Namespace:  "))
         self.namespaces = wx.ComboBox(toolbar, -1, value = 'local', choices = ['local'], size=(-1, -1), style=wx.CB_DROPDOWN)
         self.namespaces.SetEditable(False)
-        self.namespaces.SetItems(['local', 'foo'])
         toolbar.AddControl(self.namespaces)
         self.Bind(wx.EVT_COMBOBOX, self.onSelect)
-        #Add some stuff here later
+
+        refresh = wx.Button(toolbar, 1, 'Refresh List')
+        self.Bind(wx.EVT_BUTTON, self.onRefresh, id=1)
+        toolbar.AddControl(refresh)
+
         toolbar.Realize();
 
         #Create graph_view widget
@@ -158,6 +165,11 @@ class FrameViewerFrame(wx.Frame):
 
         self.Bind(wx.EVT_IDLE, self.OnIdle)
 
+    def onRefresh(self, event):
+        list = ['local']
+        list.extend(self.tf_interface.find_tf_namespaces())
+        self.namespaces.SetItems(list)
+
     def onSelect(self, event):
         print type(event)
         print event.GetEventObject() == self.from_frame
@@ -204,6 +216,17 @@ class TFInterface:
         self.data = None
         rospy.wait_for_service('~tf2_frames')
         self.srv = rospy.ServiceProxy('~tf2_frames', FrameGraph, persistent=True)
+        self.master = rosgraph.masterapi.Master(rospy.get_name())
+
+    def find_tf_namespaces(self):
+        ns = []
+        services = self.master.getSystemState()[2]
+        for name, providers in services:
+            index = name.rfind('tf2_frames')
+            if index > 0:
+                ns.append(name[:index-1])
+        ns.sort()
+        return ns
 
     def set_detail(self, detail):
         selected = detail.split('-')
@@ -272,7 +295,6 @@ class TFInterface:
 class FrameViewerApp(wx.App):
     def __init__(self):
         wx.App.__init__(self)
-        self.tf_interface = TFInterface()
         #self.update_tf_data()
         self.frame.register_select_cb(self.select_cb)
 
@@ -293,7 +315,8 @@ class FrameViewerApp(wx.App):
         wx.CallAfter(self.frame.set_dotcode, dotcode)
 
     def OnInit(self):
-        self.frame = FrameViewerFrame()
+        self.tf_interface = TFInterface()
+        self.frame = FrameViewerFrame(self.tf_interface)
         self.timer = wx.Timer(self.frame)
         self.frame.Bind(wx.EVT_TIMER, self.update_tf_data_event, self.timer)
         self.timer.Start(1000)
