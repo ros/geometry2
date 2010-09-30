@@ -132,11 +132,11 @@ class FrameViewerFrame(wx.Frame):
         echo_box = wx.BoxSizer(wx.VERTICAL)
         echo_panel.SetSizer(echo_box)
         wx.StaticText(echo_panel, -1, "Target: ", pos=(5, 15))
-        self.from_frame = wx.ComboBox(echo_panel, -1, value = 'select', choices = ['select'], pos=(60, 10), size = (200, -1), style=wx.CB_DROPDOWN)
+        self.from_frame = wx.ComboBox(echo_panel, -1, value='Select Target', choices = ['Select Target'], pos=(60, 10), size = (200, -1), style=wx.CB_DROPDOWN)
         self.from_frame.SetEditable(False)
 
         wx.StaticText(echo_panel, -1, "Source: ", pos=(5, 55))
-        self.to_frame = wx.ComboBox(echo_panel, -1, value = 'foo', choices = ['foo'], pos=(60, 50), size = (200, -1), style=wx.CB_DROPDOWN)
+        self.to_frame = wx.ComboBox(echo_panel, -1, value='Select Source', choices = ['Select Source'], pos=(60, 50), size = (200, -1), style=wx.CB_DROPDOWN)
         self.to_frame.SetEditable(False)
 
         self.echo_txt = wx.TextCtrl(echo_panel, -1, style=wx.TE_MULTILINE|wx.TE_READONLY, pos=(5, 90), size=(255,-1))
@@ -221,6 +221,17 @@ class TFInterface:
             return self.data[self.selected_child]
         return ""
 
+    def get_frame_list(self):
+        l = self.data.keys()
+
+        #we also need to find the root of the tree
+        for el in self.data:
+            map = self.data[el]
+            if not map['parent'] in self.data:
+                l.append(map['parent'])
+        l.sort()
+        return l
+
     def generate_dot(self, data):
         if len(data) == 0:
             return 'digraph G { "No tf data received" }'
@@ -262,26 +273,29 @@ class FrameViewerApp(wx.App):
     def __init__(self):
         wx.App.__init__(self)
         self.tf_interface = TFInterface()
-        #self.update_dotcode()
+        #self.update_tf_data()
         self.frame.register_select_cb(self.select_cb)
 
     def select_cb(self, target, event):
         if event.ButtonDown(wx.MOUSE_BTN_LEFT) and target.url != None:
             self.tf_interface.set_detail(target.url)
 
-    def update_dotcode_event(self, event):
-        self.update_dotcode()
+    def update_tf_data_event(self, event):
+        self.update_tf_data()
 
-    def update_dotcode(self):
+    def update_tf_data(self):
         self.tf_interface.update_data()
         dotcode = self.tf_interface.get_dot()
+        frame_list = self.tf_interface.get_frame_list()
+        self.frame.to_frame.SetItems(frame_list)
+        self.frame.from_frame.SetItems(frame_list)
         self.frame.set_info_text(yaml.dump(self.tf_interface.get_info(), default_flow_style=False))
         wx.CallAfter(self.frame.set_dotcode, dotcode)
 
     def OnInit(self):
         self.frame = FrameViewerFrame()
         self.timer = wx.Timer(self.frame)
-        self.frame.Bind(wx.EVT_TIMER, self.update_dotcode_event, self.timer)
+        self.frame.Bind(wx.EVT_TIMER, self.update_tf_data_event, self.timer)
         self.timer.Start(1000)
 
         self.frame.Show()
@@ -291,11 +305,7 @@ def main():
     app = FrameViewerApp()
     app.MainLoop()
 
-def foo(req):
-    return FrameGraphResponse()
-
 if __name__ == '__main__':
     rospy.init_node('frame_viewer', anonymous=False, disable_signals=True, log_level=rospy.DEBUG)
-    server = rospy.Service('~foobar', FrameGraph, foo)
     main()
     rospy.signal_shutdown('GUI shutdown')
