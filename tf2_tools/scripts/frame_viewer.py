@@ -53,11 +53,24 @@ import threading
 import yaml
 from tf2_msgs.srv import FrameGraph, FrameGraphResponse
 import tf2_py
+import os
 
 
 class FrameViewerFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, -1, "Frame Viewer", size=(1024,768))
+
+        menubar = wx.MenuBar()
+        file = wx.Menu()
+
+        file.Append(101, '&Load', 'Load a frame_viewer snapshot')
+        file.Append(102, '&Save', 'Save a frame_viewer snapshot')
+        menubar.Append(file, '&File')
+
+        self.SetMenuBar(menubar)
+        wx.EVT_MENU(self, 101, self.onLoad)
+        wx.EVT_MENU(self, 102, self.onSave)
+
 
         self.needs_refresh = False
         self.new_info_text = None
@@ -85,7 +98,12 @@ class FrameViewerFrame(wx.Frame):
 
         #Construct toolbar
         toolbar = wx.ToolBar(graph_viewer, -1)
-        toolbar.AddControl(wx.StaticText(toolbar,-1,"Foo:"))
+        toolbar.AddControl(wx.StaticText(toolbar,-1,"Graph Namespace:  "))
+        self.namespaces = wx.ComboBox(toolbar, -1, value = 'local', choices = ['local'], size=(-1, -1), style=wx.CB_DROPDOWN)
+        self.namespaces.SetEditable(False)
+        self.namespaces.SetItems(['local', 'foo'])
+        toolbar.AddControl(self.namespaces)
+        self.Bind(wx.EVT_COMBOBOX, self.onSelect)
         #Add some stuff here later
         toolbar.Realize();
 
@@ -96,18 +114,43 @@ class FrameViewerFrame(wx.Frame):
         gv_vbox.Add(toolbar, 0, wx.EXPAND)
         gv_vbox.Add(self.widget, 1, wx.EXPAND)
 
+        nb = wx.Notebook(self.content_splitter, -1, style=wx.NB_TOP | wx.WANTS_CHARS)
+        nb_box = wx.BoxSizer()
+        nb_box.Add(nb, 1, wx.EXPAND | wx.ALL, 4)
+
         #Create an info pane
         borders = wx.LEFT | wx.RIGHT | wx.TOP
         border = 4
-        self.info_win = wx.ScrolledWindow(self.content_splitter, -1)
+        self.info_win = wx.ScrolledWindow(nb, -1)
         self.info_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.info_sizer.Add(wx.StaticText(self.info_win,-1,"Info:"),0, borders, border)
         self.info_txt = wx.TextCtrl(self.info_win,-1,style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.info_sizer.Add(self.info_txt,1,wx.EXPAND | borders, border)
         self.info_win.SetSizer(self.info_sizer)
 
+        #Create a tf echo pane
+        echo_panel = wx.Panel(nb, -1)
+        echo_box = wx.BoxSizer(wx.VERTICAL)
+        echo_panel.SetSizer(echo_box)
+        wx.StaticText(echo_panel, -1, "Target: ", pos=(5, 15))
+        self.from_frame = wx.ComboBox(echo_panel, -1, value = 'select', choices = ['select'], pos=(60, 10), size = (200, -1), style=wx.CB_DROPDOWN)
+        self.from_frame.SetEditable(False)
+
+        wx.StaticText(echo_panel, -1, "Source: ", pos=(5, 55))
+        self.to_frame = wx.ComboBox(echo_panel, -1, value = 'foo', choices = ['foo'], pos=(60, 50), size = (200, -1), style=wx.CB_DROPDOWN)
+        self.to_frame.SetEditable(False)
+
+        self.echo_txt = wx.TextCtrl(echo_panel, -1, style=wx.TE_MULTILINE|wx.TE_READONLY, pos=(5, 90), size=(255,-1))
+        self.echo_txt.SetValue("Foobar")
+
+        #Add our panels to the notebook
+        nb.AddPage(self.info_win, "Info")
+        nb.AddPage(echo_panel, "TF Echo")
+
+
+
         # Set content splitter
-        self.content_splitter.SplitHorizontally(self.info_win, viewer, 120)
+        #self.content_splitter.SplitHorizontally(nb, viewer, 120)
+        self.content_splitter.SplitVertically(nb, viewer, 300)
 
         vbox.Add(self.content_splitter, 1, wx.EXPAND | wx.ALL)
         self.SetSizer(vbox)
@@ -115,6 +158,16 @@ class FrameViewerFrame(wx.Frame):
 
         self.Bind(wx.EVT_IDLE, self.OnIdle)
 
+    def onSelect(self, event):
+        print type(event)
+        print event.GetEventObject() == self.from_frame
+        print event.GetEventObject().GetValue()
+
+    def onLoad(self, event):
+        print wx.LoadFileSelector("TF Snapshot", ".tf")
+
+    def onSave(self, event):
+        print wx.SaveFileSelector("TF Snapshot", ".tf")
 
     def register_select_cb(self, callback):
         #Register mouse event callback for widget
@@ -197,6 +250,8 @@ class TFInterface:
             #    dot += '"];\n'
             if not map['parent'] in data:
                 root = map['parent']
+                if map['parent'] == self.selected_parent:
+                    dot += root + '[fillcolor=green style=filled]'
         dot += 'edge [style=invis];\n'
         dot += ' subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";\n'
         dot += '"Recorded at time: '+str(rospy.Time.now().to_sec())+'"[ shape=plaintext ] ;\n'
@@ -233,14 +288,14 @@ class FrameViewerApp(wx.App):
         return True
 
 def main():
-    rospy.init_node('frame_viewer', anonymous=False, disable_signals=True, log_level=rospy.DEBUG)
-    server = rospy.Service('~foobar', FrameGraph, foo)
     app = FrameViewerApp()
     app.MainLoop()
-    rospy.signal_shutdown('GUI shutdown')
 
 def foo(req):
     return FrameGraphResponse()
 
 if __name__ == '__main__':
+    rospy.init_node('frame_viewer', anonymous=False, disable_signals=True, log_level=rospy.DEBUG)
+    server = rospy.Service('~foobar', FrameGraph, foo)
     main()
+    rospy.signal_shutdown('GUI shutdown')
