@@ -50,57 +50,18 @@ import wx
 import wx.richtext
 import xdot
 import threading
-import time
 import yaml
 from tf2_msgs.srv import FrameGraph, FrameGraphResponse
 import tf2_py
 
-def generate_dot(data):
-    if len(data) == 0:
-        return 'digraph G { "No tf data received" }'
 
-    dot = 'digraph G {\n'
-    for el in data: 
-        map = data[el]
-        dot += '"'+map['parent']+'" -> "'+el+'"'
-        dot += '[label=" '
-        dot += 'Broadcaster: '+map['broadcaster']+'\\n'
-        dot += 'Average rate: '+str(map['rate'])+'\\n'
-        dot += 'Buffer length: '+str(map['buffer_length'])+'\\n' 
-        dot += 'Most recent transform: '+str(map['most_recent_transform'])+'\\n'
-        dot += 'Oldest transform: '+str(map['oldest_transform'])+'\\n'
-        dot += '"];\n'
-        if not map['parent'] in data:
-            root = map['parent']
-    dot += 'edge [style=invis];\n'
-    dot += ' subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";\n'
-    dot += '"Recorded at time: '+str(rospy.Time.now().to_sec())+'"[ shape=plaintext ] ;\n'
-    dot += '}->"'+root+'";\n}'
-    return dot
-
-class RepeatTimer(threading.Thread):
-    def __init__(self, timeout, fn):
-        threading.Thread.__init__(self)
-        self.daemon = True
-        self.timeout = timeout
-        self.fn = fn
-        self.keep_going = True
-
-    def run(self):
-        time.sleep(self.timeout)
-        while self.keep_going:
-            self.fn()
-            time.sleep(self.timeout)
-
-    def stop(self):
-        self.keep_going = False
-        
 class FrameViewerFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, -1, "Action Viewer", size=(1024,768))
+        wx.Frame.__init__(self, None, -1, "Frame Viewer", size=(1024,768))
 
         self.needs_refresh = False
         self.new_info_text = None
+        self.first_dot_data = True
 
         #Create a main pane
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -161,6 +122,12 @@ class FrameViewerFrame(wx.Frame):
 
     def set_dotcode(self, dotcode):
         self.widget.set_dotcode(dotcode, None)
+
+        #We'll only zoom to fit the first time we get data
+        if self.first_dot_data:
+            self.first_dot_data = False
+            self.widget.zoom_to_fit()
+
         self.needs_refresh = True
         wx.PostEvent(self.GetEventHandler(), wx.IdleEvent())
 
@@ -179,14 +146,62 @@ class TFInterface:
     def __init__(self):
         self.buffer = tf2_py.Buffer()
         self.listener = tf2_py.TransformListener(self.buffer)
+        self.selected_parent = None
+        self.selected_child = None
+        self.data = None
+        rospy.wait_for_service('~tf2_frames')
+        self.srv = rospy.ServiceProxy('~tf2_frames', FrameGraph, persistent=True)
+
+    def set_detail(self, detail):
+        selected = detail.split('-')
+        self.selected_parent = selected[0]
+        self.selected_child = selected[1]
+
+    def update_data(self):
+        self.data = yaml.load(self.srv().frame_yaml)
 
     def get_dot(self):
-        print "wait"
-        rospy.wait_for_service('~tf2_frames')
-        print "got"
-        srv = rospy.ServiceProxy('~tf2_frames', FrameGraph)
-        data = yaml.load(srv().frame_yaml)
-        return generate_dot(data)
+        return self.generate_dot(self.data)
+
+    def get_info(self):
+        if self.selected_child != None:
+            return self.data[self.selected_child]
+        return ""
+
+    def generate_dot(self, data):
+        if len(data) == 0:
+            return 'digraph G { "No tf data received" }'
+
+        dot = 'digraph G {\n'
+        for el in data: 
+            map = data[el]
+            node_color = 'white'
+            arrow_color = 'black'
+            if el == self.selected_parent:
+                node_color = 'green'
+            if el == self.selected_child:
+                node_color = 'green'
+                arrow_color = 'green'
+            dot += el
+            dot += '['
+            dot += 'shape=ellipse style=filled fillcolor=' + node_color + ' '
+            dot += 'URL="' + map['parent'] + '-' + el + '"] '
+            dot += '"'+map['parent']+'" -> "'+el+'" [color=' + arrow_color + ']'
+            #if map['parent'] + '-' + el == detail:
+            #    dot += '[label=" '
+            #    dot += 'Broadcaster: '+map['broadcaster']+'\\n'
+            #    dot += 'Average rate: '+str(map['rate'])+'\\n'
+            #    dot += 'Buffer length: '+str(map['buffer_length'])+'\\n' 
+            #    dot += 'Most recent transform: '+str(map['most_recent_transform'])+'\\n'
+            #    dot += 'Oldest transform: '+str(map['oldest_transform'])+'\\n'
+            #    dot += '"];\n'
+            if not map['parent'] in data:
+                root = map['parent']
+        dot += 'edge [style=invis];\n'
+        dot += ' subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";\n'
+        dot += '"Recorded at time: '+str(rospy.Time.now().to_sec())+'"[ shape=plaintext ] ;\n'
+        dot += '}->"'+root+'";\n}'
+        return dot
 
 class FrameViewerApp(wx.App):
     def __init__(self):
@@ -196,21 +211,16 @@ class FrameViewerApp(wx.App):
         self.frame.register_select_cb(self.select_cb)
 
     def select_cb(self, target, event):
-        print "here"
-        return
-        if event.ButtonUp(wx.MOUSE_BTN_LEFT):
-            self.frame.set_info_text(target.url)
-
-            if target.url is not None:
-                key = '/%s' % target.url
-                if self.watchers.has_key(key):
-                    wx.CallAfter(self.show_window, self.watchers[key])
+        if event.ButtonDown(wx.MOUSE_BTN_LEFT) and target.url != None:
+            self.tf_interface.set_detail(target.url)
 
     def update_dotcode_event(self, event):
         self.update_dotcode()
 
     def update_dotcode(self):
+        self.tf_interface.update_data()
         dotcode = self.tf_interface.get_dot()
+        self.frame.set_info_text(yaml.dump(self.tf_interface.get_info(), default_flow_style=False))
         wx.CallAfter(self.frame.set_dotcode, dotcode)
 
     def OnInit(self):
@@ -223,14 +233,14 @@ class FrameViewerApp(wx.App):
         return True
 
 def main():
+    rospy.init_node('frame_viewer', anonymous=False, disable_signals=True, log_level=rospy.DEBUG)
+    server = rospy.Service('~foobar', FrameGraph, foo)
     app = FrameViewerApp()
     app.MainLoop()
+    rospy.signal_shutdown('GUI shutdown')
 
 def foo(req):
     return FrameGraphResponse()
 
 if __name__ == '__main__':
-    rospy.init_node('frame_viewer', anonymous=False, disable_signals=True, log_level=rospy.DEBUG)
-    server = rospy.Service('~foobar', FrameGraph, foo)
     main()
-    rospy.signal_shutdown('GUI shutdown')
