@@ -79,6 +79,7 @@ class FrameViewerFrame(wx.Frame):
         self.needs_refresh = False
         self.new_info_text = None
         self.first_dot_data = True
+        self.namespace = 'local'
 
         #Create a main pane
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -103,10 +104,10 @@ class FrameViewerFrame(wx.Frame):
         #Construct toolbar
         toolbar = wx.ToolBar(graph_viewer, -1)
         toolbar.AddControl(wx.StaticText(toolbar,-1,"Graph Namespace:  "))
-        self.namespaces = wx.ComboBox(toolbar, -1, value = 'local', choices = ['local'], size=(-1, -1), style=wx.CB_DROPDOWN)
+        self.namespaces = wx.ComboBox(toolbar, 1, value = 'local', choices = ['local'], size=(-1, -1), style=wx.CB_DROPDOWN)
         self.namespaces.SetEditable(False)
         toolbar.AddControl(self.namespaces)
-        self.Bind(wx.EVT_COMBOBOX, self.onSelect)
+        self.Bind(wx.EVT_COMBOBOX, self.onSelectNS, id=1)
 
         refresh = wx.Button(toolbar, 1, 'Refresh List')
         self.Bind(wx.EVT_BUTTON, self.onRefresh, id=1)
@@ -139,12 +140,14 @@ class FrameViewerFrame(wx.Frame):
         echo_box = wx.BoxSizer(wx.VERTICAL)
         echo_panel.SetSizer(echo_box)
         wx.StaticText(echo_panel, -1, "Target: ", pos=(5, 15))
-        self.from_frame = wx.ComboBox(echo_panel, -1, value='Select Target', choices = ['Select Target'], pos=(60, 10), size = (200, -1), style=wx.CB_DROPDOWN)
+        self.from_frame = wx.ComboBox(echo_panel, 2, value='Select Target', choices = ['Select Target'], pos=(60, 10), size = (200, -1), style=wx.CB_DROPDOWN)
         self.from_frame.SetEditable(False)
+        self.Bind(wx.EVT_COMBOBOX, self.onSelectTarget, id=2)
 
         wx.StaticText(echo_panel, -1, "Source: ", pos=(5, 55))
-        self.to_frame = wx.ComboBox(echo_panel, -1, value='Select Source', choices = ['Select Source'], pos=(60, 50), size = (200, -1), style=wx.CB_DROPDOWN)
+        self.to_frame = wx.ComboBox(echo_panel, 3, value='Select Source', choices = ['Select Source'], pos=(60, 50), size = (200, -1), style=wx.CB_DROPDOWN)
         self.to_frame.SetEditable(False)
+        self.Bind(wx.EVT_COMBOBOX, self.onSelectSource, id=3)
 
         self.echo_txt = wx.TextCtrl(echo_panel, -1, style=wx.TE_MULTILINE|wx.TE_READONLY, pos=(5, 90), size=(255,-1))
         self.echo_txt.SetValue("Foobar")
@@ -170,9 +173,17 @@ class FrameViewerFrame(wx.Frame):
         list.extend(self.tf_interface.find_tf_namespaces())
         self.namespaces.SetItems(list)
 
-    def onSelect(self, event):
+    def onSelectNS(self, event):
+        self.namespace = event.GetEventObject().GetValue()
+        
+    def onSelectTarget(self, event):
+        print "target"
         print type(event)
-        print event.GetEventObject() == self.from_frame
+        print event.GetEventObject().GetValue()
+
+    def onSelectSource(self, event):
+        print "source"
+        print type(event)
         print event.GetEventObject().GetValue()
 
     def onLoad(self, event):
@@ -214,14 +225,30 @@ class TFInterface:
         self.selected_parent = None
         self.selected_child = None
         self.data = None
+        self.namespace = 'local'
         rospy.wait_for_service('~tf2_frames')
         self.srv = rospy.ServiceProxy('~tf2_frames', FrameGraph, persistent=True)
         self.master = rosgraph.masterapi.Master(rospy.get_name())
+
+    def register_srv(self, namespace):
+        if namespace == self.namespace:
+            return
+        if namespace == 'local':
+            rospy.wait_for_service('~tf2_frames')
+            self.srv = rospy.ServiceProxy('~tf2_frames', FrameGraph, persistent=True)
+        else:
+            rospy.wait_for_service(namespace + '/tf2_frames')
+            self.srv = rospy.ServiceProxy(namespace + '/tf2_frames', FrameGraph, persistent=True)
+            self.namespace = namespace
+
 
     def find_tf_namespaces(self):
         ns = []
         services = self.master.getSystemState()[2]
         for name, providers in services:
+            #we don't want to list our own node
+            if name.find(rospy.get_name() + '/') == 0:
+                continue
             index = name.rfind('tf2_frames')
             if index > 0:
                 ns.append(name[:index-1])
@@ -233,7 +260,8 @@ class TFInterface:
         self.selected_parent = selected[0]
         self.selected_child = selected[1]
 
-    def update_data(self):
+    def update_data(self, namespace):
+        self.register_srv(namespace)
         self.data = yaml.load(self.srv().frame_yaml)
 
     def get_dot(self):
@@ -306,7 +334,7 @@ class FrameViewerApp(wx.App):
         self.update_tf_data()
 
     def update_tf_data(self):
-        self.tf_interface.update_data()
+        self.tf_interface.update_data(self.frame.namespace)
         dotcode = self.tf_interface.get_dot()
         frame_list = self.tf_interface.get_frame_list()
         self.frame.to_frame.SetItems(frame_list)
