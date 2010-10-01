@@ -2,25 +2,18 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b tf2 is ... 
+\b tf2 is the second generation of the tf library.
 
-<!-- 
-Provide an overview of your package.
--->
+This library implements the interface defined by 
+tf2::BufferCore
 
+There is also a python wrapper with the same API.  
 
 \section codeapi Code API
 
-<!--
-Provide links to specific auto-generated API documentation within your
-package that is of particular interest to a reader. Doxygen will
-document pretty much every part of your code, so do your best here to
-point the reader to the actual API.
+The main interface is through the tf2::BufferCore interface.  
 
-If your codebase is fairly large or has different sets of APIs, you
-should use the doxygen 'group' tag to keep these APIs together. For
-example, the roscpp documentation has 'libros' group.
--->
-
+It uses the exceptions in exceptions.h and the Stamped datatype 
+in transform_datatypes.h. 
 
 */
