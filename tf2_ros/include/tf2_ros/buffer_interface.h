@@ -86,14 +86,14 @@ template <class P>
 template <class A, class B>
   void convert(const A& a, B& b)
   {
-    printf("In double type convert\n");
+    //printf("In double type convert\n");
     fromMsg(toMsg(a), b);
   }
 
 template <class A>
   void convert(const A& a1, A& a2)
   {
-    printf("In single type convert\n");
+    //printf("In single type convert\n");
     if(&a1 != &a2)
       a2 = a1;
   }
