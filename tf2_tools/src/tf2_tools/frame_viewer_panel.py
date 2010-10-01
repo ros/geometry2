@@ -58,8 +58,10 @@ class FrameViewerPanel(wx.Panel):
         wx.Panel.__init__(self, parent, -1)
 
         self.tf_interface   = tf_interface
-        self.first_dot_data = True
-        self.namespace      = 'local'
+        self.namespace      = ('local', False)
+        self.tf_namespaces = []
+        self.loaded_files = []
+        self.need_dot_zoom = True
 
         #Create a main pane
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -150,8 +152,13 @@ class FrameViewerPanel(wx.Panel):
 
         self.timer.Start(1000)
 
+    def update_file_list(self, file):
+        if file:
+            filename = file.rstrip('.yaml')+'.yaml'
+            self.loaded_files.append(filename)
+
     def update_tf_data(self):
-        self.tf_interface.update_data(self.namespace)
+        self.tf_interface.update_data(*self.namespace)
 
         dotcode    = self.tf_interface.get_dot()
         frame_list = self.tf_interface.get_frame_list()
@@ -168,8 +175,8 @@ class FrameViewerPanel(wx.Panel):
         self.widget.set_dotcode(dotcode, None)
 
         #We'll only zoom to fit the first time we get data
-        if self.first_dot_data:
-            self.first_dot_data = False
+        if self.need_dot_zoom:
+            self.need_dot_zoom = False
             self.widget.zoom_to_fit()
 
         wx.CallAfter(self.Refresh)
@@ -185,10 +192,21 @@ class FrameViewerPanel(wx.Panel):
             self.tf_interface.set_detail(target.url)
 
     def on_refresh_list(self, event):
-        self.namespaces.Items = ['local'] + self.tf_interface.find_tf_namespaces()
+        self.tf_namespaces = self.tf_interface.find_tf_namespaces()
+        self.namespaces.Items = ['local'] + self.tf_namespaces + self.loaded_files
         
     def on_select_ns(self, event):
-        self.namespace = event.EventObject.Value
+        value = event.EventObject.Value
+        #we need to check if we're looking up a namespace or just reading a file
+        if value == self.namespace[0]:
+            return
+
+        if value == 'local' or self.tf_namespaces.count(value) > 0:
+            self.namespace = (value, False)
+        else:
+            self.namespace = (value, True)
+
+        self.need_dot_zoom = True
         
     def on_select_target(self, event):
         print "target"

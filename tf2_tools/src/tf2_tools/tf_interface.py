@@ -38,6 +38,7 @@ import rospy
 
 import os
 import yaml
+import subprocess
 
 from tf2_msgs.srv import FrameGraph
 import tf2_py
@@ -100,15 +101,46 @@ class TFInterface(object):
     def set_data_timestamp(self, timestamp):
         self.data_timestamp = timestamp
 
-    def update_data(self, namespace):
-        if namespace == 'local':
-            frame_yaml = self.buffer.all_frames_as_yaml()
-        else:
-            self.register_srv(namespace)
-            frame_yaml = self.srv().frame_yaml
-            self.data_timestamp = rospy.Time.now()
+    def update_data(self, namespace, from_file=False):
+        if not from_file:
+            if namespace == 'local':
+                frame_yaml = self.buffer.all_frames_as_yaml()
+            else:
+                self.register_srv(namespace)
+                frame_yaml = self.srv().frame_yaml
 
-        self.data = yaml.load(frame_yaml)
+            if self.listener is not None:
+                self.data_timestamp = rospy.Time.now()
+
+            self.data = yaml.load(frame_yaml)
+        else:
+            self.data = self._load_yaml_file(namespace)
+
+    def _load_yaml_file(self, filename):
+        if not filename:
+            return
+
+        with open(filename, 'r') as f:
+            data = yaml.load(f)
+        return data
+
+    def save_yaml(self, full_name):
+        if not full_name:
+            return
+
+        filename = full_name.rstrip('.yaml')
+        with open(filename+'.yaml', 'w') as f:
+            f.write(yaml.dump(self.data))
+
+    def save_pdf(self, full_name):
+        if not full_name:
+            return
+
+        filename = full_name.rstrip('.pdf')
+        with open(filename+'.gv', 'w') as f:
+            f.write(self._generate_dot(self.data, full_info=True))
+        subprocess.Popen(('dot -Tpdf ' + filename + '.gv -o ' + filename + '.pdf').split(' ')).communicate()
+        subprocess.Popen(('rm -rf ' + filename + '.gv').split(' ')).communicate()
 
     def get_dot(self):
         return self._generate_dot(self.data)
@@ -133,7 +165,7 @@ class TFInterface(object):
         l.sort()
         return l
 
-    def _generate_dot(self, data):
+    def _generate_dot(self, data, full_info=False):
         if not data:
             return 'digraph G { "No tf data received" }'
 
@@ -152,14 +184,14 @@ class TFInterface(object):
             dot += 'shape=ellipse style=filled fillcolor=' + node_color + ' '
             dot += 'URL="' + map['parent'] + '-' + el + '"] '
             dot += '"'+map['parent']+'" -> "'+el+'" [color=' + arrow_color + ']'
-            #if map['parent'] + '-' + el == detail:
-            #    dot += '[label=" '
-            #    dot += 'Broadcaster: '+map['broadcaster']+'\\n'
-            #    dot += 'Average rate: '+str(map['rate'])+'\\n'
-            #    dot += 'Buffer length: '+str(map['buffer_length'])+'\\n' 
-            #    dot += 'Most recent transform: '+str(map['most_recent_transform'])+'\\n'
-            #    dot += 'Oldest transform: '+str(map['oldest_transform'])+'\\n'
-            #    dot += '"];\n'
+            if full_info:
+                dot += '[label=" '
+                dot += 'Broadcaster: '+map['broadcaster']+'\\n'
+                dot += 'Average rate: '+str(map['rate'])+'\\n'
+                dot += 'Buffer length: '+str(map['buffer_length'])+'\\n' 
+                dot += 'Most recent transform: '+str(map['most_recent_transform'])+'\\n'
+                dot += 'Oldest transform: '+str(map['oldest_transform'])+'\\n'
+                dot += '"];\n'
             if not map['parent'] in data:
                 root = map['parent']
                 if map['parent'] == self.selected_parent:
