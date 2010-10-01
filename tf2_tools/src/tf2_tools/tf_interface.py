@@ -128,8 +128,8 @@ class TFInterface(object):
         if not full_name:
             return
 
-        filename = full_name.rstrip('.yaml')
-        with open(filename+'.yaml', 'w') as f:
+        filename = full_name.rstrip('.tf')
+        with open(filename+'.tf', 'w') as f:
             f.write(yaml.dump(self.data))
 
     def save_pdf(self, full_name):

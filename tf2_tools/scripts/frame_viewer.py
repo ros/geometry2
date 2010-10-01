@@ -79,8 +79,8 @@ class FrameViewerFrame(wx.Frame):
         wx.EVT_MENU(self, 102, self.onSave)
         wx.EVT_MENU(self, 103, self.onPDF)
 
-    def onLoad(self, event): self.viewer.update_file_list(wx.LoadFileSelector("TF Snapshot", ".yaml"))
-    def onSave(self, event): self.viewer.tf_interface.save_yaml(wx.SaveFileSelector("TF Snapshot", ".yaml"))
+    def onLoad(self, event): self.viewer.update_file_list(wx.LoadFileSelector("TF Snapshot", ".tf"))
+    def onSave(self, event): self.viewer.tf_interface.save_yaml(wx.SaveFileSelector("TF Snapshot", ".tf"))
     def onPDF(self, event): self.viewer.tf_interface.save_pdf(wx.SaveFileSelector("PDF Export", ".pdf"))
 
 class FrameViewerApp(wx.App):

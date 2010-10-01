@@ -154,8 +154,14 @@ class FrameViewerPanel(wx.Panel):
 
     def update_file_list(self, file):
         if file:
-            filename = file.rstrip('.yaml')+'.yaml'
+            filename = file.rstrip('.tf')+'.tf'
             self.loaded_files.append(filename)
+            self.refresh_list()
+            self.namespaces.SetValue(filename)
+            cmd = wx.CommandEvent(wx.EVT_COMBOBOX.evtType[0])
+            cmd.SetEventObject(self.namespaces)
+            cmd.SetId(self.namespaces.GetId())
+            self.namespaces.GetEventHandler().ProcessEvent(cmd)
 
     def update_tf_data(self):
         self.tf_interface.update_data(*self.namespace)
@@ -192,6 +198,9 @@ class FrameViewerPanel(wx.Panel):
             self.tf_interface.set_detail(target.url)
 
     def on_refresh_list(self, event):
+        self.refresh_list()
+
+    def refresh_list(self):
         self.tf_namespaces = self.tf_interface.find_tf_namespaces()
         self.namespaces.Items = ['local'] + self.tf_namespaces + self.loaded_files
         
