@@ -41,14 +41,14 @@ import yaml
 import subprocess
 
 from tf2_msgs.srv import FrameGraph
-import tf2_py
+import tf2_ros
 import tf2
 
 import rosgraph.masterapi
 
 class TFInterface(object):
     def __init__(self, use_listener=True):
-        self.buffer = tf2_py.Buffer()
+        self.buffer = tf2_ros.Buffer()
         
         self.selected_parent = None
         self.selected_child = None
@@ -57,7 +57,7 @@ class TFInterface(object):
         self.namespace = 'local'
 
         if use_listener:
-            self.listener = tf2_py.TransformListener(self.buffer)
+            self.listener = tf2_ros.TransformListener(self.buffer)
             rospy.wait_for_service('~tf2_frames')
             self.srv = rospy.ServiceProxy('~tf2_frames', FrameGraph, persistent=True)
             self.master = rosgraph.masterapi.Master(rospy.get_name())

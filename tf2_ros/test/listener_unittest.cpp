@@ -27,63 +27,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <gtest/gtest.h>
+#include <tf2_ros/transform_listener.h>
+#include <sys/time.h>
 
-/** \author Tully Foote */
 
-
-#include "ros/ros.h"
-#include "tf2_msgs/TFMessage.h"
-#include "tf2_cpp/transform_broadcaster.h"
-
-namespace tf2 {
-
-TransformBroadcaster::TransformBroadcaster()
+void seed_rand()
 {
-  publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf", 100);
-  ros::NodeHandle l_nh("~");
+  //Seed random number generator with current microseond count
+  timeval temp_time_struct;
+  gettimeofday(&temp_time_struct,NULL);
+  srand(temp_time_struct.tv_usec);
 };
 
-void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped & msgtf)
+void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xvalues, std::vector<double>& yvalues, std::vector<double>&zvalues)
 {
-  std::vector<geometry_msgs::TransformStamped> v1;
-  v1.push_back(msgtf);
-  sendTransform(v1);
+  seed_rand();
+  for ( uint64_t i = 0; i < runs ; i++ )
+  {
+    xvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+    yvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+    zvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
+  }
 }
 
-/*void TransformBroadcaster::sendTransform(const StampedTransform & transform)
-{
-  std::vector<StampedTransform> v1;
-  v1.push_back(transform);
-  sendTransform(v1);
-} 
-*/
 
-void TransformBroadcaster::sendTransform(const std::vector<geometry_msgs::TransformStamped> & msgtf)
-{
-  tf2_msgs::TFMessage message;
-  for (std::vector<geometry_msgs::TransformStamped>::const_iterator it = msgtf.begin(); it != msgtf.end(); ++it)
-  {
-    message.transforms.push_back(*it);
-  }
-  publisher_.publish(message);
-}
-/*
-void TransformBroadcaster::sendTransform(const std::vector<StampedTransform> & transforms)
-{
-  std::vector<geometry_msgs::TransformStamped> msgtfs;
-  for (std::vector<StampedTransform>::const_iterator it = transforms.begin(); it != transforms.end(); ++it)
-  {
-    geometry_msgs::TransformStamped msgtf;
-    transformStampedTFToMsg(*it, msgtf);
-    msgtfs.push_back(msgtf);
+using namespace tf2;
 
-  }
-  sendTransform(msgtfs);
-} 
+TEST(tf2_ros_transform, transform_listener)
+{
+  tf2::Buffer buffer;
+  tf2::TransformListener tfl(buffer);
   
-*/
-
 
 }
 
 
+
+
+int main(int argc, char **argv){
+  testing::InitGoogleTest(&argc, argv);
+  ros::init(argc, argv, "transform_listener_unittest");
+  return RUN_ALL_TESTS();
+}

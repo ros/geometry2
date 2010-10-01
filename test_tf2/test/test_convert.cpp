@@ -35,7 +35,7 @@
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
 #include <gtest/gtest.h>
-#include <tf2_cpp/buffer_interface.h>
+#include <tf2_ros/buffer_interface.h>
 #include <tf2_kdl/tf2_kdl.h>
 #include <tf2_bullet/tf2_bullet.h>
 #include <ros/ros.h>

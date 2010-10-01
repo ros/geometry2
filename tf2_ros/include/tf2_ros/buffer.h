@@ -29,10 +29,10 @@
 
 /** \author Wim Meeussen */
 
-#ifndef TF2_BUFFER_H
-#define TF2_BUFFER_H
+#ifndef TF2_ROS_BUFFER_H
+#define TF2_ROS_BUFFER_H
 
-#include <tf2_cpp/buffer_interface.h>
+#include <tf2_ros/buffer_interface.h>
 #include <tf2/buffer_core.h>
 #include <tf2_msgs/FrameGraph.h>
 #include <ros/ros.h>
@@ -128,4 +128,4 @@ namespace tf2
   
 } // namespace
 
-#endif // TF2_CPP_H
+#endif // TF2_ROS_BUFFER_H

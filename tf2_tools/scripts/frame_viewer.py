@@ -52,7 +52,7 @@ import xdot
 import threading
 import yaml
 from tf2_msgs.srv import FrameGraph, FrameGraphResponse
-import tf2_py
+import tf2_ros
 import os
 
 import rosgraph.masterapi

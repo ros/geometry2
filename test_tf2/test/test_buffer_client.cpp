@@ -35,7 +35,7 @@
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
 #include <gtest/gtest.h>
-#include <tf2_cpp/buffer_client.h>
+#include <tf2_ros/buffer_client.h>
 #include <ros/ros.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_kdl/tf2_kdl.h>
@@ -43,7 +43,7 @@
 
 static const double EPS = 1e-3;
 
-TEST(tf2_cpp, buffer_client)
+TEST(tf2_ros, buffer_client)
 {
   tf2::BufferClient client("tf_action");
 
@@ -73,7 +73,7 @@ TEST(tf2_cpp, buffer_client)
   }
 } 
 
-TEST(tf2_cpp, buffer_client_different_types)
+TEST(tf2_ros, buffer_client_different_types)
 {
   tf2::BufferClient client("tf_action");
 

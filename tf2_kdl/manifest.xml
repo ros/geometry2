@@ -8,8 +8,7 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tf2_kdl</url>
-  <depend package="tf2_cpp"/>
-  <depend package="tf2_py"/>
+  <depend package="tf2_ros"/>
   <depend package="kdl"/>
   <depend package="geometry_msgs"/>
 

@@ -34,7 +34,7 @@ import tf2
 import yaml
 import subprocess
 from tf2_msgs.srv import FrameGraph
-import tf2_py
+import tf2_ros
 
 def main():
     rospy.init_node('view_frames')
@@ -42,8 +42,8 @@ def main():
     # listen to tf for 5 seconds
     rospy.loginfo('Listening to tf data during 5 seconds...')
     rospy.sleep(0.00001)
-    buffer = tf2_py.Buffer()
-    listener = tf2_py.TransformListener(buffer)
+    buffer = tf2_ros.Buffer()
+    listener = tf2_ros.TransformListener(buffer)
     rospy.sleep(5.0)
 
     rospy.loginfo('Generating graph in frames.pdf file...')

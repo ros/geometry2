@@ -30,7 +30,7 @@
 /** \author Wim Meeussen */
 
 
-#include "tf2_cpp/buffer.h"
+#include "tf2_ros/buffer.h"
 
 namespace tf2
 {

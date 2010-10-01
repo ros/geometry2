@@ -34,10 +34,10 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#ifndef TF2_CPP_BUFFER_CLIENT_H_
-#define TF2_CPP_BUFFER_CLIENT_H_
+#ifndef TF2_ROS_BUFFER_CLIENT_H_
+#define TF2_ROS_BUFFER_CLIENT_H_
 
-#include <tf2_cpp/buffer_interface.h>
+#include <tf2_ros/buffer_interface.h>
 #include <actionlib/client/simple_action_client.h>
 #include <tf2_msgs/LookupTransformAction.h>
 

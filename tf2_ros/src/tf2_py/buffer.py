@@ -27,20 +27,20 @@
 
 # author: Wim Meeussen
 
-import roslib; roslib.load_manifest('tf2_py')
+import roslib; roslib.load_manifest('tf2_ros')
 import rospy
 import tf2
-import tf2_py
+import tf2_ros
 from tf2_msgs.srv import FrameGraph, FrameGraphResponse
 import rosgraph.masterapi
 
-class Buffer(tf2.BufferCore, tf2_py.BufferInterface):
+class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
     def __init__(self, cache_time = None, debug = True):
         if cache_time != None:
             tf2.BufferCore.__init__(self, cache_time)
         else:
             tf2.BufferCore.__init__(self)
-        tf2_py.BufferInterface.__init__(self)
+        tf2_ros.BufferInterface.__init__(self)
 
         if debug:
             #Check to see if the service has already been advertised in this node

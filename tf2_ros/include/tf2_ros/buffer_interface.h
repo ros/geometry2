@@ -29,8 +29,8 @@
 
 /** \author Wim Meeussen */
 
-#ifndef TF2_CPP_H
-#define TF2_CPP_H
+#ifndef TF2_ROS_BUFFER_INTERFACE_H
+#define TF2_ROS_BUFFER_INTERFACE_H
 
 #include <tf2/buffer_core.h>
 #include <tf2/transform_datatypes.h>
@@ -234,4 +234,4 @@ public:
 
 } // namespace
 
-#endif // TF2_CPP_H
+#endif // TF2_ROS_BUFFER_INTERFACE_H

@@ -31,21 +31,21 @@ import roslib; roslib.load_manifest('tf2_geometry_msgs')
 from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped
 import PyKDL
 import rospy
-import tf2_py
+import tf2_ros
 
 def to_msg_msg(msg):
     return msg
 
-tf2_py.ConvertRegistration().add_to_msg(Vector3Stamped, to_msg_msg)
-tf2_py.ConvertRegistration().add_to_msg(PoseStamped, to_msg_msg)
-tf2_py.ConvertRegistration().add_to_msg(PointStamped, to_msg_msg)
+tf2_ros.ConvertRegistration().add_to_msg(Vector3Stamped, to_msg_msg)
+tf2_ros.ConvertRegistration().add_to_msg(PoseStamped, to_msg_msg)
+tf2_ros.ConvertRegistration().add_to_msg(PointStamped, to_msg_msg)
 
 def from_msg_msg(msg):
     return msg
 
-tf2_py.ConvertRegistration().add_from_msg(Vector3Stamped, from_msg_msg)
-tf2_py.ConvertRegistration().add_from_msg(PoseStamped, from_msg_msg)
-tf2_py.ConvertRegistration().add_from_msg(PointStamped, from_msg_msg)
+tf2_ros.ConvertRegistration().add_from_msg(Vector3Stamped, from_msg_msg)
+tf2_ros.ConvertRegistration().add_from_msg(PoseStamped, from_msg_msg)
+tf2_ros.ConvertRegistration().add_from_msg(PointStamped, from_msg_msg)
 
 def transform_to_kdl(t):
     return PyKDL.Frame(PyKDL.Rotation.Quaternion(t.transform.rotation.x, t.transform.rotation.y,
@@ -64,7 +64,7 @@ def do_transform_point(point, transform):
     res.point.z = p[2]
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(PointStamped, do_transform_point)
+tf2_ros.TransformRegistration().add(PointStamped, do_transform_point)
 
 
 # Vector3Stamped
@@ -76,7 +76,7 @@ def do_transform_vector3(vector3, transform):
     res.vector.z = p[2]
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(Vector3Stamped, do_transform_vector3)
+tf2_ros.TransformRegistration().add(Vector3Stamped, do_transform_vector3)
 
 # PoseStamped
 def do_transform_pose(pose, transform):
@@ -90,4 +90,4 @@ def do_transform_pose(pose, transform):
     (res.pose.orientation.x, res.pose.orientation.y, res.pose.orientation.z, res.pose.orientation.w) = f.M.GetQuaternion()
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(PoseStamped, do_transform_pose)
+tf2_ros.TransformRegistration().add(PoseStamped, do_transform_pose)

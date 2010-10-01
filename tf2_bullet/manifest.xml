@@ -8,7 +8,7 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tf2_bullet</url>
-  <depend package="tf2_cpp"/>
+  <depend package="tf2_ros"/>
   <depend package="bullet"/>
   <depend package="geometry_msgs"/>
 

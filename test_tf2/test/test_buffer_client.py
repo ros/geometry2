@@ -41,7 +41,7 @@ import sys
 import unittest
 
 import tf2
-import tf2_py
+import tf2_ros
 import tf2_kdl
 import tf2_geometry_msgs
 from geometry_msgs.msg import PointStamped
@@ -50,7 +50,7 @@ import PyKDL
 
 class TestBufferClient(unittest.TestCase):
     def test_buffer_client(self):
-        client = tf2_py.BufferClient("tf_action")
+        client = tf2_ros.BufferClient("tf_action")
         client.wait_for_server()
 
         p1 = PointStamped()
@@ -67,7 +67,7 @@ class TestBufferClient(unittest.TestCase):
             rospy.logerr("%s" % e)
 
     def test_transform_type(self):
-        client = tf2_py.BufferClient("tf_action")
+        client = tf2_ros.BufferClient("tf_action")
         client.wait_for_server()
 
         p1 = PointStamped()

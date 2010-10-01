@@ -10,8 +10,7 @@
   <url>http://ros.org/wiki/tf2_tools</url>
   <depend package="tf2_msgs"/>
   <depend package="tf2"/>
-  <depend package="tf2_py"/>
-  <depend package="tf2_cpp"/>
+  <depend package="tf2_ros"/>
   <depend package="xdot"/>
   <depend package="rxbag"/>
   <export>

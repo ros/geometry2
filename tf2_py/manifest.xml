@@ -1,10 +1,8 @@
 <package>
   <description brief="tf2_py">
-
-     tf2_py
-
+    This package contains the ROS Python bindings for the tf2 library. 
   </description>
-  <author>Wim Meeussen</author>
+  <author>Wim Meeussen, Eitan Marder-Eppstein</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tf2_py</url>

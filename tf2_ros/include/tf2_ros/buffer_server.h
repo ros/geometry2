@@ -34,13 +34,13 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#ifndef TF2_CPP_BUFFER_SERVER_H_
-#define TF2_CPP_BUFFER_SERVER_H_
+#ifndef TF2_ROS_BUFFER_SERVER_H_
+#define TF2_ROS_BUFFER_SERVER_H_
 
 #include <actionlib/server/action_server.h>
 #include <tf2_msgs/LookupTransformAction.h>
 #include <geometry_msgs/TransformStamped.h>
-#include <tf2_cpp/buffer.h>
+#include <tf2_ros/buffer.h>
 
 namespace tf2
 {

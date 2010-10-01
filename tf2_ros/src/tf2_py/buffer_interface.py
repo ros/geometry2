@@ -27,15 +27,15 @@
 
 # author: Wim Meeussen
 
-import roslib; roslib.load_manifest('tf2_py')
+import roslib; roslib.load_manifest('tf2_ros')
 import rospy
 import tf2
-import tf2_py
+import tf2_ros
 from copy import deepcopy
 
 class BufferInterface:
     def __init__(self):
-        self.registration = tf2_py.TransformRegistration()
+        self.registration = tf2_ros.TransformRegistration()
 
     # transform, simple api
     def transform(self, object_stamped, target_frame, timeout=rospy.Duration(0.0), new_type = None):

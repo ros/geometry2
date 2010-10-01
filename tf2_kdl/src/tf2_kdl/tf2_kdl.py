@@ -30,7 +30,7 @@
 import roslib; roslib.load_manifest('tf2_kdl')
 import PyKDL
 import rospy
-import tf2_py
+import tf2_ros
 from geometry_msgs.msg import PointStamped
 
 def transform_to_kdl(t):
@@ -47,7 +47,7 @@ def do_transform_vector(vector, transform):
     res.header = transform.header
     return res
 
-tf2_py.TransformRegistration().add(PyKDL.Vector, do_transform_vector)
+tf2_ros.TransformRegistration().add(PyKDL.Vector, do_transform_vector)
 
 def to_msg_vector(vector):
     msg = PointStamped()
@@ -57,32 +57,32 @@ def to_msg_vector(vector):
     msg.point.z = vector[2]
     return msg
 
-tf2_py.ConvertRegistration().add_to_msg(PyKDL.Vector, to_msg_vector)
+tf2_ros.ConvertRegistration().add_to_msg(PyKDL.Vector, to_msg_vector)
 
 def from_msg_vector(msg):
     vector = PyKDL.Vector(msg.point.x, msg.point.y, msg.point.z)
-    return tf2_py.Stamped(vector, msg.header.stamp, msg.header.frame_id)
+    return tf2_ros.Stamped(vector, msg.header.stamp, msg.header.frame_id)
 
-tf2_py.ConvertRegistration().add_from_msg(PyKDL.Vector, from_msg_vector)
+tf2_ros.ConvertRegistration().add_from_msg(PyKDL.Vector, from_msg_vector)
 
 def convert_vector(vector):
-    return tf2_py.Stamped(PyKDL.Vector(vector), vector.header.stamp, vector.header.frame_id)
+    return tf2_ros.Stamped(PyKDL.Vector(vector), vector.header.stamp, vector.header.frame_id)
 
-tf2_py.ConvertRegistration().add_convert((PyKDL.Vector, PyKDL.Vector), convert_vector)
+tf2_ros.ConvertRegistration().add_convert((PyKDL.Vector, PyKDL.Vector), convert_vector)
 
 # Frame
 def do_transform_frame(frame, transform):
     res = transform_to_kdl(transform) * frame
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(PyKDL.Frame, do_transform_frame)
+tf2_ros.TransformRegistration().add(PyKDL.Frame, do_transform_frame)
 
 # Twist
 def do_transform_twist(twist, transform):
     res = transform_to_kdl(transform) * twist
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(PyKDL.Twist, do_transform_twist)
+tf2_ros.TransformRegistration().add(PyKDL.Twist, do_transform_twist)
 
 
 # Wrench
@@ -90,4 +90,4 @@ def do_transform_wrench(wrench, transform):
     res = transform_to_kdl(transform) * wrench
     res.header = transform.header
     return res
-tf2_py.TransformRegistration().add(PyKDL.Wrench, do_transform_wrench)
+tf2_ros.TransformRegistration().add(PyKDL.Wrench, do_transform_wrench)

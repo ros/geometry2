@@ -41,7 +41,7 @@ import sys
 import unittest
 
 import tf2
-import tf2_py
+import tf2_ros
 import tf2_geometry_msgs
 from geometry_msgs.msg import PointStamped
 import rospy
@@ -50,11 +50,11 @@ import PyKDL
 
 class TestConvert(unittest.TestCase):
     def test_convert(self):
-        p = tf2_py.Stamped(PyKDL.Vector(1, 2, 3), rospy.Time(), 'my_frame')
+        p = tf2_ros.Stamped(PyKDL.Vector(1, 2, 3), rospy.Time(), 'my_frame')
         print p
-        msg = tf2_py.convert(p, PointStamped) 
+        msg = tf2_ros.convert(p, PointStamped) 
         print msg
-        p2 = tf2_py.convert(msg, PyKDL.Vector)
+        p2 = tf2_ros.convert(msg, PyKDL.Vector)
         print p2
         p2[0] = 100
         print p

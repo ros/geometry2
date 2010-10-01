@@ -3,13 +3,13 @@
 import roslib; roslib.load_manifest('tf2_geometry_msgs')
 import rospy
 import PyKDL
-import tf2_py
+import tf2_ros
 import tf2_geometry_msgs
 from geometry_msgs.msg import TransformStamped, PointStamped, Vector3Stamped, PoseStamped
 
 
 def main():
-    b = tf2_py.Buffer()
+    b = tf2_ros.Buffer()
     t = TransformStamped()
     t.transform.translation.x = 1
     t.transform.rotation.x = 1

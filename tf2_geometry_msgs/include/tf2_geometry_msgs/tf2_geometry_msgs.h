@@ -32,7 +32,7 @@
 #ifndef TF2_GEOMETRY_MSGS_H
 #define TF2_GEOMETRY_MSGS_H
 
-#include <tf2_cpp/buffer.h>
+#include <tf2_ros/buffer.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/PoseStamped.h>

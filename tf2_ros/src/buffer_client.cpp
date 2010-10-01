@@ -34,7 +34,7 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#include <tf2_cpp/buffer_client.h>
+#include <tf2_ros/buffer_client.h>
 
 namespace tf2
 {

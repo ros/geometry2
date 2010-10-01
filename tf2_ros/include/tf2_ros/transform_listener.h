@@ -29,15 +29,15 @@
 
 /** \author Tully Foote */
 
-#ifndef TF2_TRANSFORMLISTENER_H
-#define TF2_TRANSFORMLISTENER_H
+#ifndef TF2_ROS_TRANSFORMLISTENER_H
+#define TF2_ROS_TRANSFORMLISTENER_H
 
 #include "std_msgs/Empty.h"
 #include "tf2_msgs/TFMessage.h"
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
 
-#include "tf2_cpp/buffer.h"
+#include "tf2_ros/buffer.h"
 
 #include "boost/thread.hpp"
 

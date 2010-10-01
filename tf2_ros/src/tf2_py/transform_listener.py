@@ -27,10 +27,10 @@
 
 # author: Wim Meeussen
 
-import roslib; roslib.load_manifest('tf2_py')
+import roslib; roslib.load_manifest('tf2_ros')
 import rospy
 import rospy
-import tf2_py
+import tf2_ros
 import threading
 from tf2_msgs.msg import TFMessage
 
