@@ -215,6 +215,7 @@ class FrameViewerPanel(wx.Panel):
         else:
             self.namespace = (value, True)
 
+        self.tf_interface.clear_detail()
         self.need_dot_zoom = True
         
     def on_select_target(self, event):

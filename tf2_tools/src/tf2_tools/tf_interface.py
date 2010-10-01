@@ -93,6 +93,10 @@ class TFInterface(object):
         
         return ns
 
+    def clear_detail(self):
+        self.selected_parent = None
+        self.selected_child = None
+
     def set_detail(self, detail):
         selected = detail.split('-')
         self.selected_parent = selected[0]
