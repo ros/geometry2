@@ -52,6 +52,7 @@ else:
 import wx
 import wx.richtext
 import xdot
+import threading
 
 class FrameViewerPanel(wx.Panel):
     def __init__(self, parent, tf_interface):
@@ -62,6 +63,8 @@ class FrameViewerPanel(wx.Panel):
         self.tf_namespaces = []
         self.loaded_files = []
         self.need_dot_zoom = True
+        self.keep_running = True
+        self.ns_list_lock = threading.RLock()
 
         #Create a main pane
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -85,14 +88,14 @@ class FrameViewerPanel(wx.Panel):
 
         #Construct toolbar
         toolbar = wx.ToolBar(graph_viewer, -1)
-        toolbar.AddControl(wx.StaticText(toolbar, -1, "Graph Namespace:  "))
+        toolbar.AddControl(wx.StaticText(toolbar, -1, "Graph:  "))
         self.namespaces = wx.ComboBox(toolbar, 1, value='local', choices=['local'], size=(-1, -1), style=wx.CB_DROPDOWN)
         self.namespaces.Editable = False
         toolbar.AddControl(self.namespaces)
         self.Bind(wx.EVT_COMBOBOX, self.on_select_ns, id=1)
 
-        toolbar.AddControl(wx.Button(toolbar, 1, 'Refresh List'))
-        self.Bind(wx.EVT_BUTTON, self.on_refresh_list, id=1)
+        self.namespace_list_thread = threading.Thread(target=self._update_namespace_list)
+        self.namespace_list_thread.start()
         toolbar.Realize();
 
         #Create graph_view widget
@@ -151,6 +154,11 @@ class FrameViewerPanel(wx.Panel):
 
         self.timer.Start(1000)
 
+    def __del__(self, event):
+        print "on quit"
+        self.keep_running = False
+        self.namespace_list_thread.join()
+
     def update_file_list(self, file):
         if file:
             filename = file.rstrip('.tf')+'.tf'
@@ -185,6 +193,7 @@ class FrameViewerPanel(wx.Panel):
         self.set_dotcode(dotcode)
 
         self.check_echo()
+        self.refresh_list()
 
     def set_dotcode(self, dotcode):
         if not dotcode:
@@ -213,12 +222,17 @@ class FrameViewerPanel(wx.Panel):
         if event.ButtonDown(wx.MOUSE_BTN_LEFT) and target.url is not None:
             self.tf_interface.set_detail(target.url)
 
-    def on_refresh_list(self, event):
-        self.refresh_list()
+    def _update_namespace_list(self):
+        r = rospy.Rate(0.5)
+        while not rospy.is_shutdown() and self.keep_running:
+            tf_namespaces = self.tf_interface.find_tf_namespaces()
+            with self.ns_list_lock:
+                self.tf_namespaces = tf_namespaces
+            r.sleep()
 
     def refresh_list(self):
-        self.tf_namespaces = self.tf_interface.find_tf_namespaces()
-        self.namespaces.Items = ['local'] + self.tf_namespaces + self.loaded_files
+        with self.ns_list_lock:
+            self.namespaces.Items = ['local'] + self.tf_namespaces + self.loaded_files
         
     def on_select_ns(self, event):
         value = event.EventObject.Value
@@ -226,14 +240,15 @@ class FrameViewerPanel(wx.Panel):
         if value == self.namespace[0]:
             return
 
-        if value == 'local' or self.tf_namespaces.count(value) > 0:
-            self.namespace = (value, False)
-        else:
-            self.namespace = (value, True)
+        with self.ns_list_lock:
+            if value == 'local' or self.tf_namespaces.count(value) > 0:
+                self.namespace = (value, False)
+            else:
+                self.namespace = (value, True)
 
-        self.tf_interface.clear_detail()
-        self.reset_frame_lists()
-        self.need_dot_zoom = True
+            self.tf_interface.clear_detail()
+            self.reset_frame_lists()
+            self.need_dot_zoom = True
         
     def on_select_target(self, event):
         print "target"
