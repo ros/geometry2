@@ -120,17 +120,16 @@ class FrameViewerPanel(wx.Panel):
         echo_box = wx.BoxSizer(wx.VERTICAL)
         echo_panel.SetSizer(echo_box)
         wx.StaticText(echo_panel, -1, "Target: ", pos=(5, 15))
-        self.from_frame = wx.ComboBox(echo_panel, 2, value='Select Target', choices=['Select Target'], pos=(60, 10), size=(200, -1), style=wx.CB_DROPDOWN)
-        self.from_frame.SetEditable(False)
+        self.target_frame = wx.ComboBox(echo_panel, 2, value='Select Target', choices=['Select Target'], pos=(60, 10), size=(200, -1), style=wx.CB_DROPDOWN)
+        self.target_frame.SetEditable(False)
         self.Bind(wx.EVT_COMBOBOX, self.on_select_target, id=2)
 
         wx.StaticText(echo_panel, -1, "Source: ", pos=(5, 55))
-        self.to_frame = wx.ComboBox(echo_panel, 3, value='Select Source', choices=['Select Source'], pos=(60, 50), size=(200, -1), style=wx.CB_DROPDOWN)
-        self.to_frame.SetEditable(False)
+        self.source_frame = wx.ComboBox(echo_panel, 3, value='Select Source', choices=['Select Source'], pos=(60, 50), size=(200, -1), style=wx.CB_DROPDOWN)
+        self.source_frame.SetEditable(False)
         self.Bind(wx.EVT_COMBOBOX, self.on_select_source, id=3)
 
-        self.echo_txt = wx.TextCtrl(echo_panel, -1, style=wx.TE_MULTILINE | wx.TE_READONLY, pos=(5, 90), size=(255,-1))
-        self.echo_txt.SetValue("Foobar")
+        self.echo_txt = wx.TextCtrl(echo_panel, -1, style=wx.TE_MULTILINE | wx.TE_READONLY, pos=(5, 90), size=(255,500))
 
         #Add our panels to the notebook
         nb.AddPage(self.info_win, "Info")
@@ -169,10 +168,12 @@ class FrameViewerPanel(wx.Panel):
         dotcode    = self.tf_interface.get_dot()
         frame_list = self.tf_interface.get_frame_list()
 
-        self.to_frame.SetItems(frame_list)
-        self.from_frame.SetItems(frame_list)
+        self.source_frame.SetItems(frame_list)
+        self.target_frame.SetItems(frame_list)
         self.set_info_text(yaml.dump(self.tf_interface.get_info(), default_flow_style=False))
         self.set_dotcode(dotcode)
+
+        self.check_echo()
 
     def set_dotcode(self, dotcode):
         if not dotcode:
@@ -189,6 +190,10 @@ class FrameViewerPanel(wx.Panel):
 
     def set_info_text(self, text):
         self.info_txt.Value = text
+        self.Refresh()
+
+    def set_echo_text(self, text):
+        self.echo_txt.Value = text
         self.Refresh()
 
     ## Event handling
@@ -227,3 +232,10 @@ class FrameViewerPanel(wx.Panel):
         print "source"
         print type(event)
         print event.EventObject.Value
+
+    def check_echo(self):
+        target = self.target_frame.GetValue()
+        source = self.source_frame.GetValue()
+        if source != 'Select Source' and target != 'Select Target':
+            self.set_echo_text(self.tf_interface.get_echo_string(target, source))
+

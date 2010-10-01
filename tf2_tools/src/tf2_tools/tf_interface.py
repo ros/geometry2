@@ -154,6 +154,15 @@ class TFInterface(object):
             return self.data[self.selected_child]
         return ""
 
+    def get_echo_string(self, target, source):
+        msg = self.buffer.lookup_transform(target, source, rospy.Time())
+        echo = 'Time: ' + str(msg.header.stamp) + '\n'
+        echo += 'Target: ' + msg.header.frame_id + '\n'
+        echo += 'Source: ' + msg.child_frame_id + '\n'
+        echo += 'Translation: ' + str(msg.transform.translation) + '\n'
+        echo += 'Rotation Quaternion: ' + str(msg.transform.rotation) + '\n'
+        return echo
+
     def get_frame_list(self):
         if not self.data:
             return []
