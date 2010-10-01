@@ -9,6 +9,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/test_tf2</url>
   <depend package="rostest"/>
+  <depend package="tf"/>
   <depend package="tf2"/>
   <depend package="tf2_bullet"/>
   <depend package="tf2_ros"/>
