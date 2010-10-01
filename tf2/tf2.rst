@@ -42,14 +42,14 @@ tf2
    Raised when the arguments to the method are called improperly formed.  An example of why this might be raised is if an argument is nan. 
 
 
-Buffer
+BufferCore
 -----------
 
-.. class:: tf2.Buffer(cache_time = rospy.Duration(10))
+.. class:: tf2.BufferCore(cache_time = rospy.Duration(10))
 
    :param cache_time: how long the buffer should retain transformation information in the past.
 
-   The Buffer object is the core of tf2. It maintains a
+   The BufferCore object is the core of tf2. It maintains a
    time-varying graph of transforms, and permits asynchronous graph
    modification and queries:
 
@@ -58,7 +58,7 @@ Buffer
        >>> import rospy
        >>> import tf2
        >>> import geometry_msgs.msg
-       >>> t = tf2.Buffer(rospy.Duration(10.0))
+       >>> t = tf2.BufferCore(rospy.Duration(10.0))
        >>> t.getFrameStrings()
        []
        >>> m = geometry_msgs.msg.TransformStamped()
@@ -137,7 +137,7 @@ Buffer
 
         Clear all transformations from the buffer.
 
-    .. method::  lookupTransform(target_frame, source_frame, time) -> (position, quaternion)
+    .. method::  lookupTransform(target_frame, source_frame, time) -> geometry_msgs.msg.TransformStamped
 
         :param target_frame: transformation target frame in tf, string
         :param source_frame: transformation source frame in tf, string
@@ -154,13 +154,13 @@ Buffer
         will return the transform from "a" to "b" at the latest time available in all transforms between "a" and "b".
 
 
-    .. method::  lookupTransformFull(target_frame, target_time, source_frame, source_time, fixed_frame) -> position, quaternion
+    .. method::  lookupTransformFull(target_frame, target_time, source_frame, source_time, fixed_frame) -> geometry_msgs.msg.TransformStamped
 
         :param target_frame: transformation target frame in tf, string
         :param target_time: time of transformation in target_frame, a :class:`rospy.Time`
         :param source_frame: transformation source frame in tf, string
         :param source_time: time of transformation in target_frame, a :class:`rospy.Time`
         :param fixed_frame: reference frame common to both target_frame and source_frame.
-        :raises: :exc:`tf.ConnectivityException`, :exc:`tf.LookupException`, or :exc:`tf.ExtrapolationException`
+        :raises: :exc:`tf2.ConnectivityException`, :exc:`tf2.LookupException`, or :exc:`tf2.ExtrapolationException`, or :exc:`tf2.InvalidArgumentException`
 
         Extended version of :meth:`lookupTransform`.
