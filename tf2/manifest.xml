@@ -1,16 +1,19 @@
 <package>
   <description brief="tf2">
-
-     tf2
-
+    tf2 is the second generation of the transform libraray, which lets
+    the user keep track of multiple coordinate frames over time. tf2
+    maintains the relationship between coordinate frames in a tree
+    structure buffered in time, and lets the user transform points,
+    vectors, etc between any two coordinate frames at any desired
+    point in time.
   </description>
-  <author>Tully Foote</author>
+  <author>Tully Foote, Wim Meeussen, Eitan Marder-Eppstein</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tf2</url>
+
   <depend package="geometry_msgs"/>
   <depend package="tf2_msgs"/>
-
   <!-- For Python Binding Time Support -->
   <depend package="rospy"/>
 

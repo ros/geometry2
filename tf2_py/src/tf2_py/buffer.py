@@ -45,7 +45,7 @@ class Buffer(tf2.BufferCore, tf2_py.BufferInterface):
         if debug:
             #Check to see if the service has already been advertised in this node
             try:
-                m =  rosgraph.masterapi.Master(rospy.get_name())
+                m = rosgraph.masterapi.Master(rospy.get_name())
                 m.lookupService('~tf2_frames')
             except (rosgraph.masterapi.Error, rosgraph.masterapi.Failure):   
                 self.frame_server = rospy.Service('~tf2_frames', FrameGraph, self.__get_frames)
