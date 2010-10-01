@@ -42,6 +42,7 @@ import subprocess
 
 from tf2_msgs.srv import FrameGraph
 import tf2_py
+import tf2
 
 import rosgraph.masterapi
 
@@ -155,13 +156,16 @@ class TFInterface(object):
         return ""
 
     def get_echo_string(self, target, source):
-        msg = self.buffer.lookup_transform(target, source, rospy.Time())
-        echo = 'Time: ' + str(msg.header.stamp) + '\n'
-        echo += 'Target: ' + msg.header.frame_id + '\n'
-        echo += 'Source: ' + msg.child_frame_id + '\n'
-        echo += 'Translation: ' + str(msg.transform.translation) + '\n'
-        echo += 'Rotation Quaternion: ' + str(msg.transform.rotation) + '\n'
-        return echo
+        try:
+            msg = self.buffer.lookup_transform(target, source, rospy.Time())
+            echo = 'Time: ' + str(msg.header.stamp) + '\n'
+            echo += 'Target: ' + msg.header.frame_id + '\n'
+            echo += 'Source: ' + msg.child_frame_id + '\n'
+            echo += 'Translation: \n' + str(msg.transform.translation) + '\n'
+            echo += 'Rotation Quaternion: \n' + str(msg.transform.rotation) + '\n'
+            return echo
+        except tf2.TransformException as e:
+            return str(e)
 
     def get_frame_list(self):
         if not self.data:

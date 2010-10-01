@@ -162,14 +162,25 @@ class FrameViewerPanel(wx.Panel):
             cmd.SetId(self.namespaces.GetId())
             self.namespaces.GetEventHandler().ProcessEvent(cmd)
 
+    def reset_frame_lists(self):
+        self.source_frame.SetItems(['Select Source'])
+        self.source_frame.SetValue('Select Source')
+        self.target_frame.SetItems(['Select Target'])
+        self.target_frame.SetValue('Select Target')
+        self.set_echo_text("")
+
     def update_tf_data(self):
         self.tf_interface.update_data(*self.namespace)
 
         dotcode    = self.tf_interface.get_dot()
         frame_list = self.tf_interface.get_frame_list()
 
-        self.source_frame.SetItems(frame_list)
-        self.target_frame.SetItems(frame_list)
+        if self.namespace[0] == 'local':
+            self.source_frame.SetItems(frame_list)
+            self.target_frame.SetItems(frame_list)
+        else:
+            self.reset_frame_lists()
+
         self.set_info_text(yaml.dump(self.tf_interface.get_info(), default_flow_style=False))
         self.set_dotcode(dotcode)
 
@@ -221,6 +232,7 @@ class FrameViewerPanel(wx.Panel):
             self.namespace = (value, True)
 
         self.tf_interface.clear_detail()
+        self.reset_frame_lists()
         self.need_dot_zoom = True
         
     def on_select_target(self, event):
