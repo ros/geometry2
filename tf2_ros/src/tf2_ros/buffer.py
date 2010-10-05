@@ -66,17 +66,19 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
 
     # can, simple api
     def can_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
-        start_time = rospy.Time.now()
-        while (rospy.Time.now() < start_time + timeout and 
-               not self.can_transform_core(target_frame, source_frame, time)):
-            rospy.Duration(0.05).sleep()
+        if timeout != rospy.Duration(0.0):
+            start_time = rospy.Time.now()
+            while (rospy.Time.now() < start_time + timeout and 
+                   not self.can_transform_core(target_frame, source_frame, time)):
+                rospy.Duration(0.05).sleep()
         return self.can_transform_core(target_frame, source_frame, time)
     
     # can, advanced api
     def can_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
-        start_time = rospy.Time.now()
-        while (rospy.Time.now() < start_time + timeout and 
-               not self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)):
-            rospy.Duration(0.05).sleep()
+        if timeout != rospy.Duration(0.0):
+            start_time = rospy.Time.now()
+            while (rospy.Time.now() < start_time + timeout and 
+                   not self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)):
+                rospy.Duration(0.05).sleep()
         return self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
 
