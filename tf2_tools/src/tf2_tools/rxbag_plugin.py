@@ -52,7 +52,7 @@ class FrameViewerView(TopicMessageView):
         TopicMessageView.__init__(self, timeline, parent)
 
         self.tf_interface  = TFInterface(use_listener=False)
-        self.viewer        = FrameViewerPanel(self.parent, self.tf_interface)
+        self.viewer        = FrameViewerPanel(self.parent, self.tf_interface, False)
         self.buffer_length = roslib.rostime.Duration(10.0)
 
     def message_viewed(self, bag, msg_details):

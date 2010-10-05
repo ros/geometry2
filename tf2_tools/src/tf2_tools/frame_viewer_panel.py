@@ -55,7 +55,7 @@ import xdot
 import threading
 
 class FrameViewerPanel(wx.Panel):
-    def __init__(self, parent, tf_interface):
+    def __init__(self, parent, tf_interface, auto_update_list=True):
         wx.Panel.__init__(self, parent, -1)
 
         self.tf_interface   = tf_interface
@@ -94,8 +94,10 @@ class FrameViewerPanel(wx.Panel):
         toolbar.AddControl(self.namespaces)
         self.Bind(wx.EVT_COMBOBOX, self.on_select_ns, id=1)
 
-        self.namespace_list_thread = threading.Thread(target=self._update_namespace_list)
-        self.namespace_list_thread.start()
+        if auto_update_list:
+            self.namespace_list_thread = threading.Thread(target=self._update_namespace_list)
+            self.namespace_list_thread.start()
+
         toolbar.Realize();
 
         #Create graph_view widget
@@ -153,11 +155,6 @@ class FrameViewerPanel(wx.Panel):
         self.widget.register_select_callback(self.select_cb)
 
         self.timer.Start(1000)
-
-    def __del__(self, event):
-        print "on quit"
-        self.keep_running = False
-        self.namespace_list_thread.join()
 
     def update_file_list(self, file):
         if file:
