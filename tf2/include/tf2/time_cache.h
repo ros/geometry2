@@ -54,11 +54,38 @@ public:
 };
 
 
+class TimeCacheInterface
+{
+public:
+  /** \brief Access data from the cache */
+  virtual bool getData(ros::Time time, TransformStorage & data_out)=0; //returns false if data unavailable (should be thrown as lookup exception
+
+  /** \brief Insert data into the cache */
+  virtual bool insertData(const TransformStorage& new_data)=0;
+
+  /** @brief Clear the list of stored values */
+  virtual void clearList()=0;
+
+
+  /// Debugging information methods
+  /** @brief Get the length of the stored list */
+  virtual unsigned int getListLength()=0;
+
+  /** @brief Get the latest timestamp cached */
+  virtual ros::Time getLatestTimestamp()=0;
+
+  /** @brief Get the oldest timestamp cached */
+  virtual ros::Time getOldestTimestamp()=0;
+  
+
+};
+
+
 /** \brief A class to keep a sorted linked list in time
  * This builds and maintains a list of timestamped
  * data.  And provides lookup functions to get
  * data out as a function of time. */
-class TimeCache
+class TimeCache : public TimeCacheInterface
 {
  public:
   static const int MIN_INTERPOLATION_DISTANCE = 5; //!< Number of nano-seconds to not interpolate below.
@@ -70,23 +97,31 @@ class TimeCache
   TimeCache(ros::Duration  max_storage_time = ros::Duration().fromNSec(DEFAULT_MAX_STORAGE_TIME),
             ros::Duration  max_extrapolation_time = ros::Duration().fromNSec(DEFAULT_MAX_EXTRAPOLATION_TIME));
 
-  bool getData(ros::Time time, TransformStorage & data_out); //returns false if data unavailable (should be thrown as lookup exception
-
-  bool insertData(const TransformStorage& new_data);
-
   void interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output);  
 
-  /** @brief Clear the list of stored values */
-  void clearList();
+  /// Virtual methods
 
+  /** \brief Access data from the cache */
+  virtual bool getData(ros::Time time, TransformStorage & data_out); //returns false if data unavailable (should be thrown as lookup exception
+
+  /** \brief Insert data into the cache */
+  virtual bool insertData(const TransformStorage& new_data);
+
+  /** @brief Clear the list of stored values */
+  virtual void clearList();
+
+
+  /// Debugging information methods
   /** @brief Get the length of the stored list */
-  unsigned int getListLength();
+  virtual unsigned int getListLength();
 
   /** @brief Get the latest timestamp cached */
-  ros::Time getLatestTimestamp();
+  virtual ros::Time getLatestTimestamp();
 
   /** @brief Get the oldest timestamp cached */
-  ros::Time getOldestTimestamp();
+  virtual ros::Time getOldestTimestamp();
+  
+
 private:
   std::list<TransformStorage > storage_;
 
@@ -107,6 +142,38 @@ private:
 
 };
 
+class StaticCache : public TimeCacheInterface
+{
+ public:
+  /// Virtual methods
+
+  /** \brief Access data from the cache */
+  virtual bool getData(ros::Time time, TransformStorage & data_out); //returns false if data unavailable (should be thrown as lookup exception
+
+  /** \brief Insert data into the cache */
+  virtual bool insertData(const TransformStorage& new_data);
+
+  /** @brief Clear the list of stored values */
+  virtual void clearList();
+
+
+  /// Debugging information methods
+  /** @brief Get the length of the stored list */
+  virtual unsigned int getListLength();
+
+  /** @brief Get the latest timestamp cached */
+  virtual ros::Time getLatestTimestamp();
+
+  /** @brief Get the oldest timestamp cached */
+  virtual ros::Time getOldestTimestamp();
+  
+
+private:
+  TransformStorage  storage_;
+
+  boost::mutex storage_lock_;  ///!< The mutex to protect the linked list
+};
 
 }
+
 #endif // TF2_TIME_CACHE_H

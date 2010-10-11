@@ -34,7 +34,7 @@ include_directories (src/bt)
 
 
 #CPP Libraries
-rosbuild_add_library(tf2 src/cache.cpp src/buffer_core.cpp)
+rosbuild_add_library(tf2 src/cache.cpp src/buffer_core.cpp src/static_cache.cpp)
 rosbuild_link_boost(tf2 thread signals)
 
 #BEGIN Python Libraries
@@ -60,6 +60,9 @@ rosbuild_add_compile_flags(tf2_py ${SSE_FLAGS}) #conditionally adds sse flags if
 
 rosbuild_add_gtest(test_cache_unittest test/cache_unittest.cpp)
 target_link_libraries(test_cache_unittest tf2)
+
+rosbuild_add_gtest(test_static_cache_unittest test/static_cache_test.cpp)
+target_link_libraries(test_static_cache_unittest tf2)
 
 #rosbuild_add_gtest(test/tf2_core test/tf2_core_unittest.cpp)
 #target_link_libraries(test/tf2_core tf2)
