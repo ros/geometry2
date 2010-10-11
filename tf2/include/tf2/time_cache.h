@@ -97,7 +97,6 @@ class TimeCache : public TimeCacheInterface
   TimeCache(ros::Duration  max_storage_time = ros::Duration().fromNSec(DEFAULT_MAX_STORAGE_TIME),
             ros::Duration  max_extrapolation_time = ros::Duration().fromNSec(DEFAULT_MAX_EXTRAPOLATION_TIME));
 
-  void interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output);  
 
   /// Virtual methods
 
@@ -135,6 +134,9 @@ private:
   /// A helper function for getData
   //Assumes storage is already locked for it
   uint8_t findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, ExtrapolationMode& mode);
+
+  void interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output);  
+
 
   void pruneList();
 
