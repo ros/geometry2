@@ -108,9 +108,10 @@ bool BufferCore::warnFrameId(const std::string& function_name_arg, const std::st
   }
   if (lookupFrameNumber(frame_id) == CompactFrameID(0))
   {
-    std::stringstream ss;
+    /* Don't warn here.  It's not an invalid use case.  
+      std::stringstream ss;
     ss << "\"" << frame_id << "\" passed to "<< function_name_arg <<" does not exist. ";
-    ROS_WARN("%s",ss.str().c_str());
+    ROS_WARN("%s",ss.str().c_str()); */
     retval = true;
   }
   return retval;
@@ -441,11 +442,6 @@ bool BufferCore::canTransform(const std::string& target_frame, const std::string
   ///\todo check return
   int retval;
   retval = lookupLists(lookupFrameNumber( target_frame), local_time, lookupFrameNumber( source_frame), t_list, error_msg);
-  {
-    return false;
-  }
-  
-
 
   ///\todo WRITE HELPER FUNCITON TO RETHROW
   if (retval != tf2_msgs::TF2Error::NO_ERROR)
@@ -539,22 +535,10 @@ std::string BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
 
 int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists& lists, std::string * error_string) const
 {
-  timeval tempt;
+  /*timeval tempt;
   gettimeofday(&tempt,NULL);
   std::cerr << "Looking up list at " <<tempt.tv_sec * 1000000ULL + tempt.tv_usec << std::endl;
-  
-  if (getFrame(target_frame) == NULL)
-  {
-  
-    if (error_string) *error_string = "Target frame '"+lookupFrameString(target_frame)+"' does not exist is tf tree.";
-    return tf2_msgs::TF2Error::LOOKUP_ERROR;
-  }
-  if (getFrame(source_frame) == NULL)
-  {
-    if (error_string) *error_string = "Source frame '"+lookupFrameString(source_frame)+"' does not exist is tf tree.";
-    return tf2_msgs::TF2Error::LOOKUP_ERROR;
-  }
-  printf("NO LOOKUP ERROR\n");
+  */  
   //Clear lists before operating
   lists.forwardTransforms.clear();
   lists.inverseTransforms.clear();

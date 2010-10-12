@@ -475,7 +475,7 @@ TEST(tf, TransformThroughNO_PARENT)
 */
 
 
-TEST(BufferClient_lookupTransform, i_configuration)
+TEST(BufferCore_lookupTransform, i_configuration)
 {
   double epsilon = 1e-6;
   
@@ -560,7 +560,7 @@ TEST(BufferClient_lookupTransform, i_configuration)
     
   }
 }
-TEST(BufferClient_lookupTransform, one_link_configuration)
+TEST(BufferCore_lookupTransform, one_link_configuration)
 {
   double epsilon = 1e-6;
   
@@ -634,7 +634,7 @@ TEST(BufferClient_lookupTransform, one_link_configuration)
   }
 }
 
-TEST(BufferClient_lookupTransform, invalid_arguments)
+TEST(BufferCore_lookupTransform, invalid_arguments)
 {
   tf2::BufferCore mBC;
   
@@ -652,7 +652,7 @@ TEST(BufferClient_lookupTransform, invalid_arguments)
 
 };
 
-TEST(BufferClient_canTransform, invalid_arguments)
+TEST(BufferCore_canTransform, invalid_arguments)
 {
   tf2::BufferCore mBC;
 
