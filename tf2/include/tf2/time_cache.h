@@ -46,16 +46,14 @@ enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_
 class CompactFrameID
 {
 public:
-  CompactFrameID(unsigned int number, bool is_static = false):is_static_(is_static), num_(number) {};
-  CompactFrameID():is_static_(false), num_(0) {};
-  bool is_static_;
+  CompactFrameID(unsigned int number): num_(number) {};
+  CompactFrameID(): num_(0) {};
+  virtual ~CompactFrameID(){};
   unsigned int num_;
-  bool operator==(const CompactFrameID& other) const { return ( (is_static_ == other.is_static_) && (num_ == other.num_));};
+  bool operator==(const CompactFrameID& other) const { return ( num_ == other.num_);};
   bool operator<(const CompactFrameID& other) const
   { 
     if (num_ < other.num_)
-      return true;
-    if (is_static_ && !other.is_static_)
       return true;
     return false;
   };

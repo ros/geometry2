@@ -88,7 +88,7 @@ TEST(StaticCache, Repeatability)
     std::stringstream ss;
     ss << values[i];
     stor.header.frame_id = ss.str();
-    stor.c_frame_id_ = CompactFrameID(i, true);
+    stor.c_frame_id_ = CompactFrameID(i);
     stor.header.stamp = ros::Time().fromNSec(i);
     
     cache.insertData(stor);
@@ -112,7 +112,7 @@ TEST(StaticCache, DuplicateEntries)
   TransformStorage stor;
   setIdentity(stor.transform); 
   stor.header.frame_id = "a";
-  stor.c_frame_id_ = CompactFrameID(3, true);
+  stor.c_frame_id_ = CompactFrameID(3);
   stor.header.stamp = ros::Time().fromNSec(1);
 
   cache.insertData(stor);

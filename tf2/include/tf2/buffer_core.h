@@ -96,9 +96,10 @@ public:
   /** \brief Add transform information to the tf data structure
    * \param transform The transform to store
    * \param authority The source of the information for this transform
+   * \param is_static Record this transform as a static transform.  It will be good across all time.  (This cannot be changed after the first call.)
    * \return True unless an error occured
    */
-  bool setTransform(const geometry_msgs::TransformStamped& transform, const std::string & authority);
+  bool setTransform(const geometry_msgs::TransformStamped& transform, const std::string & authority, bool is_static = false);
 
   /*********** Accessors *************/
 
@@ -215,8 +216,7 @@ private:
   
   /** \brief The pointers to potential frames that the tree can be made of.
    * The frames will be dynamically allocated at run time when set the first time. */
-  std::vector< TimeCache*> frames_;
-  std::vector< StaticCache*> static_frames_;
+  std::vector< TimeCacheInterface*> frames_;
   
   /** \brief A mutex to protect testing and allocating new frames on the above vector. */
   boost::mutex frame_mutex_;
@@ -225,8 +225,6 @@ private:
   std::map<std::string, CompactFrameID> frameIDs_;
   /** \brief A map from CompactFrameID frame_id_numbers to string for debugging and output */
   std::vector<std::string> frameIDs_reverse;
-  /** \brief A map from CompactFrameID frame_id_numbers to string for debugging and output of static frames*/
-  std::vector<std::string> static_frameIDs_reverse;
   /** \brief A map to lookup the most recent authority for a given frame */
   std::map<CompactFrameID, std::string> frame_authority_;
 
@@ -247,11 +245,13 @@ private:
    */
   TimeCacheInterface* getFrame(CompactFrameID c_frame_id) const;
 
+  TimeCacheInterface* allocateFrame(CompactFrameID cfid, bool is_static);
+
   /// String to number for frame lookup with dynamic allocation of new frames
   CompactFrameID lookupFrameNumber(const std::string& frameid_str) const;
 
   /// String to number for frame lookup with dynamic allocation of new frames
-  CompactFrameID lookupOrInsertFrameNumber(const std::string& frameid_str, bool is_static);
+  CompactFrameID lookupOrInsertFrameNumber(const std::string& frameid_str);
 
   ///Number to string frame lookup may throw LookupException if number invalid
   std::string lookupFrameString(CompactFrameID frame_id_num) const;
