@@ -89,7 +89,7 @@ std::string stripSlash(const std::string& in)
 };
 
 
-bool warnFrameId(const std::string& function_name_arg, const std::string& frame_id)
+bool BufferCore::warnFrameId(const std::string& function_name_arg, const std::string& frame_id) const
 {
   bool retval = false;
   if (frame_id.size() == 0)
@@ -106,10 +106,17 @@ bool warnFrameId(const std::string& function_name_arg, const std::string& frame_
     ROS_WARN("%s",ss.str().c_str());
     retval = true;
   }
+  if (lookupFrameNumber(frame_id) == CompactFrameID(0))
+  {
+    std::stringstream ss;
+    ss << "\"" << frame_id << "\" passed to "<< function_name_arg <<" does not exist. ";
+    ROS_WARN("%s",ss.str().c_str());
+    retval = true;
+  }
   return retval;
 };
 
-void validateFrameId(const std::string& function_name_arg, const std::string& frame_id)
+void BufferCore::validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const
 {
   if (frame_id.size() == 0)
   {
@@ -123,6 +130,13 @@ void validateFrameId(const std::string& function_name_arg, const std::string& fr
     ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
     throw tf2::InvalidArgumentException(ss.str().c_str());
   }
+  if (lookupFrameNumber(frame_id) == CompactFrameID(0))
+  {
+    std::stringstream ss;
+    ss << "\"" << frame_id << "\" passed to "<< function_name_arg <<" does not exist. ";
+    throw tf2::LookupException(ss.str().c_str());
+  }
+  
 };
 
 BufferCore::BufferCore(ros::Duration cache_time) : cache_time_(cache_time)//: old_tf_(true, cache_time)
@@ -277,15 +291,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   TransformLists t_list;
 
   if (retval == tf2_msgs::TF2Error::NO_ERROR)
-    try
-    {
-      retval = lookupLists(lookupFrameNumber( target_frame), temp_time, lookupFrameNumber( source_frame), t_list, &error_string);
-    }
-    catch (tf2::LookupException &ex)
-    {
-      error_string = ex.what();
-      retval = tf2_msgs::TF2Error::LOOKUP_ERROR;
-    }
+    retval = lookupLists(lookupFrameNumber( target_frame), temp_time, lookupFrameNumber( source_frame), t_list, &error_string);
   else //if (retval != tf2_msgs::TF2Error::NO_ERROR)
   {
     std::stringstream ss;
@@ -434,11 +440,7 @@ bool BufferCore::canTransform(const std::string& target_frame, const std::string
   TransformLists t_list;
   ///\todo check return
   int retval;
-  try
-  {
-    retval = lookupLists(lookupFrameNumber( target_frame), local_time, lookupFrameNumber( source_frame), t_list, error_msg);
-  }
-  catch (tf2::LookupException &ex)
+  retval = lookupLists(lookupFrameNumber( target_frame), local_time, lookupFrameNumber( source_frame), t_list, error_msg);
   {
     return false;
   }
@@ -482,7 +484,7 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
 
 tf2::TimeCacheInterface* BufferCore::getFrame(CompactFrameID frame_id) const
 {
-  if (frame_id == 0) /// @todo check larger values too
+  if (frame_id == CompactFrameID(0) || frame_id.num_ > frames_.size()) /// @todo check larger values too
     return NULL;
   else
   {
@@ -497,9 +499,7 @@ CompactFrameID BufferCore::lookupFrameNumber(const std::string& frameid_str) con
   std::map<std::string, CompactFrameID>::const_iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
-    std::stringstream ss;
-    ss << "Frame id " << frameid_str << " does not exist!";
-    throw tf2::LookupException(ss.str());
+    retval = CompactFrameID(0);
   }
   else
     retval = map_it->second;
@@ -539,13 +539,22 @@ std::string BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
 
 int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists& lists, std::string * error_string) const
 {
-  /*  timeval tempt;
+  timeval tempt;
   gettimeofday(&tempt,NULL);
   std::cerr << "Looking up list at " <<tempt.tv_sec * 1000000ULL + tempt.tv_usec << std::endl;
-  */
-
-  ///\todo add fixed frame support
-
+  
+  if (getFrame(target_frame) == NULL)
+  {
+  
+    if (error_string) *error_string = "Target frame '"+lookupFrameString(target_frame)+"' does not exist is tf tree.";
+    return tf2_msgs::TF2Error::LOOKUP_ERROR;
+  }
+  if (getFrame(source_frame) == NULL)
+  {
+    if (error_string) *error_string = "Source frame '"+lookupFrameString(source_frame)+"' does not exist is tf tree.";
+    return tf2_msgs::TF2Error::LOOKUP_ERROR;
+  }
+  printf("NO LOOKUP ERROR\n");
   //Clear lists before operating
   lists.forwardTransforms.clear();
   lists.inverseTransforms.clear();
@@ -558,22 +567,20 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
   CompactFrameID frame = source_frame;
   unsigned int counter = 0;  //A counter to keep track of how deep we've descended
   CompactFrameID last_inverse;
-  if (getFrame(frame) == NULL) //Test if source frame exists this will throw a lookup error if it does not (inside the loop it will be caught)
-  {
-    if (error_string) *error_string = "Source frame '"+lookupFrameString(frame)+"' does not exist is tf tree.";
-    return tf2_msgs::TF2Error::LOOKUP_ERROR;//throw LookupException("Frame didn't exist");
-  }
   while (true)
     {
       //      printf("getting data from %d:%s \n", frame, lookupFrameString(frame).c_str());
 
       TimeCacheInterface* pointer = getFrame(frame);
-      ROS_ASSERT(pointer);
-
-      if (! pointer->getData(time, temp))
+      if (! pointer)
       {
         last_inverse = frame;
-        // this is thrown when there is no data
+        break;
+        
+      }
+      else if ( ! pointer->getData(time, temp))
+      {
+        last_inverse = frame;
         break;
       }
 
@@ -610,19 +617,17 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
   frame = target_frame;
   counter = 0;
   CompactFrameID last_forward;
-  if (getFrame(frame) == NULL)
-  {
-    if (error_string) *error_string = "Target frame '"+lookupFrameString(frame)+"' does not exist is tf tree.";
-    return tf2_msgs::TF2Error::LOOKUP_ERROR;
-  }//throw LookupException("fixme");; //Test if source frame exists this will throw a lookup error if it does not (inside the loop it will be caught)
   while (true)
     {
 
       TimeCacheInterface* pointer = getFrame(frame);
-      ROS_ASSERT(pointer);
-
-
-      if(!  pointer->getData(time, temp))
+      if (! pointer)
+      {
+        last_forward = frame;
+        break;
+        
+      }
+      else if( !  pointer->getData(time, temp))
       {
         last_forward = frame;
         break;
@@ -682,22 +687,15 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
       return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
     }
 
-    try
+    if (!(lookupFrameNumber(lists.inverseTransforms.back().header.frame_id) == target_frame))
     {
-      if (!(lookupFrameNumber(lists.inverseTransforms.back().header.frame_id) == target_frame))
-      {
-        if (error_string) *error_string = connectivity_error;
-        return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+      if (error_string) *error_string = connectivity_error;
+      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
     }
     else return 0;
-    }
-    catch (tf2::LookupException & ex)
-    {
-      if (error_string) *error_string = ex.what();
-      return tf2_msgs::TF2Error::LOOKUP_ERROR;
-    }
+    
   }
-
+  
 
   /* Make sure the end of the search shares a parent. */
   if (!(last_forward == last_inverse))
@@ -706,8 +704,7 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
     return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
   }
   /* Make sure that we don't have a no parent at the top */
-  try
-  {
+    {
     if (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id) == 0 || lookupFrameNumber( lists.forwardTransforms.back().child_frame_id) == 0)
     {
       //if (error_string) *error_string = "NO_PARENT at top of tree";
@@ -732,11 +729,7 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
 	break;
     }
   }
-  catch (tf2::LookupException & ex)
-  {
-    if (error_string) *error_string = ex.what();
-    return tf2_msgs::TF2Error::LOOKUP_ERROR;
-  }  /*
+  /*
        gettimeofday(&tempt2,NULL);
        std::cerr << "Done looking up list " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
      */
@@ -895,15 +888,8 @@ int BufferCore::getLatestCommonTime(const std::string& source, const std::string
   time = ros::Time(ros::TIME_MAX);
   int retval;
   TransformLists lists;
-  try
   {
     retval = lookupLists(lookupFrameNumber(dest), ros::Time(), lookupFrameNumber(source), lists, error_string);
-  }
-  catch (tf2::LookupException &ex)
-  {
-    time = ros::Time();
-    if (error_string) *error_string = ex.what();
-    return tf2_msgs::TF2Error::LOOKUP_ERROR;
   }
   if (retval == tf2_msgs::TF2Error::NO_ERROR)
   {

@@ -247,6 +247,10 @@ private:
 
   TimeCacheInterface* allocateFrame(CompactFrameID cfid, bool is_static);
 
+
+  bool warnFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
+  void validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
+
   /// String to number for frame lookup with dynamic allocation of new frames
   CompactFrameID lookupFrameNumber(const std::string& frameid_str) const;
 

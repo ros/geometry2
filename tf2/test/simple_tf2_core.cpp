@@ -32,6 +32,7 @@
 #include <sys/time.h>
 #include <ros/ros.h>
 #include "LinearMath/btVector3.h"
+#include "tf2/exceptions.h"
 
 void seed_rand()
 {
@@ -73,6 +74,46 @@ TEST(tf2, setTransformValid)
   EXPECT_TRUE(tfc.setTransform(st, "authority1"));
   
 }
+
+TEST(tf2_lookupTransform, LookupException_Nothing_Exists)
+{
+  tf2::BufferCore tfc;
+  EXPECT_THROW(tfc.lookupTransform("a", "b", ros::Time().fromSec(1.0)), tf2::LookupException);
+  
+}
+
+TEST(tf2_canTransform, Nothing_Exists)
+{
+  tf2::BufferCore tfc;
+  EXPECT_FALSE(tfc.canTransform("a", "b", ros::Time().fromSec(1.0)));
+  
+}
+
+TEST(tf2_lookupTransform, LookupException_One_Exists)
+{
+  tf2::BufferCore tfc;
+  geometry_msgs::TransformStamped st;
+  st.header.frame_id = "foo";
+  st.header.stamp = ros::Time(1.0);
+  st.child_frame_id = "child";
+  st.transform.rotation.w = 1;
+  EXPECT_TRUE(tfc.setTransform(st, "authority1"));
+  EXPECT_THROW(tfc.lookupTransform("foo", "bar", ros::Time().fromSec(1.0)), tf2::LookupException);
+  
+}
+
+TEST(tf2_canTransform, One_Exists)
+{
+  tf2::BufferCore tfc;
+  geometry_msgs::TransformStamped st;
+  st.header.frame_id = "foo";
+  st.header.stamp = ros::Time(1.0);
+  st.child_frame_id = "child";
+  st.transform.rotation.w = 1;
+  EXPECT_TRUE(tfc.setTransform(st, "authority1"));
+  EXPECT_FALSE(tfc.canTransform("foo", "bar", ros::Time().fromSec(1.0)));
+}
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
