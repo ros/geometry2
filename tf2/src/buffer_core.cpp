@@ -130,6 +130,7 @@ BufferCore::BufferCore(ros::Duration cache_time) : cache_time_(cache_time)//: ol
   max_extrapolation_distance_.fromNSec(DEFAULT_MAX_EXTRAPOLATION_DISTANCE);
   frameIDs_["NO_PARENT"] = 0;
   frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
+  static_frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
   frameIDs_reverse.push_back("NO_PARENT");
 
   return;
@@ -207,10 +208,10 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
     return false;
   
 
-  unsigned int frame_number = lookupOrInsertFrameNumber(stripped.child_frame_id);
+  CompactFrameID frame_number = lookupOrInsertFrameNumber(stripped.child_frame_id, false);
 
 
-  if (getFrame(frame_number)->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id))))
+  if (getFrame(frame_number)->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id, false))))
   {
     frame_authority_[frame_number] = authority;
   }
@@ -466,19 +467,24 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
 }
 
 
-tf2::TimeCache* BufferCore::getFrame(unsigned int frame_id) const
+tf2::TimeCacheInterface* BufferCore::getFrame(CompactFrameID frame_id) const
 {
   if (frame_id == 0) /// @todo check larger values too
     return NULL;
   else
-    return frames_[frame_id];
+  {
+    if (frame_id.is_static_)
+      return static_frames_[frame_id.num_];
+    else
+      return frames_[frame_id.num_];
+  }
 };
 
-unsigned int BufferCore::lookupFrameNumber(const std::string& frameid_str) const
+CompactFrameID BufferCore::lookupFrameNumber(const std::string& frameid_str) const
 {
-  unsigned int retval = 0;
+  CompactFrameID retval;
   boost::mutex::scoped_lock(frame_mutex_);
-  std::map<std::string, unsigned int>::const_iterator map_it = frameIDs_.find(frameid_str);
+  std::map<std::string, CompactFrameID>::const_iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
     std::stringstream ss;
@@ -490,17 +496,27 @@ unsigned int BufferCore::lookupFrameNumber(const std::string& frameid_str) const
   return retval;
 };
 
-unsigned int BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_str)
+CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_str, bool is_static)
 {
-  unsigned int retval = 0;
+  CompactFrameID retval = 0;
   boost::mutex::scoped_lock(frame_mutex_);
-  std::map<std::string, unsigned int>::iterator map_it = frameIDs_.find(frameid_str);
+  std::map<std::string, CompactFrameID>::iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
-    retval = frames_.size();
-    frames_.push_back( new TimeCache(cache_time_, max_extrapolation_distance_));
-    frameIDs_[frameid_str] = retval;
-    frameIDs_reverse.push_back(frameid_str);
+    if (is_static)
+    {
+      retval = CompactFrameID(static_frames_.size(), is_static);
+      static_frames_.push_back( new StaticCache());
+      frameIDs_[frameid_str] = retval;
+      static_frameIDs_reverse.push_back(frameid_str);
+    }
+    else
+    {
+      retval = CompactFrameID(frames_.size(), is_static);
+      frames_.push_back( new TimeCache(cache_time_, max_extrapolation_distance_));
+      frameIDs_[frameid_str] = retval;
+      frameIDs_reverse.push_back(frameid_str);
+    }
   }
   else
     retval = frameIDs_[frameid_str];
@@ -508,21 +524,34 @@ unsigned int BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_st
   return retval;
 };
 
-std::string BufferCore::lookupFrameString(unsigned int frame_id_num) const
+std::string BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
   {
-    if (frame_id_num >= frameIDs_reverse.size())
+    if (frame_id_num.is_static_)
     {
-      std::stringstream ss;
-      ss << "Reverse lookup of frame id " << frame_id_num << " failed!";
-      throw tf2::LookupException(ss.str());
+      if (frame_id_num.num_ >= static_frameIDs_reverse.size())
+      {
+        std::stringstream ss;
+        ss << "Reverse lookup of static frame id " << frame_id_num.num_ << " failed!";
+        throw tf2::LookupException(ss.str());
+      }
+      else
+        return static_frameIDs_reverse[frame_id_num.num_];
     }
     else
-      return frameIDs_reverse[frame_id_num];
-
+    {
+      if (frame_id_num.num_ >= frameIDs_reverse.size())
+      {
+        std::stringstream ss;
+        ss << "Reverse lookup of frame id " << frame_id_num.num_ << " failed!";
+        throw tf2::LookupException(ss.str());
+      }
+      else
+        return frameIDs_reverse[frame_id_num.num_];
+    }
   };
 
 
-int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned int source_frame, TransformLists& lists, std::string * error_string) const
+int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists& lists, std::string * error_string) const
 {
   /*  timeval tempt;
   gettimeofday(&tempt,NULL);
@@ -540,9 +569,9 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
 
   TransformStorage temp;
 
-  unsigned int frame = source_frame;
+  CompactFrameID frame = source_frame;
   unsigned int counter = 0;  //A counter to keep track of how deep we've descended
-  unsigned int last_inverse;
+  CompactFrameID last_inverse;
   if (getFrame(frame) == NULL) //Test if source frame exists this will throw a lookup error if it does not (inside the loop it will be caught)
   {
     if (error_string) *error_string = "Source frame '"+lookupFrameString(frame)+"' does not exist is tf tree.";
@@ -552,7 +581,7 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
     {
       //      printf("getting data from %d:%s \n", frame, lookupFrameString(frame).c_str());
 
-      TimeCache* pointer = getFrame(frame);
+      TimeCacheInterface* pointer = getFrame(frame);
       ROS_ASSERT(pointer);
 
       if (! pointer->getData(time, temp))
@@ -570,7 +599,7 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
       }
       lists.inverseTransforms.push_back(temp);
 
-      frame = temp.frame_id_num_;
+      frame = temp.c_frame_id_;
 
 
       /* Check if we've gone too deep.  A loop in the tree would cause this */
@@ -594,7 +623,7 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
   */
   frame = target_frame;
   counter = 0;
-  unsigned int last_forward;
+  CompactFrameID last_forward;
   if (getFrame(frame) == NULL)
   {
     if (error_string) *error_string = "Target frame '"+lookupFrameString(frame)+"' does not exist is tf tree.";
@@ -603,7 +632,7 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
   while (true)
     {
 
-      TimeCache* pointer = getFrame(frame);
+      TimeCacheInterface* pointer = getFrame(frame);
       ROS_ASSERT(pointer);
 
 
@@ -620,7 +649,7 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
         break;
       }
       lists.forwardTransforms.push_back(temp);
-      frame = temp.frame_id_num_;
+      frame = temp.c_frame_id_;
 
       /* Check if we've gone too deep.  A loop in the tree would cause this*/
       if (counter++ > MAX_GRAPH_DEPTH){
@@ -651,7 +680,7 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
       return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
     }
 
-    if (last_forward != source_frame)  //\todo match with case A
+    if (! (last_forward == source_frame) )  //\todo match with case A
     {
       if (error_string) *error_string = connectivity_error;
       return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
@@ -669,7 +698,7 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
 
     try
     {
-      if (lookupFrameNumber(lists.inverseTransforms.back().header.frame_id) != target_frame)
+      if (!(lookupFrameNumber(lists.inverseTransforms.back().header.frame_id) == target_frame))
       {
         if (error_string) *error_string = connectivity_error;
         return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
@@ -685,7 +714,7 @@ int BufferCore::lookupLists(unsigned int target_frame, ros::Time time, unsigned 
 
 
   /* Make sure the end of the search shares a parent. */
-  if (last_forward != last_inverse)
+  if (!(last_forward == last_inverse))
   {
     if (error_string) *error_string = connectivity_error;
     return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
@@ -857,17 +886,32 @@ std::string BufferCore::allFramesAsString() const
 
 
   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
+
+  ///regular transforms
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)
   {
-    unsigned int frame_id_num;
-    if(  getFrame(counter)->getData(ros::Time(), temp))
-      frame_id_num = temp.frame_id_num_;
+    CompactFrameID frame_id_num;
+    if(  getFrame(CompactFrameID(counter, false))->getData(ros::Time(), temp))
+      frame_id_num = temp.c_frame_id_;
     else
     {
       frame_id_num = 0;
     }
-    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num] << "." <<std::endl;
+    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num.num_] << "." <<std::endl;
   }
+
+  for (unsigned int counter = 1; counter < static_frames_.size(); counter ++)
+  {
+    CompactFrameID frame_id_num;
+    if(  getFrame(CompactFrameID(counter, true))->getData(ros::Time(), temp))
+      frame_id_num = temp.c_frame_id_;
+    else
+    {
+      frame_id_num = 0;
+    }
+    mstream << "Static frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num.num_] << "." <<std::endl;
+  }
+
   return mstream.str();
 }
 
@@ -930,33 +974,65 @@ std::string BufferCore::allFramesAsYAML() const
    //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
   {
-    unsigned int frame_id_num;
-    if(  getFrame(counter)->getData(ros::Time(), temp))
-      frame_id_num = temp.frame_id_num_;
+    CompactFrameID cfid = CompactFrameID(counter, true);
+    CompactFrameID frame_id_num;
+    if(  getFrame(cfid)->getData(ros::Time(), temp))
+      frame_id_num = temp.c_frame_id_;
     else
     {
       frame_id_num = 0;
     }
-    if (frame_id_num != 0)
+    if (frame_id_num.num_ != 0)
     {
       std::string authority = "no recorded authority";
-      std::map<unsigned int, std::string>::const_iterator it = frame_authority_.find(counter);
+      std::map<CompactFrameID, std::string>::const_iterator it = frame_authority_.find(cfid);
       if (it != frame_authority_.end())
         authority = it->second;
 
-      double rate = getFrame(counter)->getListLength() / std::max((getFrame(counter)->getLatestTimestamp().toSec() -
-                                                                   getFrame(counter)->getOldestTimestamp().toSec() ), 0.0001);
+      double rate = getFrame(cfid)->getListLength() / std::max((getFrame(cfid)->getLatestTimestamp().toSec() -
+                                                                   getFrame(cfid)->getOldestTimestamp().toSec() ), 0.0001);
 
       mstream << std::fixed; //fixed point notation
       mstream.precision(3); //3 decimal places
-      mstream << frameIDs_reverse[counter] << ": " << std::endl;
-      mstream << "  parent: '" << frameIDs_reverse[frame_id_num] << "'" << std::endl;
+      mstream << frameIDs_reverse[cfid.num_] << ": " << std::endl;
+      mstream << "  parent: '" << frameIDs_reverse[frame_id_num.num_] << "'" << std::endl;
       mstream << "  broadcaster: '" << authority << "'" << std::endl;
       mstream << "  rate: " << rate << std::endl;
-      mstream << "  most_recent_transform: " << (getFrame(counter)->getLatestTimestamp()).toSec() << std::endl;
-      mstream << "  oldest_transform: " << (getFrame(counter)->getOldestTimestamp()).toSec() << std::endl;
-      mstream << "  buffer_length: " << (getFrame(counter)->getLatestTimestamp()-getFrame(counter)->getOldestTimestamp()).toSec() << std::endl;
+      mstream << "  most_recent_transform: " << (getFrame(cfid)->getLatestTimestamp()).toSec() << std::endl;
+      mstream << "  oldest_transform: " << (getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
+      mstream << "  buffer_length: " << (getFrame(cfid)->getLatestTimestamp()-getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
     }
+  for (unsigned int counter = 1; counter < static_frames_.size(); counter ++)//one referenced for 0 is no frame
+  {
+    CompactFrameID cfid = CompactFrameID(counter, true);
+    CompactFrameID frame_id_num;
+    if(  getFrame(cfid)->getData(ros::Time(), temp))
+      frame_id_num = temp.c_frame_id_;
+    else
+    {
+      frame_id_num = 0;
+    }
+    if (frame_id_num.num_ != 0)
+    {
+      std::string authority = "no recorded authority";
+      std::map<CompactFrameID, std::string>::const_iterator it = frame_authority_.find(cfid);
+      if (it != frame_authority_.end())
+        authority = it->second;
+
+      double rate = getFrame(CompactFrameID(cfid))->getListLength() / std::max((getFrame(cfid)->getLatestTimestamp().toSec() -
+                                                                   getFrame(cfid)->getOldestTimestamp().toSec() ), 0.0001);
+
+      mstream << std::fixed; //fixed point notation
+      mstream.precision(3); //3 decimal places
+      mstream << frameIDs_reverse[cfid.num_] << ": " << std::endl;
+      mstream << "  parent: '" << frameIDs_reverse[frame_id_num.num_] << "'" << std::endl;
+      mstream << "  broadcaster: '" << authority << "'" << std::endl;
+      mstream << "  rate: " << rate << std::endl;
+      mstream << "  most_recent_transform: " << (getFrame(cfid)->getLatestTimestamp()).toSec() << std::endl;
+      mstream << "  oldest_transform: " << (getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
+      mstream << "  buffer_length: " << (getFrame(cfid)->getLatestTimestamp()-getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
+    }
+  }
   }
   return mstream.str();
 }

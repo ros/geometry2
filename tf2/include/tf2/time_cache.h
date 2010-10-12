@@ -43,13 +43,31 @@ namespace tf2
 {
 enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_FORWARD };
 
+class CompactFrameID
+{
+public:
+  CompactFrameID(unsigned int number, bool is_static = false):is_static_(is_static), num_(number) {};
+  CompactFrameID():is_static_(false), num_(0) {};
+  bool is_static_;
+  unsigned int num_;
+  bool operator==(const CompactFrameID& other) const { return ( (is_static_ == other.is_static_) && (num_ == other.num_));};
+  bool operator<(const CompactFrameID& other) const
+  { 
+    if (num_ < other.num_)
+      return true;
+    if (is_static_ && !other.is_static_)
+      return true;
+    return false;
+  };
+};
+
 /** \brief Storage for transforms and their parent */
 class  TransformStorage : public geometry_msgs::TransformStamped
 {
 public:
   TransformStorage(){};
-  TransformStorage(const geometry_msgs::TransformStamped& data, unsigned int frame_id_num): geometry_msgs::TransformStamped(data), frame_id_num_(frame_id_num){};
-  unsigned int frame_id_num_;
+  TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID c_frame_id): geometry_msgs::TransformStamped(data), c_frame_id_(c_frame_id){};
+  CompactFrameID c_frame_id_;
   ExtrapolationMode mode_;
 };
 

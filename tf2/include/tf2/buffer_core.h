@@ -216,15 +216,19 @@ private:
   /** \brief The pointers to potential frames that the tree can be made of.
    * The frames will be dynamically allocated at run time when set the first time. */
   std::vector< TimeCache*> frames_;
+  std::vector< StaticCache*> static_frames_;
+  
   /** \brief A mutex to protect testing and allocating new frames on the above vector. */
   boost::mutex frame_mutex_;
 
-  /** \brief A map from string frame ids to unsigned int */
-  std::map<std::string, unsigned int> frameIDs_;
-  /** \brief A map from unsigned int frame_id_numbers to string for debugging and output */
+  /** \brief A map from string frame ids to CompactFrameID */
+  std::map<std::string, CompactFrameID> frameIDs_;
+  /** \brief A map from CompactFrameID frame_id_numbers to string for debugging and output */
   std::vector<std::string> frameIDs_reverse;
+  /** \brief A map from CompactFrameID frame_id_numbers to string for debugging and output of static frames*/
+  std::vector<std::string> static_frameIDs_reverse;
   /** \brief A map to lookup the most recent authority for a given frame */
-  std::map<unsigned int, std::string> frame_authority_;
+  std::map<CompactFrameID, std::string> frame_authority_;
 
 
   /// How long to cache transform history
@@ -241,19 +245,19 @@ private:
    * This is an internal function which will get the pointer to the frame associated with the frame id
    * Possible Exception: tf::LookupException
    */
-  TimeCache* getFrame(unsigned int frame_number) const;
+  TimeCacheInterface* getFrame(CompactFrameID c_frame_id) const;
 
   /// String to number for frame lookup with dynamic allocation of new frames
-  unsigned int lookupFrameNumber(const std::string& frameid_str) const;
+  CompactFrameID lookupFrameNumber(const std::string& frameid_str) const;
 
   /// String to number for frame lookup with dynamic allocation of new frames
-  unsigned int lookupOrInsertFrameNumber(const std::string& frameid_str);
+  CompactFrameID lookupOrInsertFrameNumber(const std::string& frameid_str, bool is_static);
 
   ///Number to string frame lookup may throw LookupException if number invalid
-  std::string lookupFrameString(unsigned int frame_id_num) const;
+  std::string lookupFrameString(CompactFrameID frame_id_num) const;
 
   /** Find the list of connected frames necessary to connect two different frames */
-  int lookupLists(unsigned int target_frame, ros::Time time, unsigned int source_frame, TransformLists & lists, std::string* error_string) const;
+  int lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists & lists, std::string* error_string) const;
 
   bool test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
   bool test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;

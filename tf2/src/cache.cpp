@@ -60,7 +60,7 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns f
   }
   else if (num_nodes == 2)
   {
-    if( p_temp_1.frame_id_num_ == p_temp_2.frame_id_num_) 
+    if( p_temp_1.c_frame_id_ == p_temp_2.c_frame_id_) 
     {
       interpolate(p_temp_1, p_temp_2, time, data_out);
       data_out.mode_ = mode;
@@ -224,7 +224,7 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
   output.header.stamp = one.header.stamp;
   output.header.frame_id = one.header.frame_id;
   output.child_frame_id = one.child_frame_id;
-  output.frame_id_num_ = one.frame_id_num_;
+  output.c_frame_id_ = one.c_frame_id_;
 };
 
 void TimeCache::clearList() {   boost::mutex::scoped_lock lock(storage_lock_); storage_.clear(); };
