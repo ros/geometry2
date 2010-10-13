@@ -33,3 +33,7 @@ rosbuild_add_executable(test_listener test/listener_unittest.cpp)
 target_link_libraries(test_listener ${PROJECT_NAME})
 rosbuild_add_gtest_build_flags(test_listener)
 rosbuild_add_rostest(test/transform_listener_unittest.launch)
+
+
+rosbuild_add_executable(static_transform_publisher src/static_transform_broadcaster_program.cpp)
+target_link_libraries(static_transform_publisher ${PROJECT_NAME})
