@@ -40,7 +40,6 @@ namespace tf2 {
 TransformBroadcaster::TransformBroadcaster()
 {
   publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf", 100);
-  ros::NodeHandle l_nh("~");
 };
 
 void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped & msgtf)
@@ -50,13 +49,6 @@ void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped &
   sendTransform(v1);
 }
 
-/*void TransformBroadcaster::sendTransform(const StampedTransform & transform)
-{
-  std::vector<StampedTransform> v1;
-  v1.push_back(transform);
-  sendTransform(v1);
-} 
-*/
 
 void TransformBroadcaster::sendTransform(const std::vector<geometry_msgs::TransformStamped> & msgtf)
 {
@@ -67,21 +59,6 @@ void TransformBroadcaster::sendTransform(const std::vector<geometry_msgs::Transf
   }
   publisher_.publish(message);
 }
-/*
-void TransformBroadcaster::sendTransform(const std::vector<StampedTransform> & transforms)
-{
-  std::vector<geometry_msgs::TransformStamped> msgtfs;
-  for (std::vector<StampedTransform>::const_iterator it = transforms.begin(); it != transforms.end(); ++it)
-  {
-    geometry_msgs::TransformStamped msgtf;
-    transformStampedTFToMsg(*it, msgtf);
-    msgtfs.push_back(msgtf);
-
-  }
-  sendTransform(msgtfs);
-} 
-  
-*/
 
 
 }
