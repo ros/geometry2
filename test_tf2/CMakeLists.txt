@@ -38,3 +38,9 @@ rosbuild_add_executable(test_buffer_client test/test_buffer_client.cpp)
 rosbuild_add_gtest_build_flags(test_buffer_client)
 
 rosbuild_add_rostest(test/buffer_client_tester.launch)
+
+
+rosbuild_add_executable(test_static_publisher test/test_static_publisher.cpp)
+rosbuild_add_gtest_build_flags(test_static_publisher)
+
+rosbuild_add_rostest(test/static_publisher.launch)
