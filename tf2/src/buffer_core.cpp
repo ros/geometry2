@@ -853,8 +853,11 @@ std::string BufferCore::allFramesAsString() const
   ///regular transforms
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)
   {
+    TimeCacheInterface* frame_ptr = getFrame(CompactFrameID(counter));
+    if (frame_ptr == NULL)
+      continue;
     CompactFrameID frame_id_num;
-    if(  getFrame(CompactFrameID(counter))->getData(ros::Time(), temp))
+    if(  frame_ptr->getData(ros::Time(), temp))
       frame_id_num = temp.c_frame_id_;
     else
     {

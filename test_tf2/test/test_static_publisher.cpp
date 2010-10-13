@@ -41,15 +41,14 @@ TEST(StaticTranformPublsher, simple_test)
 {
   tf2::Buffer mB;
   tf2::TransformListener tfl(mB);
-  
-  EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(), ros::Duration(3.0)));
-  printf("frames: %s", mB.allFramesAsString().c_str());
+  EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(100), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(1000), ros::Duration(1.0)));
 };
 
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::Time::init(); //needed for ros::TIme::now()
   ros::init(argc, argv, "tf_unittest");
   return RUN_ALL_TESTS();
 }
