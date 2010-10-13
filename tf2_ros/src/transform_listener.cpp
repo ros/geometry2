@@ -58,6 +58,7 @@ TransformListener::~TransformListener()
 void TransformListener::init()
 {
   message_subscriber_tf_ = node_.subscribe<tf2_msgs::TFMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1)); ///\todo magic number
+  message_subscriber_tf_ = node_.subscribe<tf2_msgs::TFMessage>("/tf_static", 100, boost::bind(&TransformListener::static_subscription_callback, this, _1)); ///\todo magic number
   
   
   ros::NodeHandle local_nh("~");
@@ -69,9 +70,11 @@ void TransformListener::initWithThread()
 {
   using_dedicated_thread_ = true;
   ros::SubscribeOptions ops_tf = ros::SubscribeOptions::create<tf2_msgs::TFMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
-    
   message_subscriber_tf_ = node_.subscribe(ops_tf);
   
+  ros::SubscribeOptions ops_tf_static = ros::SubscribeOptions::create<tf2_msgs::TFMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
+  message_subscriber_tf_static_ = node_.subscribe(ops_tf_static);
+
   dedicated_listener_thread_ = new boost::thread(boost::bind(&TransformListener::dedicatedListenerThread, this));
 
   ros::NodeHandle local_nh("~");
@@ -81,6 +84,15 @@ void TransformListener::initWithThread()
 
 
 void TransformListener::subscription_callback(const tf2_msgs::TFMessageConstPtr& msg)
+{
+  subscription_callback_impl(msg, false);
+}
+void TransformListener::static_subscription_callback(const tf2_msgs::TFMessageConstPtr& msg)
+{
+  subscription_callback_impl(msg, true);
+}
+
+void TransformListener::subscription_callback_impl(const tf2_msgs::TFMessageConstPtr& msg, bool is_static)
 {
   ros::Duration ros_diff = ros::Time::now() - last_update_ros_time_;
   float ros_dt = ros_diff.toSec();
@@ -111,7 +123,7 @@ void TransformListener::subscription_callback(const tf2_msgs::TFMessageConstPtr&
 
     try
     {
-      buffer_.setTransform(msg_in.transforms[i], authority);
+      buffer_.setTransform(msg_in.transforms[i], authority, is_static);
     }
     
     catch (TransformException& ex)

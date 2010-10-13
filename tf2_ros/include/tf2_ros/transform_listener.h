@@ -61,11 +61,14 @@ private:
 
   /// Callback function for ros message subscriptoin
   void subscription_callback(const tf2_msgs::TFMessageConstPtr& msg);
+  void static_subscription_callback(const tf2_msgs::TFMessageConstPtr& msg);
+  void subscription_callback_impl(const tf2_msgs::TFMessageConstPtr& msg, bool is_static);
 
   ros::CallbackQueue tf_message_callback_queue_;
   boost::thread* dedicated_listener_thread_;
   ros::NodeHandle node_;
   ros::Subscriber message_subscriber_tf_;
+  ros::Subscriber message_subscriber_tf_static_;
   tf2::Buffer& buffer_;
   bool using_dedicated_thread_;
  
