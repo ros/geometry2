@@ -37,7 +37,7 @@
 #include "tf2_ros/transform_listener.h"
 
 
-TEST(StaticTranformPublsher, simple_test)
+TEST(StaticTranformPublsher, a_b_different_times)
 {
   tf2::Buffer mB;
   tf2::TransformListener tfl(mB);
@@ -46,6 +46,40 @@ TEST(StaticTranformPublsher, simple_test)
   EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(1000), ros::Duration(1.0)));
 };
 
+TEST(StaticTranformPublsher, a_c_different_times)
+{
+  tf2::Buffer mB;
+  tf2::TransformListener tfl(mB);
+  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(100), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(1000), ros::Duration(1.0)));
+};
+
+TEST(StaticTranformPublsher, a_d_different_times)
+{
+  tf2::Buffer mB;
+  tf2::TransformListener tfl(mB);
+  geometry_msgs::TransformStamped ts;
+  ts.transform.rotation.w = 1;
+  ts.header.frame_id = "c";
+  ts.header.stamp = ros::Time(10.0);
+  ts.child_frame_id = "d";
+  
+  // make sure listener has populated
+  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(100), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(1000), ros::Duration(1.0)));
+
+
+  mB.setTransform(ts, "authority");
+  //printf("%s\n", mB.allFramesAsString().c_str());
+  EXPECT_TRUE(mB.canTransform("c", "d", ros::Time(10), ros::Duration(0)));
+
+  EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(), ros::Duration(0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(10), ros::Duration(0)));
+  EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(100), ros::Duration(0)));
+
+};
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
