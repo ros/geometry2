@@ -94,16 +94,6 @@ void TransformListener::static_subscription_callback(const tf2_msgs::TFMessageCo
 
 void TransformListener::subscription_callback_impl(const tf2_msgs::TFMessageConstPtr& msg, bool is_static)
 {
-  ros::Duration ros_diff = ros::Time::now() - last_update_ros_time_;
-  float ros_dt = ros_diff.toSec();
-
-  if (ros_dt < 0.0)
-  {
-    ROS_WARN("Saw a negative time change of %f seconds, clearing the tf buffer.", ros_dt);
-    buffer_.clear();
-  }
-
-  last_update_ros_time_ = ros::Time::now();
 
   const tf2_msgs::TFMessage& msg_in = *msg;
   for (unsigned int i = 0; i < msg_in.transforms.size(); i++)

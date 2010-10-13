@@ -72,9 +72,6 @@ private:
   tf2::Buffer& buffer_;
   bool using_dedicated_thread_;
  
-  /// last time
-  ros::Time last_update_ros_time_;
-
   void dedicatedListenerThread()
   {
     while (using_dedicated_thread_)
