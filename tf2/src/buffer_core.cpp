@@ -752,13 +752,12 @@ bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, cons
 
 bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  std::stringstream ss;
-  ss << std::fixed;
-  ss.precision(3);
-
   if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.header.stamp - target_time > max_extrapolation_distance_)
   {
     if (error_string) {
+      std::stringstream ss;
+      ss << std::fixed;
+      ss.precision(3);
       ss << "Extrapolating into the past.  You requested a transform at time " << target_time.toSec() << " seconds \n"
          << "but the tf buffer only has a history of until " << tr.header.stamp.toSec()  << " seconds.\n";
       if ( max_extrapolation_distance_ > ros::Duration(0))
@@ -776,13 +775,13 @@ bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const Tra
 
 bool BufferCore::test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  std::stringstream ss;
-  ss << std::fixed;
-  ss.precision(3);
-
   if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time - tr.header.stamp > max_extrapolation_distance_)
   {
     if (error_string){
+      std::stringstream ss;
+      ss << std::fixed;
+      ss.precision(3);
+
       ss << "Extrapolating into the future.  You requested a transform that is at time" << target_time.toSec() << " seconds, \n"
          << "but the most recent transform in the tf buffer is at " << tr.header.stamp.toSec() << " seconds.\n";
       if ( max_extrapolation_distance_ > ros::Duration(0))
@@ -800,9 +799,6 @@ bool BufferCore::test_extrapolation_future(const ros::Time& target_time, const T
 
 bool BufferCore::test_extrapolation(const ros::Time& target_time, const TransformLists& lists, std::string * error_string) const
 {
-  std::stringstream ss;
-  ss << std::fixed;
-  ss.precision(3);
   for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
   {
     if (test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string)) return true;
