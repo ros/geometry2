@@ -724,15 +724,14 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
 
 bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  std::stringstream ss;
-  ss << std::fixed;
-  ss.precision(3);
-
   if (tr.mode_ == ONE_VALUE)
   {
     if (tr.header.stamp - target_time > max_extrapolation_distance_ || target_time - tr.header.stamp > max_extrapolation_distance_)
     {
       if (error_string) {
+        std::stringstream ss;
+        ss << std::fixed;
+        ss.precision(3);
         ss << "You requested a transform at time " << (target_time).toSec() 
            << ",\n but the tf buffer only contains a single transform " 
            << "at time " << tr.header.stamp.toSec() << ".\n";
