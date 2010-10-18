@@ -262,6 +262,7 @@ private:
 
   /** Find the list of connected frames necessary to connect two different frames */
   int lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists & lists, std::string* error_string) const;
+  int findCommonParent(CompactFrameID frame1, CompactFrameID frame2, ros::Time time, std::string* error_string);
 
   bool test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
   bool test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
@@ -271,6 +272,7 @@ private:
   /** Compute the transform based on the list of frames */
   btTransform computeTransformFromList(const TransformLists & list) const;
 
+  void createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const;
 
   /**@brief Return the latest rostime which is common across the spanning set
    * zero if fails to cross */

@@ -35,9 +35,18 @@
 #include <list>
 #include <boost/thread/mutex.hpp>
 
-#include "geometry_msgs/TransformStamped.h"
-
 #include <sstream>
+
+#include <LinearMath/btVector3.h>
+#include <LinearMath/btQuaternion.h>
+
+#include <ros/message_forward.h>
+#include <ros/time.h>
+
+namespace geometry_msgs
+{
+ROS_DECLARE_MESSAGE(TransformStamped);
+}
 
 namespace tf2
 {
@@ -48,9 +57,9 @@ class CompactFrameID
 public:
   CompactFrameID(unsigned int number): num_(number) {};
   CompactFrameID(): num_(0) {};
-  virtual ~CompactFrameID(){};
   unsigned int num_;
   bool operator==(const CompactFrameID& other) const { return ( num_ == other.num_);};
+  bool operator!=(const CompactFrameID& other) const { return !(*this == other); }
   bool operator<(const CompactFrameID& other) const
   { 
     if (num_ < other.num_)
@@ -60,12 +69,16 @@ public:
 };
 
 /** \brief Storage for transforms and their parent */
-class  TransformStorage : public geometry_msgs::TransformStamped
+class  TransformStorage
 {
 public:
-  TransformStorage(){};
-  TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID c_frame_id): geometry_msgs::TransformStamped(data), c_frame_id_(c_frame_id){};
-  CompactFrameID c_frame_id_;
+  TransformStorage();
+  TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID frame_id, CompactFrameID child_frame_id);
+  btQuaternion rotation_;
+  btVector3 translation_;
+  ros::Time stamp_;
+  CompactFrameID frame_id_;
+  CompactFrameID child_frame_id_;
   ExtrapolationMode mode_;
 };
 

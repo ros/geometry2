@@ -42,7 +42,7 @@ bool StaticCache::getData(ros::Time time, TransformStorage & data_out) //returns
 {
   boost::mutex::scoped_lock lock(storage_lock_);
   data_out = storage_;
-  data_out.header.stamp = time;
+  data_out.stamp_ = time;
   return true;
 };
 

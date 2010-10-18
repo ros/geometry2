@@ -33,9 +33,25 @@
 #include "tf2/exceptions.h"
 
 #include "LinearMath/btTransform.h"
-
+#include <geometry_msgs/TransformStamped.h>
 
 using namespace tf2;
+
+TransformStorage::TransformStorage()
+{
+}
+
+TransformStorage::TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID frame_id,
+                                   CompactFrameID child_frame_id)
+: stamp_(data.header.stamp)
+, frame_id_(frame_id)
+, child_frame_id_(child_frame_id)
+{
+  const geometry_msgs::Quaternion& o = data.transform.rotation;
+  rotation_ = btQuaternion(o.x, o.y, o.z, o.w);
+  const geometry_msgs::Vector3& v = data.transform.translation;
+  translation_ = btVector3(v.x, v.y, v.z);
+}
 
 TimeCache::TimeCache( ros::Duration  max_storage_time,
                      ros::Duration max_extrapolation_time):
@@ -60,7 +76,7 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns f
   }
   else if (num_nodes == 2)
   {
-    if( p_temp_1.c_frame_id_ == p_temp_2.c_frame_id_) 
+    if( p_temp_1.frame_id_ == p_temp_2.frame_id_)
     {
       interpolate(p_temp_1, p_temp_2, time, data_out);
       data_out.mode_ = mode;
@@ -77,32 +93,31 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns f
 };
 
 bool TimeCache::insertData(const TransformStorage& new_data)
-  {
-    
-    boost::mutex::scoped_lock lock(storage_lock_);
-    
-    std::list<TransformStorage >::iterator storage_it = storage_.begin();
-    
-    if(storage_it != storage_.end())
-    {
-      if (storage_it->header.stamp > new_data.header.stamp + max_storage_time_)
-      {
-        return false;
-      }
-    }
-    
-    
-    while(storage_it != storage_.end())
-    {
-      if (storage_it->header.stamp <= new_data.header.stamp)
-        break;
-      storage_it++;
-    }
-    storage_.insert(storage_it, new_data);
+{
+  boost::mutex::scoped_lock lock(storage_lock_);
 
-    pruneList();
-    return true;
-  };
+  std::list<TransformStorage >::iterator storage_it = storage_.begin();
+
+  if(storage_it != storage_.end())
+  {
+    if (storage_it->stamp_ > new_data.stamp_ + max_storage_time_)
+    {
+      return false;
+    }
+  }
+
+
+  while(storage_it != storage_.end())
+  {
+    if (storage_it->stamp_ <= new_data.stamp_)
+      break;
+    storage_it++;
+  }
+  storage_.insert(storage_it, new_data);
+
+  pruneList();
+  return true;
+};
 
 
 uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, ExtrapolationMode& mode)
@@ -134,7 +149,7 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
   std::list<TransformStorage >::iterator storage_it = storage_.begin();
   while(storage_it != storage_.end())
   {
-    if (storage_it->header.stamp <= target_time)
+    if (storage_it->stamp_ <= target_time)
       break;
     storage_it++;
   }
@@ -149,8 +164,8 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
     {
       std::stringstream ss;
       ss << "Extrapolation Too Far in the future: target_time = "<< (target_time).toSec() <<", closest data at "
-         << (one.header.stamp).toSec() << " and " << (two.header.stamp).toSec() <<" which are farther away than max_extrapolation_time "
-         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.header.stamp).toSec()<< " and " << (target_time - two.header.stamp).toSec() <<" respectively.";
+         << (one.stamp_).toSec() << " and " << (two.stamp_).toSec() <<" which are farther away than max_extrapolation_time "
+         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.stamp_).toSec()<< " and " << (target_time - two.stamp_).toSec() <<" respectively.";
       throw ExtrapolationException(ss.str());
     }
     */
@@ -164,13 +179,13 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
     two = *(--storage_it);
     mode = EXTRAPOLATE_BACK;
     /*
-      time_diff = target_time - one.header.stamp;
+      time_diff = target_time - one.stamp_;
     if (time_diff < ros::Duration()-max_extrapolation_time_) //Guarenteed in the past ///\todo check negative sign
     {
       std::stringstream ss;
       ss << "Extrapolation Too Far in the past: target_time = "<< (target_time).toSec() <<", closest data at "
-         << (one.header.stamp).toSec() << " and " << (two.header.stamp).toSec() <<" which are farther away than max_extrapolation_time "
-         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.header.stamp).toSec()<< " and " << (target_time - two.header.stamp).toSec() <<" respectively."; //sign flip since in the past
+         << (one.stamp_).toSec() << " and " << (two.stamp_).toSec() <<" which are farther away than max_extrapolation_time "
+         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.stamp_).toSec()<< " and " << (target_time - two.stamp_).toSec() <<" respectively."; //sign flip since in the past
       throw ExtrapolationException(ss.str());
     }
     */
@@ -190,41 +205,28 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
 { 
 
   // Check for zero distance case 
-  if( two.header.stamp == one.header.stamp )
+  if( two.stamp_ == one.stamp_ )
   {
     output = two;
     return;    
   }
   //Calculate the ratio
-  btScalar ratio = ((time - one.header.stamp).toSec()) / ((two.header.stamp - one.header.stamp).toSec());
+  btScalar ratio = ((time - one.stamp_).toSec()) / ((two.stamp_ - one.stamp_).toSec());
   
   //Interpolate translation
   btVector3 v(0,0,0); //initialzed to fix uninitialized warning, not actually necessary
-  v.setInterpolate3(btVector3(one.transform.translation.x, one.transform.translation.y, one.transform.translation.z), btVector3(two.transform.translation.x, two.transform.translation.y, two.transform.translation.z), ratio);
-  output.transform.translation.x = v.getX();
-  output.transform.translation.y = v.getY();
-  output.transform.translation.z = v.getZ();
+  v.setInterpolate3(one.translation_, two.translation_, ratio);
+  output.translation_ = v;
   
   //Interpolate rotation
-  btQuaternion q1(one.transform.rotation.x, 
-                  one.transform.rotation.y, 
-                  one.transform.rotation.z, 
-                  one.transform.rotation.w);
-  
-  btQuaternion q2(two.transform.rotation.x, 
-                  two.transform.rotation.y, 
-                  two.transform.rotation.z, 
-                  two.transform.rotation.w);
+  btQuaternion q1(one.rotation_);
+  btQuaternion q2(two.rotation_);
   btQuaternion out;
   out = slerp( q1, q2 , ratio);
-  output.transform.rotation.x = out.getX();
-  output.transform.rotation.y = out.getY();
-  output.transform.rotation.z = out.getZ();
-  output.transform.rotation.w = out.getW();
-  output.header.stamp = one.header.stamp;
-  output.header.frame_id = one.header.frame_id;
-  output.child_frame_id = one.child_frame_id;
-  output.c_frame_id_ = one.c_frame_id_;
+  output.rotation_ = out;
+  output.stamp_ = one.stamp_;
+  output.frame_id_ = one.frame_id_;
+  output.child_frame_id_ = one.child_frame_id_;
 };
 
 void TimeCache::clearList() {   boost::mutex::scoped_lock lock(storage_lock_); storage_.clear(); };
@@ -236,21 +238,21 @@ ros::Time TimeCache::getLatestTimestamp()
 {   
   boost::mutex::scoped_lock lock(storage_lock_); 
   if (storage_.empty()) return ros::Time(); //empty list case
-  return storage_.front().header.stamp; 
+  return storage_.front().stamp_;
 };
 
 ros::Time TimeCache::getOldestTimestamp() 
 {   
   boost::mutex::scoped_lock lock(storage_lock_); 
   if (storage_.empty()) return ros::Time(); //empty list case
-  return storage_.back().header.stamp; 
+  return storage_.back().stamp_;
 };
 
 void TimeCache::pruneList()
 {
-  ros::Time latest_time = storage_.begin()->header.stamp;
+  ros::Time latest_time = storage_.begin()->stamp_;
   
-  while(!storage_.empty() && storage_.back().header.stamp + max_storage_time_ < latest_time)
+  while(!storage_.empty() && storage_.back().stamp_ + max_storage_time_ < latest_time)
   {
     storage_.pop_back();
   }

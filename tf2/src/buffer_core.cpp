@@ -228,7 +228,7 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
     frame = allocateFrame(frame_number, is_static);
   
     
-  if (frame->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id))))
+  if (frame->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id), frame_number)))
   {
     frame_authority_[frame_number] = authority;
   }
@@ -532,6 +532,16 @@ std::string BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
       return frameIDs_reverse[frame_id_num.num_];
 };
 
+void BufferCore::createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const
+{
+  if (!out)
+  {
+    return;
+  }
+  *out = std::string("Could not find a connection between '"+lookupFrameString(target_frame)+"' and '"+
+                     lookupFrameString(source_frame)+"' because they are not part of the same tree."+
+                     "Tf has two or more unconnected trees.");
+}
 
 int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists& lists, std::string * error_string) const
 {
@@ -576,7 +586,7 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
       }
       lists.inverseTransforms.push_back(temp);
 
-      frame = temp.c_frame_id_;
+      frame = temp.frame_id_;
 
 
       /* Check if we've gone too deep.  A loop in the tree would cause this */
@@ -624,7 +634,7 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
         break;
       }
       lists.forwardTransforms.push_back(temp);
-      frame = temp.c_frame_id_;
+      frame = temp.frame_id_;
 
       /* Check if we've gone too deep.  A loop in the tree would cause this*/
       if (counter++ > MAX_GRAPH_DEPTH){
@@ -643,21 +653,18 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
   std::cerr << "Side B " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
   */
 
-  std::string connectivity_error("Could not find a connection between '"+lookupFrameString(target_frame)+"' and '"+
-                                 lookupFrameString(source_frame)+"' because they are not part of the same tree."+
-                                 "Tf has two or more unconnected trees.");
   /* Check the zero length cases*/
   if (lists.inverseTransforms.size() == 0)
   {
     if (lists.forwardTransforms.size() == 0) //If it's going to itself it's already been caught
     {
-      if (error_string) *error_string = connectivity_error;
+      createConnectivityErrorString(source_frame, target_frame, error_string);
       return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
     }
 
     if (! (last_forward == source_frame) )  //\todo match with case A
     {
-      if (error_string) *error_string = connectivity_error;
+      createConnectivityErrorString(source_frame, target_frame, error_string);
       return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
     }
     else return 0;
@@ -667,13 +674,13 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
   {
     if (lists.inverseTransforms.size() == 0)  //If it's going to itself it's already been caught
     {//\todo remove THis is the same as case D
-      if (error_string) *error_string = connectivity_error;
+      createConnectivityErrorString(source_frame, target_frame, error_string);
       return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
     }
 
-    if (!(lookupFrameNumber(lists.inverseTransforms.back().header.frame_id) == target_frame))
+    if (lists.inverseTransforms.back().frame_id_ != target_frame)
     {
-      if (error_string) *error_string = connectivity_error;
+      createConnectivityErrorString(source_frame, target_frame, error_string);
       return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
     }
     else return 0;
@@ -684,15 +691,15 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
   /* Make sure the end of the search shares a parent. */
   if (!(last_forward == last_inverse))
   {
-    if (error_string) *error_string = connectivity_error;
+    createConnectivityErrorString(source_frame, target_frame, error_string);
     return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
   }
   /* Make sure that we don't have a no parent at the top */
     {
-    if (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id) == 0 || lookupFrameNumber( lists.forwardTransforms.back().child_frame_id) == 0)
+    if (lists.inverseTransforms.back().child_frame_id_ == 0 || lists.forwardTransforms.back().child_frame_id_ == 0)
     {
       //if (error_string) *error_string = "NO_PARENT at top of tree";
-      if (error_string) *error_string = connectivity_error;
+      createConnectivityErrorString(source_frame, target_frame, error_string);
       return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
     }
 
@@ -701,7 +708,7 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
       std::cerr << "Base Cases done" <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
     */
 
-    while (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id) == lookupFrameNumber(lists.forwardTransforms.back().child_frame_id))
+    while (lists.inverseTransforms.back().child_frame_id_ == lists.forwardTransforms.back().child_frame_id_)
     {
       lists.inverseTransforms.pop_back();
       lists.forwardTransforms.pop_back();
@@ -726,7 +733,7 @@ bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, cons
 {
   if (tr.mode_ == ONE_VALUE)
   {
-    if (tr.header.stamp - target_time > max_extrapolation_distance_ || target_time - tr.header.stamp > max_extrapolation_distance_)
+    if (tr.stamp_ - target_time > max_extrapolation_distance_ || target_time - tr.stamp_ > max_extrapolation_distance_)
     {
       if (error_string) {
         std::stringstream ss;
@@ -734,7 +741,7 @@ bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, cons
         ss.precision(3);
         ss << "You requested a transform at time " << (target_time).toSec() 
            << ",\n but the tf buffer only contains a single transform " 
-           << "at time " << tr.header.stamp.toSec() << ".\n";
+           << "at time " << tr.stamp_.toSec() << ".\n";
         if ( max_extrapolation_distance_ > ros::Duration(0))
         {
           ss << "The tf extrapollation distance is set to " 
@@ -751,14 +758,14 @@ bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, cons
 
 bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.header.stamp - target_time > max_extrapolation_distance_)
+  if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.stamp_ - target_time > max_extrapolation_distance_)
   {
     if (error_string) {
       std::stringstream ss;
       ss << std::fixed;
       ss.precision(3);
       ss << "Extrapolating into the past.  You requested a transform at time " << target_time.toSec() << " seconds \n"
-         << "but the tf buffer only has a history of until " << tr.header.stamp.toSec()  << " seconds.\n";
+         << "but the tf buffer only has a history of until " << tr.stamp_.toSec()  << " seconds.\n";
       if ( max_extrapolation_distance_ > ros::Duration(0))
       {
         ss << "The tf extrapollation distance is set to " 
@@ -774,7 +781,7 @@ bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const Tra
 
 bool BufferCore::test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time - tr.header.stamp > max_extrapolation_distance_)
+  if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time - tr.stamp_ > max_extrapolation_distance_)
   {
     if (error_string){
       std::stringstream ss;
@@ -782,7 +789,7 @@ bool BufferCore::test_extrapolation_future(const ros::Time& target_time, const T
       ss.precision(3);
 
       ss << "Extrapolating into the future.  You requested a transform that is at time" << target_time.toSec() << " seconds, \n"
-         << "but the most recent transform in the tf buffer is at " << tr.header.stamp.toSec() << " seconds.\n";
+         << "but the most recent transform in the tf buffer is at " << tr.stamp_.toSec() << " seconds.\n";
       if ( max_extrapolation_distance_ > ros::Duration(0))
       {
         ss << "The tf extrapollation distance is set to " 
@@ -823,13 +830,17 @@ btTransform BufferCore::computeTransformFromList(const TransformLists & lists) c
   retTrans.setIdentity();
   ///@todo change these to iterators
   for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
-    {
-      retTrans *= transformMsgToBT((lists.inverseTransforms[lists.inverseTransforms.size() -1 - i]).transform); //Reverse to get left multiply
-    }
+  {
+    const TransformStorage& ts = lists.inverseTransforms[lists.inverseTransforms.size() -1 - i];
+    btTransform transform(ts.rotation_, ts.translation_);
+    retTrans *= transform; //Reverse to get left multiply
+  }
   for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
-    {
-      retTrans = transformMsgToBT((lists.forwardTransforms[lists.forwardTransforms.size() -1 - i]).transform).inverse() * retTrans; //Do this list backwards(from backwards) for it was generated traveling the wrong way
-    }
+  {
+    const TransformStorage& ts = lists.forwardTransforms[lists.forwardTransforms.size() -1 - i];
+    btTransform transform(ts.rotation_, ts.translation_);
+    retTrans = transform.inverse() * retTrans; //Do this list backwards(from backwards) for it was generated traveling the wrong way
+  }
 
   return retTrans;
 }
@@ -853,7 +864,7 @@ std::string BufferCore::allFramesAsString() const
       continue;
     CompactFrameID frame_id_num;
     if(  frame_ptr->getData(ros::Time(), temp))
-      frame_id_num = temp.c_frame_id_;
+      frame_id_num = temp.frame_id_;
     else
     {
       frame_id_num = 0;
@@ -866,6 +877,12 @@ std::string BufferCore::allFramesAsString() const
 
 int BufferCore::getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time & time, std::string * error_string) const
 {
+  if (source == dest)
+  {
+    //Set time to latest timestamp of frameid in case of target and source frame id are the same
+    time = ros::Time();                 ///\todo review was now();
+    return tf2_msgs::TF2Error::NO_ERROR;
+  }
 
   time = ros::Time(ros::TIME_MAX);
   int retval;
@@ -875,22 +892,15 @@ int BufferCore::getLatestCommonTime(const std::string& source, const std::string
   }
   if (retval == tf2_msgs::TF2Error::NO_ERROR)
   {
-    //Set time to latest timestamp of frameid in case of target and source frame id are the same
-    if (lists.inverseTransforms.size() == 0 && lists.forwardTransforms.size() == 0)
-    {
-      time = ros::Time(); ///\todo review was now();
-      return retval;
-    }
-
     for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
     {
-      if (time > lists.inverseTransforms[i].header.stamp)
-        time = lists.inverseTransforms[i].header.stamp;
+      if (time > lists.inverseTransforms[i].stamp_)
+        time = lists.inverseTransforms[i].stamp_;
     }
     for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
     {
-      if (time > lists.forwardTransforms[i].header.stamp)
-        time = lists.forwardTransforms[i].header.stamp;
+      if (time > lists.forwardTransforms[i].stamp_)
+        time = lists.forwardTransforms[i].stamp_;
     }
 
   }
@@ -919,7 +929,7 @@ std::string BufferCore::allFramesAsYAML() const
     CompactFrameID cfid = CompactFrameID(counter);
     CompactFrameID frame_id_num;
     if(  getFrame(cfid)->getData(ros::Time(), temp))
-      frame_id_num = temp.c_frame_id_;
+      frame_id_num = temp.frame_id_;
     else
     {
       frame_id_num = 0;
