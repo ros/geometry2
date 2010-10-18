@@ -733,9 +733,13 @@ bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, cons
 {
   if (tr.mode_ == ONE_VALUE)
   {
-    if (tr.stamp_ - target_time > max_extrapolation_distance_ || target_time - tr.stamp_ > max_extrapolation_distance_)
+    double stamp = tr.stamp_.toSec();
+    double target = target_time.toSec();
+    double max_dist = max_extrapolation_distance_.toSec();
+    if (stamp - target > max_dist || target - stamp > max_dist)
     {
-      if (error_string) {
+      if (error_string)
+      {
         std::stringstream ss;
         ss << std::fixed;
         ss.precision(3);
