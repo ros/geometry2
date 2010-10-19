@@ -74,8 +74,6 @@ public:
 
   /** @brief Get the oldest timestamp cached */
   virtual ros::Time getOldestTimestamp()=0;
-  
-
 };
 
 

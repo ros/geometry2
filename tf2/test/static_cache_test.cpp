@@ -65,7 +65,7 @@ TEST(StaticCache, Repeatability)
 
     
     cache.getData(ros::Time().fromNSec(i), stor);
-    EXPECT_EQ(stor.frame_id_.num_, i);
+    EXPECT_EQ(stor.frame_id_, i);
     EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
     
   }

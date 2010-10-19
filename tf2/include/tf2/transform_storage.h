@@ -37,6 +37,7 @@
 
 #include <ros/message_forward.h>
 #include <ros/time.h>
+#include <ros/types.h>
 
 namespace geometry_msgs
 {
@@ -47,21 +48,7 @@ namespace tf2
 {
 enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_FORWARD };
 
-class CompactFrameID
-{
-public:
-  CompactFrameID(unsigned int number): num_(number) {};
-  CompactFrameID(): num_(0) {};
-  unsigned int num_;
-  bool operator==(const CompactFrameID& other) const { return ( num_ == other.num_);};
-  bool operator!=(const CompactFrameID& other) const { return !(*this == other); }
-  bool operator<(const CompactFrameID& other) const
-  {
-    if (num_ < other.num_)
-      return true;
-    return false;
-  };
-};
+typedef uint32_t CompactFrameID;
 
 /** \brief Storage for transforms and their parent */
 class  TransformStorage
