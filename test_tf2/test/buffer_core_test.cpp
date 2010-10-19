@@ -69,8 +69,10 @@ void setIdentity(geometry_msgs::Transform& trans)
 
 void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & time, const ros::Duration& interpolation_space = ros::Duration())
 {
-
+  ROS_DEBUG("Clearing Buffer Core for new test setup");
   mBC.clear();
+
+  ROS_DEBUG("Setting up test tree for formation %s", mode.c_str());
 
   if (mode == "i")
   {
@@ -149,7 +151,9 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
       setIdentity(ts.transform);
       ts.transform.translation.x = sqrt(2)/2 - 1;
       ts.transform.translation.y = sqrt(2)/2;
-      ts.transform.rotation.x = sin(M_PI/8);
+      ts.transform.rotation.x = 0;
+      ts.transform.rotation.y = 0;
+      ts.transform.rotation.z = sin(M_PI/8);
       ts.transform.rotation.w = cos(M_PI/8);
       if (time > ros::Time() + (interpolation_space * .5))
         ts.header.stamp = time - (interpolation_space * .5);
@@ -672,6 +676,171 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
     else
     {
       EXPECT_FALSE("Shouldn't get here");
+      printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
+    }
+    
+  }
+}
+
+TEST(BufferCore_lookupTransform, ring_45_configuration)
+{
+  double epsilon = 1e-6;
+  
+
+
+  rostest::Permuter permuter;
+
+  std::vector<ros::Time> times;
+  times.push_back(ros::Time(1.0));
+  times.push_back(ros::Time(10.0));
+  times.push_back(ros::Time(0.0));
+  ros::Time eval_time;
+  permuter.addOptionSet(times, &eval_time);
+
+  std::vector<ros::Duration> durations;
+  durations.push_back(ros::Duration(1.0));
+  durations.push_back(ros::Duration(0.001));
+  durations.push_back(ros::Duration(0.1));
+  ros::Duration interpolation_space;
+  //  permuter.addOptionSet(durations, &interpolation_space);
+
+  std::vector<std::string> source_frames;
+  source_frames.push_back("a");
+  source_frames.push_back("b");
+  source_frames.push_back("c");
+  std::string source_frame;
+  permuter.addOptionSet(source_frames, &source_frame);
+  
+  std::vector<std::string> target_frames;
+  target_frames.push_back("a");
+  target_frames.push_back("b");
+  target_frames.push_back("c");
+  std::string target_frame;
+  permuter.addOptionSet(target_frames, &target_frame);
+
+  while  (permuter.step())
+  {
+
+    tf2::BufferCore mBC;
+    setupTree(mBC, "ring_45", eval_time, interpolation_space);
+
+    geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
+
+
+    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
+    EXPECT_EQ(outpose.header.stamp, eval_time);
+    EXPECT_EQ(outpose.header.frame_id, source_frame);
+    EXPECT_EQ(outpose.child_frame_id, target_frame);
+
+
+    
+    //Zero distance or all the way
+    if (source_frame == target_frame               ||
+        source_frame == "a" && target_frame == "i" ||
+        source_frame == "a" && target_frame == "i" )
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
+    }
+    // Chaining 1
+    else if ((source_frame == "a" && target_frame =="b") ||
+             (source_frame == "b" && target_frame =="c") ||
+             (source_frame == "c" && target_frame =="d") ||
+             (source_frame == "d" && target_frame =="e") ||
+             (source_frame == "e" && target_frame =="f") ||
+             (source_frame == "f" && target_frame =="g") ||
+             (source_frame == "g" && target_frame =="h") ||
+             (source_frame == "h" && target_frame =="i")
+             )
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
+      EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI/8), epsilon);
+    }
+    // Inverse Chaining 1
+    else if ((source_frame == "b" && target_frame =="a") ||
+             (source_frame == "c" && target_frame =="b") ||
+             (source_frame == "d" && target_frame =="c") ||
+             (source_frame == "e" && target_frame =="d") ||
+             (source_frame == "f" && target_frame =="e") ||
+             (source_frame == "g" && target_frame =="f") ||
+             (source_frame == "h" && target_frame =="g") ||
+             (source_frame == "i" && target_frame =="h")
+             )
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.y, -sqrt(2)/2 , epsilon);
+      EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI/8), epsilon);
+    }
+    // Chaining 2
+    else if ((source_frame == "a" && target_frame =="c") ||
+             (source_frame == "b" && target_frame =="d") ||
+             (source_frame == "c" && target_frame =="e") ||
+             (source_frame == "d" && target_frame =="f") ||
+             (source_frame == "e" && target_frame =="g") ||
+             (source_frame == "f" && target_frame =="h") ||
+             (source_frame == "g" && target_frame =="i")
+             )
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.y, 1 , epsilon);
+      EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI/4), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI/4), epsilon);
+    }
+    // Inverse Chaining 2
+    else if ((source_frame == "c" && target_frame =="a") ||
+             (source_frame == "d" && target_frame =="b") ||
+             (source_frame == "e" && target_frame =="c") ||
+             (source_frame == "f" && target_frame =="d") ||
+             (source_frame == "g" && target_frame =="e") ||
+             (source_frame == "h" && target_frame =="f") ||
+             (source_frame == "i" && target_frame =="g")
+             )
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.y, -1 , epsilon);
+      EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI/4), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI/4), epsilon);
+    }
+    // Chaining 3
+    else if ((source_frame == "a" && target_frame =="d") ||
+             (source_frame == "b" && target_frame =="e") ||
+             (source_frame == "c" && target_frame =="f") ||
+             (source_frame == "d" && target_frame =="g") ||
+             (source_frame == "e" && target_frame =="h") ||
+             (source_frame == "f" && target_frame =="i")
+             )
+    {
+      EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2)/2, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
+      EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI*3/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI*3/8), epsilon);
+    }
+    else
+    {
+      //EXPECT_FALSE("Shouldn't get here");
       printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
     }
     
