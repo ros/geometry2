@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
+ * Copyright (c) 2010, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,43 +29,55 @@
 
 /** \author Tully Foote */
 
-#include "tf2/time_cache.h"
-#include "tf2/exceptions.h"
+#ifndef TF2_TRANSFORM_STORAGE_H
+#define TF2_TRANSFORM_STORAGE_H
 
-#include "LinearMath/btTransform.h"
+#include <LinearMath/btVector3.h>
+#include <LinearMath/btQuaternion.h>
 
+#include <ros/message_forward.h>
+#include <ros/time.h>
 
-using namespace tf2;
-
-
-bool StaticCache::getData(ros::Time time, TransformStorage & data_out) //returns false if data not available
+namespace geometry_msgs
 {
-  data_out = storage_;
-  data_out.stamp_ = time;
-  return true;
-};
+ROS_DECLARE_MESSAGE(TransformStamped);
+}
 
-bool StaticCache::insertData(const TransformStorage& new_data)
+namespace tf2
 {
-  storage_ = new_data;
-  return true;
+enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_FORWARD };
+
+class CompactFrameID
+{
+public:
+  CompactFrameID(unsigned int number): num_(number) {};
+  CompactFrameID(): num_(0) {};
+  unsigned int num_;
+  bool operator==(const CompactFrameID& other) const { return ( num_ == other.num_);};
+  bool operator!=(const CompactFrameID& other) const { return !(*this == other); }
+  bool operator<(const CompactFrameID& other) const
+  {
+    if (num_ < other.num_)
+      return true;
+    return false;
+  };
 };
 
-
-
-
-void StaticCache::clearList() { return; };
-
-unsigned int StaticCache::getListLength() {   return 1; };
-
-
-ros::Time StaticCache::getLatestTimestamp() 
-{   
-  return ros::Time();
+/** \brief Storage for transforms and their parent */
+class  TransformStorage
+{
+public:
+  TransformStorage();
+  TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID frame_id, CompactFrameID child_frame_id);
+  btQuaternion rotation_;
+  btVector3 translation_;
+  ros::Time stamp_;
+  CompactFrameID frame_id_;
+  CompactFrameID child_frame_id_;
+  ExtrapolationMode mode_;
 };
 
-ros::Time StaticCache::getOldestTimestamp() 
-{   
-  return ros::Time();
-};
+}
+
+#endif // TF2_TRANSFORM_STORAGE_H
 

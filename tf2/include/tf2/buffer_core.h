@@ -32,6 +32,8 @@
 #ifndef TF2_BUFFER_CORE_H
 #define TF2_BUFFER_CORE_H
 
+#include "transform_storage.h"
+
 #include <string>
 
 #include "ros/duration.h"
@@ -40,14 +42,16 @@
 #include "geometry_msgs/TransformStamped.h"
 #include "LinearMath/btTransform.h"
 
-#include "tf2/time_cache.h"
 //////////////////////////backwards startup for porting
 //#include "tf/tf.h"
 
 #include <boost/unordered_map.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace tf2
 {
+
+class TimeCacheInterface;
 
 /** \brief An internal representation of transform chains
  *

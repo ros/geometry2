@@ -36,6 +36,8 @@
 
 #include <geometry_msgs/TransformStamped.h>
 
+#include <cmath>
+
 std::vector<double> values;
 unsigned int step = 0;
 

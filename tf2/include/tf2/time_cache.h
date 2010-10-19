@@ -32,8 +32,9 @@
 #ifndef TF2_TIME_CACHE_H
 #define TF2_TIME_CACHE_H
 
+#include "transform_storage.h"
+
 #include <list>
-#include <boost/thread/mutex.hpp>
 
 #include <sstream>
 
@@ -50,38 +51,6 @@ ROS_DECLARE_MESSAGE(TransformStamped);
 
 namespace tf2
 {
-enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_FORWARD };
-
-class CompactFrameID
-{
-public:
-  CompactFrameID(unsigned int number): num_(number) {};
-  CompactFrameID(): num_(0) {};
-  unsigned int num_;
-  bool operator==(const CompactFrameID& other) const { return ( num_ == other.num_);};
-  bool operator!=(const CompactFrameID& other) const { return !(*this == other); }
-  bool operator<(const CompactFrameID& other) const
-  { 
-    if (num_ < other.num_)
-      return true;
-    return false;
-  };
-};
-
-/** \brief Storage for transforms and their parent */
-class  TransformStorage
-{
-public:
-  TransformStorage();
-  TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID frame_id, CompactFrameID child_frame_id);
-  btQuaternion rotation_;
-  btVector3 translation_;
-  ros::Time stamp_;
-  CompactFrameID frame_id_;
-  CompactFrameID child_frame_id_;
-  ExtrapolationMode mode_;
-};
-
 
 class TimeCacheInterface
 {
@@ -199,8 +168,6 @@ class StaticCache : public TimeCacheInterface
 
 private:
   TransformStorage  storage_;
-
-  boost::mutex storage_lock_;  ///!< The mutex to protect the linked list
 };
 
 }
