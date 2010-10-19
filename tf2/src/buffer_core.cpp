@@ -130,18 +130,20 @@ bool BufferCore::warnFrameId(const std::string& function_name_arg, const std::st
 
 void BufferCore::validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const
 {
-  if (frame_id.size() == 0)
+  if (frame_id.empty())
   {
     std::stringstream ss;
     ss << "Invalid argument passed to "<< function_name_arg <<" in tf2 frame_ids cannot be empty";
     throw tf2::InvalidArgumentException(ss.str().c_str());
   }
+
   if (startsWithSlash(frame_id))
   {
     std::stringstream ss;
     ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
     throw tf2::InvalidArgumentException(ss.str().c_str());
   }
+
   if (lookupFrameNumber(frame_id) == CompactFrameID(0))
   {
     std::stringstream ss;
@@ -151,7 +153,8 @@ void BufferCore::validateFrameId(const std::string& function_name_arg, const std
   
 };
 
-BufferCore::BufferCore(ros::Duration cache_time) : cache_time_(cache_time)//: old_tf_(true, cache_time)
+BufferCore::BufferCore(ros::Duration cache_time)
+: cache_time_(cache_time)
 {
   max_extrapolation_distance_.fromNSec(DEFAULT_MAX_EXTRAPOLATION_DISTANCE);
   frameIDs_["NO_PARENT"] = 0;
@@ -253,15 +256,15 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
 
 TimeCacheInterface* BufferCore::allocateFrame(CompactFrameID cfid, bool is_static)
 {
-  TimeCacheInterface* frame_ptr = frames_[cfid.num_];
+  TimeCacheInterface* frame_ptr = frames_[cfid];
   if ( frame_ptr != NULL)
     delete frame_ptr;
   if (is_static)
-    frames_[cfid.num_] = new StaticCache();
+    frames_[cfid] = new StaticCache();
   else
-    frames_[cfid.num_] = new TimeCache(cache_time_, max_extrapolation_distance_);
+    frames_[cfid] = new TimeCache(cache_time_, max_extrapolation_distance_);
   
-  return frames_[cfid.num_];
+  return frames_[cfid];
 }
 
 geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame, 
@@ -493,11 +496,11 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
 
 tf2::TimeCacheInterface* BufferCore::getFrame(CompactFrameID frame_id) const
 {
-  if (frame_id == CompactFrameID(0) || frame_id.num_ > frames_.size()) /// @todo check larger values too
+  if (frame_id == CompactFrameID(0) || frame_id > frames_.size()) /// @todo check larger values too
     return NULL;
   else
   {
-    return frames_[frame_id.num_];
+    return frames_[frame_id];
   }
 };
 
@@ -534,14 +537,14 @@ CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_
 
 std::string BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
 {
-    if (frame_id_num.num_ >= frameIDs_reverse.size())
+    if (frame_id_num >= frameIDs_reverse.size())
     {
       std::stringstream ss;
-      ss << "Reverse lookup of frame id " << frame_id_num.num_ << " failed!";
+      ss << "Reverse lookup of frame id " << frame_id_num << " failed!";
       throw tf2::LookupException(ss.str());
     }
     else
-      return frameIDs_reverse[frame_id_num.num_];
+      return frameIDs_reverse[frame_id_num];
 };
 
 void BufferCore::createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const
@@ -738,7 +741,14 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
      */
   return 0;
 
-  }
+}
+
+#if 0
+int BufferCore::findCommonParent(CompactFrameID frame1, CompactFrameID frame2, ros::Time time, std::string* error_string)
+{
+  return 0;
+}
+#endif
 
 
 bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
@@ -765,6 +775,7 @@ bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, cons
     }
     return true;
   }
+  return false;
 }
 
 
@@ -900,7 +911,7 @@ std::string BufferCore::allFramesAsString() const
     {
       frame_id_num = 0;
     }
-    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num.num_] << "." <<std::endl;
+    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num] << "." <<std::endl;
   }
 
   return mstream.str();
@@ -965,7 +976,7 @@ std::string BufferCore::allFramesAsYAML() const
     {
       frame_id_num = 0;
     }
-    if (frame_id_num.num_ != 0)
+    if (frame_id_num != 0)
     {
       std::string authority = "no recorded authority";
       std::map<CompactFrameID, std::string>::const_iterator it = frame_authority_.find(cfid);
@@ -977,8 +988,8 @@ std::string BufferCore::allFramesAsYAML() const
 
       mstream << std::fixed; //fixed point notation
       mstream.precision(3); //3 decimal places
-      mstream << frameIDs_reverse[cfid.num_] << ": " << std::endl;
-      mstream << "  parent: '" << frameIDs_reverse[frame_id_num.num_] << "'" << std::endl;
+      mstream << frameIDs_reverse[cfid] << ": " << std::endl;
+      mstream << "  parent: '" << frameIDs_reverse[frame_id_num] << "'" << std::endl;
       mstream << "  broadcaster: '" << authority << "'" << std::endl;
       mstream << "  rate: " << rate << std::endl;
       mstream << "  most_recent_transform: " << (getFrame(cfid)->getLatestTimestamp()).toSec() << std::endl;

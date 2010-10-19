@@ -83,7 +83,7 @@ TEST(TimeCache, Repeatability)
   
   for ( uint64_t i = 1; i < runs ; i++ )
   {
-    stor.frame_id_.num_ = i;
+    stor.frame_id_ = i;
     stor.stamp_ = ros::Time().fromNSec(i);
     
     cache.insertData(stor);
@@ -93,7 +93,7 @@ TEST(TimeCache, Repeatability)
 
   {
     cache.getData(ros::Time().fromNSec(i), stor);
-    EXPECT_EQ(stor.frame_id_.num_, i);
+    EXPECT_EQ(stor.frame_id_, i);
     EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
   }
   
@@ -110,7 +110,7 @@ TEST(TimeCache, RepeatabilityReverseInsertOrder)
   
   for ( int i = runs -1; i >= 0 ; i-- )
   {
-    stor.frame_id_.num_ = i;
+    stor.frame_id_ = i;
     stor.stamp_ = ros::Time().fromNSec(i);
     
     cache.insertData(stor);
@@ -119,7 +119,7 @@ TEST(TimeCache, RepeatabilityReverseInsertOrder)
 
   {
     cache.getData(ros::Time().fromNSec(i), stor);
-    EXPECT_EQ(stor.frame_id_.num_, i);
+    EXPECT_EQ(stor.frame_id_, i);
     EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
   }
   
@@ -144,7 +144,7 @@ TEST(TimeCache, RepeatabilityRandomInsertOrder)
     std::stringstream ss;
     ss << values[i];
     stor.header.frame_id = ss.str();
-    stor.frame_id_.num_ = i;
+    stor.frame_id_ = i;
     stor.stamp_ = ros::Time().fromNSec(i);
     
     cache.insertData(stor);
@@ -153,7 +153,7 @@ TEST(TimeCache, RepeatabilityRandomInsertOrder)
 
   {
     cache.getData(ros::Time().fromNSec(i), stor);
-    EXPECT_EQ(stor.frame_id_.num_, i);
+    EXPECT_EQ(stor.frame_id_, i);
     EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
     std::stringstream ss;
     ss << values[i];
@@ -174,13 +174,13 @@ TEST(TimeCache, ZeroAtFront)
   
   for ( uint64_t i = 1; i < runs ; i++ )
   {
-    stor.frame_id_.num_ = i;
+    stor.frame_id_ = i;
     stor.stamp_ = ros::Time().fromNSec(i);
     
     cache.insertData(stor);
   }
 
-  stor.frame_id_.num_ = runs;
+  stor.frame_id_ = runs;
   stor.stamp_ = ros::Time().fromNSec(runs);
   cache.insertData(stor);
 
@@ -188,22 +188,22 @@ TEST(TimeCache, ZeroAtFront)
 
   {
     cache.getData(ros::Time().fromNSec(i), stor);
-    EXPECT_EQ(stor.frame_id_.num_, i);
+    EXPECT_EQ(stor.frame_id_, i);
     EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
   }
 
   cache.getData(ros::Time(), stor);
-  EXPECT_EQ(stor.frame_id_.num_, runs);
+  EXPECT_EQ(stor.frame_id_, runs);
   EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(runs));
 
-  stor.frame_id_.num_ = runs;
+  stor.frame_id_ = runs;
   stor.stamp_ = ros::Time().fromNSec(runs+1);
   cache.insertData(stor);
 
 
   //Make sure we get a different value now that a new values is added at the front
   cache.getData(ros::Time(), stor);
-  EXPECT_EQ(stor.frame_id_.num_, runs);
+  EXPECT_EQ(stor.frame_id_, runs);
   EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(runs+1));
   
 }
@@ -234,7 +234,7 @@ TEST(TimeCache, CartesianInterpolation)
       zvalues[step] = 10.0 * get_rand();
     
       stor.translation_.setValue(xvalues[step], yvalues[step], zvalues[step]);
-      stor.frame_id_.num_ = 2;
+      stor.frame_id_ = 2;
       stor.stamp_ = ros::Time().fromNSec(step * 100 + offset);
       cache.insertData(stor);
     }
@@ -282,7 +282,7 @@ TEST(TimeCache, ReparentingInterpolationProtection)
     zvalues[step] = 10.0 * get_rand();
 
     stor.translation_.setValue(xvalues[step], yvalues[step], zvalues[step]);
-    stor.frame_id_.num_ = step + 4;
+    stor.frame_id_ = step + 4;
     stor.stamp_ = ros::Time().fromNSec(step * 100 + offset);
     cache.insertData(stor);
   }
@@ -338,7 +338,7 @@ TEST(TimeCache, CartesianExtrapolation)
       zvalues[step] = 10.0 * get_rand();
     
       stor.translation_.setValue(xvalues[step], yvalues[step], zvalues[step]);
-      stor.frame_id_.num_ = 2;
+      stor.frame_id_ = 2;
       stor.stamp_ = ros::Time().fromNSec(step * 100 + offset);
       cache.insertData(stor);
     }
@@ -411,7 +411,7 @@ TEST(TimeCache, AngularInterpolation)
       rollvalues[step] = 0;//10.0 * get_rand();
       quats[step].setRPY(yawvalues[step], pitchvalues[step], rollvalues[step]);
       stor.rotation_ = quats[step];
-      stor.frame_id_.num_ = 3;
+      stor.frame_id_ = 3;
       stor.stamp_ = ros::Time().fromNSec(offset + (step * 100)); //step = 0 or 1
       cache.insertData(stor);
     }
@@ -442,7 +442,7 @@ TEST(TimeCache, DuplicateEntries)
 
   TransformStorage stor;
   setIdentity(stor);
-  stor.frame_id_.num_ = 3;
+  stor.frame_id_ = 3;
   stor.stamp_ = ros::Time().fromNSec(1);
 
   cache.insertData(stor);

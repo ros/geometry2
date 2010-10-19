@@ -222,7 +222,8 @@ private:
   
   /** \brief The pointers to potential frames that the tree can be made of.
    * The frames will be dynamically allocated at run time when set the first time. */
-  std::vector< TimeCacheInterface*> frames_;
+  typedef std::vector<TimeCacheInterface*> V_TimeCacheInterface;
+  V_TimeCacheInterface frames_;
   
   /** \brief A mutex to protect testing and allocating new frames on the above vector. */
   mutable boost::mutex frame_mutex_;
