@@ -743,38 +743,34 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
 
 bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  if (tr.mode_ == ONE_VALUE)
+  double stamp = tr.stamp_.toSec();
+  double target = target_time.toSec();
+  double max_dist = max_extrapolation_distance_.toSec();
+  if (stamp - target > max_dist || target - stamp > max_dist)
   {
-    double stamp = tr.stamp_.toSec();
-    double target = target_time.toSec();
-    double max_dist = max_extrapolation_distance_.toSec();
-    if (stamp - target > max_dist || target - stamp > max_dist)
+    if (error_string)
     {
-      if (error_string)
+      std::stringstream ss;
+      ss << std::fixed;
+      ss.precision(3);
+      ss << "You requested a transform at time " << (target_time).toSec()
+         << ",\n but the tf buffer only contains a single transform "
+         << "at time " << tr.stamp_.toSec() << ".\n";
+      if ( max_extrapolation_distance_ > ros::Duration(0))
       {
-        std::stringstream ss;
-        ss << std::fixed;
-        ss.precision(3);
-        ss << "You requested a transform at time " << (target_time).toSec() 
-           << ",\n but the tf buffer only contains a single transform " 
-           << "at time " << tr.stamp_.toSec() << ".\n";
-        if ( max_extrapolation_distance_ > ros::Duration(0))
-        {
-          ss << "The tf extrapollation distance is set to " 
-             << (max_extrapolation_distance_).toSec() <<" seconds.\n";
-        }
-        *error_string = ss.str();
+        ss << "The tf extrapollation distance is set to "
+           << (max_extrapolation_distance_).toSec() <<" seconds.\n";
       }
-      return true;
+      *error_string = ss.str();
     }
+    return true;
   }
-  return false;
 }
 
 
 bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.stamp_.toSec() - target_time.toSec() > max_extrapolation_distance_.toSec())
+  if (tr.stamp_.toSec() - target_time.toSec() > max_extrapolation_distance_.toSec())
   {
     if (error_string) {
       std::stringstream ss;
@@ -797,7 +793,7 @@ bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const Tra
 
 bool BufferCore::test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time.toSec() - tr.stamp_.toSec() > max_extrapolation_distance_.toSec())
+  if (target_time.toSec() - tr.stamp_.toSec() > max_extrapolation_distance_.toSec())
   {
     if (error_string){
       std::stringstream ss;
