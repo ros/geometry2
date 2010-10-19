@@ -32,6 +32,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 include_directories (src/bt) 
 
+add_definitions(-DBT_USE_DOUBLE_PRECISION)
 
 #CPP Libraries
 rosbuild_add_library(tf2 src/cache.cpp src/buffer_core.cpp src/static_cache.cpp)

@@ -38,75 +38,35 @@
 
 #include <cmath>
 
-std::vector<double> values;
-unsigned int step = 0;
-
-void seed_rand()
-{
-  for (unsigned int i = 0; i < 1000; i++)
-  {
-    int pseudo_rand = std::floor(i * M_PI);
-    values.push_back(( pseudo_rand % 100)/50.0 - 1.0);
-    //printf("Seeding with %f\n", values.back());
-  }
-};
-
-
-double get_rand() 
-{ 
-  if (values.size() == 0) throw std::runtime_error("you need to call seed_rand first");
-  if (step >= values.size()) 
-    step = 0;
-  else
-    step++;
-  return values[step];
-}
-
 using namespace tf2;
 
 
-void setIdentity(geometry_msgs::Transform& trans) 
+void setIdentity(TransformStorage& stor)
 {
-  trans.translation.x = 0;
-  trans.translation.y = 0;
-  trans.translation.z = 0;
-  trans.rotation.x = 0;
-  trans.rotation.y = 0;
-  trans.rotation.z = 0;
-  trans.rotation.w = 1;
+  stor.translation_.setValue(0.0, 0.0, 0.0);
+  stor.rotation_.setValue(0.0, 0.0, 0.0, 1.0);
 }
-
-#if 0
 
 TEST(StaticCache, Repeatability)
 {
   unsigned int runs = 100;
-
-  seed_rand();
   
   tf2::StaticCache  cache;
 
   TransformStorage stor;
-  setIdentity(stor.transform);
+  setIdentity(stor);
   
   for ( uint64_t i = 1; i < runs ; i++ )
   {
-    values[i] = 10.0 * ((double) get_rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-    std::stringstream ss;
-    ss << values[i];
-    stor.header.frame_id = ss.str();
-    stor.c_frame_id_ = CompactFrameID(i);
-    stor.header.stamp = ros::Time().fromNSec(i);
+    stor.frame_id_ = CompactFrameID(i);
+    stor.stamp_ = ros::Time().fromNSec(i);
     
     cache.insertData(stor);
 
     
     cache.getData(ros::Time().fromNSec(i), stor);
-    EXPECT_EQ(stor.c_frame_id_.num_, i);
-    EXPECT_EQ(stor.header.stamp, ros::Time().fromNSec(i));
-    std::stringstream ss2;
-    ss2 << values[i];
-    EXPECT_EQ(stor.header.frame_id, ss2.str());
+    EXPECT_EQ(stor.frame_id_.num_, i);
+    EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
     
   }
 }
@@ -117,10 +77,9 @@ TEST(StaticCache, DuplicateEntries)
   tf2::StaticCache cache;
 
   TransformStorage stor;
-  setIdentity(stor.transform); 
-  stor.header.frame_id = "a";
-  stor.c_frame_id_ = CompactFrameID(3);
-  stor.header.stamp = ros::Time().fromNSec(1);
+  setIdentity(stor);
+  stor.frame_id_ = CompactFrameID(3);
+  stor.stamp_ = ros::Time().fromNSec(1);
 
   cache.insertData(stor);
 
@@ -130,16 +89,14 @@ TEST(StaticCache, DuplicateEntries)
   cache.getData(ros::Time().fromNSec(1), stor);
   
   //printf(" stor is %f\n", stor.transform.translation.x);
-  EXPECT_TRUE(!std::isnan(stor.transform.translation.x));
-  EXPECT_TRUE(!std::isnan(stor.transform.translation.y));
-  EXPECT_TRUE(!std::isnan(stor.transform.translation.z));
-  EXPECT_TRUE(!std::isnan(stor.transform.rotation.x));
-  EXPECT_TRUE(!std::isnan(stor.transform.rotation.y));
-  EXPECT_TRUE(!std::isnan(stor.transform.rotation.z));
-  EXPECT_TRUE(!std::isnan(stor.transform.rotation.w));
+  EXPECT_TRUE(!std::isnan(stor.translation_.x()));
+  EXPECT_TRUE(!std::isnan(stor.translation_.y()));
+  EXPECT_TRUE(!std::isnan(stor.translation_.z()));
+  EXPECT_TRUE(!std::isnan(stor.rotation_.x()));
+  EXPECT_TRUE(!std::isnan(stor.rotation_.y()));
+  EXPECT_TRUE(!std::isnan(stor.rotation_.z()));
+  EXPECT_TRUE(!std::isnan(stor.rotation_.w()));
 }
-
-#endif
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);

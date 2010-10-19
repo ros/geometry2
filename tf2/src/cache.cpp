@@ -200,7 +200,6 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
 
 void TimeCache::interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output)
 { 
-
   // Check for zero distance case 
   if( two.stamp_ == one.stamp_ )
   {
@@ -211,16 +210,11 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
   btScalar ratio = ((time - one.stamp_).toSec()) / ((two.stamp_ - one.stamp_).toSec());
   
   //Interpolate translation
-  btVector3 v(0,0,0); //initialzed to fix uninitialized warning, not actually necessary
-  v.setInterpolate3(one.translation_, two.translation_, ratio);
-  output.translation_ = v;
+  output.translation_.setInterpolate3(one.translation_, two.translation_, ratio);
   
   //Interpolate rotation
-  btQuaternion q1(one.rotation_);
-  btQuaternion q2(two.rotation_);
-  btQuaternion out;
-  out = slerp( q1, q2 , ratio);
-  output.rotation_ = out;
+  output.rotation_ = slerp( one.rotation_, two.rotation_, ratio);
+
   output.stamp_ = one.stamp_;
   output.frame_id_ = one.frame_id_;
   output.child_frame_id_ = one.child_frame_id_;
