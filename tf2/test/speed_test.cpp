@@ -71,6 +71,6 @@ int main(int argc, char** argv)
   }
   ros::WallTime end = ros::WallTime::now();
   ros::WallDuration dur = end - start;
-  ROS_INFO("100000 %d-level transforms took %f for an average of %f", num_levels, dur.toSec(), dur.toSec() / 100000.0);
+  ROS_INFO("100000 %d-level transforms took %f for an average of %9f", num_levels, dur.toSec(), dur.toSec() / 100000.0);
   //ROS_INFO_STREAM(out_t);
 }

@@ -811,16 +811,34 @@ bool BufferCore::test_extrapolation(const ros::Time& target_time, const Transfor
 {
   for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
   {
-    if (test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string)) return true;
-    if (test_extrapolation_past(target_time, lists.inverseTransforms[i], error_string)) return true;
-    if (test_extrapolation_future(target_time, lists.inverseTransforms[i], error_string)) return true;
+    const TransformStorage& ts = lists.inverseTransforms[i];
+    switch (ts.mode_)
+    {
+    case ONE_VALUE:
+      return test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string);
+    case EXTRAPOLATE_BACK:
+      return test_extrapolation_past(target_time, lists.inverseTransforms[i], error_string);
+    case EXTRAPOLATE_FORWARD:
+      return test_extrapolation_future(target_time, lists.inverseTransforms[i], error_string);
+    default:
+      break;
+    }
   }
 
   for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
   {
-    if (test_extrapolation_one_value(target_time, lists.forwardTransforms[i], error_string)) return true;
-    if (test_extrapolation_past(target_time, lists.forwardTransforms[i], error_string)) return true;
-    if (test_extrapolation_future(target_time, lists.forwardTransforms[i], error_string)) return true;
+    const TransformStorage& ts = lists.forwardTransforms[i];
+    switch (ts.mode_)
+    {
+    case ONE_VALUE:
+      return test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string);
+    case EXTRAPOLATE_BACK:
+      return test_extrapolation_past(target_time, lists.inverseTransforms[i], error_string);
+    case EXTRAPOLATE_FORWARD:
+      return test_extrapolation_future(target_time, lists.inverseTransforms[i], error_string);
+    default:
+      break;
+    }
   }
 
   return false;
