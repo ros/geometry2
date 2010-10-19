@@ -221,7 +221,7 @@ private:
   std::vector< TimeCacheInterface*> frames_;
   
   /** \brief A mutex to protect testing and allocating new frames on the above vector. */
-  boost::mutex frame_mutex_;
+  mutable boost::mutex frame_mutex_;
 
   /** \brief A map from string frame ids to CompactFrameID */
   typedef boost::unordered_map<std::string, CompactFrameID> M_StringToCompactFrameID;

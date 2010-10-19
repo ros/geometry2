@@ -221,12 +221,11 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
   if (error_exists)
     return false;
   
-
+  boost::mutex::scoped_lock lock(frame_mutex_);
   CompactFrameID frame_number = lookupOrInsertFrameNumber(stripped.child_frame_id);
   TimeCacheInterface* frame = getFrame(frame_number);
   if (frame == NULL)
     frame = allocateFrame(frame_number, is_static);
-  
     
   if (frame->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id), frame_number)))
   {
@@ -253,10 +252,13 @@ TimeCacheInterface* BufferCore::allocateFrame(CompactFrameID cfid, bool is_stati
   
   return frames_[cfid.num_];
 }
+
 geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame, 
                                                             const std::string& source_frame,
                                                             const ros::Time& time) const
 {
+  boost::mutex::scoped_lock lock(frame_mutex_);
+
   validateFrameId("lookupTransform argument target_frame", target_frame);
   validateFrameId("lookupTransform argument source_frame", source_frame);
   
@@ -505,7 +507,6 @@ CompactFrameID BufferCore::lookupFrameNumber(const std::string& frameid_str) con
 CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_str)
 {
   CompactFrameID retval = 0;
-  boost::mutex::scoped_lock(frame_mutex_);
   M_StringToCompactFrameID::iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
@@ -762,7 +763,7 @@ bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, cons
 
 bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.stamp_ - target_time > max_extrapolation_distance_)
+  if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.stamp_.toSec() - target_time.toSec() > max_extrapolation_distance_.toSec())
   {
     if (error_string) {
       std::stringstream ss;
@@ -785,7 +786,7 @@ bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const Tra
 
 bool BufferCore::test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
 {
-  if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time - tr.stamp_ > max_extrapolation_distance_)
+  if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time.toSec() - tr.stamp_.toSec() > max_extrapolation_distance_.toSec())
   {
     if (error_string){
       std::stringstream ss;

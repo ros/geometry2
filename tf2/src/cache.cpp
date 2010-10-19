@@ -57,7 +57,7 @@ TimeCache::TimeCache( ros::Duration  max_storage_time,
                      ros::Duration max_extrapolation_time):
   max_storage_time_(max_storage_time),
   max_extrapolation_time_(max_extrapolation_time)
-{};
+{}
 
 bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns false if data not available
 {
@@ -65,7 +65,6 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns f
 
   int num_nodes;
   ros::Duration time_diff;
-  boost::mutex::scoped_lock lock(storage_lock_);
 
   ExtrapolationMode mode;
   num_nodes = findClosest(p_temp_1,p_temp_2, time, mode);
@@ -90,12 +89,10 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns f
     
   return (num_nodes > 0);
 
-};
+}
 
 bool TimeCache::insertData(const TransformStorage& new_data)
 {
-  boost::mutex::scoped_lock lock(storage_lock_);
-
   L_TransformStorage::iterator storage_it = storage_.begin();
 
   if(storage_it != storage_.end())
@@ -117,7 +114,7 @@ bool TimeCache::insertData(const TransformStorage& new_data)
 
   pruneList();
   return true;
-};
+}
 
 
 uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, ExtrapolationMode& mode)
@@ -199,7 +196,7 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
   return 2;
 
 
-};
+}
 
 void TimeCache::interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output)
 { 
@@ -227,26 +224,29 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
   output.stamp_ = one.stamp_;
   output.frame_id_ = one.frame_id_;
   output.child_frame_id_ = one.child_frame_id_;
-};
+}
 
-void TimeCache::clearList() {   boost::mutex::scoped_lock lock(storage_lock_); storage_.clear(); };
+void TimeCache::clearList()
+{
+  storage_.clear();
+}
 
-unsigned int TimeCache::getListLength() {   boost::mutex::scoped_lock lock(storage_lock_); return storage_.size(); };
-
+unsigned int TimeCache::getListLength()
+{
+  return storage_.size();
+}
 
 ros::Time TimeCache::getLatestTimestamp() 
 {   
-  boost::mutex::scoped_lock lock(storage_lock_); 
   if (storage_.empty()) return ros::Time(); //empty list case
   return storage_.front().stamp_;
-};
+}
 
 ros::Time TimeCache::getOldestTimestamp() 
 {   
-  boost::mutex::scoped_lock lock(storage_lock_); 
   if (storage_.empty()) return ros::Time(); //empty list case
   return storage_.back().stamp_;
-};
+}
 
 void TimeCache::pruneList()
 {
@@ -257,4 +257,4 @@ void TimeCache::pruneList()
     storage_.pop_back();
   }
   
-};
+}

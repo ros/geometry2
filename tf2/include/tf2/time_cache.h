@@ -157,9 +157,6 @@ private:
   ros::Duration max_storage_time_;
   ros::Duration max_extrapolation_time_;
 
-  boost::mutex storage_lock_;  ///!< The mutex to protect the linked list
-
-
 
   /// A helper function for getData
   //Assumes storage is already locked for it
