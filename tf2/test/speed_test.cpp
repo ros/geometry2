@@ -36,7 +36,7 @@
 
 int main(int argc, char** argv)
 {
-  uint32_t num_levels = 100;
+  uint32_t num_levels = 10;
   if (argc > 1)
   {
     num_levels = boost::lexical_cast<uint32_t>(argv[1]);
@@ -65,12 +65,12 @@ int main(int argc, char** argv)
 
   std::string levels_string = boost::lexical_cast<std::string>(num_levels);
   ros::WallTime start = ros::WallTime::now();
-  for (int i = 0; i < 100000; ++i)
+  for (int i = 0; i < 1000000; ++i)
   {
     geometry_msgs::TransformStamped out_t = bc.lookupTransform("root", levels_string, ros::Time(0));
   }
   ros::WallTime end = ros::WallTime::now();
   ros::WallDuration dur = end - start;
-  ROS_INFO("100000 %d-level transforms took %f for an average of %9f", num_levels, dur.toSec(), dur.toSec() / 100000.0);
+  ROS_INFO("1000000 %d-level transforms took %f for an average of %9f", num_levels, dur.toSec(), dur.toSec() / 1000000.0);
   //ROS_INFO_STREAM(out_t);
 }

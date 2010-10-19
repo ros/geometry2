@@ -61,6 +61,16 @@ void transformTF2ToMsg(const btTransform& bt, geometry_msgs::Transform& msg)
   msg.rotation.w = bt.getRotation().w();
 };
 
+void transformTF2ToMsg(const btQuaternion& orient, const btVector3& pos, geometry_msgs::Transform& msg)
+{
+  msg.translation.x = pos.x();
+  msg.translation.y = pos.y();
+  msg.translation.z = pos.z();
+  msg.rotation.x = orient.x();
+  msg.rotation.y = orient.y();
+  msg.rotation.z = orient.z();
+  msg.rotation.w = orient.w();
+};
 
 void setIdentity(geometry_msgs::Transform& tx)
 {
@@ -307,7 +317,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   }
 
   if (test_extrapolation(temp_time, t_list, &error_string))
-    {
+  {
     std::stringstream ss;
     if (time == ros::Time())// Using latest common time if we extrapolate this means that one of the links is out of date
     {
@@ -319,7 +329,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
       ss << " When trying to transform between " << source_frame << " and " << target_frame <<"."<< std::endl;
       throw ExtrapolationException(error_string + ss.str());
     }
-    }
+   }
 
 
   btTransform output = computeTransformFromList(t_list);
@@ -817,11 +827,11 @@ bool BufferCore::test_extrapolation(const ros::Time& target_time, const Transfor
     switch (ts.mode_)
     {
     case ONE_VALUE:
-      return test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string);
+      return test_extrapolation_one_value(target_time, ts, error_string);
     case EXTRAPOLATE_BACK:
-      return test_extrapolation_past(target_time, lists.inverseTransforms[i], error_string);
+      return test_extrapolation_past(target_time, ts, error_string);
     case EXTRAPOLATE_FORWARD:
-      return test_extrapolation_future(target_time, lists.inverseTransforms[i], error_string);
+      return test_extrapolation_future(target_time, ts, error_string);
     default:
       break;
     }
@@ -833,11 +843,11 @@ bool BufferCore::test_extrapolation(const ros::Time& target_time, const Transfor
     switch (ts.mode_)
     {
     case ONE_VALUE:
-      return test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string);
+      return test_extrapolation_one_value(target_time, ts, error_string);
     case EXTRAPOLATE_BACK:
-      return test_extrapolation_past(target_time, lists.inverseTransforms[i], error_string);
+      return test_extrapolation_past(target_time, ts, error_string);
     case EXTRAPOLATE_FORWARD:
-      return test_extrapolation_future(target_time, lists.inverseTransforms[i], error_string);
+      return test_extrapolation_future(target_time, ts, error_string);
     default:
       break;
     }
@@ -859,6 +869,7 @@ btTransform BufferCore::computeTransformFromList(const TransformLists & lists) c
     btTransform transform(ts.rotation_, ts.translation_);
     retTrans *= transform; //Reverse to get left multiply
   }
+
   for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
   {
     const TransformStorage& ts = lists.forwardTransforms[lists.forwardTransforms.size() -1 - i];
