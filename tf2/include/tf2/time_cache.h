@@ -151,7 +151,8 @@ class TimeCache : public TimeCacheInterface
   
 
 private:
-  std::list<TransformStorage > storage_;
+  typedef std::list<TransformStorage> L_TransformStorage;
+  L_TransformStorage storage_;
 
   ros::Duration max_storage_time_;
   ros::Duration max_extrapolation_time_;

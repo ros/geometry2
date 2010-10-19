@@ -235,6 +235,8 @@ private:
   /// whether or not to allow extrapolation
   ros::Duration max_extrapolation_distance_;
 
+  mutable TransformLists cached_lists_;
+
   /************************* Internal Functions ****************************/
 
   /** \brief An accessor to get a frame, which will throw an exception if the frame is no there.

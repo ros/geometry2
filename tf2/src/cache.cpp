@@ -96,7 +96,7 @@ bool TimeCache::insertData(const TransformStorage& new_data)
 {
   boost::mutex::scoped_lock lock(storage_lock_);
 
-  std::list<TransformStorage >::iterator storage_it = storage_.begin();
+  L_TransformStorage::iterator storage_it = storage_.begin();
 
   if(storage_it != storage_.end())
   {
@@ -146,7 +146,7 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
 
   //At least 2 values stored
   //Find the first value less than the target value
-  std::list<TransformStorage >::iterator storage_it = storage_.begin();
+  L_TransformStorage::iterator storage_it = storage_.begin();
   while(storage_it != storage_.end())
   {
     if (storage_it->stamp_ <= target_time)

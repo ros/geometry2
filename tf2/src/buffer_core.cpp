@@ -289,7 +289,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   else
     temp_time = time;
 
-  TransformLists t_list;
+  TransformLists& t_list = cached_lists_;
 
   if (retval == tf2_msgs::TF2Error::NO_ERROR)
     retval = lookupLists(lookupFrameNumber( target_frame), temp_time, lookupFrameNumber( source_frame), t_list, &error_string);
@@ -438,7 +438,7 @@ bool BufferCore::canTransform(const std::string& target_frame, const std::string
       return false;
     }
   
-  TransformLists t_list;
+  TransformLists& t_list = cached_lists_;
   ///\todo check return
   int retval;
   retval = lookupLists(lookupFrameNumber( target_frame), local_time, lookupFrameNumber( source_frame), t_list, error_msg);
@@ -890,7 +890,7 @@ int BufferCore::getLatestCommonTime(const std::string& source, const std::string
 
   time = ros::Time(ros::TIME_MAX);
   int retval;
-  TransformLists lists;
+  TransformLists& lists = cached_lists_;
   {
     retval = lookupLists(lookupFrameNumber(dest), ros::Time(), lookupFrameNumber(source), lists, error_string);
   }
