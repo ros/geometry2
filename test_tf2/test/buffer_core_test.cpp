@@ -124,6 +124,50 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
   {
 
   }  
+  else if (mode == "ring_45")
+  {
+    /* Form a ring of transforms at every 45 degrees on the unit circle.  */
+
+    std::vector<std::string> frames;
+        
+
+    
+    frames.push_back("a");
+    frames.push_back("b");
+    frames.push_back("c");
+    frames.push_back("d");
+    frames.push_back("e");
+    frames.push_back("f");
+    frames.push_back("h");
+    frames.push_back("j");
+    frames.push_back("i");
+    
+    
+    for (uint64_t i = 1; i <  frames.size(); i++)
+    {
+      geometry_msgs::TransformStamped ts;
+      setIdentity(ts.transform);
+      ts.transform.translation.x = sqrt(2)/2 - 1;
+      ts.transform.translation.y = sqrt(2)/2;
+      ts.transform.rotation.x = sin(M_PI/8);
+      ts.transform.rotation.w = cos(M_PI/8);
+      if (time > ros::Time() + (interpolation_space * .5))
+        ts.header.stamp = time - (interpolation_space * .5);
+      else
+        ts.header.stamp = ros::Time();
+            
+      ts.header.frame_id = frames[i-1];
+      ts.child_frame_id = frames[i];
+      EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+      if (interpolation_space > ros::Duration())
+      {
+        ts.header.stamp = time + interpolation_space * .5;
+        EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+      
+      }
+    }
+
+  }  
   else if (mode == "1")
   {
     geometry_msgs::TransformStamped ts;
