@@ -12,6 +12,7 @@
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
   <depend package="actionlib"/>
   <depend package="actionlib_msgs"/>
   <depend package="rosgraph"/>
