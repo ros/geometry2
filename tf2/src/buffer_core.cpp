@@ -492,7 +492,7 @@ CompactFrameID BufferCore::lookupFrameNumber(const std::string& frameid_str) con
 {
   CompactFrameID retval;
   boost::mutex::scoped_lock(frame_mutex_);
-  std::map<std::string, CompactFrameID>::const_iterator map_it = frameIDs_.find(frameid_str);
+  M_StringToCompactFrameID::const_iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
     retval = CompactFrameID(0);
@@ -506,7 +506,7 @@ CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_
 {
   CompactFrameID retval = 0;
   boost::mutex::scoped_lock(frame_mutex_);
-  std::map<std::string, CompactFrameID>::iterator map_it = frameIDs_.find(frameid_str);
+  M_StringToCompactFrameID::iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
     retval = CompactFrameID(frames_.size());

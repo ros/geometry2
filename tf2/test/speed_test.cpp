@@ -32,8 +32,16 @@
 #include <ros/time.h>
 #include <ros/assert.h>
 
+#include <boost/lexical_cast.hpp>
+
 int main(int argc, char** argv)
 {
+  uint32_t num_levels = 100;
+  if (argc > 1)
+  {
+    num_levels = boost::lexical_cast<uint32_t>(argv[1]);
+  }
+
   tf2::BufferCore bc;
   geometry_msgs::TransformStamped t;
   t.header.stamp = ros::Time(1);
@@ -42,7 +50,7 @@ int main(int argc, char** argv)
   t.transform.rotation.w = 1.0;
   bc.setTransform(t, "me");
 
-  for (uint32_t i = 2; i < 100; ++i)
+  for (uint32_t i = 2; i <= num_levels; ++i)
   {
     std::stringstream parent_ss;
     parent_ss << (i - 1);
@@ -55,13 +63,14 @@ int main(int argc, char** argv)
     bc.setTransform(t, "me");
   }
 
+  std::string levels_string = boost::lexical_cast<std::string>(num_levels);
   ros::WallTime start = ros::WallTime::now();
-  for (int i = 0; i < 10000; ++i)
+  for (int i = 0; i < 100000; ++i)
   {
-    geometry_msgs::TransformStamped out_t = bc.lookupTransform("root", "99", ros::Time(0));
+    geometry_msgs::TransformStamped out_t = bc.lookupTransform("root", levels_string, ros::Time(0));
   }
   ros::WallTime end = ros::WallTime::now();
   ros::WallDuration dur = end - start;
-  ROS_INFO("10000 100-level transforms took %f for an average of %f", dur.toSec(), dur.toSec() / 10000.0);
+  ROS_INFO("100000 %d-level transforms took %f for an average of %f", num_levels, dur.toSec(), dur.toSec() / 100000.0);
   //ROS_INFO_STREAM(out_t);
 }

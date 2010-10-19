@@ -44,6 +44,8 @@
 //////////////////////////backwards startup for porting
 //#include "tf/tf.h"
 
+#include <boost/unordered_map.hpp>
+
 namespace tf2
 {
 
@@ -222,7 +224,8 @@ private:
   boost::mutex frame_mutex_;
 
   /** \brief A map from string frame ids to CompactFrameID */
-  std::map<std::string, CompactFrameID> frameIDs_;
+  typedef boost::unordered_map<std::string, CompactFrameID> M_StringToCompactFrameID;
+  M_StringToCompactFrameID frameIDs_;
   /** \brief A map from CompactFrameID frame_id_numbers to string for debugging and output */
   std::vector<std::string> frameIDs_reverse;
   /** \brief A map to lookup the most recent authority for a given frame */
