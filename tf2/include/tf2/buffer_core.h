@@ -55,15 +55,6 @@ typedef std::pair<ros::Time, CompactFrameID> P_TimeAndFrameID;
 
 class TimeCacheInterface;
 
-/** \brief An internal representation of transform chains
- *
- * This struct is how the list of transforms are stored before being passed to computeTransformFromList. */
-typedef struct
-{
-  std::vector<TransformStorage > inverseTransforms;
-  std::vector<TransformStorage > forwardTransforms;
-} TransformLists;
-
 /** \brief A Class which provides coordinate transforms between any two frames in a system.
  *
  * This class provides a simple interface to allow recording and lookup of
@@ -242,7 +233,6 @@ private:
   /// How long to cache transform history
   ros::Duration cache_time_;
 
-  mutable TransformLists cached_lists_;
   mutable std::vector<P_TimeAndFrameID> lct_cache_;
 
   /************************* Internal Functions ****************************/
@@ -269,9 +259,6 @@ private:
 
   ///Number to string frame lookup may throw LookupException if number invalid
   std::string lookupFrameString(CompactFrameID frame_id_num) const;
-
-  /** Find the list of connected frames necessary to connect two different frames */
-  int lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists & lists, std::string* error_string) const;
 
   void createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const;
 

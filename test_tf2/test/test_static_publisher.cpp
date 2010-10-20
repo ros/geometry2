@@ -75,7 +75,8 @@ TEST(StaticTranformPublsher, a_d_different_times)
   //printf("%s\n", mB.allFramesAsString().c_str());
   EXPECT_TRUE(mB.canTransform("c", "d", ros::Time(10), ros::Duration(0)));
 
-  EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(), ros::Duration(0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(), ros::Duration(0)));
+  EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(1), ros::Duration(0)));
   EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(10), ros::Duration(0)));
   EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(100), ros::Duration(0)));
 

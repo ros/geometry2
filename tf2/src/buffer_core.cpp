@@ -591,6 +591,28 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
 }
 */
 
+struct CanTransformAccum
+{
+  CompactFrameID gather(TimeCacheInterface* cache, ros::Time time, std::string* error_string)
+  {
+    if (!cache->getData(time, st, error_string))
+    {
+      return 0;
+    }
+
+    return st.frame_id_;
+  }
+
+  void accum(bool source)
+  {
+  }
+
+  void finalize(WalkEnding end, ros::Time _time)
+  {
+  }
+
+  TransformStorage st;
+};
 
 bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
                            const ros::Time& time, std::string* error_msg) const
@@ -600,43 +622,21 @@ bool BufferCore::canTransform(const std::string& target_frame, const std::string
   if (warnFrameId("canTransform argument source_frame", source_frame))
     return false;
 
-  ros::Time local_time = time;
+  CompactFrameID target_id = lookupFrameNumber(target_frame);
+  CompactFrameID source_id = lookupFrameNumber(source_frame);
 
-  //break out early if no op transform
-  if (source_frame == target_frame) return true;
-
-  if (local_time == ros::Time())
-    if (getLatestCommonTime(lookupFrameNumber(source_frame), lookupFrameNumber(target_frame), local_time, error_msg) != tf2_msgs::TF2Error::NO_ERROR) // set time if zero
-    {
-      return false;
-    }
-  
-  TransformLists& t_list = cached_lists_;
-  ///\todo check return
-  int retval;
-  retval = lookupLists(lookupFrameNumber( target_frame), local_time, lookupFrameNumber( source_frame), t_list, error_msg);
-
-  ///\todo WRITE HELPER FUNCITON TO RETHROW
-  if (retval != tf2_msgs::TF2Error::NO_ERROR)
+  if (target_id == 0 || source_id == 0)
   {
-    if (retval == tf2_msgs::TF2Error::LOOKUP_ERROR)
-    {
-      return false;
-    }
-    if (retval == tf2_msgs::TF2Error::CONNECTIVITY_ERROR)
-    {
-      return false;
-    }
+    return false;
   }
 
-#if 0
-  if (test_extrapolation(local_time, t_list, error_msg))
-    {
-      return false;
-    }
-#endif
+  CanTransformAccum accum;
+  if (walkToTopParent(accum, time, target_id, source_id, error_msg) == tf2_msgs::TF2Error::NO_ERROR)
+  {
+    return true;
+  }
 
-  return true;
+  return false;
 }
 
 bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& target_time,
@@ -647,8 +647,9 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
     return false;
   if (warnFrameId("canTransform argument source_frame", source_frame))
     return false;
-  if (warnFrameId("canTransform argument source_frame", fixed_frame))
+  if (warnFrameId("canTransform argument fixed_frame", fixed_frame))
     return false;
+
   return canTransform(target_frame, fixed_frame, target_time) && canTransform(fixed_frame, source_frame, source_time, error_msg);
 }
 
@@ -715,191 +716,6 @@ void BufferCore::createConnectivityErrorString(CompactFrameID source_frame, Comp
   *out = std::string("Could not find a connection between '"+lookupFrameString(target_frame)+"' and '"+
                      lookupFrameString(source_frame)+"' because they are not part of the same tree."+
                      "Tf has two or more unconnected trees.");
-}
-
-int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists& lists, std::string * error_string) const
-{
-  /*timeval tempt;
-  gettimeofday(&tempt,NULL);
-  std::cerr << "Looking up list at " <<tempt.tv_sec * 1000000ULL + tempt.tv_usec << std::endl;
-  */  
-  //Clear lists before operating
-  lists.forwardTransforms.clear();
-  lists.inverseTransforms.clear();
-  //  TransformLists mTfLs;
-  if (target_frame == source_frame)
-    return 0;  //Don't do anythign if we're not going anywhere
-
-  TransformStorage temp;
-
-  CompactFrameID frame = source_frame;
-  unsigned int counter = 0;  //A counter to keep track of how deep we've descended
-  CompactFrameID last_inverse;
-  while (true)
-  {
-    //      printf("getting data from %d:%s \n", frame, lookupFrameString(frame).c_str());
-
-    TimeCacheInterface* pointer = getFrame(frame);
-    if (! pointer)
-    {
-      last_inverse = frame;
-      break;
-
-    }
-    else if ( ! pointer->getData(time, temp))
-    {
-      last_inverse = frame;
-      break;
-    }
-
-    //break if parent is NO_PARENT (0)
-    if (frame == 0)
-    {
-      last_inverse = frame;
-      break;
-    }
-    lists.inverseTransforms.push_back(temp);
-
-    frame = temp.frame_id_;
-
-
-    /* Check if we've gone too deep.  A loop in the tree would cause this */
-    if (counter++ > MAX_GRAPH_DEPTH)
-    {
-      if (error_string)
-      {
-        std::stringstream ss;
-        ss<<"The tf tree is invalid because it contains a loop." << std::endl
-          << allFramesAsString() << std::endl;
-        *error_string =ss.str();
-      }
-      return tf2_msgs::TF2Error::LOOKUP_ERROR;
-      //        throw(LookupException(ss.str()));
-    }
-  }
-  /*
-    timeval tempt2;
-  gettimeofday(&tempt2,NULL);
-  std::cerr << "Side A " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
-  */
-  frame = target_frame;
-  counter = 0;
-  CompactFrameID last_forward;
-  while (true)
-    {
-
-      TimeCacheInterface* pointer = getFrame(frame);
-      if (! pointer)
-      {
-        last_forward = frame;
-        break;
-        
-      }
-      else if( !  pointer->getData(time, temp))
-      {
-        last_forward = frame;
-        break;
-      }
-
-      //break if parent is NO_PARENT (0)
-      if (frame == 0)
-      {
-        last_forward = frame;
-        break;
-      }
-      lists.forwardTransforms.push_back(temp);
-      frame = temp.frame_id_;
-
-      /* Check if we've gone too deep.  A loop in the tree would cause this*/
-      if (counter++ > MAX_GRAPH_DEPTH){
-        if (error_string)
-        {
-          std::stringstream ss;
-          ss<<"The tf tree is invalid because it contains a loop." << std::endl
-            << allFramesAsString() << std::endl;
-          *error_string = ss.str();
-        }
-        return tf2_msgs::TF2Error::LOOKUP_ERROR;//throw(LookupException(ss.str()));
-      }
-    }
-  /*
-  gettimeofday(&tempt2,NULL);
-  std::cerr << "Side B " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
-  */
-
-  /* Check the zero length cases*/
-  if (lists.inverseTransforms.size() == 0)
-  {
-    if (lists.forwardTransforms.size() == 0) //If it's going to itself it's already been caught
-    {
-      createConnectivityErrorString(source_frame, target_frame, error_string);
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-
-    if (! (last_forward == source_frame) )  //\todo match with case A
-    {
-      createConnectivityErrorString(source_frame, target_frame, error_string);
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-    else return 0;
-  }
-
-  if (lists.forwardTransforms.size() == 0)
-  {
-    if (lists.inverseTransforms.size() == 0)  //If it's going to itself it's already been caught
-    {//\todo remove THis is the same as case D
-      createConnectivityErrorString(source_frame, target_frame, error_string);
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-
-    if (lists.inverseTransforms.back().frame_id_ != target_frame)
-    {
-      createConnectivityErrorString(source_frame, target_frame, error_string);
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-    else return 0;
-    
-  }
-  
-
-  /* Make sure the end of the search shares a parent. */
-  if (!(last_forward == last_inverse))
-  {
-    createConnectivityErrorString(source_frame, target_frame, error_string);
-    return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-  }
-  /* Make sure that we don't have a no parent at the top */
-    {
-    if (lists.inverseTransforms.back().child_frame_id_ == 0 || lists.forwardTransforms.back().child_frame_id_ == 0)
-    {
-      //if (error_string) *error_string = "NO_PARENT at top of tree";
-      createConnectivityErrorString(source_frame, target_frame, error_string);
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-
-    /*
-      gettimeofday(&tempt2,NULL);
-      std::cerr << "Base Cases done" <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
-    */
-
-    while (lists.inverseTransforms.back().child_frame_id_ == lists.forwardTransforms.back().child_frame_id_)
-    {
-      lists.inverseTransforms.pop_back();
-      lists.forwardTransforms.pop_back();
-
-      // Make sure we don't go beyond the beginning of the list.
-      // (The while statement above doesn't fail if you hit the beginning of the list,
-      // which happens in the zero distance case.)
-      if (lists.inverseTransforms.size() == 0 || lists.forwardTransforms.size() == 0)
-	break;
-    }
-  }
-  /*
-       gettimeofday(&tempt2,NULL);
-       std::cerr << "Done looking up list " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
-     */
-  return 0;
-
 }
 
 std::string BufferCore::allFramesAsString() const
