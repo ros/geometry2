@@ -111,30 +111,23 @@ std::string stripSlash(const std::string& in)
 
 bool BufferCore::warnFrameId(const std::string& function_name_arg, const std::string& frame_id) const
 {
-  bool retval = false;
   if (frame_id.size() == 0)
   {
     std::stringstream ss;
     ss << "Invalid argument passed to "<< function_name_arg <<" in tf2 frame_ids cannot be empty";
     ROS_WARN("%s",ss.str().c_str());
-    retval = true;
+    return true;
   }
+
   if (startsWithSlash(frame_id))
   {
     std::stringstream ss;
     ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
     ROS_WARN("%s",ss.str().c_str());
-    retval = true;
+    return true;
   }
-  if (lookupFrameNumber(frame_id) == CompactFrameID(0))
-  {
-    /* Don't warn here.  It's not an invalid use case.  
-      std::stringstream ss;
-    ss << "\"" << frame_id << "\" passed to "<< function_name_arg <<" does not exist. ";
-    ROS_WARN("%s",ss.str().c_str()); */
-    retval = true;
-  }
-  return retval;
+
+  return false;
 }
 
 CompactFrameID BufferCore::validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const
@@ -671,46 +664,45 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
   unsigned int counter = 0;  //A counter to keep track of how deep we've descended
   CompactFrameID last_inverse;
   while (true)
+  {
+    //      printf("getting data from %d:%s \n", frame, lookupFrameString(frame).c_str());
+
+    TimeCacheInterface* pointer = getFrame(frame);
+    if (! pointer)
     {
-      //      printf("getting data from %d:%s \n", frame, lookupFrameString(frame).c_str());
+      last_inverse = frame;
+      break;
 
-      TimeCacheInterface* pointer = getFrame(frame);
-      if (! pointer)
+    }
+    else if ( ! pointer->getData(time, temp))
+    {
+      last_inverse = frame;
+      break;
+    }
+
+    //break if parent is NO_PARENT (0)
+    if (frame == 0)
+    {
+      last_inverse = frame;
+      break;
+    }
+    lists.inverseTransforms.push_back(temp);
+
+    frame = temp.frame_id_;
+
+
+    /* Check if we've gone too deep.  A loop in the tree would cause this */
+    if (counter++ > MAX_GRAPH_DEPTH)
+    {
+      if (error_string)
       {
-        last_inverse = frame;
-        break;
-        
+        std::stringstream ss;
+        ss<<"The tf tree is invalid because it contains a loop." << std::endl
+          << allFramesAsString() << std::endl;
+        *error_string =ss.str();
       }
-      else if ( ! pointer->getData(time, temp))
-      {
-        last_inverse = frame;
-        break;
-      }
-
-      //break if parent is NO_PARENT (0)
-      if (frame == 0)
-      {
-        last_inverse = frame;
-        break;
-      }
-      lists.inverseTransforms.push_back(temp);
-
-      frame = temp.frame_id_;
-
-
-      /* Check if we've gone too deep.  A loop in the tree would cause this */
-      if (counter++ > MAX_GRAPH_DEPTH)
-      {
-        if (error_string)
-        {
-          std::stringstream ss;
-          ss<<"The tf tree is invalid because it contains a loop." << std::endl
-            << allFramesAsString() << std::endl;
-          *error_string =ss.str();
-        }
-        return tf2_msgs::TF2Error::LOOKUP_ERROR;
-        //        throw(LookupException(ss.str()));
-      }
+      return tf2_msgs::TF2Error::LOOKUP_ERROR;
+      //        throw(LookupException(ss.str()));
     }
   }
   /*
