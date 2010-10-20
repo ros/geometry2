@@ -52,6 +52,8 @@ ROS_DECLARE_MESSAGE(TransformStamped);
 namespace tf2
 {
 
+typedef std::pair<ros::Time, CompactFrameID> P_TimeAndFrameID;
+
 class TimeCacheInterface
 {
 public:
@@ -63,6 +65,11 @@ public:
 
   /** @brief Clear the list of stored values */
   virtual void clearList()=0;
+
+  /**
+   * \brief Get the latest time stored in this cache, and the parent associated with it.  Returns parent = 0 if no data.
+   */
+  virtual P_TimeAndFrameID getLatestTimeAndParent() = 0;
 
 
   /// Debugging information methods
@@ -93,24 +100,14 @@ class TimeCache : public TimeCacheInterface
 
   /// Virtual methods
 
-  /** \brief Access data from the cache */
-  virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0); //returns false if data unavailable (should be thrown as lookup exception
-
-  /** \brief Insert data into the cache */
+  virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0);
   virtual bool insertData(const TransformStorage& new_data);
-
-  /** @brief Clear the list of stored values */
   virtual void clearList();
-
+  virtual P_TimeAndFrameID getLatestTimeAndParent();
 
   /// Debugging information methods
-  /** @brief Get the length of the stored list */
   virtual unsigned int getListLength();
-
-  /** @brief Get the latest timestamp cached */
   virtual ros::Time getLatestTimestamp();
-
-  /** @brief Get the oldest timestamp cached */
   virtual ros::Time getOldestTimestamp();
   
 
@@ -123,7 +120,7 @@ private:
 
   /// A helper function for getData
   //Assumes storage is already locked for it
-  uint8_t findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, std::string* error_str);
+  uint8_t findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str);
 
   void interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output);  
 
@@ -139,24 +136,15 @@ class StaticCache : public TimeCacheInterface
  public:
   /// Virtual methods
 
-  /** \brief Access data from the cache */
   virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0); //returns false if data unavailable (should be thrown as lookup exception
-
-  /** \brief Insert data into the cache */
   virtual bool insertData(const TransformStorage& new_data);
-
-  /** @brief Clear the list of stored values */
   virtual void clearList();
+  virtual P_TimeAndFrameID getLatestTimeAndParent();
 
 
   /// Debugging information methods
-  /** @brief Get the length of the stored list */
   virtual unsigned int getListLength();
-
-  /** @brief Get the latest timestamp cached */
   virtual ros::Time getLatestTimestamp();
-
-  /** @brief Get the oldest timestamp cached */
   virtual ros::Time getOldestTimestamp();
   
 

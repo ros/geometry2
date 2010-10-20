@@ -59,7 +59,8 @@ TimeCache::TimeCache(ros::Duration max_storage_time)
 
 bool TimeCache::getData(ros::Time time, TransformStorage & data_out, std::string* error_str) //returns false if data not available
 {
-  TransformStorage p_temp_1, p_temp_2;
+  TransformStorage* p_temp_1;
+  TransformStorage* p_temp_2;
 
   int num_nodes;
   ros::Duration time_diff;
@@ -71,17 +72,17 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out, std::string
   }
   else if (num_nodes == 1)
   {
-    data_out = p_temp_1;
+    data_out = *p_temp_1;
   }
   else if (num_nodes == 2)
   {
-    if( p_temp_1.frame_id_ == p_temp_2.frame_id_)
+    if( p_temp_1->frame_id_ == p_temp_2->frame_id_)
     {
-      interpolate(p_temp_1, p_temp_2, time, data_out);
+      interpolate(*p_temp_1, *p_temp_2, time, data_out);
     }
     else
     {
-      data_out = p_temp_1;
+      data_out = *p_temp_1;
     }
   }
   else
@@ -118,7 +119,7 @@ bool TimeCache::insertData(const TransformStorage& new_data)
 }
 
 
-uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, std::string* error_str)
+uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str)
 {
   //No values stored
   if (storage_.empty())
@@ -129,17 +130,17 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
   //If time == 0 return the latest
   if (target_time == ros::Time())
   {
-    one = storage_.front();
+    one = &storage_.front();
     return 1;
   }
 
   // One value stored
   if (++storage_.begin() == storage_.end())
   {
-    const TransformStorage& ts = *storage_.begin();
+    TransformStorage& ts = *storage_.begin();
     if (ts.stamp_ == target_time)
     {
-      one = ts;
+      one = &ts;
       return 1;
     }
     else
@@ -191,8 +192,8 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
   }
 
   //Finally the case were somewhere in the middle  Guarenteed no extrapolation :-)
-  one = *(storage_it); //Older
-  two = *(--storage_it); //Newer
+  one = &*(storage_it); //Older
+  two = &*(--storage_it); //Newer
   return 2;
 
 
@@ -228,6 +229,17 @@ void TimeCache::clearList()
 unsigned int TimeCache::getListLength()
 {
   return storage_.size();
+}
+
+P_TimeAndFrameID TimeCache::getLatestTimeAndParent()
+{
+  if (storage_.empty())
+  {
+    return std::make_pair(ros::Time(), 0);
+  }
+
+  const TransformStorage& ts = storage_.front();
+  return std::make_pair(ts.stamp_, ts.frame_id_);
 }
 
 ros::Time TimeCache::getLatestTimestamp() 

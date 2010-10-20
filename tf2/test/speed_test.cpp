@@ -90,7 +90,7 @@ int main(int argc, char** argv)
   ros::WallTime start = ros::WallTime::now();
   for (int i = 0; i < 1000000; ++i)
   {
-    out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(1));
+    out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(0));
   }
   ros::WallTime end = ros::WallTime::now();
   ros::WallDuration dur = end - start;

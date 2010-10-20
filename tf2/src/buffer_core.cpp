@@ -323,7 +323,10 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
       throw ConnectivityException(error_string);
     case tf2_msgs::TF2Error::EXTRAPOLATION_ERROR:
       throw ExtrapolationException(error_string);
+    case tf2_msgs::TF2Error::LOOKUP_ERROR:
+      throw LookupException(error_string);
     default:
+      ROS_ERROR("Unknown error code: %d", retval);
       ROS_BREAK();
     }
   }
@@ -709,6 +712,7 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
         //        throw(LookupException(ss.str()));
       }
     }
+  }
   /*
     timeval tempt2;
   gettimeofday(&tempt2,NULL);
@@ -834,30 +838,6 @@ int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, Compact
 
 }
 
-void BufferCore::computeTransformFromList(const TransformLists & lists, btQuaternion& out_orient, btVector3& out_pos) const
-{
-  btQuaternion orient(0.0, 0.0, 0.0, 1.0);
-  btVector3 pos(0.0, 0.0, 0.0);
-
-  ///@todo change these to iterators
-  for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
-  {
-    const TransformStorage& ts = lists.inverseTransforms[lists.inverseTransforms.size() -1 - i];
-    pos += quatRotate(orient, ts.translation_);
-    orient *= ts.rotation_;
-  }
-
-  for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
-  {
-    const TransformStorage& ts = lists.forwardTransforms[lists.forwardTransforms.size() -1 - i];
-    pos += quatRotate(orient.inverse(), -ts.translation_);
-    orient *= ts.rotation_.inverse();// ts.rotation_.inverse() * orient;
-  }
-
-  out_orient = orient;
-  out_pos = pos;
-}
-
 std::string BufferCore::allFramesAsString() const
 {
   std::stringstream mstream;
@@ -888,39 +868,158 @@ std::string BufferCore::allFramesAsString() const
   return mstream.str();
 }
 
-int BufferCore::getLatestCommonTime(CompactFrameID source_frame, CompactFrameID target_frame, ros::Time & time, std::string * error_string) const
+struct TimeAndFrameIDFrameComparator
 {
-  if (source_frame == target_frame)
+  TimeAndFrameIDFrameComparator(CompactFrameID id)
+  : id(id)
+  {}
+
+  bool operator()(const P_TimeAndFrameID& rhs) const
+  {
+    return rhs.second == id;
+  }
+
+  CompactFrameID id;
+};
+
+int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID target_id, ros::Time & time, std::string * error_string) const
+{
+  if (source_id == target_id)
   {
     //Set time to latest timestamp of frameid in case of target and source frame id are the same
     time = ros::Time();                 ///\todo review was now();
     return tf2_msgs::TF2Error::NO_ERROR;
   }
 
-  time = ros::Time(ros::TIME_MAX);
-  int retval;
-  TransformLists& lists = cached_lists_;
+  lct_cache_.clear();
+
+  // Walk the tree to its root from the source frame, accumulating the list of parent/time as well as the latest time
+  // in the target is a direct parent
+  CompactFrameID frame = source_id;
+  P_TimeAndFrameID temp;
+  uint32_t depth = 0;
+  ros::Time latest_time;
+  while (frame != 0)
   {
-    retval = lookupLists(source_frame, ros::Time(), target_frame, lists, error_string);
-  }
-  if (retval == tf2_msgs::TF2Error::NO_ERROR)
-  {
-    for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
+    TimeCacheInterface* cache = getFrame(frame);
+
+    if (!cache)
     {
-      if (time > lists.inverseTransforms[i].stamp_)
-        time = lists.inverseTransforms[i].stamp_;
-    }
-    for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
-    {
-      if (time > lists.forwardTransforms[i].stamp_)
-        time = lists.forwardTransforms[i].stamp_;
+      // There will be no cache for the very root of the tree
+      break;
     }
 
-  }
-  else
-    time.fromSec(0);
+    P_TimeAndFrameID latest = cache->getLatestTimeAndParent();
 
-  return retval;
+    if (latest.second == 0)
+    {
+      // Just break out here... there may still be a path from source -> target
+      break;
+    }
+
+    latest_time = std::max(latest.first, latest_time);
+
+    lct_cache_.push_back(latest);
+
+    frame = latest.second;
+
+    // Early out... target frame is a direct parent of the source frame
+    if (frame == target_id)
+    {
+      time = latest_time;
+      return tf2_msgs::TF2Error::NO_ERROR;
+    }
+
+    ++depth;
+    if (depth > MAX_GRAPH_DEPTH)
+    {
+      if (error_string)
+      {
+        std::stringstream ss;
+        ss<<"The tf tree is invalid because it contains a loop." << std::endl
+          << allFramesAsString() << std::endl;
+        *error_string = ss.str();
+      }
+      return tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  }
+
+  // Now walk to the top parent from the target frame, accumulating the latest time and looking for a common parent
+  frame = target_id;
+  depth = 0;
+  latest_time = ros::Time();
+  CompactFrameID common_parent = 0;
+  while (true)
+  {
+    TimeCacheInterface* cache = getFrame(frame);
+
+    if (!cache)
+    {
+      break;
+    }
+
+    P_TimeAndFrameID latest = cache->getLatestTimeAndParent();
+
+    if (latest.second == 0)
+    {
+      break;
+    }
+
+    latest_time = std::max(latest.first, latest_time);
+
+    std::vector<P_TimeAndFrameID>::iterator it = std::find_if(lct_cache_.begin(), lct_cache_.end(), TimeAndFrameIDFrameComparator(latest.second));
+    if (it != lct_cache_.end()) // found a common parent
+    {
+      common_parent = it->second;
+      break;
+    }
+
+    frame = latest.second;
+
+    // Early out... source frame is a direct parent of the target frame
+    if (frame == source_id)
+    {
+      time = latest_time;
+      return tf2_msgs::TF2Error::NO_ERROR;
+    }
+
+    ++depth;
+    if (depth > MAX_GRAPH_DEPTH)
+    {
+      if (error_string)
+      {
+        std::stringstream ss;
+        ss<<"The tf tree is invalid because it contains a loop." << std::endl
+          << allFramesAsString() << std::endl;
+        *error_string = ss.str();
+      }
+      return tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  }
+
+  if (common_parent == 0)
+  {
+    createConnectivityErrorString(source_id, target_id, error_string);
+    return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+  }
+
+  // Loop through the source -> root list until we hit the common parent
+  {
+    std::vector<P_TimeAndFrameID>::iterator it = lct_cache_.begin();
+    std::vector<P_TimeAndFrameID>::iterator end = lct_cache_.end();
+    for (; it != end; ++it)
+    {
+      if (it->second == common_parent)
+      {
+        break;
+      }
+
+      latest_time = std::max(latest_time, it->first);
+    }
+  }
+
+  time = latest_time;
+  return tf2_msgs::TF2Error::NO_ERROR;
 }
 
 std::string BufferCore::allFramesAsYAML() const

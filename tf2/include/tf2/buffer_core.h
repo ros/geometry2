@@ -51,6 +51,8 @@
 namespace tf2
 {
 
+typedef std::pair<ros::Time, CompactFrameID> P_TimeAndFrameID;
+
 class TimeCacheInterface;
 
 /** \brief An internal representation of transform chains
@@ -241,6 +243,7 @@ private:
   ros::Duration cache_time_;
 
   mutable TransformLists cached_lists_;
+  mutable std::vector<P_TimeAndFrameID> lct_cache_;
 
   /************************* Internal Functions ****************************/
 
@@ -269,9 +272,6 @@ private:
 
   /** Find the list of connected frames necessary to connect two different frames */
   int lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists & lists, std::string* error_string) const;
-
-  /** Compute the transform based on the list of frames */
-  void computeTransformFromList(const TransformLists & lists, btQuaternion& out_orient, btVector3& out_pos) const;
 
   void createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const;
 
