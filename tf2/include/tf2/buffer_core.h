@@ -240,9 +240,6 @@ private:
   /// How long to cache transform history
   ros::Duration cache_time_;
 
-  /// whether or not to allow extrapolation
-  ros::Duration max_extrapolation_distance_;
-
   mutable TransformLists cached_lists_;
 
   /************************* Internal Functions ****************************/
@@ -259,7 +256,7 @@ private:
 
 
   bool warnFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
-  void validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
+  CompactFrameID validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
 
   /// String to number for frame lookup with dynamic allocation of new frames
   CompactFrameID lookupFrameNumber(const std::string& frameid_str) const;
@@ -272,39 +269,15 @@ private:
 
   /** Find the list of connected frames necessary to connect two different frames */
   int lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists & lists, std::string* error_string) const;
-  int findCommonParent(CompactFrameID frame1, CompactFrameID frame2, ros::Time time, std::string* error_string);
-
-  bool test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
-  bool test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
-  bool test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
-  bool test_extrapolation(const ros::Time& target_time, const TransformLists& t_lists, std::string * error_string) const;
 
   /** Compute the transform based on the list of frames */
-  btTransform computeTransformFromList(const TransformLists & list) const;
+  void computeTransformFromList(const TransformLists & lists, btQuaternion& out_orient, btVector3& out_pos) const;
 
   void createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const;
 
   /**@brief Return the latest rostime which is common across the spanning set
    * zero if fails to cross */
-  int getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time& time, std::string * error_string) const;
-
-  /** \brief convert Transform msg to Transform */
-  static inline btTransform transformMsgToBT(const geometry_msgs::Transform& msg)
-  {btTransform bt(btQuaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), btVector3(msg.translation.x, msg.translation.y, msg.translation.z)); return bt;};
-  /** \brief convert Transform to Transform msg*/
-  static inline geometry_msgs::Transform transformBTToMsg(const btTransform& bt)
-  {
-    geometry_msgs::Transform msg; 
-    msg.translation.x = bt.getOrigin().getX();
-    msg.translation.y = bt.getOrigin().getY();
-    msg.translation.z = bt.getOrigin().getZ();
-    msg.rotation.x = bt.getRotation().getX();
-    msg.rotation.y = bt.getRotation().getY();
-    msg.rotation.z = bt.getRotation().getZ();
-    msg.rotation.w = bt.getRotation().getW();
-    return msg;
-  }
-
+  int getLatestCommonTime(CompactFrameID source_frame, CompactFrameID target_frame, ros::Time& time, std::string * error_string) const;
 
   /////////////////////////////////// Backwards hack for quick startup /////////////////////////
   //Using tf for now will be replaced fully

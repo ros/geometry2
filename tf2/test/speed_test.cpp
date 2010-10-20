@@ -46,31 +46,54 @@ int main(int argc, char** argv)
   geometry_msgs::TransformStamped t;
   t.header.stamp = ros::Time(1);
   t.header.frame_id = "root";
-  t.child_frame_id = "1";
+  t.child_frame_id = "0";
+  t.transform.translation.x = 1;
   t.transform.rotation.w = 1.0;
   bc.setTransform(t, "me");
 
-  for (uint32_t i = 2; i <= num_levels; ++i)
+  for (uint32_t i = 1; i < num_levels/2; ++i)
   {
     std::stringstream parent_ss;
     parent_ss << (i - 1);
     std::stringstream child_ss;
     child_ss << i;
 
-    t.transform.translation.x = 1;
     t.header.frame_id = parent_ss.str();
     t.child_frame_id = child_ss.str();
     bc.setTransform(t, "me");
   }
 
-  std::string levels_string = boost::lexical_cast<std::string>(num_levels);
+  t.header.frame_id = "root";
+  std::stringstream ss;
+  ss << num_levels/2 ;
+  t.child_frame_id = ss.str();
+  bc.setTransform(t, "me");
+
+  for (uint32_t i = num_levels/2 + 1; i < num_levels; ++i)
+  {
+    std::stringstream parent_ss;
+    parent_ss << (i - 1);
+    std::stringstream child_ss;
+    child_ss << i;
+
+    t.header.frame_id = parent_ss.str();
+    t.child_frame_id = child_ss.str();
+    bc.setTransform(t, "me");
+  }
+
+  //ROS_INFO_STREAM(bc.allFramesAsYAML());
+
+  std::string v_frame0 = boost::lexical_cast<std::string>(num_levels - 1);
+  std::string v_frame1 = boost::lexical_cast<std::string>(num_levels/2 - 1);
+  ROS_INFO("%s to %s", v_frame0.c_str(), v_frame1.c_str());
+  geometry_msgs::TransformStamped out_t;
   ros::WallTime start = ros::WallTime::now();
   for (int i = 0; i < 1000000; ++i)
   {
-    geometry_msgs::TransformStamped out_t = bc.lookupTransform("root", levels_string, ros::Time(0));
+    out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(1));
   }
   ros::WallTime end = ros::WallTime::now();
   ros::WallDuration dur = end - start;
-  ROS_INFO("1000000 %d-level transforms took %f for an average of %9f", num_levels, dur.toSec(), dur.toSec() / 1000000.0);
-  //ROS_INFO_STREAM(out_t);
+  ROS_INFO_STREAM(out_t);
+  ROS_INFO("1000000 %d-level transforms took %f for an average of %.9f", num_levels, dur.toSec(), dur.toSec() / 1000000.0);
 }

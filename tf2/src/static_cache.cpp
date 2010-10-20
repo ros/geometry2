@@ -38,7 +38,7 @@
 using namespace tf2;
 
 
-bool StaticCache::getData(ros::Time time, TransformStorage & data_out) //returns false if data not available
+bool StaticCache::getData(ros::Time time, TransformStorage & data_out, std::string* error_str) //returns false if data not available
 {
   data_out = storage_;
   data_out.stamp_ = time;

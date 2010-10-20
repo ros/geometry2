@@ -46,7 +46,6 @@ ROS_DECLARE_MESSAGE(TransformStamped);
 
 namespace tf2
 {
-enum ExtrapolationMode {  ONE_VALUE, INTERPOLATE, EXTRAPOLATE_BACK, EXTRAPOLATE_FORWARD };
 
 typedef uint32_t CompactFrameID;
 
@@ -61,7 +60,6 @@ public:
   ros::Time stamp_;
   CompactFrameID frame_id_;
   CompactFrameID child_frame_id_;
-  ExtrapolationMode mode_;
 };
 
 }

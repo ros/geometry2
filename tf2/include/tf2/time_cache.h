@@ -56,7 +56,7 @@ class TimeCacheInterface
 {
 public:
   /** \brief Access data from the cache */
-  virtual bool getData(ros::Time time, TransformStorage & data_out)=0; //returns false if data unavailable (should be thrown as lookup exception
+  virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0)=0; //returns false if data unavailable (should be thrown as lookup exception
 
   /** \brief Insert data into the cache */
   virtual bool insertData(const TransformStorage& new_data)=0;
@@ -87,17 +87,14 @@ class TimeCache : public TimeCacheInterface
   static const int MIN_INTERPOLATION_DISTANCE = 5; //!< Number of nano-seconds to not interpolate below.
   static const unsigned int MAX_LENGTH_LINKED_LIST = 1000000; //!< Maximum length of linked list, to make sure not to be able to use unlimited memory.
   static const int64_t DEFAULT_MAX_STORAGE_TIME = 1ULL * 1000000000LL; //!< default value of 10 seconds storage
-  static const int64_t DEFAULT_MAX_EXTRAPOLATION_TIME = 0LL; //!< default max extrapolation of 0 nanoseconds \todo remove and make not optional??
 
-
-  TimeCache(ros::Duration  max_storage_time = ros::Duration().fromNSec(DEFAULT_MAX_STORAGE_TIME),
-            ros::Duration  max_extrapolation_time = ros::Duration().fromNSec(DEFAULT_MAX_EXTRAPOLATION_TIME));
+  TimeCache(ros::Duration  max_storage_time = ros::Duration().fromNSec(DEFAULT_MAX_STORAGE_TIME));
 
 
   /// Virtual methods
 
   /** \brief Access data from the cache */
-  virtual bool getData(ros::Time time, TransformStorage & data_out); //returns false if data unavailable (should be thrown as lookup exception
+  virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0); //returns false if data unavailable (should be thrown as lookup exception
 
   /** \brief Insert data into the cache */
   virtual bool insertData(const TransformStorage& new_data);
@@ -122,12 +119,11 @@ private:
   L_TransformStorage storage_;
 
   ros::Duration max_storage_time_;
-  ros::Duration max_extrapolation_time_;
 
 
   /// A helper function for getData
   //Assumes storage is already locked for it
-  uint8_t findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, ExtrapolationMode& mode);
+  uint8_t findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, std::string* error_str);
 
   void interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output);  
 
@@ -144,7 +140,7 @@ class StaticCache : public TimeCacheInterface
   /// Virtual methods
 
   /** \brief Access data from the cache */
-  virtual bool getData(ros::Time time, TransformStorage & data_out); //returns false if data unavailable (should be thrown as lookup exception
+  virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0); //returns false if data unavailable (should be thrown as lookup exception
 
   /** \brief Insert data into the cache */
   virtual bool insertData(const TransformStorage& new_data);

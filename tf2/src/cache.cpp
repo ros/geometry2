@@ -53,42 +53,43 @@ TransformStorage::TransformStorage(const geometry_msgs::TransformStamped& data, 
   translation_ = btVector3(v.x, v.y, v.z);
 }
 
-TimeCache::TimeCache( ros::Duration  max_storage_time,
-                     ros::Duration max_extrapolation_time):
-  max_storage_time_(max_storage_time),
-  max_extrapolation_time_(max_extrapolation_time)
+TimeCache::TimeCache(ros::Duration max_storage_time)
+: max_storage_time_(max_storage_time)
 {}
 
-bool TimeCache::getData(ros::Time time, TransformStorage & data_out) //returns false if data not available
+bool TimeCache::getData(ros::Time time, TransformStorage & data_out, std::string* error_str) //returns false if data not available
 {
   TransformStorage p_temp_1, p_temp_2;
 
   int num_nodes;
   ros::Duration time_diff;
 
-  ExtrapolationMode mode;
-  num_nodes = findClosest(p_temp_1,p_temp_2, time, mode);
-  if (num_nodes == 1)
+  num_nodes = findClosest(p_temp_1, p_temp_2, time, error_str);
+  if (num_nodes == 0)
+  {
+    return false;
+  }
+  else if (num_nodes == 1)
   {
     data_out = p_temp_1;
-    data_out.mode_ = mode;
   }
   else if (num_nodes == 2)
   {
     if( p_temp_1.frame_id_ == p_temp_2.frame_id_)
     {
       interpolate(p_temp_1, p_temp_2, time, data_out);
-      data_out.mode_ = mode;
     }
     else
     {
       data_out = p_temp_1;
-      data_out.mode_ = mode;
     }
   }
-    
-  return (num_nodes > 0);
+  else
+  {
+    ROS_BREAK();
+  }
 
+  return true;
 }
 
 bool TimeCache::insertData(const TransformStorage& new_data)
@@ -117,7 +118,7 @@ bool TimeCache::insertData(const TransformStorage& new_data)
 }
 
 
-uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, ExtrapolationMode& mode)
+uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros::Time target_time, std::string* error_str)
 {
   //No values stored
   if (storage_.empty())
@@ -129,16 +130,54 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
   if (target_time == ros::Time())
   {
     one = storage_.front();
-    mode = ONE_VALUE;
     return 1;
   }
 
   // One value stored
   if (++storage_.begin() == storage_.end())
   {
-    one = *(storage_.begin());
-    mode = ONE_VALUE;
-    return 1;
+    const TransformStorage& ts = *storage_.begin();
+    if (ts.stamp_ == target_time)
+    {
+      one = ts;
+      return 1;
+    }
+    else
+    {
+      if (error_str)
+      {
+        std::stringstream ss;
+        ss << "Lookup would require extrapolation at time " << target_time << ", but only time " << ts.stamp_ << " is in the buffer";
+        *error_str = ss.str();
+      }
+
+      return 0;
+    }
+  }
+
+  ros::Time latest_time = (*storage_.begin()).stamp_;
+  ros::Time earliest_time = (*(storage_.rbegin())).stamp_;
+
+  // Catch cases that would require extrapolation
+  if (target_time > latest_time)
+  {
+    if (error_str)
+    {
+      std::stringstream ss;
+      ss << "Lookup would require extrapolation into the future.  Requested time " << target_time << " but the latest data is at time " << latest_time;
+      *error_str = ss.str();
+    }
+    return 0;
+  }
+  else if (target_time < earliest_time)
+  {
+    if (error_str)
+    {
+      std::stringstream ss;
+      ss << "Lookup would require extrapolation into the past.  Requested time " << target_time << " but the earliest data is at time " << earliest_time;
+      *error_str = ss.str();
+    }
+    return 0;
   }
 
   //At least 2 values stored
@@ -150,49 +189,10 @@ uint8_t TimeCache::findClosest(TransformStorage& one, TransformStorage& two, ros
       break;
     storage_it++;
   }
-  //Catch the case it is the first value in the list
-  if (storage_it == storage_.begin())
-  {
-    one = *storage_it;
-    two = *(++storage_it);
-    mode = EXTRAPOLATE_FORWARD;
-
-    /*    if (time_diff > max_extrapolation_time_) //Guarenteed in the future therefore positive
-    {
-      std::stringstream ss;
-      ss << "Extrapolation Too Far in the future: target_time = "<< (target_time).toSec() <<", closest data at "
-         << (one.stamp_).toSec() << " and " << (two.stamp_).toSec() <<" which are farther away than max_extrapolation_time "
-         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.stamp_).toSec()<< " and " << (target_time - two.stamp_).toSec() <<" respectively.";
-      throw ExtrapolationException(ss.str());
-    }
-    */
-    return 2;
-  }
-
-  //Catch the case where it's in the past
-  if (storage_it == storage_.end())
-  {
-    one = *(--storage_it);
-    two = *(--storage_it);
-    mode = EXTRAPOLATE_BACK;
-    /*
-      time_diff = target_time - one.stamp_;
-    if (time_diff < ros::Duration()-max_extrapolation_time_) //Guarenteed in the past ///\todo check negative sign
-    {
-      std::stringstream ss;
-      ss << "Extrapolation Too Far in the past: target_time = "<< (target_time).toSec() <<", closest data at "
-         << (one.stamp_).toSec() << " and " << (two.stamp_).toSec() <<" which are farther away than max_extrapolation_time "
-         << (max_extrapolation_time_).toSec() <<" at "<< (target_time - one.stamp_).toSec()<< " and " << (target_time - two.stamp_).toSec() <<" respectively."; //sign flip since in the past
-      throw ExtrapolationException(ss.str());
-    }
-    */
-    return 2;
-  }
 
   //Finally the case were somewhere in the middle  Guarenteed no extrapolation :-)
   one = *(storage_it); //Older
   two = *(--storage_it); //Newer
-  mode = INTERPOLATE;
   return 2;
 
 

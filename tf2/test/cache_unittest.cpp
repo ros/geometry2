@@ -267,6 +267,8 @@ TEST(TimeCache, ReparentingInterpolationProtection)
   double epsilon = 1e-6;
   uint64_t offset = 555;
 
+  seed_rand();
+
   tf2::TimeCache cache;
   std::vector<double> xvalues(2);
   std::vector<double> yvalues(2);
@@ -297,67 +299,6 @@ TEST(TimeCache, ReparentingInterpolationProtection)
     EXPECT_NEAR(yvalues[0], y_out, epsilon);
     EXPECT_NEAR(zvalues[0], z_out, epsilon);
   }
-  
-  for (int pos = 100; pos < 120 ; pos ++)
-  {
-    EXPECT_TRUE(cache.getData(ros::Time().fromNSec(offset + pos), stor));
-    double x_out = stor.translation_.x();
-    double y_out = stor.translation_.y();
-    double z_out = stor.translation_.z();
-    EXPECT_NEAR(xvalues[1], x_out, epsilon);
-    EXPECT_NEAR(yvalues[1], y_out, epsilon);
-    EXPECT_NEAR(zvalues[1], z_out, epsilon);
-  }
-
-
-}
-
-TEST(TimeCache, CartesianExtrapolation)
-{
-  uint64_t runs = 100;
-  double epsilon = 1e-5;
-  seed_rand();
-  
-  tf2::TimeCache  cache;
-  std::vector<double> xvalues(2);
-  std::vector<double> yvalues(2);
-  std::vector<double> zvalues(2);
-
-  uint64_t offset = 555;
-
-  TransformStorage stor;
-  setIdentity(stor);
-  
-  for ( uint64_t i = 1; i < runs ; i++ )
-  {
-
-    for (uint64_t step = 0; step < 2 ; step++)
-    {
-      xvalues[step] = 10.0 * get_rand();
-      yvalues[step] = 10.0 * get_rand();
-      zvalues[step] = 10.0 * get_rand();
-    
-      stor.translation_.setValue(xvalues[step], yvalues[step], zvalues[step]);
-      stor.frame_id_ = 2;
-      stor.stamp_ = ros::Time().fromNSec(step * 100 + offset);
-      cache.insertData(stor);
-    }
-    
-    for (int pos = -200; pos < 300 ; pos ++)
-    {
-      cache.getData(ros::Time().fromNSec(offset + pos), stor);
-      double x_out = stor.translation_.x();
-      double y_out = stor.translation_.y();
-      double z_out = stor.translation_.z();
-      EXPECT_NEAR(xvalues[0] + (xvalues[1] - xvalues[0]) * (double)pos/100.0, x_out, epsilon);
-      EXPECT_NEAR(yvalues[0] + (yvalues[1] - yvalues[0]) * (double)pos/100.0, y_out, epsilon);
-      EXPECT_NEAR(zvalues[0] + (zvalues[1] - zvalues[0]) * (double)pos/100.0, z_out, epsilon);
-    }
-    
-    cache.clearList();
-  }
-
-  
 }
 
 TEST(Bullet, Slerp)
@@ -416,9 +357,9 @@ TEST(TimeCache, AngularInterpolation)
       cache.insertData(stor);
     }
     
-    for (int pos = -100; pos < 200 ; pos ++)
+    for (int pos = 0; pos < 100 ; pos ++)
     {
-      cache.getData(ros::Time().fromNSec(offset + pos), stor); //get the transform for the position
+      EXPECT_TRUE(cache.getData(ros::Time().fromNSec(offset + pos), stor)); //get the transform for the position
       btQuaternion quat (stor.rotation_);
 
       //Generate a ground truth quaternion directly calling slerp
