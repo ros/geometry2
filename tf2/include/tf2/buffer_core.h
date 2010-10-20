@@ -258,8 +258,8 @@ private:
   TimeCacheInterface* allocateFrame(CompactFrameID cfid, bool is_static);
 
 
-  bool warnFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
-  CompactFrameID validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
+  bool warnFrameId(const char* function_name_arg, const std::string& frame_id) const;
+  CompactFrameID validateFrameId(const char* function_name_arg, const std::string& frame_id) const;
 
   /// String to number for frame lookup with dynamic allocation of new frames
   CompactFrameID lookupFrameNumber(const std::string& frameid_str) const;
@@ -277,7 +277,10 @@ private:
 
   /**@brief Return the latest rostime which is common across the spanning set
    * zero if fails to cross */
-  int getLatestCommonTime(CompactFrameID source_frame, CompactFrameID target_frame, ros::Time& time, std::string * error_string) const;
+  int getLatestCommonTime(CompactFrameID source_frame, CompactFrameID target_frame, ros::Time& time, std::string* error_string) const;
+
+  template<typename F>
+  int walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string) const;
 
   /////////////////////////////////// Backwards hack for quick startup /////////////////////////
   //Using tf for now will be replaced fully
