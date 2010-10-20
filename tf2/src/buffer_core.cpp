@@ -410,9 +410,11 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
 struct TransformAccum
 {
   TransformAccum()
+  : source_to_top_quat(0.0, 0.0, 0.0, 1.0)
+  , source_to_top_vec(0.0, 0.0, 0.0)
+  , target_to_top_quat(0.0, 0.0, 0.0, 1.0)
+  , target_to_top_vec(0.0, 0.0, 0.0)
   {
-    source_to_top.setIdentity();
-    target_to_top.setIdentity();
     final_result.setIdentity();
   }
 
@@ -428,15 +430,15 @@ struct TransformAccum
 
   void accum(bool source)
   {
-    btTransform trans(st.rotation_, st.translation_);
-
     if (source)
     {
-      source_to_top *= trans;
+      source_to_top_vec += quatRotate(source_to_top_quat, st.translation_);
+      source_to_top_quat *= st.rotation_;
     }
     else
     {
-      target_to_top *= trans;
+      target_to_top_vec += quatRotate(target_to_top_quat, st.translation_);
+      target_to_top_quat *= st.rotation_;
     }
   }
 
@@ -447,13 +449,13 @@ struct TransformAccum
     case Identity:
       break;
     case TargetParentOfSource:
-      final_result = source_to_top;
+      final_result = btTransform(source_to_top_quat, source_to_top_vec);
       break;
     case SourceParentOfTarget:
-      final_result = target_to_top.inverse();
+      final_result = btTransform(target_to_top_quat, target_to_top_vec).inverse();
       break;
     case FullPath:
-      final_result = source_to_top * target_to_top.inverse();
+      final_result = btTransform(source_to_top_quat, source_to_top_vec) * btTransform(target_to_top_quat, target_to_top_vec).inverse();
       break;
     };
 
@@ -462,8 +464,10 @@ struct TransformAccum
 
   TransformStorage st;
   ros::Time time;
-  btTransform source_to_top;
-  btTransform target_to_top;
+  btQuaternion source_to_top_quat;
+  btVector3 source_to_top_vec;
+  btQuaternion target_to_top_quat;
+  btVector3 target_to_top_vec;
   btTransform final_result;
 };
 
