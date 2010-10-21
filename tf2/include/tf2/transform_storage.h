@@ -50,11 +50,29 @@ namespace tf2
 typedef uint32_t CompactFrameID;
 
 /** \brief Storage for transforms and their parent */
-class  TransformStorage
+class TransformStorage
 {
 public:
   TransformStorage();
   TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID frame_id, CompactFrameID child_frame_id);
+
+  TransformStorage(const TransformStorage& rhs)
+  {
+    *this = rhs;
+  }
+
+  TransformStorage& operator=(const TransformStorage& rhs)
+  {
+#if 01
+    rotation_ = rhs.rotation_;
+    translation_ = rhs.translation_;
+    stamp_ = rhs.stamp_;
+    frame_id_ = rhs.frame_id_;
+    child_frame_id_ = rhs.child_frame_id_;
+#endif
+    return *this;
+  }
+
   btQuaternion rotation_;
   btVector3 translation_;
   ros::Time stamp_;

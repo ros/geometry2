@@ -205,7 +205,7 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
     return;    
   }
   //Calculate the ratio
-  btScalar ratio = ((time - one.stamp_).toSec()) / ((two.stamp_ - one.stamp_).toSec());
+  btScalar ratio = (time.toSec() - one.stamp_.toSec()) / (two.stamp_.toSec() - one.stamp_.toSec());
   
   //Interpolate translation
   output.translation_.setInterpolate3(one.translation_, two.translation_, ratio);
