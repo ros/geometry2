@@ -81,6 +81,14 @@ void transformTF2ToMsg(const btQuaternion& orient, const btVector3& pos, geometr
   msg.rotation.w = orient.w();
 }
 
+void transformTF2ToMsg(const btQuaternion& orient, const btVector3& pos, geometry_msgs::TransformStamped& msg, ros::Time stamp, const std::string& frame_id, const std::string& child_frame_id)
+{
+  transformTF2ToMsg(orient, pos, msg.transform);
+  msg.header.stamp = stamp;
+  msg.header.frame_id = frame_id;
+  msg.child_frame_id = child_frame_id;
+}
+
 void setIdentity(geometry_msgs::Transform& tx)
 {
   tx.translation.x = 0;
@@ -414,8 +422,9 @@ struct TransformAccum
   , source_to_top_vec(0.0, 0.0, 0.0)
   , target_to_top_quat(0.0, 0.0, 0.0, 1.0)
   , target_to_top_vec(0.0, 0.0, 0.0)
+  , result_quat(0.0, 0.0, 0.0, 1.0)
+  , result_vec(0.0, 0.0, 0.0)
   {
-    final_result.setIdentity();
   }
 
   CompactFrameID gather(TimeCacheInterface* cache, ros::Time time, std::string* error_string)
@@ -449,13 +458,25 @@ struct TransformAccum
     case Identity:
       break;
     case TargetParentOfSource:
-      final_result = btTransform(source_to_top_quat, source_to_top_vec);
+      result_vec = source_to_top_vec;
+      result_quat = source_to_top_quat;
       break;
     case SourceParentOfTarget:
-      final_result = btTransform(target_to_top_quat, target_to_top_vec).inverse();
-      break;
+      {
+        btQuaternion inv_target_quat = target_to_top_quat.inverse();
+        btVector3 inv_target_vec = quatRotate(inv_target_quat, -target_to_top_vec);
+        result_vec = inv_target_vec;
+        result_quat = inv_target_quat;
+        break;
+      }
     case FullPath:
-      final_result = btTransform(source_to_top_quat, source_to_top_vec) * btTransform(target_to_top_quat, target_to_top_vec).inverse();
+      {
+        btQuaternion inv_target_quat = target_to_top_quat.inverse();
+        btVector3 inv_target_vec = quatRotate(inv_target_quat, -target_to_top_vec);
+
+        result_vec = source_to_top_vec + quatRotate(source_to_top_quat, inv_target_vec);
+        result_quat = source_to_top_quat * inv_target_quat;
+      }
       break;
     };
 
@@ -468,7 +489,9 @@ struct TransformAccum
   btVector3 source_to_top_vec;
   btQuaternion target_to_top_quat;
   btVector3 target_to_top_vec;
-  btTransform final_result;
+
+  btQuaternion result_quat;
+  btVector3 result_vec;
 };
 
 geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame,
@@ -500,7 +523,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   }
 
   geometry_msgs::TransformStamped output_transform;
-  transformTF2ToMsg(accum.final_result, output_transform, accum.time, target_frame, source_frame);
+  transformTF2ToMsg(accum.result_quat, accum.result_vec, output_transform, accum.time, target_frame, source_frame);
   return output_transform;
 }
 
