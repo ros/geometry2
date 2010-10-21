@@ -71,42 +71,25 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
 {
   ROS_DEBUG("Clearing Buffer Core for new test setup");
   mBC.clear();
-
+  
   ROS_DEBUG("Setting up test tree for formation %s", mode.c_str());
+
+  std::vector<std::string> children;
+  std::vector<std::string> parents;
+  std::vector<double> dx, dy;
 
   if (mode == "i")
   {
-    std::vector<std::string> children;
-    std::vector<std::string> parents;
-    
-
-    
     children.push_back("b");
     parents.push_back("a");
+    dx.push_back(1.0);
+    dy.push_back(0.0);
     children.push_back("c");
     parents.push_back("b");
+    dx.push_back(1.0);
+    dy.push_back(0.0);
     
     
-    for (uint64_t i = 0; i <  children.size(); i++)
-    {
-      geometry_msgs::TransformStamped ts;
-      setIdentity(ts.transform);
-      ts.transform.translation.x = 1;
-      if (time > ros::Time() + (interpolation_space * .5))
-        ts.header.stamp = time - (interpolation_space * .5);
-      else
-        ts.header.stamp = ros::Time();
-            
-      ts.header.frame_id = parents[i];
-      ts.child_frame_id = children[i];
-      EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-      if (interpolation_space > ros::Duration())
-      {
-        ts.header.stamp = time + interpolation_space * .5;
-        EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-      
-      }
-    }
   }
   else if (mode == "yl")
   {
@@ -167,10 +150,10 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
       {
         ts.header.stamp = time + interpolation_space * .5;
         EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-      
+        
       }
     }
-
+    return; // nonstandard setup return before standard executinog
   }  
   else if (mode == "1")
   {
@@ -185,10 +168,34 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
     ts.header.frame_id = "a";
     ts.child_frame_id = "b";
     EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-    
+    return; // nonstandard setup return before standard executinog
   }  
   else
     EXPECT_FALSE("Undefined mode for tree setup.  Test harness improperly setup.");
+
+
+  /// Standard 
+  for (uint64_t i = 0; i <  children.size(); i++)
+  {
+    geometry_msgs::TransformStamped ts;
+    setIdentity(ts.transform);
+    ts.transform.translation.x = dx[i];
+    ts.transform.translation.y = dy[i];
+    if (time > ros::Time() + (interpolation_space * .5))
+      ts.header.stamp = time - (interpolation_space * .5);
+    else
+      ts.header.stamp = ros::Time();
+            
+    ts.header.frame_id = parents[i];
+    ts.child_frame_id = children[i];
+    EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+    if (interpolation_space > ros::Duration())
+    {
+      ts.header.stamp = time + interpolation_space * .5;
+      EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+      
+    }
+  }
 }
 
 
