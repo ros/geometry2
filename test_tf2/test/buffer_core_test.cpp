@@ -77,9 +77,17 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
   std::vector<std::string> children;
   std::vector<std::string> parents;
   std::vector<double> dx, dy;
-
+  
   if (mode == "i")
   {
+    /* 
+       "a"
+       v   (1,0)
+       "b"
+       v   (1,0)
+       "c"
+    */
+    
     children.push_back("b");
     parents.push_back("a");
     dx.push_back(1.0);
@@ -88,27 +96,71 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
     parents.push_back("b");
     dx.push_back(1.0);
     dy.push_back(0.0);
-    
-    
   }
-  else if (mode == "yl")
+  else if (mode == "y")
   {
-
+    
+    /*
+      "a"
+      v  (1,0)
+      "b" ------(0,1)-----> "d"
+      v  (1,0)              v  (0,1)
+      "c"                   "e"
+    */
+    // a>b
+    children.push_back("b");
+    parents.push_back("a");
+    dx.push_back(1.0);
+    dy.push_back(0.0);
+     // b>c
+    children.push_back("c");
+    parents.push_back("b");
+    dx.push_back(1.0);
+    dy.push_back(0.0);
+     // b>d
+    children.push_back("d");
+    parents.push_back("b");
+    dx.push_back(0.0);
+    dy.push_back(1.0);
+     // d>e
+    children.push_back("e");
+    parents.push_back("d");
+    dx.push_back(0.0);
+    dy.push_back(1.0);
+    
   }
 
-  else if (mode == "yr")
-  {
-
-  }
   else if (mode == "v")
   {
-
+    /*
+      "a" ------(0,1)-----> "f"
+      v  (1,0)              v  (0,1)
+      "b"                   "g" 
+      v  (1,0)
+      "c"
+    */
+    // a>b
+    children.push_back("b");
+    parents.push_back("a");
+    dx.push_back(1.0);
+    dy.push_back(0.0);
+     // b>c
+    children.push_back("c");
+    parents.push_back("b");
+    dx.push_back(1.0);
+    dy.push_back(0.0);
+     // a>f
+    children.push_back("f");
+    parents.push_back("a");
+    dx.push_back(0.0);
+    dy.push_back(1.0);
+     // f>g
+    children.push_back("g");
+    parents.push_back("f");
+    dx.push_back(0.0);
+    dy.push_back(1.0);
   }
 
-  else if (mode == "w")
-  {
-
-  }  
   else if (mode == "ring_45")
   {
     /* Form a ring of transforms at every 45 degrees on the unit circle.  */
@@ -165,8 +217,8 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
     else
       ts.header.stamp = ros::Time();
     
-    ts.header.frame_id = "a";
-    ts.child_frame_id = "b";
+    ts.header.frame_id = "1";
+    ts.child_frame_id = "2";
     EXPECT_TRUE(mBC.setTransform(ts, "authority"));
     return; // nonstandard setup return before standard executinog
   }  
@@ -638,14 +690,14 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> source_frames;
-  source_frames.push_back("a");
-  source_frames.push_back("b");
+  source_frames.push_back("1");
+  source_frames.push_back("2");
   std::string source_frame;
   permuter.addOptionSet(source_frames, &source_frame);
   
   std::vector<std::string> target_frames;
-  target_frames.push_back("a");
-  target_frames.push_back("b");
+  target_frames.push_back("1");
+  target_frames.push_back("2");
   std::string target_frame;
   permuter.addOptionSet(target_frames, &target_frame);
 
@@ -672,11 +724,11 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
     {
       EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
     }
-    else if (source_frame == "a" && target_frame =="b")
+    else if (source_frame == "1" && target_frame =="2")
     {
       EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
     }
-    else if (source_frame == "b" && target_frame =="a")
+    else if (source_frame == "2" && target_frame =="1")
     {
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
     }
@@ -689,12 +741,10 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
   }
 }
 
-TEST(BufferCore_lookupTransform, ring_45_configuration)
+
+void test_ring(void)
 {
   double epsilon = 1e-6;
-  
-
-
   rostest::Permuter permuter;
 
   std::vector<ros::Time> times;
@@ -852,6 +902,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
     }
     
   }
+}
+TEST(BufferCore_lookupTransform, ring_45_configuration)
+{
+  test_ring();
 }
 
 TEST(BufferCore_lookupTransform, invalid_arguments)
