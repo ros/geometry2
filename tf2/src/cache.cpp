@@ -129,6 +129,36 @@ bool TimeCache::insertData(const TransformStorage& new_data)
   return true;
 }
 
+// hoisting these into separate functions causes an ~8% speedup.  Removing calling them altogether adds another ~10%
+void createExtrapolationException1(ros::Time t0, ros::Time t1, std::string* error_str)
+{
+  if (error_str)
+  {
+    std::stringstream ss;
+    ss << "Lookup would require extrapolation at time " << t0 << ", but only time " << t1 << " is in the buffer";
+    *error_str = ss.str();
+  }
+}
+
+void createExtrapolationException2(ros::Time t0, ros::Time t1, std::string* error_str)
+{
+  if (error_str)
+  {
+    std::stringstream ss;
+    ss << "Lookup would require extrapolation into the future.  Requested time " << t0 << " but the latest data is at time " << t1;
+    *error_str = ss.str();
+  }
+}
+
+void createExtrapolationException3(ros::Time t0, ros::Time t1, std::string* error_str)
+{
+  if (error_str)
+  {
+    std::stringstream ss;
+    ss << "Lookup would require extrapolation into the past.  Requested time " << t0 << " but the earliest data is at time " << t1;
+    *error_str = ss.str();
+  }
+}
 
 uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str)
 {
@@ -156,13 +186,7 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
     }
     else
     {
-      if (error_str)
-      {
-        std::stringstream ss;
-        ss << "Lookup would require extrapolation at time " << target_time << ", but only time " << ts.stamp_ << " is in the buffer";
-        *error_str = ss.str();
-      }
-
+      createExtrapolationException1(target_time, ts.stamp_, error_str);
       return 0;
     }
   }
@@ -173,22 +197,12 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
   // Catch cases that would require extrapolation
   if (target_time > latest_time)
   {
-    if (error_str)
-    {
-      std::stringstream ss;
-      ss << "Lookup would require extrapolation into the future.  Requested time " << target_time << " but the latest data is at time " << latest_time;
-      *error_str = ss.str();
-    }
+    createExtrapolationException2(target_time, latest_time, error_str);
     return 0;
   }
   else if (target_time < earliest_time)
   {
-    if (error_str)
-    {
-      std::stringstream ss;
-      ss << "Lookup would require extrapolation into the past.  Requested time " << target_time << " but the earliest data is at time " << earliest_time;
-      *error_str = ss.str();
-    }
+    createExtrapolationException2(target_time, earliest_time, error_str);
     return 0;
   }
 
