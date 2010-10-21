@@ -50,35 +50,48 @@ int main(int argc, char** argv)
   t.transform.translation.x = 1;
   t.transform.rotation.w = 1.0;
   bc.setTransform(t, "me");
+  t.header.stamp = ros::Time(2);
+  bc.setTransform(t, "me");
 
   for (uint32_t i = 1; i < num_levels/2; ++i)
   {
-    std::stringstream parent_ss;
-    parent_ss << (i - 1);
-    std::stringstream child_ss;
-    child_ss << i;
+    for (uint32_t j = 1; j < 3; ++j)
+    {
+      std::stringstream parent_ss;
+      parent_ss << (i - 1);
+      std::stringstream child_ss;
+      child_ss << i;
 
-    t.header.frame_id = parent_ss.str();
-    t.child_frame_id = child_ss.str();
-    bc.setTransform(t, "me");
+      t.header.stamp = ros::Time(j);
+      t.header.frame_id = parent_ss.str();
+      t.child_frame_id = child_ss.str();
+      bc.setTransform(t, "me");
+    }
   }
 
   t.header.frame_id = "root";
   std::stringstream ss;
-  ss << num_levels/2 ;
+  ss << num_levels/2;
+  t.header.stamp = ros::Time(1);
   t.child_frame_id = ss.str();
+  bc.setTransform(t, "me");
+  t.header.stamp = ros::Time(2);
   bc.setTransform(t, "me");
 
   for (uint32_t i = num_levels/2 + 1; i < num_levels; ++i)
   {
-    std::stringstream parent_ss;
-    parent_ss << (i - 1);
-    std::stringstream child_ss;
-    child_ss << i;
+    for (uint32_t j = 1; j < 3; ++j)
+    {
+      std::stringstream parent_ss;
+      parent_ss << (i - 1);
+      std::stringstream child_ss;
+      child_ss << i;
 
-    t.header.frame_id = parent_ss.str();
-    t.child_frame_id = child_ss.str();
-    bc.setTransform(t, "me");
+      t.header.stamp = ros::Time(j);
+      t.header.frame_id = parent_ss.str();
+      t.child_frame_id = child_ss.str();
+      bc.setTransform(t, "me");
+    }
   }
 
   //ROS_INFO_STREAM(bc.allFramesAsYAML());
@@ -88,10 +101,10 @@ int main(int argc, char** argv)
   ROS_INFO("%s to %s", v_frame0.c_str(), v_frame1.c_str());
   geometry_msgs::TransformStamped out_t;
 
-  const uint32_t count = 10000000;
+  const uint32_t count = 1000000;
   ROS_INFO("Doing %d %d-level tests", count, num_levels);
 
-#if 0
+#if 01
   {
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
@@ -105,7 +118,7 @@ int main(int argc, char** argv)
   }
 #endif
 
-#if 0
+#if 01
   {
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
@@ -119,7 +132,7 @@ int main(int argc, char** argv)
   }
 #endif
 
-#if 0
+#if 01
   {
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)

@@ -800,7 +800,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID tar
   CompactFrameID frame = source_id;
   P_TimeAndFrameID temp;
   uint32_t depth = 0;
-  ros::Time latest_time;
+  ros::Time common_time = ros::TIME_MAX;
   while (frame != 0)
   {
     TimeCacheInterface* cache = getFrame(frame);
@@ -819,7 +819,10 @@ int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID tar
       break;
     }
 
-    latest_time = std::max(latest.first, latest_time);
+    if (!latest.first.isZero())
+    {
+      common_time = std::min(latest.first, common_time);
+    }
 
     lct_cache_.push_back(latest);
 
@@ -828,7 +831,11 @@ int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID tar
     // Early out... target frame is a direct parent of the source frame
     if (frame == target_id)
     {
-      time = latest_time;
+      time = common_time;
+      if (time == ros::TIME_MAX)
+      {
+        time = ros::Time();
+      }
       return tf2_msgs::TF2Error::NO_ERROR;
     }
 
@@ -849,7 +856,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID tar
   // Now walk to the top parent from the target frame, accumulating the latest time and looking for a common parent
   frame = target_id;
   depth = 0;
-  latest_time = ros::Time();
+  common_time = ros::TIME_MAX;
   CompactFrameID common_parent = 0;
   while (true)
   {
@@ -867,7 +874,10 @@ int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID tar
       break;
     }
 
-    latest_time = std::max(latest.first, latest_time);
+    if (!latest.first.isZero())
+    {
+      common_time = std::min(latest.first, common_time);
+    }
 
     std::vector<P_TimeAndFrameID>::iterator it = std::find_if(lct_cache_.begin(), lct_cache_.end(), TimeAndFrameIDFrameComparator(latest.second));
     if (it != lct_cache_.end()) // found a common parent
@@ -881,7 +891,11 @@ int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID tar
     // Early out... source frame is a direct parent of the target frame
     if (frame == source_id)
     {
-      time = latest_time;
+      time = common_time;
+      if (time == ros::TIME_MAX)
+      {
+        time = ros::Time();
+      }
       return tf2_msgs::TF2Error::NO_ERROR;
     }
 
@@ -911,16 +925,24 @@ int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID tar
     std::vector<P_TimeAndFrameID>::iterator end = lct_cache_.end();
     for (; it != end; ++it)
     {
+      if (!it->first.isZero())
+      {
+        common_time = std::min(common_time, it->first);
+      }
+
       if (it->second == common_parent)
       {
         break;
       }
-
-      latest_time = std::max(latest_time, it->first);
     }
   }
 
-  time = latest_time;
+  if (common_time == ros::TIME_MAX)
+  {
+    common_time = ros::Time();
+  }
+
+  time = common_time;
   return tf2_msgs::TF2Error::NO_ERROR;
 }
 
