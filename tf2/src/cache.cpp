@@ -62,10 +62,7 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out, std::string
   TransformStorage* p_temp_1;
   TransformStorage* p_temp_2;
 
-  int num_nodes;
-  ros::Duration time_diff;
-
-  num_nodes = findClosest(p_temp_1, p_temp_2, time, error_str);
+  int num_nodes = findClosest(p_temp_1, p_temp_2, time, error_str);
   if (num_nodes == 0)
   {
     return false;
@@ -128,7 +125,7 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
   }
 
   //If time == 0 return the latest
-  if (target_time == ros::Time())
+  if (target_time.isZero())
   {
     one = &storage_.front();
     return 1;

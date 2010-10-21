@@ -91,7 +91,7 @@ int main(int argc, char** argv)
   const uint32_t count = 1000000;
   ROS_INFO("Doing %d %d-level tests", count, num_levels);
 
-#if 01
+#if 0
   {
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
@@ -101,11 +101,11 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("lookupTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / 1000000.0);
+    ROS_INFO("lookupTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
-#if 01
+#if 0
   {
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
@@ -115,11 +115,11 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("lookupTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / 1000000.0);
+    ROS_INFO("lookupTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
-#if 01
+#if 0
   {
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("canTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / 1000000.0);
+    ROS_INFO("canTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -143,7 +143,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("canTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / 1000000.0);
+    ROS_INFO("canTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 }
