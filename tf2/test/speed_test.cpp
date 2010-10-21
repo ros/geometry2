@@ -88,7 +88,7 @@ int main(int argc, char** argv)
   ROS_INFO("%s to %s", v_frame0.c_str(), v_frame1.c_str());
   geometry_msgs::TransformStamped out_t;
 
-  const uint32_t count = 1000000;
+  const uint32_t count = 10000000;
   ROS_INFO("Doing %d %d-level tests", count, num_levels);
 
 #if 0

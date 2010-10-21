@@ -124,9 +124,9 @@ private:
 
   /// A helper function for getData
   //Assumes storage is already locked for it
-  uint8_t findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str);
+  inline uint8_t findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str);
 
-  void interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output);  
+  inline void interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output);
 
 
   void pruneList();
