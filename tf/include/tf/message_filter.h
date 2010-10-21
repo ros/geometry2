@@ -359,9 +359,8 @@ private:
       if (target_frame != frame_id)
       {
         ros::Time latest_transform_time ;
-        std::string error_string ;
 
-        tf_.getLatestCommonTime(frame_id, target_frame, latest_transform_time, &error_string) ;
+        tf_.getLatestCommonTime(frame_id, target_frame, latest_transform_time, 0) ;
         if (stamp + tf_.getCacheLength() < latest_transform_time)
         {
           ++failed_out_the_back_count_;
