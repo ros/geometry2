@@ -87,17 +87,63 @@ int main(int argc, char** argv)
   std::string v_frame1 = boost::lexical_cast<std::string>(num_levels/2 - 1);
   ROS_INFO("%s to %s", v_frame0.c_str(), v_frame1.c_str());
   geometry_msgs::TransformStamped out_t;
-  ros::WallTime start = ros::WallTime::now();
-  for (int i = 0; i < 1000000; ++i)
-  {
+
+  const uint32_t count = 1000000;
+  ROS_INFO("Doing %d %d-level tests", count, num_levels);
+
 #if 01
-    out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(0));
-#else
-    bc.canTransform(v_frame1, v_frame0, ros::Time(0));
-#endif
+  {
+    ros::WallTime start = ros::WallTime::now();
+    for (uint32_t i = 0; i < count; ++i)
+    {
+      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(0));
+    }
+    ros::WallTime end = ros::WallTime::now();
+    ros::WallDuration dur = end - start;
+    //ROS_INFO_STREAM(out_t);
+    ROS_INFO("lookupTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / 1000000.0);
   }
-  ros::WallTime end = ros::WallTime::now();
-  ros::WallDuration dur = end - start;
-  ROS_INFO_STREAM(out_t);
-  ROS_INFO("1000000 %d-level transforms took %f for an average of %.9f", num_levels, dur.toSec(), dur.toSec() / 1000000.0);
+#endif
+
+#if 01
+  {
+    ros::WallTime start = ros::WallTime::now();
+    for (uint32_t i = 0; i < count; ++i)
+    {
+      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(1));
+    }
+    ros::WallTime end = ros::WallTime::now();
+    ros::WallDuration dur = end - start;
+    //ROS_INFO_STREAM(out_t);
+    ROS_INFO("lookupTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / 1000000.0);
+  }
+#endif
+
+#if 01
+  {
+    ros::WallTime start = ros::WallTime::now();
+    for (uint32_t i = 0; i < count; ++i)
+    {
+      bc.canTransform(v_frame1, v_frame0, ros::Time(0));
+    }
+    ros::WallTime end = ros::WallTime::now();
+    ros::WallDuration dur = end - start;
+    //ROS_INFO_STREAM(out_t);
+    ROS_INFO("canTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / 1000000.0);
+  }
+#endif
+
+#if 01
+  {
+    ros::WallTime start = ros::WallTime::now();
+    for (uint32_t i = 0; i < count; ++i)
+    {
+      bc.canTransform(v_frame1, v_frame0, ros::Time(1));
+    }
+    ros::WallTime end = ros::WallTime::now();
+    ros::WallDuration dur = end - start;
+    //ROS_INFO_STREAM(out_t);
+    ROS_INFO("canTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / 1000000.0);
+  }
+#endif
 }
