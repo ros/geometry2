@@ -66,6 +66,9 @@ public:
   /** @brief Clear the list of stored values */
   virtual void clearList()=0;
 
+  /** \brief Retrieve the parent at a specific time */
+  virtual CompactFrameID getParent(ros::Time time, std::string* error_str) = 0;
+
   /**
    * \brief Get the latest time stored in this cache, and the parent associated with it.  Returns parent = 0 if no data.
    */
@@ -103,6 +106,7 @@ class TimeCache : public TimeCacheInterface
   virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0);
   virtual bool insertData(const TransformStorage& new_data);
   virtual void clearList();
+  virtual CompactFrameID getParent(ros::Time time, std::string* error_str);
   virtual P_TimeAndFrameID getLatestTimeAndParent();
 
   /// Debugging information methods
@@ -139,6 +143,7 @@ class StaticCache : public TimeCacheInterface
   virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0); //returns false if data unavailable (should be thrown as lookup exception
   virtual bool insertData(const TransformStorage& new_data);
   virtual void clearList();
+  virtual CompactFrameID getParent(ros::Time time, std::string* error_str);
   virtual P_TimeAndFrameID getLatestTimeAndParent();
 
 

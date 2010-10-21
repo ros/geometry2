@@ -622,12 +622,7 @@ struct CanTransformAccum
 {
   CompactFrameID gather(TimeCacheInterface* cache, ros::Time time, std::string* error_string)
   {
-    if (!cache->getData(time, st, error_string))
-    {
-      return 0;
-    }
-
-    return st.frame_id_;
+    return cache->getParent(time, error_string);
   }
 
   void accum(bool source)

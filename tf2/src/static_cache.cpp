@@ -58,6 +58,11 @@ void StaticCache::clearList() { return; };
 
 unsigned int StaticCache::getListLength() {   return 1; };
 
+CompactFrameID StaticCache::getParent(ros::Time time, std::string* error_str)
+{
+  return storage_.frame_id_;
+}
+
 P_TimeAndFrameID StaticCache::getLatestTimeAndParent()
 {
   return std::make_pair(ros::Time(), storage_.frame_id_);

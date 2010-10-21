@@ -90,6 +90,20 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out, std::string
   return true;
 }
 
+CompactFrameID TimeCache::getParent(ros::Time time, std::string* error_str)
+{
+  TransformStorage* p_temp_1;
+  TransformStorage* p_temp_2;
+
+  int num_nodes = findClosest(p_temp_1, p_temp_2, time, error_str);
+  if (num_nodes == 0)
+  {
+    return 0;
+  }
+
+  return p_temp_1->frame_id_;
+}
+
 bool TimeCache::insertData(const TransformStorage& new_data)
 {
   L_TransformStorage::iterator storage_it = storage_.begin();
