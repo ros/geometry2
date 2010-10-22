@@ -167,12 +167,12 @@ CompactFrameID BufferCore::validateFrameId(const char* function_name_arg, const 
 
 BufferCore::BufferCore(ros::Duration cache_time)
 : cache_time_(cache_time)
+, transformable_callbacks_counter_(0)
+, transformable_requests_counter_(0)
 {
   frameIDs_["NO_PARENT"] = 0;
   frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
   frameIDs_reverse.push_back("NO_PARENT");
-
-  return;
 }
 
 BufferCore::~BufferCore()
@@ -636,17 +636,9 @@ struct CanTransformAccum
   TransformStorage st;
 };
 
-bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
-                           const ros::Time& time, std::string* error_msg) const
+bool BufferCore::canTransformNoLock(CompactFrameID target_id, CompactFrameID source_id,
+                    const ros::Time& time, std::string* error_msg) const
 {
-  if (warnFrameId("canTransform argument target_frame", target_frame))
-    return false;
-  if (warnFrameId("canTransform argument source_frame", source_frame))
-    return false;
-
-  CompactFrameID target_id = lookupFrameNumber(target_frame);
-  CompactFrameID source_id = lookupFrameNumber(source_frame);
-
   if (target_id == 0 || source_id == 0)
   {
     return false;
@@ -659,6 +651,29 @@ bool BufferCore::canTransform(const std::string& target_frame, const std::string
   }
 
   return false;
+}
+
+bool BufferCore::canTransformInternal(CompactFrameID target_id, CompactFrameID source_id,
+                                  const ros::Time& time, std::string* error_msg) const
+{
+  boost::mutex::scoped_lock lock(frame_mutex_);
+  return canTransformNoLock(target_id, source_id, time, error_msg);
+}
+
+bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
+                           const ros::Time& time, std::string* error_msg) const
+{
+  if (warnFrameId("canTransform argument target_frame", target_frame))
+    return false;
+  if (warnFrameId("canTransform argument source_frame", source_frame))
+    return false;
+
+  boost::mutex::scoped_lock lock(frame_mutex_);
+
+  CompactFrameID target_id = lookupFrameNumber(target_frame);
+  CompactFrameID source_id = lookupFrameNumber(source_frame);
+
+  return canTransformNoLock(target_id, source_id, time, error_msg);
 }
 
 bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& target_time,
@@ -717,7 +732,7 @@ CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_
   return retval;
 }
 
-std::string BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
+const std::string& BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
 {
     if (frame_id_num >= frameIDs_reverse.size())
     {
@@ -784,7 +799,7 @@ struct TimeAndFrameIDFrameComparator
   CompactFrameID id;
 };
 
-int BufferCore::getLatestCommonTime(CompactFrameID source_id, CompactFrameID target_id, ros::Time & time, std::string * error_string) const
+int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID source_id, ros::Time & time, std::string * error_string) const
 {
   if (source_id == target_id)
   {
@@ -997,6 +1012,135 @@ std::string BufferCore::allFramesAsYAML() const
   }
   
   return mstream.str();
+}
+
+TransformableCallbackHandle BufferCore::addTransformableCallback(const TransformableCallback& cb)
+{
+  boost::mutex::scoped_lock lock(transformable_callbacks_mutex_);
+  TransformableCallbackHandle handle = ++transformable_callbacks_counter_;
+  while (!transformable_callbacks_.insert(std::make_pair(handle, cb)).second)
+  {
+    handle = ++transformable_callbacks_counter_;
+  }
+
+  return handle;
+}
+
+struct BufferCore::RemoveRequestByCallback
+{
+  RemoveRequestByCallback(TransformableCallbackHandle handle)
+  : handle_(handle)
+  {}
+
+  bool operator()(const TransformableRequest& req)
+  {
+    return req.cb_handle == handle_;
+  }
+
+  TransformableCallbackHandle handle_;
+};
+
+void BufferCore::removeTransformableCallback(TransformableCallbackHandle handle)
+{
+  {
+    boost::mutex::scoped_lock lock(transformable_callbacks_mutex_);
+    transformable_callbacks_.erase(handle);
+  }
+
+  {
+    boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+    V_TransformableRequest::iterator it = std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByCallback(handle));
+    transformable_requests_.erase(it, transformable_requests_.end());
+  }
+}
+
+TransformableRequestHandle BufferCore::addTransformableRequest(TransformableCallbackHandle handle, const std::string& target_frame, const std::string& source_frame, ros::Time time)
+{
+  TransformableRequest req;
+  req.cb_handle = handle;
+  req.time = time;
+  req.request_handle = ++transformable_requests_counter_;
+  req.target_id = lookupFrameNumber(target_frame);
+  req.source_id = lookupFrameNumber(source_frame);
+
+  boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+  transformable_requests_.push_back(req);
+
+  return req.request_handle;
+}
+
+struct BufferCore::RemoveRequestByID
+{
+  RemoveRequestByID(TransformableRequestHandle handle)
+  : handle_(handle)
+  {}
+
+  bool operator()(const TransformableRequest& req)
+  {
+    return req.request_handle == handle_;
+  }
+
+  TransformableCallbackHandle handle_;
+};
+
+void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
+{
+  {
+    boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+    V_TransformableRequest::iterator it = std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByID(handle));
+    transformable_requests_.erase(it, transformable_requests_.end());
+  }
+}
+
+void BufferCore::testTransformableRequests()
+{
+  boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+  V_TransformableRequest::iterator it = transformable_requests_.begin();
+  for (; it != transformable_requests_.end();)
+  {
+    const TransformableRequest& req = *it;
+
+    ros::Time latest_time;
+    bool do_cb = false;
+    TransformableResult result = TransformAvailable;
+    // TODO: This is incorrect, but better than nothing.  Really we want the latest time for
+    // any of the frames
+    getLatestCommonTime(req.target_id, req.source_id, latest_time, 0);
+    if (!latest_time.isZero() && req.time + cache_time_ < latest_time)
+    {
+      do_cb = true;
+      result = TransformFailure;
+    }
+    else if (canTransformInternal(req.target_id, req.source_id, req.time, 0))
+    {
+      do_cb = true;
+      result = TransformAvailable;
+    }
+
+    if (do_cb)
+    {
+      {
+        boost::mutex::scoped_lock lock2(transformable_callbacks_mutex_);
+        M_TransformableCallback::iterator it = transformable_callbacks_.find(req.cb_handle);
+        if (it != transformable_callbacks_.end())
+        {
+          const TransformableCallback& cb = it->second;
+          cb(req.request_handle, lookupFrameString(req.target_id), lookupFrameString(req.source_id), req.time, result);
+        }
+      }
+
+      if (transformable_requests_.size() > 1)
+      {
+        transformable_requests_[it - transformable_requests_.begin()] = transformable_requests_.back();
+      }
+
+      transformable_requests_.erase(transformable_requests_.end() - 1);
+    }
+    else
+    {
+      ++it;
+    }
+  }
 }
 
 } // namespace tf2

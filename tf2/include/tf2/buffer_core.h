@@ -47,11 +47,14 @@
 
 #include <boost/unordered_map.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/function.hpp>
 
 namespace tf2
 {
 
 typedef std::pair<ros::Time, CompactFrameID> P_TimeAndFrameID;
+typedef uint32_t TransformableCallbackHandle;
+typedef uint64_t TransformableRequestHandle;
 
 class TimeCacheInterface;
 
@@ -208,6 +211,20 @@ public:
    */
   std::string allFramesAsString() const;
   
+
+  enum TransformableResult
+  {
+    TransformAvailable,
+    TransformFailure,
+  };
+  typedef boost::function<void(TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
+                               ros::Time time, TransformableResult result)> TransformableCallback;
+
+  TransformableCallbackHandle addTransformableCallback(const TransformableCallback& cb);
+  void removeTransformableCallback(TransformableCallbackHandle handle);
+  TransformableRequestHandle addTransformableRequest(TransformableCallbackHandle handle, const std::string& target_frame, const std::string& source_frame, ros::Time time);
+  void cancelTransformableRequest(TransformableRequestHandle handle);
+
 private:
 
 
@@ -235,6 +252,27 @@ private:
 
   mutable std::vector<P_TimeAndFrameID> lct_cache_;
 
+  typedef boost::unordered_map<TransformableCallbackHandle, TransformableCallback> M_TransformableCallback;
+  M_TransformableCallback transformable_callbacks_;
+  uint32_t transformable_callbacks_counter_;
+  boost::mutex transformable_callbacks_mutex_;
+
+  struct TransformableRequest
+  {
+    ros::Time time;
+    TransformableRequestHandle request_handle;
+    TransformableCallbackHandle cb_handle;
+    CompactFrameID target_id;
+    CompactFrameID source_id;
+  };
+  typedef std::vector<TransformableRequest> V_TransformableRequest;
+  V_TransformableRequest transformable_requests_;
+  boost::mutex transformable_requests_mutex_;
+  uint64_t transformable_requests_counter_;
+
+  struct RemoveRequestByCallback;
+  struct RemoveRequestByID;
+
   /************************* Internal Functions ****************************/
 
   /** \brief An accessor to get a frame, which will throw an exception if the frame is no there.
@@ -258,16 +296,22 @@ private:
   CompactFrameID lookupOrInsertFrameNumber(const std::string& frameid_str);
 
   ///Number to string frame lookup may throw LookupException if number invalid
-  std::string lookupFrameString(CompactFrameID frame_id_num) const;
+  const std::string& lookupFrameString(CompactFrameID frame_id_num) const;
 
   void createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const;
 
   /**@brief Return the latest rostime which is common across the spanning set
    * zero if fails to cross */
-  int getLatestCommonTime(CompactFrameID source_frame, CompactFrameID target_frame, ros::Time& time, std::string* error_string) const;
+  int getLatestCommonTime(CompactFrameID target_frame, CompactFrameID source_frame, ros::Time& time, std::string* error_string) const;
 
   template<typename F>
   int walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string) const;
+
+  void testTransformableRequests();
+  bool canTransformInternal(CompactFrameID target_id, CompactFrameID source_id,
+                    const ros::Time& time, std::string* error_msg) const;
+  bool canTransformNoLock(CompactFrameID target_id, CompactFrameID source_id,
+                      const ros::Time& time, std::string* error_msg) const;
 
   /////////////////////////////////// Backwards hack for quick startup /////////////////////////
   //Using tf for now will be replaced fully
