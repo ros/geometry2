@@ -742,7 +742,7 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
 }
 
 
-void test_ring(void)
+TEST(BufferCore_lookupTransform, ring_45_configuration)
 {
   double epsilon = 1e-6;
   rostest::Permuter permuter;
@@ -902,10 +902,6 @@ void test_ring(void)
     }
     
   }
-}
-TEST(BufferCore_lookupTransform, ring_45_configuration)
-{
-  test_ring();
 }
 
 TEST(BufferCore_lookupTransform, invalid_arguments)
