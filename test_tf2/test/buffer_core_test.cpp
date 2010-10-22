@@ -626,19 +626,15 @@ TEST(BufferCore_lookupTransform, i_configuration)
   ros::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
-  std::vector<std::string> source_frames;
-  source_frames.push_back("a");
-  source_frames.push_back("b");
-  source_frames.push_back("c");
+  std::vector<std::string> frames;
+  frames.push_back("a");
+  frames.push_back("b");
+  frames.push_back("c");
   std::string source_frame;
-  permuter.addOptionSet(source_frames, &source_frame);
+  permuter.addOptionSet(frames, &source_frame);
   
-  std::vector<std::string> target_frames;
-  target_frames.push_back("a");
-  target_frames.push_back("b");
-  target_frames.push_back("c");
   std::string target_frame;
-  permuter.addOptionSet(target_frames, &target_frame);
+  permuter.addOptionSet(frames, &target_frame);
 
   while  (permuter.step())
   {
@@ -857,17 +853,14 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
   ros::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
-  std::vector<std::string> source_frames;
-  source_frames.push_back("1");
-  source_frames.push_back("2");
+  std::vector<std::string> frames;
+  frames.push_back("1");
+  frames.push_back("2");
   std::string source_frame;
-  permuter.addOptionSet(source_frames, &source_frame);
+  permuter.addOptionSet(frames, &source_frame);
   
-  std::vector<std::string> target_frames;
-  target_frames.push_back("1");
-  target_frames.push_back("2");
   std::string target_frame;
-  permuter.addOptionSet(target_frames, &target_frame);
+  permuter.addOptionSet(frames, &target_frame);
 
   while  (permuter.step())
   {
@@ -904,17 +897,17 @@ TEST(BufferCore_lookupTransform, v_configuration)
   ros::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
-  std::vector<std::string> source_frames;
-  source_frames.push_back("a");
-  source_frames.push_back("b");
-  source_frames.push_back("c");
-  source_frames.push_back("f");
-  source_frames.push_back("g");
+  std::vector<std::string> frames;
+  frames.push_back("a");
+  frames.push_back("b");
+  frames.push_back("c");
+  frames.push_back("f");
+  frames.push_back("g");
   std::string source_frame;
-  permuter.addOptionSet(source_frames, &source_frame);
+  permuter.addOptionSet(frames, &source_frame);
   
   std::string target_frame;
-  permuter.addOptionSet(source_frames, &target_frame);
+  permuter.addOptionSet(frames, &target_frame);
 
   while  (permuter.step())
   {
@@ -950,22 +943,19 @@ TEST(BufferCore_lookupTransform, multi_configuration)
   ros::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
-  std::vector<std::string> source_frames;
-  source_frames.push_back("1");
-  source_frames.push_back("2");
-  source_frames.push_back("a");
-  source_frames.push_back("b");
-  source_frames.push_back("c");
-  source_frames.push_back("f");
-  source_frames.push_back("g");
+  std::vector<std::string> frames;
+  frames.push_back("1");
+  frames.push_back("2");
+  frames.push_back("a");
+  frames.push_back("b");
+  frames.push_back("c");
+  frames.push_back("f");
+  frames.push_back("g");
   std::string source_frame;
-  permuter.addOptionSet(source_frames, &source_frame);
+  permuter.addOptionSet(frames, &source_frame);
   
-  std::vector<std::string> target_frames;
-  target_frames.push_back("1");
-  target_frames.push_back("2");
   std::string target_frame;
-  permuter.addOptionSet(source_frames, &target_frame);
+  permuter.addOptionSet(frames, &target_frame);
 
   while  (permuter.step())
   {
@@ -1015,19 +1005,15 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
   ros::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
-  std::vector<std::string> source_frames;
-  source_frames.push_back("a");
-  source_frames.push_back("b");
-  source_frames.push_back("c");
+  std::vector<std::string> frames;
+  frames.push_back("a");
+  frames.push_back("b");
+  frames.push_back("c");
   std::string source_frame;
-  permuter.addOptionSet(source_frames, &source_frame);
+  permuter.addOptionSet(frames, &source_frame);
   
-  std::vector<std::string> target_frames;
-  target_frames.push_back("a");
-  target_frames.push_back("b");
-  target_frames.push_back("c");
   std::string target_frame;
-  permuter.addOptionSet(target_frames, &target_frame);
+  permuter.addOptionSet(frames, &target_frame);
 
   while  (permuter.step())
   {
