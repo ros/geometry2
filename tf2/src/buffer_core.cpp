@@ -246,23 +246,27 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
   if (error_exists)
     return false;
   
-  boost::mutex::scoped_lock lock(frame_mutex_);
-  CompactFrameID frame_number = lookupOrInsertFrameNumber(stripped.child_frame_id);
-  TimeCacheInterface* frame = getFrame(frame_number);
-  if (frame == NULL)
-    frame = allocateFrame(frame_number, is_static);
-    
-  if (frame->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id), frame_number)))
   {
-    frame_authority_[frame_number] = authority;
-  }
-  else
-  {
-    ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", stripped.child_frame_id.c_str(), stripped.header.stamp.toSec(), authority.c_str());
-    return false;
-  }
-  return true;
+    boost::mutex::scoped_lock lock(frame_mutex_);
+    CompactFrameID frame_number = lookupOrInsertFrameNumber(stripped.child_frame_id);
+    TimeCacheInterface* frame = getFrame(frame_number);
+    if (frame == NULL)
+      frame = allocateFrame(frame_number, is_static);
 
+    if (frame->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id), frame_number)))
+    {
+      frame_authority_[frame_number] = authority;
+    }
+    else
+    {
+      ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", stripped.child_frame_id.c_str(), stripped.header.stamp.toSec(), authority.c_str());
+      return false;
+    }
+  }
+
+  testTransformableRequests();
+
+  return true;
 }
 
 TimeCacheInterface* BufferCore::allocateFrame(CompactFrameID cfid, bool is_static)
@@ -1062,6 +1066,15 @@ TransformableRequestHandle BufferCore::addTransformableRequest(TransformableCall
   req.request_handle = ++transformable_requests_counter_;
   req.target_id = lookupFrameNumber(target_frame);
   req.source_id = lookupFrameNumber(source_frame);
+  if (req.target_id == 0)
+  {
+    req.target_string = target_frame;
+  }
+
+  if (req.source_id == 0)
+  {
+    req.source_string = source_frame;
+  }
 
   boost::mutex::scoped_lock lock(transformable_requests_mutex_);
   transformable_requests_.push_back(req);
@@ -1098,7 +1111,18 @@ void BufferCore::testTransformableRequests()
   V_TransformableRequest::iterator it = transformable_requests_.begin();
   for (; it != transformable_requests_.end();)
   {
-    const TransformableRequest& req = *it;
+    TransformableRequest& req = *it;
+
+    // One or both of the frames may not have existed when the request was originally made.
+    if (req.target_id == 0)
+    {
+      req.target_id = lookupFrameNumber(req.target_string);
+    }
+
+    if (req.source_id == 0)
+    {
+      req.source_id = lookupFrameNumber(req.source_string);
+    }
 
     ros::Time latest_time;
     bool do_cb = false;

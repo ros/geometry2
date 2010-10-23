@@ -736,8 +736,8 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
     
     //Zero distance or all the way
     if (source_frame == target_frame               ||
-        source_frame == "a" && target_frame == "i" ||
-        source_frame == "a" && target_frame == "i" )
+        (source_frame == "a" && target_frame == "i") ||
+        (source_frame == "a" && target_frame == "i") )
     {
       EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
@@ -883,6 +883,37 @@ TEST(BufferCore_canTransform, invalid_arguments)
   EXPECT_FALSE(mBC.canTransform("b", "/a", ros::Time()));
 
 };
+
+struct TransformableHelper
+{
+  TransformableHelper()
+  : called(false)
+  {}
+
+  void callback(tf2::TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
+          ros::Time time, tf2::TransformableResult result)
+  {
+    called = true;
+  }
+
+  bool called;
+};
+
+TEST(BufferCore_callbacks, transformableCallbacks)
+{
+  tf2::BufferCore b;
+  TransformableHelper h;
+  tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
+  b.addTransformableRequest(cb_handle, "a", "b", ros::Time(1));
+
+  geometry_msgs::TransformStamped t;
+  t.header.stamp = ros::Time(1);
+  t.header.frame_id = "a";
+  t.child_frame_id = "b";
+  t.transform.rotation.w = 1.0;
+  b.setTransform(t, "me");
+  EXPECT_TRUE(h.called);
+}
 
 /*
 TEST(tf, Exceptions)

@@ -58,6 +58,12 @@ typedef uint64_t TransformableRequestHandle;
 
 class TimeCacheInterface;
 
+enum TransformableResult
+{
+  TransformAvailable,
+  TransformFailure,
+};
+
 /** \brief A Class which provides coordinate transforms between any two frames in a system.
  *
  * This class provides a simple interface to allow recording and lookup of
@@ -211,12 +217,6 @@ public:
    */
   std::string allFramesAsString() const;
   
-
-  enum TransformableResult
-  {
-    TransformAvailable,
-    TransformFailure,
-  };
   typedef boost::function<void(TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
                                ros::Time time, TransformableResult result)> TransformableCallback;
 
@@ -264,6 +264,8 @@ private:
     TransformableCallbackHandle cb_handle;
     CompactFrameID target_id;
     CompactFrameID source_id;
+    std::string target_string;
+    std::string source_string;
   };
   typedef std::vector<TransformableRequest> V_TransformableRequest;
   V_TransformableRequest transformable_requests_;
