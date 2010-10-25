@@ -1061,11 +1061,23 @@ void BufferCore::removeTransformableCallback(TransformableCallbackHandle handle)
 TransformableRequestHandle BufferCore::addTransformableRequest(TransformableCallbackHandle handle, const std::string& target_frame, const std::string& source_frame, ros::Time time)
 {
   TransformableRequest req;
+  req.target_id = lookupFrameNumber(target_frame);
+  req.source_id = lookupFrameNumber(source_frame);
+
+  // First check if the request is already transformable.  If it is, return immediately
+  if (canTransformInternal(req.target_id, req.source_id, time, 0))
+  {
+    return 0;
+  }
+
   req.cb_handle = handle;
   req.time = time;
   req.request_handle = ++transformable_requests_counter_;
-  req.target_id = lookupFrameNumber(target_frame);
-  req.source_id = lookupFrameNumber(source_frame);
+  if (req.request_handle == 0)
+  {
+    req.request_handle = 1;
+  }
+
   if (req.target_id == 0)
   {
     req.target_string = target_frame;

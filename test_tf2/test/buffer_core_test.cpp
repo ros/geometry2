@@ -899,7 +899,23 @@ struct TransformableHelper
   bool called;
 };
 
-TEST(BufferCore_callbacks, transformableCallbacks)
+TEST(BufferCore_transformableCallbacks, alreadyTransformable)
+{
+  tf2::BufferCore b;
+  TransformableHelper h;
+
+  geometry_msgs::TransformStamped t;
+  t.header.stamp = ros::Time(1);
+  t.header.frame_id = "a";
+  t.child_frame_id = "b";
+  t.transform.rotation.w = 1.0;
+  b.setTransform(t, "me");
+
+  tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
+  EXPECT_EQ(b.addTransformableRequest(cb_handle, "a", "b", ros::Time(1)), 0U);
+}
+
+TEST(BufferCore_transformableCallbacks, waitForNewTransform)
 {
   tf2::BufferCore b;
   TransformableHelper h;
@@ -913,6 +929,35 @@ TEST(BufferCore_callbacks, transformableCallbacks)
   t.transform.rotation.w = 1.0;
   b.setTransform(t, "me");
   EXPECT_TRUE(h.called);
+}
+
+TEST(BufferCore_transformableCallbacks, waitForOldTransform)
+{
+  tf2::BufferCore b;
+  TransformableHelper h;
+  tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
+  b.addTransformableRequest(cb_handle, "a", "b", ros::Time(1));
+
+  geometry_msgs::TransformStamped t;
+  for (uint32_t i = 10; i > 0; --i)
+  {
+    t.header.stamp = ros::Time(i);
+    t.header.frame_id = "a";
+    t.child_frame_id = "b";
+    t.transform.rotation.w = 1.0;
+    b.setTransform(t, "me");
+
+    if (i > 1)
+    {
+      ASSERT_FALSE(h.called);
+    }
+    else
+    {
+      ASSERT_TRUE(h.called);
+    }
+  }
+
+
 }
 
 /*
