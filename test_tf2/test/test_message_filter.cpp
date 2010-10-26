@@ -29,7 +29,7 @@
 
 /** \author Josh Faust */
 
-#include <tf2/message_filter.h>
+#include <tf2_ros/message_filter.h>
 #include <tf2/buffer_core.h>
 #include <geometry_msgs/PointStamped.h>
 #include <boost/bind.hpp>
@@ -40,6 +40,7 @@
 #include <gtest/gtest.h>
 
 using namespace tf2;
+using namespace tf2_ros;
 
 class Notification
 {
