@@ -36,6 +36,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "ros/ros.h"
+#include "ros/callback_queue.h"
 
 #include <gtest/gtest.h>
 
@@ -69,7 +70,7 @@ TEST(MessageFilter, noTransforms)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -84,7 +85,7 @@ TEST(MessageFilter, noTransformsSameFrame)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -115,7 +116,7 @@ TEST(MessageFilter, preexistingTransforms)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   ros::Time stamp(1);
@@ -134,7 +135,7 @@ TEST(MessageFilter, postTransforms)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   ros::Time stamp(1);
@@ -156,7 +157,7 @@ TEST(MessageFilter, queueSize)
 {
   BufferCore bc;
   Notification n(10);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 10);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 10, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
   filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
@@ -183,7 +184,7 @@ TEST(MessageFilter, setTargetFrame)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
   filter.setTargetFrame("frame1000");
 
@@ -204,7 +205,7 @@ TEST(MessageFilter, multipleTargetFrames)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   std::vector<std::string> target_frames;
@@ -234,7 +235,7 @@ TEST(MessageFilter, tolerance)
   ros::Duration offset(0.2);
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
   filter.setTolerance(offset);
 
@@ -262,7 +263,7 @@ TEST(MessageFilter, outTheBackFailure)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
   ros::Time stamp(1);
@@ -281,7 +282,7 @@ TEST(MessageFilter, outTheBackFailure2)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
   ros::Time stamp(1);
@@ -303,7 +304,7 @@ TEST(MessageFilter, emptyFrameIDFailure)
 {
   BufferCore bc;
   Notification n(1);
-  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -312,6 +313,27 @@ TEST(MessageFilter, emptyFrameIDFailure)
 
   EXPECT_EQ(1, n.failure_count_);
 }
+
+TEST(MessageFilter, callbackQueue)
+{
+  BufferCore bc;
+  Notification n(1);
+  ros::CallbackQueue queue;
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, &queue);
+  filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
+
+  geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
+  msg->header.stamp = ros::Time(1);
+  msg->header.frame_id = "frame1";
+  filter.add(msg);
+
+  EXPECT_EQ(0, n.count_);
+
+  queue.callAvailable();
+
+  EXPECT_EQ(1, n.count_);
+}
+
 
 int main(int argc, char** argv)
 {

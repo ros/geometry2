@@ -16,6 +16,7 @@
   <depend package="actionlib"/>
   <depend package="actionlib_msgs"/>
   <depend package="rosgraph"/>
+  <depend package="message_filters"/>
 
  <export>
     <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf2_ros"/>    
