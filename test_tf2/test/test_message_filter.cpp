@@ -277,6 +277,28 @@ TEST(MessageFilter, outTheBackFailure)
   EXPECT_EQ(1, n.failure_count_);
 }
 
+TEST(MessageFilter, outTheBackFailure2)
+{
+  BufferCore bc;
+  Notification n(1);
+  MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1);
+  filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
+
+  ros::Time stamp(1);
+
+  geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
+  msg->header.stamp = stamp;
+  msg->header.frame_id = "frame2";
+  filter.add(msg);
+
+  EXPECT_EQ(0, n.count_);
+  EXPECT_EQ(0, n.failure_count_);
+
+  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp + ros::Duration(10000), "frame1", "frame2"), "me");
+
+  EXPECT_EQ(1, n.failure_count_);
+}
+
 TEST(MessageFilter, emptyFrameIDFailure)
 {
   BufferCore bc;
