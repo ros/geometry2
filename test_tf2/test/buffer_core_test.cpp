@@ -745,20 +745,20 @@ bool check_v_result(const geometry_msgs::TransformStamped& outpose, const std::s
     EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
     EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
   }
-  else if (source_frame == "b" && target_frame =="a" ||
-           source_frame == "c" && target_frame =="b")
+  else if ((source_frame == "b" && target_frame =="a") ||
+           (source_frame == "c" && target_frame =="b"))
   {
     EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
     EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
   }
-  else if (source_frame == "a" && target_frame =="f" ||
-           source_frame == "f" && target_frame =="g")
+  else if ((source_frame == "a" && target_frame =="f") ||
+           (source_frame == "f" && target_frame =="g"))
   {
     EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
     EXPECT_NEAR(outpose.transform.translation.y, 1, epsilon);
   }
-  else if (source_frame == "f" && target_frame =="a" ||
-           source_frame == "g" && target_frame =="f")
+  else if ((source_frame == "f" && target_frame =="a") ||
+           (source_frame == "g" && target_frame =="f"))
   {
     EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
     EXPECT_NEAR(outpose.transform.translation.y, -1, epsilon);
@@ -855,20 +855,20 @@ bool check_y_result(const geometry_msgs::TransformStamped& outpose, const std::s
     EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
     EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
   }
-  else if (source_frame == "b" && target_frame =="a" ||
-           source_frame == "c" && target_frame =="b")
+  else if ((source_frame == "b" && target_frame =="a") ||
+           (source_frame == "c" && target_frame =="b"))
   {
     EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
     EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
   }
-  else if (source_frame == "b" && target_frame =="d" ||
-           source_frame == "d" && target_frame =="e")
+  else if ((source_frame == "b" && target_frame =="d") ||
+           (source_frame == "d" && target_frame =="e"))
   {
     EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
     EXPECT_NEAR(outpose.transform.translation.y, 1, epsilon);
   }
-  else if (source_frame == "d" && target_frame =="b" ||
-           source_frame == "e" && target_frame =="d")
+  else if ((source_frame == "d" && target_frame =="b") ||
+           (source_frame == "e" && target_frame =="d"))
   {
     EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
     EXPECT_NEAR(outpose.transform.translation.y, -1, epsilon);
