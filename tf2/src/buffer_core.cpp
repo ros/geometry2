@@ -1060,6 +1060,12 @@ void BufferCore::removeTransformableCallback(TransformableCallbackHandle handle)
 
 TransformableRequestHandle BufferCore::addTransformableRequest(TransformableCallbackHandle handle, const std::string& target_frame, const std::string& source_frame, ros::Time time)
 {
+  // shortcut if target == source
+  if (target_frame == source_frame)
+  {
+    return 0;
+  }
+
   TransformableRequest req;
   req.target_id = lookupFrameNumber(target_frame);
   req.source_id = lookupFrameNumber(source_frame);
@@ -1070,10 +1076,23 @@ TransformableRequestHandle BufferCore::addTransformableRequest(TransformableCall
     return 0;
   }
 
+  // Might not be transformable at all, ever (if it's too far in the past)
+  if (req.target_id && req.source_id)
+  {
+    ros::Time latest_time;
+    // TODO: This is incorrect, but better than nothing.  Really we want the latest time for
+    // any of the frames
+    getLatestCommonTime(req.target_id, req.source_id, latest_time, 0);
+    if (!latest_time.isZero() && time + cache_time_ < latest_time)
+    {
+      return 0xffffffffffffffff;
+    }
+  }
+
   req.cb_handle = handle;
   req.time = time;
   req.request_handle = ++transformable_requests_counter_;
-  if (req.request_handle == 0)
+  if (req.request_handle == 0 || req.request_handle == 0xffffffffffffffff)
   {
     req.request_handle = 1;
   }
@@ -1110,9 +1129,11 @@ struct BufferCore::RemoveRequestByID
 
 void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
 {
+  boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+  V_TransformableRequest::iterator it = std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByID(handle));
+
+  if (it != transformable_requests_.end())
   {
-    boost::mutex::scoped_lock lock(transformable_requests_mutex_);
-    V_TransformableRequest::iterator it = std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByID(handle));
     transformable_requests_.erase(it, transformable_requests_.end());
   }
 }

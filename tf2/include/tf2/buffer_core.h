@@ -220,9 +220,13 @@ public:
   typedef boost::function<void(TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
                                ros::Time time, TransformableResult result)> TransformableCallback;
 
+  /// \brief Internal use only
   TransformableCallbackHandle addTransformableCallback(const TransformableCallback& cb);
+  /// \brief Internal use only
   void removeTransformableCallback(TransformableCallbackHandle handle);
+  /// \brief Internal use only
   TransformableRequestHandle addTransformableRequest(TransformableCallbackHandle handle, const std::string& target_frame, const std::string& source_frame, ros::Time time);
+  /// \brief Internal use only
   void cancelTransformableRequest(TransformableRequestHandle handle);
 
 private:
