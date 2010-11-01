@@ -329,6 +329,7 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
     if (parent == 0)
     {
       // Just break out here... there may still be a path from source -> target
+      top_parent = frame;
       break;
     }
 
