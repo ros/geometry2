@@ -1,13 +1,15 @@
 <stack>
-  <description brief="geometry and math libraries">
-    The basic geometric and math libraries used in ros.
+  <description brief="experimental geometry and math libraries">
+    The experimental geometric and math libraries used in ros.
   </description>
   <author>Maintained by Tully Foote tfoote@willowgarage.com</author>
-  <license>BSD,LGPL,ZLib</license>  
-  <review status="doc reviewed" notes="2009-10-07"/>
-  <url>http://ros.org/wiki/geometry</url>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/geometry-experimental</url>
+
   <depend stack="common" /> <!-- actionlib -->
-  <depend stack="common_msgs" /> <!-- sensor_msgs, actionlib_msgs, geometry_msgs -->
-  <depend stack="ros" /> <!-- rosconsole, roscpp, message_filters, roslib, rostest, rospy, roswtf -->
+  <depend stack="common_msgs" /> <!-- actionlib_msgs, geometry_msgs -->
+  <depend stack="geometry" /> <!-- kdl, tf, bullet -->
+  <depend stack="ros" /> <!-- roscpp, message_filters, rosgraph, roslib, std_msgs, xdot, rostest, rospy, rxbag -->
 
 </stack>

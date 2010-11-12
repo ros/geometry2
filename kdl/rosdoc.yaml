@@ -1,8 +1,0 @@
- - builder: rosmake
- - builder: sphinx
-   name: Python API
-   output_dir: python
- - builder: external
-   external_url: http://people.mech.kuleuven.be/~orocos/pub/devel/kdl/latest/api/html/
-   output_dir: cpp
-   name: C++ API
