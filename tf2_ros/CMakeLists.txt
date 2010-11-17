@@ -26,8 +26,8 @@ rosbuild_add_library(${PROJECT_NAME} src/buffer.cpp src/transform_listener.cpp s
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+rosbuild_add_executable(buffer_server src/buffer_server_main.cpp)
+target_link_libraries(buffer_server ${PROJECT_NAME})
 
 rosbuild_add_executable(test_listener test/listener_unittest.cpp)
 target_link_libraries(test_listener ${PROJECT_NAME})
