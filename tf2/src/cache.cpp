@@ -123,8 +123,18 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
   ros::Time latest_time = (*storage_.begin()).stamp_;
   ros::Time earliest_time = (*(storage_.rbegin())).stamp_;
 
+  if (target_time == latest_time)
+  {
+    one = &(*storage_.begin());
+    return 1;
+  }
+  else if (target_time == earliest_time)
+  {
+    one = &(*storage_.rbegin());
+    return 1;
+  }
   // Catch cases that would require extrapolation
-  if (target_time > latest_time)
+  else if (target_time > latest_time)
   {
     createExtrapolationException2(target_time, latest_time, error_str);
     return 0;
