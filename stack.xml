@@ -10,5 +10,6 @@
   <depend stack="common_msgs" /> <!-- actionlib_msgs, geometry_msgs -->
   <depend stack="geometry" /> <!-- kdl, tf, bullet -->
   <depend stack="ros" /> <!-- roscpp, message_filters, rosgraph, roslib, std_msgs, xdot, rostest, rospy, rxbag -->
+  <depend stack="rx" />
 
 </stack>
