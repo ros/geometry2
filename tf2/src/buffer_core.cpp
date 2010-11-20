@@ -1086,14 +1086,14 @@ TransformableRequestHandle BufferCore::addTransformableRequest(TransformableCall
     getLatestCommonTime(req.target_id, req.source_id, latest_time, 0);
     if (!latest_time.isZero() && time + cache_time_ < latest_time)
     {
-      return 0xffffffffffffffff;
+      return 0xffffffffffffffffULL;
     }
   }
 
   req.cb_handle = handle;
   req.time = time;
   req.request_handle = ++transformable_requests_counter_;
-  if (req.request_handle == 0 || req.request_handle == 0xffffffffffffffff)
+  if (req.request_handle == 0 || req.request_handle == 0xffffffffffffffffULL)
   {
     req.request_handle = 1;
   }

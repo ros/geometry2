@@ -317,7 +317,7 @@ public:
       {
         const std::string& target_frame = *it;
         tf2::TransformableRequestHandle handle = bc_.addTransformableRequest(callback_handle_, target_frame, frame_id, stamp);
-        if (handle == 0xffffffffffffffff) // never transformable
+        if (handle == 0xffffffffffffffffULL) // never transformable
         {
           messageDropped(evt, filter_failure_reasons::OutTheBack);
           return;
@@ -334,7 +334,7 @@ public:
         if (!time_tolerance_.isZero())
         {
           handle = bc_.addTransformableRequest(callback_handle_, target_frame, frame_id, stamp + time_tolerance_);
-          if (handle == 0xffffffffffffffff) // never transformable
+          if (handle == 0xffffffffffffffffULL) // never transformable
           {
             messageDropped(evt, filter_failure_reasons::OutTheBack);
             return;
