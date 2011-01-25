@@ -47,9 +47,9 @@ class TransformListener
 {
 
 public:
-  /**@brief Constructor for transform listener
-   * \param max_cache_time How long to store transform information */
-  TransformListener(tf2::Buffer& buffer, bool spin_thread = true);
+  /**@brief Constructor for transform listener */
+  TransformListener(tf2::BufferCore& buffer, bool spin_thread = true);
+  TransformListener(tf2::BufferCore& buffer, const ros::NodeHandle& nh, bool spin_thread = true);
 
   ~TransformListener();
 
@@ -69,7 +69,7 @@ private:
   ros::NodeHandle node_;
   ros::Subscriber message_subscriber_tf_;
   ros::Subscriber message_subscriber_tf_static_;
-  tf2::Buffer& buffer_;
+  tf2::BufferCore& buffer_;
   bool using_dedicated_thread_;
  
   void dedicatedListenerThread()
