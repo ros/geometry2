@@ -11,9 +11,4 @@
   <depend package="tf2_msgs"/>
   <depend package="tf2"/>
   <depend package="tf2_ros"/>
-  <depend package="xdot"/>
-  <depend package="rxbag"/>
-  <export>
-    <rxbag plugin="tf2_tools.rxbag_plugin"/>
-  </export>
 </package>
