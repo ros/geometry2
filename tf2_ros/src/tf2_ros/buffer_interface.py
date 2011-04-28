@@ -32,6 +32,7 @@ import rospy
 import tf2
 import tf2_ros
 from copy import deepcopy
+from std_msgs.msg import Header
 
 class BufferInterface:
     def __init__(self):
@@ -76,7 +77,7 @@ class BufferInterface:
 
 
 def Stamped(obj, stamp, frame_id):
-    obj.header = roslib.msg._Header.Header(frame_id=frame_id, stamp=stamp)
+    obj.header = Header(frame_id=frame_id, stamp=stamp)
     return obj
 
 
