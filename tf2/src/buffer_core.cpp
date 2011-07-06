@@ -479,8 +479,8 @@ struct TransformAccum
         btQuaternion inv_target_quat = target_to_top_quat.inverse();
         btVector3 inv_target_vec = quatRotate(inv_target_quat, -target_to_top_vec);
 
-	result_vec = quatRotate(inv_target_quat, source_to_top_vec) + inv_target_vec;
-        result_quat = source_to_top_quat * inv_target_quat;
+     	result_vec = quatRotate(inv_target_quat, source_to_top_vec) + inv_target_vec;
+        result_quat = inv_target_quat * source_to_top_quat;
       }
       break;
     };
