@@ -203,7 +203,6 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
     EXPECT_FALSE("Undefined mode for tree setup.  Test harness improperly setup.");
 }
 
-
 TEST(BufferCore_setTransform, NoInsertOnSelfTransform)
 {
   tf2::BufferCore mBC;
@@ -732,11 +731,78 @@ TEST(BufferCore_canTransform, invalid_arguments)
 };
 
 
-#define CHECK_QUATERNION_NEAR(_q1, _x, _y, _z, _w)      \
+#define CHECK_QUATERNION_NEAR(_q1, _x, _y, _z, _w, _epsilon)      \
 	   btQuaternion q1(_q1.x, _q1.y, _q1.z, _q1.w);     \
        btQuaternion q2(_x, _y, _z, _w);                 \
        double angle = q1.angle(q2);                     \
-	   EXPECT_TRUE(fabs(angle) < epsilon || fabs(angle - M_PI) < epsilon);
+	   EXPECT_TRUE(fabs(angle) < _epsilon || fabs(angle - M_PI) < _epsilon);
+
+TEST(BufferCore_lookupTransform, helix_configuration)
+{
+	double epsilon = 1e-4;
+
+    tf2::BufferCore mBC;
+
+    ros::Time     t0   = ros::Time() + ros::Duration(10);
+    ros::Duration step = ros::Duration(0.05);
+    ros::Time     t1   = t0 + ros::Duration(5.0);
+
+    /*
+     * a->b->c
+     *
+     * b.z = vel * (t - t0)
+     * c.x = cos(theta * (t - t0))
+     * c.y = sin(theta * (t - t0))
+     *
+     *
+     */
+
+    double theta = 0.25;
+    double vel   = 1.0;
+
+    for (ros::Time t = t0; t <= t1; t += step)
+    {
+    	double dt = (t - t0).toSec();
+
+        geometry_msgs::TransformStamped ts;
+        ts.header.frame_id = "a";
+        ts.header.stamp    = t;
+        ts.child_frame_id  = "b";
+        ts.transform.translation.z = vel * dt;
+        ts.transform.rotation.w = 1.0;
+        EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+
+        geometry_msgs::TransformStamped ts2;
+        ts2.header.frame_id = "b";
+        ts2.header.stamp    = t;
+        ts2.child_frame_id  = "c";
+        ts2.transform.translation.x = cos(theta * dt);
+        ts2.transform.translation.y = sin(theta * dt);
+        btQuaternion q;
+        q.setRPY(0,0,theta*dt);
+        ts2.transform.rotation.z = q.z();
+        ts2.transform.rotation.w = q.w();
+        EXPECT_TRUE(mBC.setTransform(ts2, "authority"));
+    }
+
+
+    for (ros::Time t = t0 + ros::Duration(0.025); t < t1; t += step)
+    {
+    	double dt = (t - t0).toSec();
+
+        geometry_msgs::TransformStamped out_ab = mBC.lookupTransform("a", "b", t);
+        EXPECT_NEAR(out_ab.transform.translation.z, vel * dt, epsilon);
+
+        geometry_msgs::TransformStamped out_ac = mBC.lookupTransform("a", "c", t);
+        EXPECT_NEAR(out_ac.transform.translation.x, cos(theta * dt), epsilon);
+        EXPECT_NEAR(out_ac.transform.translation.y, sin(theta * dt), epsilon);
+        EXPECT_NEAR(out_ac.transform.translation.z, vel * dt, 		 epsilon);
+        btQuaternion q;
+        q.setRPY(0,0,theta*dt);
+        CHECK_QUATERNION_NEAR(out_ac.transform.rotation, 0, 0, q.z(), q.w(), epsilon);
+    }
+}
+
 
 TEST(BufferCore_lookupTransform, ring_45_configuration)
 {
@@ -821,7 +887,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/8), cos(M_PI/8));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/8), cos(M_PI/8), epsilon);
     }
     // Inverse Chaining 1
     else if ((source_frame == "b" && target_frame =="a") ||
@@ -837,7 +903,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/8), cos(-M_PI/8));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/8), cos(-M_PI/8), epsilon);
     }
     // Chaining 2
     else if ((source_frame == "a" && target_frame =="c") ||
@@ -852,7 +918,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 1 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/4), cos(M_PI/4));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/4), cos(M_PI/4), epsilon);
     }
     // Inverse Chaining 2
     else if ((source_frame == "c" && target_frame =="a") ||
@@ -867,7 +933,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -1 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/4), cos(-M_PI/4));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/4), cos(-M_PI/4), epsilon);
     }
     // Chaining 3
     else if ((source_frame == "a" && target_frame =="d") ||
@@ -881,7 +947,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2)/2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*3/8), cos(M_PI*3/8));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*3/8), cos(M_PI*3/8), epsilon);
     }
     // Inverse Chaining 3
     else if ((target_frame == "a" && source_frame =="d") ||
@@ -895,7 +961,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2)/2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, - sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*3/8), cos(-M_PI*3/8));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*3/8), cos(-M_PI*3/8), epsilon);
     }
     // Chaining 4
     else if ((source_frame == "a" && target_frame =="e") ||
@@ -908,7 +974,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 0 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/2), cos(M_PI/2));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/2), cos(M_PI/2), epsilon);
     }
     // Inverse Chaining 4
     else if ((target_frame == "a" && source_frame =="e") ||
@@ -921,7 +987,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 0 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/2), cos(-M_PI/2));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/2), cos(-M_PI/2), epsilon);
     }
     // Chaining 5
     else if ((source_frame == "a" && target_frame =="f") ||
@@ -933,7 +999,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2) /2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, - sqrt(2) /2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*5/8), cos(M_PI*5/8));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*5/8), cos(M_PI*5/8), epsilon);
     }
     // Inverse Chaining 5
     else if ((target_frame == "a" && source_frame =="f") ||
@@ -945,7 +1011,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2)/2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*5/8), cos(-M_PI*5/8));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*5/8), cos(-M_PI*5/8), epsilon);
     }
     // Chaining 6
     else if ((source_frame == "a" && target_frame =="g") ||
@@ -956,7 +1022,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -1 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*3/4), cos(M_PI*3/4));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*3/4), cos(M_PI*3/4), epsilon);
     }
     // Inverse Chaining 6
     else if ((target_frame == "a" && source_frame =="g") ||
@@ -967,7 +1033,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 1 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*3/4), cos(-M_PI*3/4));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*3/4), cos(-M_PI*3/4), epsilon);
     }
     // Chaining 7
     else if ((source_frame == "a" && target_frame =="h") ||
@@ -977,7 +1043,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*7/8), cos(M_PI*7/8));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*7/8), cos(M_PI*7/8), epsilon);
     }
     // Inverse Chaining 7
     else if ((target_frame == "a" && source_frame =="h") ||
@@ -987,7 +1053,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*7/8), cos(-M_PI*7/8));
+      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*7/8), cos(-M_PI*7/8), epsilon);
     }
     else
     {
