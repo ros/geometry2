@@ -742,13 +742,14 @@ TEST(BufferCore_canTransform, invalid_arguments)
 // Time varying transforms, testing interpolation
 TEST(BufferCore_lookupTransform, helix_configuration)
 {
-	double epsilon = 1e-4; // Larger epsilon for interpolation values
+	double epsilon = 2e-5; // Larger epsilon for interpolation values
 
     tf2::BufferCore mBC;
 
-    ros::Time     t0   = ros::Time() + ros::Duration(10);
-    ros::Duration step = ros::Duration(0.05);
-    ros::Time     t1   = t0 + ros::Duration(5.0);
+    ros::Time     t0        = ros::Time() + ros::Duration(10);
+    ros::Duration step      = ros::Duration(0.05);
+    ros::Duration half_step = ros::Duration(0.025);
+    ros::Time     t1        = t0 + ros::Duration(5.0);
 
     /*
      * a->b->c
@@ -760,6 +761,7 @@ TEST(BufferCore_lookupTransform, helix_configuration)
      * a->d
      *
      * d.z = 2 * cos(theta * (t - t0))
+     * a->d transforms are at half-step between a->b->c transforms
      */
 
     double theta = 0.25;
@@ -767,7 +769,9 @@ TEST(BufferCore_lookupTransform, helix_configuration)
 
     for (ros::Time t = t0; t <= t1; t += step)
     {
-    	double dt = (t - t0).toSec();
+    	ros::Time t2 = t + half_step;
+    	double dt  = (t - t0).toSec();
+    	double dt2 = (t2 - t0).toSec();
 
         geometry_msgs::TransformStamped ts;
         ts.header.frame_id = "a";
@@ -791,17 +795,19 @@ TEST(BufferCore_lookupTransform, helix_configuration)
 
         geometry_msgs::TransformStamped ts3;
         ts3.header.frame_id = "a";
-        ts3.header.stamp    = t;
+        ts3.header.stamp    = t2;
         ts3.child_frame_id  = "d";
-        ts3.transform.translation.z = cos(theta * dt);
+        ts3.transform.translation.z = cos(theta * dt2);
         ts3.transform.rotation.w = 1.0;
         EXPECT_TRUE(mBC.setTransform(ts3, "authority"));
     }
 
 
-    for (ros::Time t = t0 + ros::Duration(0.025); t < t1; t += step)
+    for (ros::Time t = t0 + half_step; t < t1; t += step)
     {
-    	double dt = (t - t0).toSec();
+    	ros::Time t2 = t + half_step;
+    	double dt  = (t - t0).toSec();
+    	double dt2 = (t2 - t0).toSec();
 
         geometry_msgs::TransformStamped out_ab = mBC.lookupTransform("a", "b", t);
         EXPECT_NEAR(out_ab.transform.translation.z, vel * dt, epsilon);
@@ -817,15 +823,29 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         geometry_msgs::TransformStamped out_ad = mBC.lookupTransform("a", "d", t);
         EXPECT_NEAR(out_ad.transform.translation.z, cos(theta * dt), epsilon);
 
-        geometry_msgs::TransformStamped out_cd = mBC.lookupTransform("c", "d", t);
-        EXPECT_NEAR(out_cd.transform.translation.x, -1,           			    epsilon);
-        EXPECT_NEAR(out_cd.transform.translation.y,  0,  			            epsilon);
-        EXPECT_NEAR(out_cd.transform.translation.z, cos(theta * dt) - vel * dt, epsilon);
+        geometry_msgs::TransformStamped out_cd = mBC.lookupTransform("c", "d", t2);
+        EXPECT_NEAR(out_cd.transform.translation.x, -1,           			      epsilon);
+        EXPECT_NEAR(out_cd.transform.translation.y,  0,  			              epsilon);
+        EXPECT_NEAR(out_cd.transform.translation.z, cos(theta * dt2) - vel * dt2, epsilon);
         btQuaternion mq;
-        mq.setRPY(0,0,-theta*dt);
+        mq.setRPY(0,0,-theta*dt2);
         CHECK_QUATERNION_NEAR(out_cd.transform.rotation, 0, 0, mq.z(), mq.w(), epsilon);
+    }
 
+    // Advanced API
+    for (ros::Time t = t0 + half_step; t < t1; t += (step + step))
+    {
+    	ros::Time t2 = t + step;
+    	double dt  = (t - t0).toSec();
+    	double dt2 = (t2 - t0).toSec();
 
+        geometry_msgs::TransformStamped out_cd2 = mBC.lookupTransform("c", t, "d", t2, "a");
+        EXPECT_NEAR(out_cd2.transform.translation.x, -1,           			      epsilon);
+        EXPECT_NEAR(out_cd2.transform.translation.y,  0,  			              epsilon);
+        EXPECT_NEAR(out_cd2.transform.translation.z, cos(theta * dt2) - vel * dt, epsilon);
+        btQuaternion mq2;
+        mq2.setRPY(0,0,-theta*dt);
+        CHECK_QUATERNION_NEAR(out_cd2.transform.rotation, 0, 0, mq2.z(), mq2.w(), epsilon);
     }
 }
 
