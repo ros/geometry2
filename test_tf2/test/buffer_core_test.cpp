@@ -739,6 +739,13 @@ TEST(BufferCore_canTransform, invalid_arguments)
 	   EXPECT_TRUE(fabs(angle) < _epsilon || fabs(angle - M_PI) < _epsilon); \
 	   }
 
+#define CHECK_TRANSFORMS_NEAR(_out, _expected, _eps)       																							            	            \
+	EXPECT_NEAR(_out.transform.translation.x, _expected.getOrigin().x(), epsilon); 											              			            				\
+	EXPECT_NEAR(_out.transform.translation.y, _expected.getOrigin().y(), epsilon); 															                        			\
+	EXPECT_NEAR(_out.transform.translation.z, _expected.getOrigin().z(), epsilon); 													            	             				\
+	CHECK_QUATERNION_NEAR(_out.transform.rotation, _expected.getRotation().x(), _expected.getRotation().y(), _expected.getRotation().z(), _expected.getRotation().w(), _eps);
+
+
 // Simple test with compound transform
 TEST(BufferCore_lookupTransform, compound_xfm_configuration)
 {
@@ -837,118 +844,46 @@ TEST(BufferCore_lookupTransform, compound_xfm_configuration)
 
     // root -> b -> c
     geometry_msgs::TransformStamped out_rootc = mBC.lookupTransform("root", "c", ros::Time());
-    EXPECT_NEAR(out_rootc.transform.translation.x, expected_rootc.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_rootc.transform.translation.y, expected_rootc.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_rootc.transform.translation.z, expected_rootc.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_rootc.transform.rotation.x,    expected_rootc.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_rootc.transform.rotation.y,    expected_rootc.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_rootc.transform.rotation.z,    expected_rootc.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_rootc.transform.rotation.w,    expected_rootc.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_rootc, expected_rootc, epsilon);
 
     // root -> b -> c -> d
     geometry_msgs::TransformStamped out_rootd = mBC.lookupTransform("root", "d", ros::Time());
-    EXPECT_NEAR(out_rootd.transform.translation.x, expected_rootd.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_rootd.transform.translation.y, expected_rootd.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_rootd.transform.translation.z, expected_rootd.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_rootd.transform.rotation.x,    expected_rootd.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_rootd.transform.rotation.y,    expected_rootd.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_rootd.transform.rotation.z,    expected_rootd.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_rootd.transform.rotation.w,    expected_rootd.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_rootd, expected_rootd, epsilon);
 
     // a <- root -> b
     geometry_msgs::TransformStamped out_ab = mBC.lookupTransform("a", "b", ros::Time());
-    EXPECT_NEAR(out_ab.transform.translation.x, expected_ab.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_ab.transform.translation.y, expected_ab.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_ab.transform.translation.z, expected_ab.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_ab.transform.rotation.x,    expected_ab.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_ab.transform.rotation.y,    expected_ab.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_ab.transform.rotation.z,    expected_ab.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_ab.transform.rotation.w,    expected_ab.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_ab, expected_ab, epsilon);
 
     geometry_msgs::TransformStamped out_ba = mBC.lookupTransform("b", "a", ros::Time());
-    EXPECT_NEAR(out_ba.transform.translation.x, expected_ba.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_ba.transform.translation.y, expected_ba.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_ba.transform.translation.z, expected_ba.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_ba.transform.rotation.x,    expected_ba.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_ba.transform.rotation.y,    expected_ba.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_ba.transform.rotation.z,    expected_ba.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_ba.transform.rotation.w,    expected_ba.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_ba, expected_ba, epsilon);
 
     // a <- root -> b -> c
     geometry_msgs::TransformStamped out_ac = mBC.lookupTransform("a", "c", ros::Time());
-    EXPECT_NEAR(out_ac.transform.translation.x, expected_ac.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_ac.transform.translation.y, expected_ac.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_ac.transform.translation.z, expected_ac.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_ac.transform.rotation.x,    expected_ac.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_ac.transform.rotation.y,    expected_ac.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_ac.transform.rotation.z,    expected_ac.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_ac.transform.rotation.w,    expected_ac.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_ac, expected_ac, epsilon);
 
     geometry_msgs::TransformStamped out_ca = mBC.lookupTransform("c", "a", ros::Time());
-    EXPECT_NEAR(out_ca.transform.translation.x, expected_ca.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_ca.transform.translation.y, expected_ca.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_ca.transform.translation.z, expected_ca.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_ca.transform.rotation.x,    expected_ca.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_ca.transform.rotation.y,    expected_ca.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_ca.transform.rotation.z,    expected_ca.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_ca.transform.rotation.w,    expected_ca.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_ca, expected_ca, epsilon);
 
     // a <- root -> b -> c -> d
     geometry_msgs::TransformStamped out_ad = mBC.lookupTransform("a", "d", ros::Time());
-    EXPECT_NEAR(out_ad.transform.translation.x, expected_ad.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_ad.transform.translation.y, expected_ad.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_ad.transform.translation.z, expected_ad.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_ad.transform.rotation.x,    expected_ad.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_ad.transform.rotation.y,    expected_ad.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_ad.transform.rotation.z,    expected_ad.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_ad.transform.rotation.w,    expected_ad.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_ad, expected_ad, epsilon);
 
     geometry_msgs::TransformStamped out_da = mBC.lookupTransform("d", "a", ros::Time());
-    EXPECT_NEAR(out_da.transform.translation.x, expected_da.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_da.transform.translation.y, expected_da.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_da.transform.translation.z, expected_da.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_da.transform.rotation.x,    expected_da.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_da.transform.rotation.y,    expected_da.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_da.transform.rotation.z,    expected_da.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_da.transform.rotation.w,    expected_da.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_da, expected_da, epsilon);
 
     // b -> c
     geometry_msgs::TransformStamped out_cb = mBC.lookupTransform("c", "b", ros::Time());
-    EXPECT_NEAR(out_cb.transform.translation.x, expected_cb.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_cb.transform.translation.y, expected_cb.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_cb.transform.translation.z, expected_cb.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_cb.transform.rotation.x,    expected_cb.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_cb.transform.rotation.y,    expected_cb.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_cb.transform.rotation.z,    expected_cb.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_cb.transform.rotation.w,    expected_cb.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_cb, expected_cb, epsilon);
 
     geometry_msgs::TransformStamped out_bc = mBC.lookupTransform("b", "c", ros::Time());
-    EXPECT_NEAR(out_bc.transform.translation.x, expected_bc.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_bc.transform.translation.y, expected_bc.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_bc.transform.translation.z, expected_bc.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_bc.transform.rotation.x,    expected_bc.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_bc.transform.rotation.y,    expected_bc.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_bc.transform.rotation.z,    expected_bc.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_bc.transform.rotation.w,    expected_bc.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_bc, expected_bc, epsilon);
 
     // b -> c -> d
     geometry_msgs::TransformStamped out_bd = mBC.lookupTransform("b", "d", ros::Time());
-    EXPECT_NEAR(out_bd.transform.translation.x, expected_bd.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_bd.transform.translation.y, expected_bd.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_bd.transform.translation.z, expected_bd.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_bd.transform.rotation.x,    expected_bd.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_bd.transform.rotation.y,    expected_bd.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_bd.transform.rotation.z,    expected_bd.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_bd.transform.rotation.w,    expected_bd.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_bd, expected_bd, epsilon);
 
     geometry_msgs::TransformStamped out_db = mBC.lookupTransform("d", "b", ros::Time());
-    EXPECT_NEAR(out_db.transform.translation.x, expected_db.getOrigin().x(),   epsilon);
-    EXPECT_NEAR(out_db.transform.translation.y, expected_db.getOrigin().y(),   epsilon);
-    EXPECT_NEAR(out_db.transform.translation.z, expected_db.getOrigin().z(),   epsilon);
-    EXPECT_NEAR(out_db.transform.rotation.x,    expected_db.getRotation().x(), epsilon);
-    EXPECT_NEAR(out_db.transform.rotation.y,    expected_db.getRotation().y(), epsilon);
-    EXPECT_NEAR(out_db.transform.rotation.z,    expected_db.getRotation().z(), epsilon);
-    EXPECT_NEAR(out_db.transform.rotation.w,    expected_db.getRotation().w(), epsilon);
+    CHECK_TRANSFORMS_NEAR(out_db, expected_db, epsilon);
 }
 
 // Time varying transforms, testing interpolation
