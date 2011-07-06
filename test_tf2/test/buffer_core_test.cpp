@@ -774,15 +774,22 @@ TEST(BufferCore_lookupTransform, compound_xfm_configuration)
     tsb.transform.rotation.w = q2.w();
     EXPECT_TRUE(mBC.setTransform(tsb, "authority"));
 
-    // Test values calculated using known-good transform
+    btTransform t1, t2, expected;
+    t1.setOrigin(btVector3(1.0,  1.0,  1.0));
+    t1.setRotation(q1);
+    t2.setOrigin(btVector3(-1.0, 0.0, -1.0));
+    t2.setRotation(q2);
+
+    expected = t1.inverse() * t2;
+
     geometry_msgs::TransformStamped out = mBC.lookupTransform("a", "b", ros::Time());
-    EXPECT_NEAR(out.transform.translation.x, -0.9235779, epsilon);
-    EXPECT_NEAR(out.transform.translation.y, -0.0767048, epsilon);
-    EXPECT_NEAR(out.transform.translation.z, -2.8532648, epsilon);
-    EXPECT_NEAR(out.transform.rotation.x,     0.4030708, epsilon);
-    EXPECT_NEAR(out.transform.rotation.y,    -0.1681953, epsilon);
-    EXPECT_NEAR(out.transform.rotation.z,    -0.0217027, epsilon);
-    EXPECT_NEAR(out.transform.rotation.w,     0.8993182, epsilon);
+    EXPECT_NEAR(out.transform.translation.x, expected.getOrigin().x(),   epsilon);
+    EXPECT_NEAR(out.transform.translation.y, expected.getOrigin().y(),   epsilon);
+    EXPECT_NEAR(out.transform.translation.z, expected.getOrigin().z(),   epsilon);
+    EXPECT_NEAR(out.transform.rotation.x,    expected.getRotation().x(), epsilon);
+    EXPECT_NEAR(out.transform.rotation.y,    expected.getRotation().y(), epsilon);
+    EXPECT_NEAR(out.transform.rotation.z,    expected.getRotation().z(), epsilon);
+    EXPECT_NEAR(out.transform.rotation.w,    expected.getRotation().w(), epsilon);
 }
 
 // Time varying transforms, testing interpolation
