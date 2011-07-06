@@ -1166,6 +1166,59 @@ TEST(BufferCore_lookupTransform, multi_configuration)
 	   EXPECT_TRUE(fabs(angle) < _epsilon || fabs(angle - M_PI) < _epsilon); \
 	   }
 
+// Simple test with compound transform
+TEST(BufferCore_lookupTransform, compound_xfm_configuration)
+{
+	double epsilon = 2e-5; // Larger epsilon for interpolation values
+
+    tf2::BufferCore mBC;
+
+    geometry_msgs::TransformStamped tsa;
+    tsa.header.frame_id = "root";
+    tsa.child_frame_id  = "a";
+    tsa.transform.translation.x = 1.0;
+    tsa.transform.translation.y = 1.0;
+    tsa.transform.translation.z = 1.0;
+    btQuaternion q1;
+    q1.setRPY(0.25, .5, .75);
+    tsa.transform.rotation.x = q1.x();
+    tsa.transform.rotation.y = q1.y();
+    tsa.transform.rotation.z = q1.z();
+    tsa.transform.rotation.w = q1.w();
+    EXPECT_TRUE(mBC.setTransform(tsa, "authority"));
+
+    geometry_msgs::TransformStamped tsb;
+    tsb.header.frame_id = "root";
+    tsb.child_frame_id  = "b";
+    tsb.transform.translation.x = -1.0;
+    tsb.transform.translation.y =  0.0;
+    tsb.transform.translation.z = -1.0;
+    btQuaternion q2;
+    q2.setRPY(1.0, 0.25, 0.5);
+    tsb.transform.rotation.x = q2.x();
+    tsb.transform.rotation.y = q2.y();
+    tsb.transform.rotation.z = q2.z();
+    tsb.transform.rotation.w = q2.w();
+    EXPECT_TRUE(mBC.setTransform(tsb, "authority"));
+
+    btTransform t1, t2, expected;
+    t1.setOrigin(btVector3(1.0,  1.0,  1.0));
+    t1.setRotation(q1);
+    t2.setOrigin(btVector3(-1.0, 0.0, -1.0));
+    t2.setRotation(q2);
+
+    expected = t1.inverse() * t2;
+
+    geometry_msgs::TransformStamped out = mBC.lookupTransform("a", "b", ros::Time());
+    EXPECT_NEAR(out.transform.translation.x, expected.getOrigin().x(),   epsilon);
+    EXPECT_NEAR(out.transform.translation.y, expected.getOrigin().y(),   epsilon);
+    EXPECT_NEAR(out.transform.translation.z, expected.getOrigin().z(),   epsilon);
+    EXPECT_NEAR(out.transform.rotation.x,    expected.getRotation().x(), epsilon);
+    EXPECT_NEAR(out.transform.rotation.y,    expected.getRotation().y(), epsilon);
+    EXPECT_NEAR(out.transform.rotation.z,    expected.getRotation().z(), epsilon);
+    EXPECT_NEAR(out.transform.rotation.w,    expected.getRotation().w(), epsilon);
+}
+
 // Time varying transforms, testing interpolation
 TEST(BufferCore_lookupTransform, helix_configuration)
 {
