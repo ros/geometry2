@@ -731,15 +731,18 @@ TEST(BufferCore_canTransform, invalid_arguments)
 };
 
 
-#define CHECK_QUATERNION_NEAR(_q1, _x, _y, _z, _w, _epsilon)      \
-	   btQuaternion q1(_q1.x, _q1.y, _q1.z, _q1.w);     \
-       btQuaternion q2(_x, _y, _z, _w);                 \
-       double angle = q1.angle(q2);                     \
-	   EXPECT_TRUE(fabs(angle) < _epsilon || fabs(angle - M_PI) < _epsilon);
+#define CHECK_QUATERNION_NEAR(_q1, _x, _y, _z, _w, _epsilon)                 \
+	   {                        											 \
+	   btQuaternion q1(_q1.x, _q1.y, _q1.z, _q1.w);                          \
+       btQuaternion q2(_x, _y, _z, _w);                                      \
+       double angle = q1.angle(q2);                                          \
+	   EXPECT_TRUE(fabs(angle) < _epsilon || fabs(angle - M_PI) < _epsilon); \
+	   }
 
+// Time varying transforms, testing interpolation
 TEST(BufferCore_lookupTransform, helix_configuration)
 {
-	double epsilon = 1e-4;
+	double epsilon = 1e-4; // Larger epsilon for interpolation values
 
     tf2::BufferCore mBC;
 
@@ -754,7 +757,9 @@ TEST(BufferCore_lookupTransform, helix_configuration)
      * c.x = cos(theta * (t - t0))
      * c.y = sin(theta * (t - t0))
      *
+     * a->d
      *
+     * d.z = 2 * cos(theta * (t - t0))
      */
 
     double theta = 0.25;
@@ -783,6 +788,14 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         ts2.transform.rotation.z = q.z();
         ts2.transform.rotation.w = q.w();
         EXPECT_TRUE(mBC.setTransform(ts2, "authority"));
+
+        geometry_msgs::TransformStamped ts3;
+        ts3.header.frame_id = "a";
+        ts3.header.stamp    = t;
+        ts3.child_frame_id  = "d";
+        ts3.transform.translation.z = cos(theta * dt);
+        ts3.transform.rotation.w = 1.0;
+        EXPECT_TRUE(mBC.setTransform(ts3, "authority"));
     }
 
 
@@ -800,6 +813,19 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         btQuaternion q;
         q.setRPY(0,0,theta*dt);
         CHECK_QUATERNION_NEAR(out_ac.transform.rotation, 0, 0, q.z(), q.w(), epsilon);
+
+        geometry_msgs::TransformStamped out_ad = mBC.lookupTransform("a", "d", t);
+        EXPECT_NEAR(out_ad.transform.translation.z, cos(theta * dt), epsilon);
+
+        geometry_msgs::TransformStamped out_cd = mBC.lookupTransform("c", "d", t);
+        EXPECT_NEAR(out_cd.transform.translation.x, -1,           			    epsilon);
+        EXPECT_NEAR(out_cd.transform.translation.y,  0,  			            epsilon);
+        EXPECT_NEAR(out_cd.transform.translation.z, cos(theta * dt) - vel * dt, epsilon);
+        btQuaternion mq;
+        mq.setRPY(0,0,-theta*dt);
+        CHECK_QUATERNION_NEAR(out_cd.transform.rotation, 0, 0, mq.z(), mq.w(), epsilon);
+
+
     }
 }
 
