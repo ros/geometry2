@@ -1436,7 +1436,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
              (source_frame == "b" && target_frame =="i")
              )
     {
-      EXPECT_NEAR(outpose.transform.translation.x, -sqrt(2)/2, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
       EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
@@ -1449,7 +1449,7 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
              (target_frame == "b" && source_frame =="i")
              )
     {
-      EXPECT_NEAR(outpose.transform.translation.x, -sqrt(2)/2, epsilon);
+      EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
       EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
