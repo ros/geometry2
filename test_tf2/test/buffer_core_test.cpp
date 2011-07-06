@@ -739,6 +739,52 @@ TEST(BufferCore_canTransform, invalid_arguments)
 	   EXPECT_TRUE(fabs(angle) < _epsilon || fabs(angle - M_PI) < _epsilon); \
 	   }
 
+// Simple test with compound transform
+TEST(BufferCore_lookupTransform, compound_xfm_configuration)
+{
+	double epsilon = 2e-5; // Larger epsilon for interpolation values
+
+    tf2::BufferCore mBC;
+
+    geometry_msgs::TransformStamped tsa;
+    tsa.header.frame_id = "root";
+    tsa.child_frame_id  = "a";
+    tsa.transform.translation.x = 1.0;
+    tsa.transform.translation.y = 1.0;
+    tsa.transform.translation.z = 1.0;
+    btQuaternion q1;
+    q1.setRPY(0.25, .5, .75);
+    tsa.transform.rotation.x = q1.x();
+    tsa.transform.rotation.y = q1.y();
+    tsa.transform.rotation.z = q1.z();
+    tsa.transform.rotation.w = q1.w();
+    EXPECT_TRUE(mBC.setTransform(tsa, "authority"));
+
+    geometry_msgs::TransformStamped tsb;
+    tsb.header.frame_id = "root";
+    tsb.child_frame_id  = "b";
+    tsb.transform.translation.x = -1.0;
+    tsb.transform.translation.y =  0.0;
+    tsb.transform.translation.z = -1.0;
+    btQuaternion q2;
+    q2.setRPY(1.0, 0.25, 0.5);
+    tsb.transform.rotation.x = q2.x();
+    tsb.transform.rotation.y = q2.y();
+    tsb.transform.rotation.z = q2.z();
+    tsb.transform.rotation.w = q2.w();
+    EXPECT_TRUE(mBC.setTransform(tsb, "authority"));
+
+    // Test values calculated using known-good transform
+    geometry_msgs::TransformStamped out = mBC.lookupTransform("a", "b", ros::Time());
+    EXPECT_NEAR(out.transform.translation.x, -0.9235779, epsilon);
+    EXPECT_NEAR(out.transform.translation.y, -0.0767048, epsilon);
+    EXPECT_NEAR(out.transform.translation.z, -2.8532648, epsilon);
+    EXPECT_NEAR(out.transform.rotation.x,     0.4030708, epsilon);
+    EXPECT_NEAR(out.transform.rotation.y,    -0.1681953, epsilon);
+    EXPECT_NEAR(out.transform.rotation.z,    -0.0217027, epsilon);
+    EXPECT_NEAR(out.transform.rotation.w,     0.8993182, epsilon);
+}
+
 // Time varying transforms, testing interpolation
 TEST(BufferCore_lookupTransform, helix_configuration)
 {
@@ -801,7 +847,6 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         ts3.transform.rotation.w = 1.0;
         EXPECT_TRUE(mBC.setTransform(ts3, "authority"));
     }
-
 
     for (ros::Time t = t0 + half_step; t < t1; t += step)
     {
