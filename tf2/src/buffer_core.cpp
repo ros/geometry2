@@ -446,13 +446,13 @@ struct TransformAccum
   {
     if (source)
     {
-      source_to_top_vec += quatRotate(source_to_top_quat, st.translation_);
-      source_to_top_quat *= st.rotation_;
+      source_to_top_vec = quatRotate(st.rotation_, source_to_top_vec) + st.translation_;
+      source_to_top_quat = st.rotation_ * source_to_top_quat;
     }
     else
     {
-      target_to_top_vec += quatRotate(target_to_top_quat, st.translation_);
-      target_to_top_quat *= st.rotation_;
+      target_to_top_vec = quatRotate(st.rotation_, target_to_top_vec) + st.translation_;
+      target_to_top_quat = st.rotation_ * target_to_top_quat;
     }
   }
 
