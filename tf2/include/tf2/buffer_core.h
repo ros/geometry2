@@ -32,6 +32,8 @@
 #ifndef TF2_BUFFER_CORE_H
 #define TF2_BUFFER_CORE_H
 
+#include "transform_storage.h"
+
 #include <string>
 
 #include "ros/duration.h"
@@ -40,21 +42,27 @@
 #include "geometry_msgs/TransformStamped.h"
 #include "LinearMath/btTransform.h"
 
-#include "tf2/time_cache.h"
 //////////////////////////backwards startup for porting
 //#include "tf/tf.h"
+
+#include <boost/unordered_map.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/function.hpp>
 
 namespace tf2
 {
 
-/** \brief An internal representation of transform chains
- *
- * This struct is how the list of transforms are stored before being passed to computeTransformFromList. */
-typedef struct
+typedef std::pair<ros::Time, CompactFrameID> P_TimeAndFrameID;
+typedef uint32_t TransformableCallbackHandle;
+typedef uint64_t TransformableRequestHandle;
+
+class TimeCacheInterface;
+
+enum TransformableResult
 {
-  std::vector<TransformStorage > inverseTransforms;
-  std::vector<TransformStorage > forwardTransforms;
-} TransformLists;
+  TransformAvailable,
+  TransformFailure,
+};
 
 /** \brief A Class which provides coordinate transforms between any two frames in a system.
  *
@@ -209,6 +217,18 @@ public:
    */
   std::string allFramesAsString() const;
   
+  typedef boost::function<void(TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
+                               ros::Time time, TransformableResult result)> TransformableCallback;
+
+  /// \brief Internal use only
+  TransformableCallbackHandle addTransformableCallback(const TransformableCallback& cb);
+  /// \brief Internal use only
+  void removeTransformableCallback(TransformableCallbackHandle handle);
+  /// \brief Internal use only
+  TransformableRequestHandle addTransformableRequest(TransformableCallbackHandle handle, const std::string& target_frame, const std::string& source_frame, ros::Time time);
+  /// \brief Internal use only
+  void cancelTransformableRequest(TransformableRequestHandle handle);
+
 private:
 
 
@@ -216,13 +236,15 @@ private:
   
   /** \brief The pointers to potential frames that the tree can be made of.
    * The frames will be dynamically allocated at run time when set the first time. */
-  std::vector< TimeCacheInterface*> frames_;
+  typedef std::vector<TimeCacheInterface*> V_TimeCacheInterface;
+  V_TimeCacheInterface frames_;
   
   /** \brief A mutex to protect testing and allocating new frames on the above vector. */
-  boost::mutex frame_mutex_;
+  mutable boost::mutex frame_mutex_;
 
   /** \brief A map from string frame ids to CompactFrameID */
-  std::map<std::string, CompactFrameID> frameIDs_;
+  typedef boost::unordered_map<std::string, CompactFrameID> M_StringToCompactFrameID;
+  M_StringToCompactFrameID frameIDs_;
   /** \brief A map from CompactFrameID frame_id_numbers to string for debugging and output */
   std::vector<std::string> frameIDs_reverse;
   /** \brief A map to lookup the most recent authority for a given frame */
@@ -232,8 +254,30 @@ private:
   /// How long to cache transform history
   ros::Duration cache_time_;
 
-  /// whether or not to allow extrapolation
-  ros::Duration max_extrapolation_distance_;
+  mutable std::vector<P_TimeAndFrameID> lct_cache_;
+
+  typedef boost::unordered_map<TransformableCallbackHandle, TransformableCallback> M_TransformableCallback;
+  M_TransformableCallback transformable_callbacks_;
+  uint32_t transformable_callbacks_counter_;
+  boost::mutex transformable_callbacks_mutex_;
+
+  struct TransformableRequest
+  {
+    ros::Time time;
+    TransformableRequestHandle request_handle;
+    TransformableCallbackHandle cb_handle;
+    CompactFrameID target_id;
+    CompactFrameID source_id;
+    std::string target_string;
+    std::string source_string;
+  };
+  typedef std::vector<TransformableRequest> V_TransformableRequest;
+  V_TransformableRequest transformable_requests_;
+  boost::mutex transformable_requests_mutex_;
+  uint64_t transformable_requests_counter_;
+
+  struct RemoveRequestByCallback;
+  struct RemoveRequestByID;
 
   /************************* Internal Functions ****************************/
 
@@ -248,8 +292,8 @@ private:
   TimeCacheInterface* allocateFrame(CompactFrameID cfid, bool is_static);
 
 
-  bool warnFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
-  void validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const;
+  bool warnFrameId(const char* function_name_arg, const std::string& frame_id) const;
+  CompactFrameID validateFrameId(const char* function_name_arg, const std::string& frame_id) const;
 
   /// String to number for frame lookup with dynamic allocation of new frames
   CompactFrameID lookupFrameNumber(const std::string& frameid_str) const;
@@ -258,41 +302,22 @@ private:
   CompactFrameID lookupOrInsertFrameNumber(const std::string& frameid_str);
 
   ///Number to string frame lookup may throw LookupException if number invalid
-  std::string lookupFrameString(CompactFrameID frame_id_num) const;
+  const std::string& lookupFrameString(CompactFrameID frame_id_num) const;
 
-  /** Find the list of connected frames necessary to connect two different frames */
-  int lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists & lists, std::string* error_string) const;
-
-  bool test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
-  bool test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
-  bool test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const;
-  bool test_extrapolation(const ros::Time& target_time, const TransformLists& t_lists, std::string * error_string) const;
-
-  /** Compute the transform based on the list of frames */
-  btTransform computeTransformFromList(const TransformLists & list) const;
-
+  void createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const;
 
   /**@brief Return the latest rostime which is common across the spanning set
    * zero if fails to cross */
-  int getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time& time, std::string * error_string) const;
+  int getLatestCommonTime(CompactFrameID target_frame, CompactFrameID source_frame, ros::Time& time, std::string* error_string) const;
 
-  /** \brief convert Transform msg to Transform */
-  static inline btTransform transformMsgToBT(const geometry_msgs::Transform& msg)
-  {btTransform bt(btQuaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), btVector3(msg.translation.x, msg.translation.y, msg.translation.z)); return bt;};
-  /** \brief convert Transform to Transform msg*/
-  static inline geometry_msgs::Transform transformBTToMsg(const btTransform& bt)
-  {
-    geometry_msgs::Transform msg; 
-    msg.translation.x = bt.getOrigin().getX();
-    msg.translation.y = bt.getOrigin().getY();
-    msg.translation.z = bt.getOrigin().getZ();
-    msg.rotation.x = bt.getRotation().getX();
-    msg.rotation.y = bt.getRotation().getY();
-    msg.rotation.z = bt.getRotation().getZ();
-    msg.rotation.w = bt.getRotation().getW();
-    return msg;
-  }
+  template<typename F>
+  int walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string) const;
 
+  void testTransformableRequests();
+  bool canTransformInternal(CompactFrameID target_id, CompactFrameID source_id,
+                    const ros::Time& time, std::string* error_msg) const;
+  bool canTransformNoLock(CompactFrameID target_id, CompactFrameID source_id,
+                      const ros::Time& time, std::string* error_msg) const;
 
   /////////////////////////////////// Backwards hack for quick startup /////////////////////////
   //Using tf for now will be replaced fully

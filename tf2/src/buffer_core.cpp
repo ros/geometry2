@@ -30,14 +30,15 @@
 /** \author Tully Foote */
 
 #include "tf2/buffer_core.h"
+#include "tf2/time_cache.h"
 #include "tf2/exceptions.h"
 #include "tf2_msgs/TF2Error.h"
 //legacy
 //#include "tf/tf.h"
 //#include "tf/transform_datatypes.h"
 
-
-using namespace tf2;
+namespace tf2
+{
 
 // Must provide storage for non-integral static const class members.
 // Otherwise you get undefined symbol errors on OS X (why not on Linux?).
@@ -46,7 +47,7 @@ const double tf2::BufferCore::DEFAULT_CACHE_TIME;
 
 /** \brief convert Transform msg to Transform */
 void transformMsgToTF2(const geometry_msgs::Transform& msg, btTransform& bt)
-{bt = btTransform(btQuaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), btVector3(msg.translation.x, msg.translation.y, msg.translation.z));};
+{bt = btTransform(btQuaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), btVector3(msg.translation.x, msg.translation.y, msg.translation.z));}
 
 /** \brief convert Transform to Transform msg*/
 void transformTF2ToMsg(const btTransform& bt, geometry_msgs::Transform& msg)
@@ -58,8 +59,35 @@ void transformTF2ToMsg(const btTransform& bt, geometry_msgs::Transform& msg)
   msg.rotation.y = bt.getRotation().y();
   msg.rotation.z = bt.getRotation().z();
   msg.rotation.w = bt.getRotation().w();
-};
+}
 
+/** \brief convert Transform to Transform msg*/
+void transformTF2ToMsg(const btTransform& bt, geometry_msgs::TransformStamped& msg, ros::Time stamp, const std::string& frame_id, const std::string& child_frame_id)
+{
+  transformTF2ToMsg(bt, msg.transform);
+  msg.header.stamp = stamp;
+  msg.header.frame_id = frame_id;
+  msg.child_frame_id = child_frame_id;
+}
+
+void transformTF2ToMsg(const btQuaternion& orient, const btVector3& pos, geometry_msgs::Transform& msg)
+{
+  msg.translation.x = pos.x();
+  msg.translation.y = pos.y();
+  msg.translation.z = pos.z();
+  msg.rotation.x = orient.x();
+  msg.rotation.y = orient.y();
+  msg.rotation.z = orient.z();
+  msg.rotation.w = orient.w();
+}
+
+void transformTF2ToMsg(const btQuaternion& orient, const btVector3& pos, geometry_msgs::TransformStamped& msg, ros::Time stamp, const std::string& frame_id, const std::string& child_frame_id)
+{
+  transformTF2ToMsg(orient, pos, msg.transform);
+  msg.header.stamp = stamp;
+  msg.header.frame_id = frame_id;
+  msg.child_frame_id = child_frame_id;
+}
 
 void setIdentity(geometry_msgs::Transform& tx)
 {
@@ -86,68 +114,65 @@ std::string stripSlash(const std::string& in)
   if (startsWithSlash(in))
     out.erase(0,1);
   return out;
-};
+}
 
 
-bool BufferCore::warnFrameId(const std::string& function_name_arg, const std::string& frame_id) const
+bool BufferCore::warnFrameId(const char* function_name_arg, const std::string& frame_id) const
 {
-  bool retval = false;
   if (frame_id.size() == 0)
   {
     std::stringstream ss;
     ss << "Invalid argument passed to "<< function_name_arg <<" in tf2 frame_ids cannot be empty";
     ROS_WARN("%s",ss.str().c_str());
-    retval = true;
+    return true;
   }
+
   if (startsWithSlash(frame_id))
   {
     std::stringstream ss;
     ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
     ROS_WARN("%s",ss.str().c_str());
-    retval = true;
+    return true;
   }
-  if (lookupFrameNumber(frame_id) == CompactFrameID(0))
-  {
-    /* Don't warn here.  It's not an invalid use case.  
-      std::stringstream ss;
-    ss << "\"" << frame_id << "\" passed to "<< function_name_arg <<" does not exist. ";
-    ROS_WARN("%s",ss.str().c_str()); */
-    retval = true;
-  }
-  return retval;
-};
 
-void BufferCore::validateFrameId(const std::string& function_name_arg, const std::string& frame_id) const
+  return false;
+}
+
+CompactFrameID BufferCore::validateFrameId(const char* function_name_arg, const std::string& frame_id) const
 {
-  if (frame_id.size() == 0)
+  if (frame_id.empty())
   {
     std::stringstream ss;
     ss << "Invalid argument passed to "<< function_name_arg <<" in tf2 frame_ids cannot be empty";
     throw tf2::InvalidArgumentException(ss.str().c_str());
   }
+
   if (startsWithSlash(frame_id))
   {
     std::stringstream ss;
     ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
     throw tf2::InvalidArgumentException(ss.str().c_str());
   }
-  if (lookupFrameNumber(frame_id) == CompactFrameID(0))
+
+  CompactFrameID id = lookupFrameNumber(frame_id);
+  if (id == 0)
   {
     std::stringstream ss;
     ss << "\"" << frame_id << "\" passed to "<< function_name_arg <<" does not exist. ";
     throw tf2::LookupException(ss.str().c_str());
   }
   
-};
+  return id;
+}
 
-BufferCore::BufferCore(ros::Duration cache_time) : cache_time_(cache_time)//: old_tf_(true, cache_time)
+BufferCore::BufferCore(ros::Duration cache_time)
+: cache_time_(cache_time)
+, transformable_callbacks_counter_(0)
+, transformable_requests_counter_(0)
 {
-  max_extrapolation_distance_.fromNSec(DEFAULT_MAX_EXTRAPOLATION_DISTANCE);
   frameIDs_["NO_PARENT"] = 0;
   frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
   frameIDs_reverse.push_back("NO_PARENT");
-
-  return;
 }
 
 BufferCore::~BufferCore()
@@ -221,111 +246,291 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
   if (error_exists)
     return false;
   
+  {
+    boost::mutex::scoped_lock lock(frame_mutex_);
+    CompactFrameID frame_number = lookupOrInsertFrameNumber(stripped.child_frame_id);
+    TimeCacheInterface* frame = getFrame(frame_number);
+    if (frame == NULL)
+      frame = allocateFrame(frame_number, is_static);
 
-  CompactFrameID frame_number = lookupOrInsertFrameNumber(stripped.child_frame_id);
-  TimeCacheInterface* frame = getFrame(frame_number);
-  if (frame == NULL)
-    frame = allocateFrame(frame_number, is_static);
-  
-    
-  if (frame->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id))))
-  {
-    frame_authority_[frame_number] = authority;
+    if (frame->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id), frame_number)))
+    {
+      frame_authority_[frame_number] = authority;
+    }
+    else
+    {
+      ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", stripped.child_frame_id.c_str(), stripped.header.stamp.toSec(), authority.c_str());
+      return false;
+    }
   }
-  else
-  {
-    ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", stripped.child_frame_id.c_str(), stripped.header.stamp.toSec(), authority.c_str());
-    return false;
-  }
+
+  testTransformableRequests();
+
   return true;
-
-};
+}
 
 TimeCacheInterface* BufferCore::allocateFrame(CompactFrameID cfid, bool is_static)
 {
-  TimeCacheInterface* frame_ptr = frames_[cfid.num_];
+  TimeCacheInterface* frame_ptr = frames_[cfid];
   if ( frame_ptr != NULL)
     delete frame_ptr;
   if (is_static)
-    frames_[cfid.num_] = new StaticCache();
+    frames_[cfid] = new StaticCache();
   else
-    frames_[cfid.num_] = new TimeCache(cache_time_, max_extrapolation_distance_);
+    frames_[cfid] = new TimeCache(cache_time_);
   
-  return frames_[cfid.num_];
+  return frames_[cfid];
 }
-geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame, 
+
+enum WalkEnding
+{
+  Identity,
+  TargetParentOfSource,
+  SourceParentOfTarget,
+  FullPath,
+};
+
+template<typename F>
+int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string) const
+{
+  // Short circuit if zero length transform to allow lookups on non existant links
+  if (source_id == target_id)
+  {
+    f.finalize(Identity, time);
+    return tf2_msgs::TF2Error::NO_ERROR;
+  }
+
+  //If getting the latest get the latest common time
+  if (time == ros::Time())
+  {
+    int retval = getLatestCommonTime(target_id, source_id, time, error_string);
+    if (retval != tf2_msgs::TF2Error::NO_ERROR)
+    {
+      return retval;
+    }
+  }
+
+  // Walk the tree to its root from the source frame, accumulating the transform
+  CompactFrameID frame = source_id;
+  CompactFrameID top_parent = frame;
+  uint32_t depth = 0;
+  while (frame != 0)
+  {
+    TimeCacheInterface* cache = getFrame(frame);
+
+    if (!cache)
+    {
+      // There will be no cache for the very root of the tree
+      top_parent = frame;
+      break;
+    }
+
+    CompactFrameID parent = f.gather(cache, time, 0);
+    if (parent == 0)
+    {
+      // Just break out here... there may still be a path from source -> target
+      top_parent = frame;
+      break;
+    }
+
+    // Early out... target frame is a direct parent of the source frame
+    if (frame == target_id)
+    {
+      f.finalize(TargetParentOfSource, time);
+      return tf2_msgs::TF2Error::NO_ERROR;
+    }
+
+    f.accum(true);
+
+    top_parent = frame;
+    frame = parent;
+
+    ++depth;
+    if (depth > MAX_GRAPH_DEPTH)
+    {
+      if (error_string)
+      {
+        std::stringstream ss;
+        ss << "The tf tree is invalid because it contains a loop." << std::endl
+           << allFramesAsString() << std::endl;
+        *error_string = ss.str();
+      }
+      return tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  }
+
+  // Now walk to the top parent from the target frame, accumulating its transform
+  frame = target_id;
+  depth = 0;
+  while (frame != top_parent)
+  {
+    TimeCacheInterface* cache = getFrame(frame);
+
+    if (!cache)
+    {
+      break;
+    }
+
+    CompactFrameID parent = f.gather(cache, time, error_string);
+    if (parent == 0)
+    {
+      if (error_string)
+      {
+        std::stringstream ss;
+        ss << *error_string << ", when looking up transform from frame [" << lookupFrameString(source_id) << "] to frame [" << lookupFrameString(target_id) << "]";
+        *error_string = ss.str();
+      }
+
+      return tf2_msgs::TF2Error::EXTRAPOLATION_ERROR;
+    }
+
+    // Early out... source frame is a direct parent of the target frame
+    if (frame == source_id)
+    {
+      f.finalize(SourceParentOfTarget, time);
+      return tf2_msgs::TF2Error::NO_ERROR;
+    }
+
+    f.accum(false);
+
+    frame = parent;
+
+    ++depth;
+    if (depth > MAX_GRAPH_DEPTH)
+    {
+      if (error_string)
+      {
+        std::stringstream ss;
+        ss << "The tf tree is invalid because it contains a loop." << std::endl
+           << allFramesAsString() << std::endl;
+        *error_string = ss.str();
+      }
+      return tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  }
+
+  if (frame != top_parent)
+  {
+    createConnectivityErrorString(source_id, target_id, error_string);
+    return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+  }
+
+  f.finalize(FullPath, time);
+
+  return tf2_msgs::TF2Error::NO_ERROR;
+}
+
+struct TransformAccum
+{
+  TransformAccum()
+  : source_to_top_quat(0.0, 0.0, 0.0, 1.0)
+  , source_to_top_vec(0.0, 0.0, 0.0)
+  , target_to_top_quat(0.0, 0.0, 0.0, 1.0)
+  , target_to_top_vec(0.0, 0.0, 0.0)
+  , result_quat(0.0, 0.0, 0.0, 1.0)
+  , result_vec(0.0, 0.0, 0.0)
+  {
+  }
+
+  CompactFrameID gather(TimeCacheInterface* cache, ros::Time time, std::string* error_string)
+  {
+    if (!cache->getData(time, st, error_string))
+    {
+      return 0;
+    }
+
+    return st.frame_id_;
+  }
+
+  void accum(bool source)
+  {
+    if (source)
+    {
+      source_to_top_vec = quatRotate(st.rotation_, source_to_top_vec) + st.translation_;
+      source_to_top_quat = st.rotation_ * source_to_top_quat;
+    }
+    else
+    {
+      target_to_top_vec = quatRotate(st.rotation_, target_to_top_vec) + st.translation_;
+      target_to_top_quat = st.rotation_ * target_to_top_quat;
+    }
+  }
+
+  void finalize(WalkEnding end, ros::Time _time)
+  {
+    switch (end)
+    {
+    case Identity:
+      break;
+    case TargetParentOfSource:
+      result_vec = source_to_top_vec;
+      result_quat = source_to_top_quat;
+      break;
+    case SourceParentOfTarget:
+      {
+        btQuaternion inv_target_quat = target_to_top_quat.inverse();
+        btVector3 inv_target_vec = quatRotate(inv_target_quat, -target_to_top_vec);
+        result_vec = inv_target_vec;
+        result_quat = inv_target_quat;
+        break;
+      }
+    case FullPath:
+      {
+        btQuaternion inv_target_quat = target_to_top_quat.inverse();
+        btVector3 inv_target_vec = quatRotate(inv_target_quat, -target_to_top_vec);
+
+     	result_vec = quatRotate(inv_target_quat, source_to_top_vec) + inv_target_vec;
+        result_quat = inv_target_quat * source_to_top_quat;
+      }
+      break;
+    };
+
+    time = _time;
+  }
+
+  TransformStorage st;
+  ros::Time time;
+  btQuaternion source_to_top_quat;
+  btVector3 source_to_top_vec;
+  btQuaternion target_to_top_quat;
+  btVector3 target_to_top_vec;
+
+  btQuaternion result_quat;
+  btVector3 result_vec;
+};
+
+geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame,
                                                             const std::string& source_frame,
                                                             const ros::Time& time) const
 {
-  validateFrameId("lookupTransform argument target_frame", target_frame);
-  validateFrameId("lookupTransform argument source_frame", source_frame);
-  
+  boost::mutex::scoped_lock lock(frame_mutex_);
+
+  CompactFrameID target_id = validateFrameId("lookupTransform argument target_frame", target_frame);
+  CompactFrameID source_id = validateFrameId("lookupTransform argument source_frame", source_frame);
+
+  std::string error_string;
+  TransformAccum accum;
+  int retval = walkToTopParent(accum, time, target_id, source_id, &error_string);
+  if (retval != tf2_msgs::TF2Error::NO_ERROR)
+  {
+    switch (retval)
+    {
+    case tf2_msgs::TF2Error::CONNECTIVITY_ERROR:
+      throw ConnectivityException(error_string);
+    case tf2_msgs::TF2Error::EXTRAPOLATION_ERROR:
+      throw ExtrapolationException(error_string);
+    case tf2_msgs::TF2Error::LOOKUP_ERROR:
+      throw LookupException(error_string);
+    default:
+      ROS_ERROR("Unknown error code: %d", retval);
+      ROS_BREAK();
+    }
+  }
 
   geometry_msgs::TransformStamped output_transform;
-  // Short circuit if zero length transform to allow lookups on non existant links
-  if (source_frame == target_frame)
-  {
-    setIdentity(output_transform.transform);
-
-
-    output_transform.header.stamp = time;
-    /*    if (time == ros::Time())
-      output_transform.header.stamp = ros::Time(ros::TIME_MAX); ///\todo review what this should be
-    else
-      output_transform.header.stamp  = time;
-    */
-
-    output_transform.child_frame_id = source_frame;
-    output_transform.header.frame_id = target_frame;
-    return output_transform;
-  }
-  //  printf("Mapped Source: %s \nMapped Target: %s\n", source_frame.c_str(), target_frame.c_str());
-  int retval = tf2_msgs::TF2Error::NO_ERROR;
-  ros::Time temp_time;
-  std::string error_string;
-  //If getting the latest get the latest common time
-  if (time == ros::Time())
-    retval = getLatestCommonTime(target_frame, source_frame, temp_time, &error_string);
-  else
-    temp_time = time;
-
-  TransformLists t_list;
-
-  if (retval == tf2_msgs::TF2Error::NO_ERROR)
-    retval = lookupLists(lookupFrameNumber( target_frame), temp_time, lookupFrameNumber( source_frame), t_list, &error_string);
-  else //if (retval != tf2_msgs::TF2Error::NO_ERROR)
-  {
-    std::stringstream ss;
-    ss << " When trying to transform between " << source_frame << " and " << target_frame <<".";
-    if (retval == tf2_msgs::TF2Error::LOOKUP_ERROR)
-      throw LookupException(error_string + ss.str());
-    if (retval == tf2_msgs::TF2Error::CONNECTIVITY_ERROR)
-      throw ConnectivityException(error_string + ss.str());
-  }
-
-  if (test_extrapolation(temp_time, t_list, &error_string))
-    {
-    std::stringstream ss;
-    if (time == ros::Time())// Using latest common time if we extrapolate this means that one of the links is out of date
-    {
-      ss << "Could not find a common time " << source_frame << " and " << target_frame <<".";
-      throw ConnectivityException(ss.str());
-    }
-    else
-    {
-      ss << " When trying to transform between " << source_frame << " and " << target_frame <<"."<< std::endl;
-      throw ExtrapolationException(error_string + ss.str());
-    }
-    }
-
-
-  btTransform output = computeTransformFromList(t_list);
-  transformTF2ToMsg(output, output_transform.transform);
-  output_transform.header.stamp = temp_time;
-  output_transform.header.frame_id = target_frame;
-  output_transform.child_frame_id = source_frame;
+  transformTF2ToMsg(accum.result_quat, accum.result_vec, output_transform, accum.time, target_frame, source_frame);
   return output_transform;
-};
+}
 
                                                        
 geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame, 
@@ -336,7 +541,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
 {
   validateFrameId("lookupTransform argument target_frame", target_frame);
   validateFrameId("lookupTransform argument source_frame", source_frame);
-  validateFrameId("lookupTransform argument source_frame", fixed_frame);
+  validateFrameId("lookupTransform argument fixed_frame", fixed_frame);
 
   geometry_msgs::TransformStamped output;
   geometry_msgs::TransformStamped temp1 =  lookupTransform(fixed_frame, source_frame, source_time);
@@ -350,7 +555,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   output.header.frame_id = target_frame;
   output.child_frame_id = source_frame;
   return output;
-};
+}
 
 
 
@@ -383,7 +588,7 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
   {
     throw tf2::InvalidArgumentException(ex.what());
   }
-};
+}
 
 geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame, 
                                           const std::string& observation_frame, 
@@ -415,9 +620,50 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
   {
     throw tf2::InvalidArgumentException(ex.what());
   }
-};
+}
 */
 
+struct CanTransformAccum
+{
+  CompactFrameID gather(TimeCacheInterface* cache, ros::Time time, std::string* error_string)
+  {
+    return cache->getParent(time, error_string);
+  }
+
+  void accum(bool source)
+  {
+  }
+
+  void finalize(WalkEnding end, ros::Time _time)
+  {
+  }
+
+  TransformStorage st;
+};
+
+bool BufferCore::canTransformNoLock(CompactFrameID target_id, CompactFrameID source_id,
+                    const ros::Time& time, std::string* error_msg) const
+{
+  if (target_id == 0 || source_id == 0)
+  {
+    return false;
+  }
+
+  CanTransformAccum accum;
+  if (walkToTopParent(accum, time, target_id, source_id, error_msg) == tf2_msgs::TF2Error::NO_ERROR)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+bool BufferCore::canTransformInternal(CompactFrameID target_id, CompactFrameID source_id,
+                                  const ros::Time& time, std::string* error_msg) const
+{
+  boost::mutex::scoped_lock lock(frame_mutex_);
+  return canTransformNoLock(target_id, source_id, time, error_msg);
+}
 
 bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
                            const ros::Time& time, std::string* error_msg) const
@@ -427,41 +673,12 @@ bool BufferCore::canTransform(const std::string& target_frame, const std::string
   if (warnFrameId("canTransform argument source_frame", source_frame))
     return false;
 
-  ros::Time local_time = time;
+  boost::mutex::scoped_lock lock(frame_mutex_);
 
-  //break out early if no op transform
-  if (source_frame == target_frame) return true;
+  CompactFrameID target_id = lookupFrameNumber(target_frame);
+  CompactFrameID source_id = lookupFrameNumber(source_frame);
 
-  if (local_time == ros::Time())
-    if (getLatestCommonTime(source_frame, target_frame, local_time, error_msg) != tf2_msgs::TF2Error::NO_ERROR) // set time if zero
-    {
-      return false;
-    }
-  
-  TransformLists t_list;
-  ///\todo check return
-  int retval;
-  retval = lookupLists(lookupFrameNumber( target_frame), local_time, lookupFrameNumber( source_frame), t_list, error_msg);
-
-  ///\todo WRITE HELPER FUNCITON TO RETHROW
-  if (retval != tf2_msgs::TF2Error::NO_ERROR)
-  {
-    if (retval == tf2_msgs::TF2Error::LOOKUP_ERROR)
-    {
-      return false;
-    }
-    if (retval == tf2_msgs::TF2Error::CONNECTIVITY_ERROR)
-    {
-      return false;
-    }
-  }
-
-  if (test_extrapolation(local_time, t_list, error_msg))
-    {
-      return false;
-    }
-
-  return true;
+  return canTransformNoLock(target_id, source_id, time, error_msg);
 }
 
 bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& target_time,
@@ -472,27 +689,28 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
     return false;
   if (warnFrameId("canTransform argument source_frame", source_frame))
     return false;
-  if (warnFrameId("canTransform argument source_frame", fixed_frame))
+  if (warnFrameId("canTransform argument fixed_frame", fixed_frame))
     return false;
+
   return canTransform(target_frame, fixed_frame, target_time) && canTransform(fixed_frame, source_frame, source_time, error_msg);
 }
 
 
 tf2::TimeCacheInterface* BufferCore::getFrame(CompactFrameID frame_id) const
 {
-  if (frame_id == CompactFrameID(0) || frame_id.num_ > frames_.size()) /// @todo check larger values too
+  if (frame_id == 0 || frame_id > frames_.size()) /// @todo check larger values too
     return NULL;
   else
   {
-    return frames_[frame_id.num_];
+    return frames_[frame_id];
   }
-};
+}
 
 CompactFrameID BufferCore::lookupFrameNumber(const std::string& frameid_str) const
 {
   CompactFrameID retval;
   boost::mutex::scoped_lock(frame_mutex_);
-  std::map<std::string, CompactFrameID>::const_iterator map_it = frameIDs_.find(frameid_str);
+  M_StringToCompactFrameID::const_iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
     retval = CompactFrameID(0);
@@ -500,13 +718,12 @@ CompactFrameID BufferCore::lookupFrameNumber(const std::string& frameid_str) con
   else
     retval = map_it->second;
   return retval;
-};
+}
 
 CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_str)
 {
   CompactFrameID retval = 0;
-  boost::mutex::scoped_lock(frame_mutex_);
-  std::map<std::string, CompactFrameID>::iterator map_it = frameIDs_.find(frameid_str);
+  M_StringToCompactFrameID::iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
     retval = CompactFrameID(frames_.size());
@@ -518,325 +735,29 @@ CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_
     retval = frameIDs_[frameid_str];
 
   return retval;
-};
+}
 
-std::string BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
+const std::string& BufferCore::lookupFrameString(CompactFrameID frame_id_num) const
 {
-    if (frame_id_num.num_ >= frameIDs_reverse.size())
+    if (frame_id_num >= frameIDs_reverse.size())
     {
       std::stringstream ss;
-      ss << "Reverse lookup of frame id " << frame_id_num.num_ << " failed!";
+      ss << "Reverse lookup of frame id " << frame_id_num << " failed!";
       throw tf2::LookupException(ss.str());
     }
     else
-      return frameIDs_reverse[frame_id_num.num_];
-};
-
-
-int BufferCore::lookupLists(CompactFrameID target_frame, ros::Time time, CompactFrameID source_frame, TransformLists& lists, std::string * error_string) const
-{
-  /*timeval tempt;
-  gettimeofday(&tempt,NULL);
-  std::cerr << "Looking up list at " <<tempt.tv_sec * 1000000ULL + tempt.tv_usec << std::endl;
-  */  
-  //Clear lists before operating
-  lists.forwardTransforms.clear();
-  lists.inverseTransforms.clear();
-  //  TransformLists mTfLs;
-  if (target_frame == source_frame)
-    return 0;  //Don't do anythign if we're not going anywhere
-
-  TransformStorage temp;
-
-  CompactFrameID frame = source_frame;
-  unsigned int counter = 0;  //A counter to keep track of how deep we've descended
-  CompactFrameID last_inverse;
-  while (true)
-    {
-      //      printf("getting data from %d:%s \n", frame, lookupFrameString(frame).c_str());
-
-      TimeCacheInterface* pointer = getFrame(frame);
-      if (! pointer)
-      {
-        last_inverse = frame;
-        break;
-        
-      }
-      else if ( ! pointer->getData(time, temp))
-      {
-        last_inverse = frame;
-        break;
-      }
-
-      //break if parent is NO_PARENT (0)
-      if (frame == 0)
-      {
-        last_inverse = frame;
-        break;
-      }
-      lists.inverseTransforms.push_back(temp);
-
-      frame = temp.c_frame_id_;
-
-
-      /* Check if we've gone too deep.  A loop in the tree would cause this */
-      if (counter++ > MAX_GRAPH_DEPTH)
-      {
-        if (error_string)
-        {
-          std::stringstream ss;
-          ss<<"The tf tree is invalid because it contains a loop." << std::endl
-            << allFramesAsString() << std::endl;
-          *error_string =ss.str();
-        }
-        return tf2_msgs::TF2Error::LOOKUP_ERROR;
-        //        throw(LookupException(ss.str()));
-      }
-    }
-  /*
-    timeval tempt2;
-  gettimeofday(&tempt2,NULL);
-  std::cerr << "Side A " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
-  */
-  frame = target_frame;
-  counter = 0;
-  CompactFrameID last_forward;
-  while (true)
-    {
-
-      TimeCacheInterface* pointer = getFrame(frame);
-      if (! pointer)
-      {
-        last_forward = frame;
-        break;
-        
-      }
-      else if( !  pointer->getData(time, temp))
-      {
-        last_forward = frame;
-        break;
-      }
-
-      //break if parent is NO_PARENT (0)
-      if (frame == 0)
-      {
-        last_forward = frame;
-        break;
-      }
-      lists.forwardTransforms.push_back(temp);
-      frame = temp.c_frame_id_;
-
-      /* Check if we've gone too deep.  A loop in the tree would cause this*/
-      if (counter++ > MAX_GRAPH_DEPTH){
-        if (error_string)
-        {
-          std::stringstream ss;
-          ss<<"The tf tree is invalid because it contains a loop." << std::endl
-            << allFramesAsString() << std::endl;
-          *error_string = ss.str();
-        }
-        return tf2_msgs::TF2Error::LOOKUP_ERROR;//throw(LookupException(ss.str()));
-      }
-    }
-  /*
-  gettimeofday(&tempt2,NULL);
-  std::cerr << "Side B " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
-  */
-
-  std::string connectivity_error("Could not find a connection between '"+lookupFrameString(target_frame)+"' and '"+
-                                 lookupFrameString(source_frame)+"' because they are not part of the same tree."+
-                                 "Tf has two or more unconnected trees.");
-  /* Check the zero length cases*/
-  if (lists.inverseTransforms.size() == 0)
-  {
-    if (lists.forwardTransforms.size() == 0) //If it's going to itself it's already been caught
-    {
-      if (error_string) *error_string = connectivity_error;
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-
-    if (! (last_forward == source_frame) )  //\todo match with case A
-    {
-      if (error_string) *error_string = connectivity_error;
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-    else return 0;
-  }
-
-  if (lists.forwardTransforms.size() == 0)
-  {
-    if (lists.inverseTransforms.size() == 0)  //If it's going to itself it's already been caught
-    {//\todo remove THis is the same as case D
-      if (error_string) *error_string = connectivity_error;
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-
-    if (!(lookupFrameNumber(lists.inverseTransforms.back().header.frame_id) == target_frame))
-    {
-      if (error_string) *error_string = connectivity_error;
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-    else return 0;
-    
-  }
-  
-
-  /* Make sure the end of the search shares a parent. */
-  if (!(last_forward == last_inverse))
-  {
-    if (error_string) *error_string = connectivity_error;
-    return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-  }
-  /* Make sure that we don't have a no parent at the top */
-    {
-    if (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id) == 0 || lookupFrameNumber( lists.forwardTransforms.back().child_frame_id) == 0)
-    {
-      //if (error_string) *error_string = "NO_PARENT at top of tree";
-      if (error_string) *error_string = connectivity_error;
-      return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
-    }
-
-    /*
-      gettimeofday(&tempt2,NULL);
-      std::cerr << "Base Cases done" <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
-    */
-
-    while (lookupFrameNumber(lists.inverseTransforms.back().child_frame_id) == lookupFrameNumber(lists.forwardTransforms.back().child_frame_id))
-    {
-      lists.inverseTransforms.pop_back();
-      lists.forwardTransforms.pop_back();
-
-      // Make sure we don't go beyond the beginning of the list.
-      // (The while statement above doesn't fail if you hit the beginning of the list,
-      // which happens in the zero distance case.)
-      if (lists.inverseTransforms.size() == 0 || lists.forwardTransforms.size() == 0)
-	break;
-    }
-  }
-  /*
-       gettimeofday(&tempt2,NULL);
-       std::cerr << "Done looking up list " <<tempt.tv_sec * 1000000LL + tempt.tv_usec- tempt2.tv_sec * 1000000LL - tempt2.tv_usec << std::endl;
-     */
-  return 0;
-
-  }
-
-
-bool BufferCore::test_extrapolation_one_value(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
-{
-  std::stringstream ss;
-  ss << std::fixed;
-  ss.precision(3);
-
-  if (tr.mode_ == ONE_VALUE)
-  {
-    if (tr.header.stamp - target_time > max_extrapolation_distance_ || target_time - tr.header.stamp > max_extrapolation_distance_)
-    {
-      if (error_string) {
-        ss << "You requested a transform at time " << (target_time).toSec() 
-           << ",\n but the tf buffer only contains a single transform " 
-           << "at time " << tr.header.stamp.toSec() << ".\n";
-        if ( max_extrapolation_distance_ > ros::Duration(0))
-        {
-          ss << "The tf extrapollation distance is set to " 
-             << (max_extrapolation_distance_).toSec() <<" seconds.\n";
-        }
-        *error_string = ss.str();
-      }
-      return true;
-    }
-  }
-  return false;
+      return frameIDs_reverse[frame_id_num];
 }
 
-
-bool BufferCore::test_extrapolation_past(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
+void BufferCore::createConnectivityErrorString(CompactFrameID source_frame, CompactFrameID target_frame, std::string* out) const
 {
-  std::stringstream ss;
-  ss << std::fixed;
-  ss.precision(3);
-
-  if (tr.mode_ == EXTRAPOLATE_BACK &&  tr.header.stamp - target_time > max_extrapolation_distance_)
+  if (!out)
   {
-    if (error_string) {
-      ss << "Extrapolating into the past.  You requested a transform at time " << target_time.toSec() << " seconds \n"
-         << "but the tf buffer only has a history of until " << tr.header.stamp.toSec()  << " seconds.\n";
-      if ( max_extrapolation_distance_ > ros::Duration(0))
-      {
-        ss << "The tf extrapollation distance is set to " 
-           << (max_extrapolation_distance_).toSec() <<" seconds.\n";
-      }
-      *error_string = ss.str();
-    }
-    return true;
+    return;
   }
-  return false;
-}
-
-
-bool BufferCore::test_extrapolation_future(const ros::Time& target_time, const TransformStorage& tr, std::string* error_string) const
-{
-  std::stringstream ss;
-  ss << std::fixed;
-  ss.precision(3);
-
-  if( tr.mode_ == EXTRAPOLATE_FORWARD && target_time - tr.header.stamp > max_extrapolation_distance_)
-  {
-    if (error_string){
-      ss << "Extrapolating into the future.  You requested a transform that is at time" << target_time.toSec() << " seconds, \n"
-         << "but the most recent transform in the tf buffer is at " << tr.header.stamp.toSec() << " seconds.\n";
-      if ( max_extrapolation_distance_ > ros::Duration(0))
-      {
-        ss << "The tf extrapollation distance is set to " 
-           << (max_extrapolation_distance_).toSec() <<" seconds.\n";
-      }
-      *error_string = ss.str();
-    }
-    return true;
-  }
-  return false;
-}
-
-
-bool BufferCore::test_extrapolation(const ros::Time& target_time, const TransformLists& lists, std::string * error_string) const
-{
-  std::stringstream ss;
-  ss << std::fixed;
-  ss.precision(3);
-  for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
-  {
-    if (test_extrapolation_one_value(target_time, lists.inverseTransforms[i], error_string)) return true;
-    if (test_extrapolation_past(target_time, lists.inverseTransforms[i], error_string)) return true;
-    if (test_extrapolation_future(target_time, lists.inverseTransforms[i], error_string)) return true;
-  }
-
-  for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
-  {
-    if (test_extrapolation_one_value(target_time, lists.forwardTransforms[i], error_string)) return true;
-    if (test_extrapolation_past(target_time, lists.forwardTransforms[i], error_string)) return true;
-    if (test_extrapolation_future(target_time, lists.forwardTransforms[i], error_string)) return true;
-  }
-
-  return false;
-}
-
-
-
-btTransform BufferCore::computeTransformFromList(const TransformLists & lists) const
-{
-  btTransform retTrans;
-  retTrans.setIdentity();
-  ///@todo change these to iterators
-  for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
-    {
-      retTrans *= transformMsgToBT((lists.inverseTransforms[lists.inverseTransforms.size() -1 - i]).transform); //Reverse to get left multiply
-    }
-  for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
-    {
-      retTrans = transformMsgToBT((lists.forwardTransforms[lists.forwardTransforms.size() -1 - i]).transform).inverse() * retTrans; //Do this list backwards(from backwards) for it was generated traveling the wrong way
-    }
-
-  return retTrans;
+  *out = std::string("Could not find a connection between '"+lookupFrameString(target_frame)+"' and '"+
+                     lookupFrameString(source_frame)+"' because they are not part of the same tree."+
+                     "Tf has two or more unconnected trees.");
 }
 
 std::string BufferCore::allFramesAsString() const
@@ -858,52 +779,192 @@ std::string BufferCore::allFramesAsString() const
       continue;
     CompactFrameID frame_id_num;
     if(  frame_ptr->getData(ros::Time(), temp))
-      frame_id_num = temp.c_frame_id_;
+      frame_id_num = temp.frame_id_;
     else
     {
       frame_id_num = 0;
     }
-    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num.num_] << "." <<std::endl;
+    mstream << "Frame "<< frameIDs_reverse[counter] << " exists with parent " << frameIDs_reverse[frame_id_num] << "." <<std::endl;
   }
 
   return mstream.str();
 }
 
-int BufferCore::getLatestCommonTime(const std::string& source, const std::string& dest, ros::Time & time, std::string * error_string) const
+struct TimeAndFrameIDFrameComparator
 {
+  TimeAndFrameIDFrameComparator(CompactFrameID id)
+  : id(id)
+  {}
 
-  time = ros::Time(ros::TIME_MAX);
-  int retval;
-  TransformLists lists;
+  bool operator()(const P_TimeAndFrameID& rhs) const
   {
-    retval = lookupLists(lookupFrameNumber(dest), ros::Time(), lookupFrameNumber(source), lists, error_string);
+    return rhs.second == id;
   }
-  if (retval == tf2_msgs::TF2Error::NO_ERROR)
+
+  CompactFrameID id;
+};
+
+int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID source_id, ros::Time & time, std::string * error_string) const
+{
+  if (source_id == target_id)
   {
     //Set time to latest timestamp of frameid in case of target and source frame id are the same
-    if (lists.inverseTransforms.size() == 0 && lists.forwardTransforms.size() == 0)
-    {
-      time = ros::Time(); ///\todo review was now();
-      return retval;
-    }
-
-    for (unsigned int i = 0; i < lists.inverseTransforms.size(); i++)
-    {
-      if (time > lists.inverseTransforms[i].header.stamp)
-        time = lists.inverseTransforms[i].header.stamp;
-    }
-    for (unsigned int i = 0; i < lists.forwardTransforms.size(); i++)
-    {
-      if (time > lists.forwardTransforms[i].header.stamp)
-        time = lists.forwardTransforms[i].header.stamp;
-    }
-
+    time = ros::Time();                 ///\todo review was now();
+    return tf2_msgs::TF2Error::NO_ERROR;
   }
-  else
-    time.fromSec(0);
 
-  return retval;
-};
+  lct_cache_.clear();
+
+  // Walk the tree to its root from the source frame, accumulating the list of parent/time as well as the latest time
+  // in the target is a direct parent
+  CompactFrameID frame = source_id;
+  P_TimeAndFrameID temp;
+  uint32_t depth = 0;
+  ros::Time common_time = ros::TIME_MAX;
+  while (frame != 0)
+  {
+    TimeCacheInterface* cache = getFrame(frame);
+
+    if (!cache)
+    {
+      // There will be no cache for the very root of the tree
+      break;
+    }
+
+    P_TimeAndFrameID latest = cache->getLatestTimeAndParent();
+
+    if (latest.second == 0)
+    {
+      // Just break out here... there may still be a path from source -> target
+      break;
+    }
+
+    if (!latest.first.isZero())
+    {
+      common_time = std::min(latest.first, common_time);
+    }
+
+    lct_cache_.push_back(latest);
+
+    frame = latest.second;
+
+    // Early out... target frame is a direct parent of the source frame
+    if (frame == target_id)
+    {
+      time = common_time;
+      if (time == ros::TIME_MAX)
+      {
+        time = ros::Time();
+      }
+      return tf2_msgs::TF2Error::NO_ERROR;
+    }
+
+    ++depth;
+    if (depth > MAX_GRAPH_DEPTH)
+    {
+      if (error_string)
+      {
+        std::stringstream ss;
+        ss<<"The tf tree is invalid because it contains a loop." << std::endl
+          << allFramesAsString() << std::endl;
+        *error_string = ss.str();
+      }
+      return tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  }
+
+  // Now walk to the top parent from the target frame, accumulating the latest time and looking for a common parent
+  frame = target_id;
+  depth = 0;
+  common_time = ros::TIME_MAX;
+  CompactFrameID common_parent = 0;
+  while (true)
+  {
+    TimeCacheInterface* cache = getFrame(frame);
+
+    if (!cache)
+    {
+      break;
+    }
+
+    P_TimeAndFrameID latest = cache->getLatestTimeAndParent();
+
+    if (latest.second == 0)
+    {
+      break;
+    }
+
+    if (!latest.first.isZero())
+    {
+      common_time = std::min(latest.first, common_time);
+    }
+
+    std::vector<P_TimeAndFrameID>::iterator it = std::find_if(lct_cache_.begin(), lct_cache_.end(), TimeAndFrameIDFrameComparator(latest.second));
+    if (it != lct_cache_.end()) // found a common parent
+    {
+      common_parent = it->second;
+      break;
+    }
+
+    frame = latest.second;
+
+    // Early out... source frame is a direct parent of the target frame
+    if (frame == source_id)
+    {
+      time = common_time;
+      if (time == ros::TIME_MAX)
+      {
+        time = ros::Time();
+      }
+      return tf2_msgs::TF2Error::NO_ERROR;
+    }
+
+    ++depth;
+    if (depth > MAX_GRAPH_DEPTH)
+    {
+      if (error_string)
+      {
+        std::stringstream ss;
+        ss<<"The tf tree is invalid because it contains a loop." << std::endl
+          << allFramesAsString() << std::endl;
+        *error_string = ss.str();
+      }
+      return tf2_msgs::TF2Error::LOOKUP_ERROR;
+    }
+  }
+
+  if (common_parent == 0)
+  {
+    createConnectivityErrorString(source_id, target_id, error_string);
+    return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
+  }
+
+  // Loop through the source -> root list until we hit the common parent
+  {
+    std::vector<P_TimeAndFrameID>::iterator it = lct_cache_.begin();
+    std::vector<P_TimeAndFrameID>::iterator end = lct_cache_.end();
+    for (; it != end; ++it)
+    {
+      if (!it->first.isZero())
+      {
+        common_time = std::min(common_time, it->first);
+      }
+
+      if (it->second == common_parent)
+      {
+        break;
+      }
+    }
+  }
+
+  if (common_time == ros::TIME_MAX)
+  {
+    common_time = ros::Time();
+  }
+
+  time = common_time;
+  return tf2_msgs::TF2Error::NO_ERROR;
+}
 
 std::string BufferCore::allFramesAsYAML() const
 {
@@ -923,34 +984,221 @@ std::string BufferCore::allFramesAsYAML() const
   {
     CompactFrameID cfid = CompactFrameID(counter);
     CompactFrameID frame_id_num;
-    if(  getFrame(cfid)->getData(ros::Time(), temp))
-      frame_id_num = temp.c_frame_id_;
-    else
+    TimeCacheInterface* cache = getFrame(cfid);
+    if (!cache)
     {
-      frame_id_num = 0;
+      continue;
     }
-    if (frame_id_num.num_ != 0)
+
+    if(!cache->getData(ros::Time(), temp))
     {
-      std::string authority = "no recorded authority";
-      std::map<CompactFrameID, std::string>::const_iterator it = frame_authority_.find(cfid);
-      if (it != frame_authority_.end())
-        authority = it->second;
-
-      double rate = getFrame(cfid)->getListLength() / std::max((getFrame(cfid)->getLatestTimestamp().toSec() -
-                                                                   getFrame(cfid)->getOldestTimestamp().toSec() ), 0.0001);
-
-      mstream << std::fixed; //fixed point notation
-      mstream.precision(3); //3 decimal places
-      mstream << frameIDs_reverse[cfid.num_] << ": " << std::endl;
-      mstream << "  parent: '" << frameIDs_reverse[frame_id_num.num_] << "'" << std::endl;
-      mstream << "  broadcaster: '" << authority << "'" << std::endl;
-      mstream << "  rate: " << rate << std::endl;
-      mstream << "  most_recent_transform: " << (getFrame(cfid)->getLatestTimestamp()).toSec() << std::endl;
-      mstream << "  oldest_transform: " << (getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
-      mstream << "  buffer_length: " << (getFrame(cfid)->getLatestTimestamp()-getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
+      continue;
     }
+
+    frame_id_num = temp.frame_id_;
+
+    std::string authority = "no recorded authority";
+    std::map<CompactFrameID, std::string>::const_iterator it = frame_authority_.find(cfid);
+    if (it != frame_authority_.end())
+      authority = it->second;
+
+    double rate = getFrame(cfid)->getListLength() / std::max((getFrame(cfid)->getLatestTimestamp().toSec() -
+                                                                 getFrame(cfid)->getOldestTimestamp().toSec() ), 0.0001);
+
+    mstream << std::fixed; //fixed point notation
+    mstream.precision(3); //3 decimal places
+    mstream << frameIDs_reverse[cfid] << ": " << std::endl;
+    mstream << "  parent: '" << frameIDs_reverse[frame_id_num] << "'" << std::endl;
+    mstream << "  broadcaster: '" << authority << "'" << std::endl;
+    mstream << "  rate: " << rate << std::endl;
+    mstream << "  most_recent_transform: " << (getFrame(cfid)->getLatestTimestamp()).toSec() << std::endl;
+    mstream << "  oldest_transform: " << (getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
+    mstream << "  buffer_length: " << (getFrame(cfid)->getLatestTimestamp()-getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
   }
   
   return mstream.str();
 }
 
+TransformableCallbackHandle BufferCore::addTransformableCallback(const TransformableCallback& cb)
+{
+  boost::mutex::scoped_lock lock(transformable_callbacks_mutex_);
+  TransformableCallbackHandle handle = ++transformable_callbacks_counter_;
+  while (!transformable_callbacks_.insert(std::make_pair(handle, cb)).second)
+  {
+    handle = ++transformable_callbacks_counter_;
+  }
+
+  return handle;
+}
+
+struct BufferCore::RemoveRequestByCallback
+{
+  RemoveRequestByCallback(TransformableCallbackHandle handle)
+  : handle_(handle)
+  {}
+
+  bool operator()(const TransformableRequest& req)
+  {
+    return req.cb_handle == handle_;
+  }
+
+  TransformableCallbackHandle handle_;
+};
+
+void BufferCore::removeTransformableCallback(TransformableCallbackHandle handle)
+{
+  {
+    boost::mutex::scoped_lock lock(transformable_callbacks_mutex_);
+    transformable_callbacks_.erase(handle);
+  }
+
+  {
+    boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+    V_TransformableRequest::iterator it = std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByCallback(handle));
+    transformable_requests_.erase(it, transformable_requests_.end());
+  }
+}
+
+TransformableRequestHandle BufferCore::addTransformableRequest(TransformableCallbackHandle handle, const std::string& target_frame, const std::string& source_frame, ros::Time time)
+{
+  // shortcut if target == source
+  if (target_frame == source_frame)
+  {
+    return 0;
+  }
+
+  TransformableRequest req;
+  req.target_id = lookupFrameNumber(target_frame);
+  req.source_id = lookupFrameNumber(source_frame);
+
+  // First check if the request is already transformable.  If it is, return immediately
+  if (canTransformInternal(req.target_id, req.source_id, time, 0))
+  {
+    return 0;
+  }
+
+  // Might not be transformable at all, ever (if it's too far in the past)
+  if (req.target_id && req.source_id)
+  {
+    ros::Time latest_time;
+    // TODO: This is incorrect, but better than nothing.  Really we want the latest time for
+    // any of the frames
+    getLatestCommonTime(req.target_id, req.source_id, latest_time, 0);
+    if (!latest_time.isZero() && time + cache_time_ < latest_time)
+    {
+      return 0xffffffffffffffffULL;
+    }
+  }
+
+  req.cb_handle = handle;
+  req.time = time;
+  req.request_handle = ++transformable_requests_counter_;
+  if (req.request_handle == 0 || req.request_handle == 0xffffffffffffffffULL)
+  {
+    req.request_handle = 1;
+  }
+
+  if (req.target_id == 0)
+  {
+    req.target_string = target_frame;
+  }
+
+  if (req.source_id == 0)
+  {
+    req.source_string = source_frame;
+  }
+
+  boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+  transformable_requests_.push_back(req);
+
+  return req.request_handle;
+}
+
+struct BufferCore::RemoveRequestByID
+{
+  RemoveRequestByID(TransformableRequestHandle handle)
+  : handle_(handle)
+  {}
+
+  bool operator()(const TransformableRequest& req)
+  {
+    return req.request_handle == handle_;
+  }
+
+  TransformableCallbackHandle handle_;
+};
+
+void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
+{
+  boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+  V_TransformableRequest::iterator it = std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByID(handle));
+
+  if (it != transformable_requests_.end())
+  {
+    transformable_requests_.erase(it, transformable_requests_.end());
+  }
+}
+
+void BufferCore::testTransformableRequests()
+{
+  boost::mutex::scoped_lock lock(transformable_requests_mutex_);
+  V_TransformableRequest::iterator it = transformable_requests_.begin();
+  for (; it != transformable_requests_.end();)
+  {
+    TransformableRequest& req = *it;
+
+    // One or both of the frames may not have existed when the request was originally made.
+    if (req.target_id == 0)
+    {
+      req.target_id = lookupFrameNumber(req.target_string);
+    }
+
+    if (req.source_id == 0)
+    {
+      req.source_id = lookupFrameNumber(req.source_string);
+    }
+
+    ros::Time latest_time;
+    bool do_cb = false;
+    TransformableResult result = TransformAvailable;
+    // TODO: This is incorrect, but better than nothing.  Really we want the latest time for
+    // any of the frames
+    getLatestCommonTime(req.target_id, req.source_id, latest_time, 0);
+    if (!latest_time.isZero() && req.time + cache_time_ < latest_time)
+    {
+      do_cb = true;
+      result = TransformFailure;
+    }
+    else if (canTransformInternal(req.target_id, req.source_id, req.time, 0))
+    {
+      do_cb = true;
+      result = TransformAvailable;
+    }
+
+    if (do_cb)
+    {
+      {
+        boost::mutex::scoped_lock lock2(transformable_callbacks_mutex_);
+        M_TransformableCallback::iterator it = transformable_callbacks_.find(req.cb_handle);
+        if (it != transformable_callbacks_.end())
+        {
+          const TransformableCallback& cb = it->second;
+          cb(req.request_handle, lookupFrameString(req.target_id), lookupFrameString(req.source_id), req.time, result);
+        }
+      }
+
+      if (transformable_requests_.size() > 1)
+      {
+        transformable_requests_[it - transformable_requests_.begin()] = transformable_requests_.back();
+      }
+
+      transformable_requests_.erase(transformable_requests_.end() - 1);
+    }
+    else
+    {
+      ++it;
+    }
+  }
+}
+
+} // namespace tf2

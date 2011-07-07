@@ -56,6 +56,7 @@ TransformListener::TransformListener(tf2::BufferCore& buffer, const ros::NodeHan
     init();
 }
 
+
 TransformListener::~TransformListener()
 {
   using_dedicated_thread_ = false;

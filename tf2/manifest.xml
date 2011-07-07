@@ -20,7 +20,7 @@
   <depend package="roscpp"/>
 
  <export>
-    <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf2"/>
+    <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp -DBT_USE_DOUBLE_PRECISION" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ltf2"/>
     <rosdoc config="rosdoc.yaml" />
  </export>
 

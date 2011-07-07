@@ -67,71 +67,135 @@ void setIdentity(geometry_msgs::Transform& trans)
 }
 
 
-void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & time, const ros::Duration& interpolation_space = ros::Duration())
+void push_back_i(std::vector<std::string>& children, std::vector<std::string>& parents, 
+                 std::vector<double>& dx, std::vector<double>& dy)
 {
-
-  mBC.clear();
-
-  if (mode == "i")
-  {
-    std::vector<std::string> children;
-    std::vector<std::string> parents;
+  /* 
+     "a"
+     v   (1,0)
+     "b"
+     v   (1,0)
+     "c"
+  */
     
+  children.push_back("b");
+  parents.push_back("a");
+  dx.push_back(1.0);
+  dy.push_back(0.0);
+  children.push_back("c");
+  parents.push_back("b");
+  dx.push_back(1.0);
+  dy.push_back(0.0);
+}
 
-    
+
+void push_back_y(std::vector<std::string>& children, std::vector<std::string>& parents, 
+                 std::vector<double>& dx, std::vector<double>& dy)
+{
+    /*
+      "a"
+      v  (1,0)
+      "b" ------(0,1)-----> "d"
+      v  (1,0)              v  (0,1)
+      "c"                   "e"
+    */
+    // a>b
     children.push_back("b");
     parents.push_back("a");
+    dx.push_back(1.0);
+    dy.push_back(0.0);
+     // b>c
     children.push_back("c");
     parents.push_back("b");
-    
-    
-    for (uint64_t i = 0; i <  children.size(); i++)
-    {
-      geometry_msgs::TransformStamped ts;
-      setIdentity(ts.transform);
-      ts.transform.translation.x = 1;
-      if (time > ros::Time() + (interpolation_space * .5))
-        ts.header.stamp = time - (interpolation_space * .5);
-      else
-        ts.header.stamp = ros::Time();
-            
-      ts.header.frame_id = parents[i];
-      ts.child_frame_id = children[i];
-      EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-      if (interpolation_space > ros::Duration())
-      {
-        ts.header.stamp = time + interpolation_space * .5;
-        EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-      
-      }
-    }
-  }
-  else if (mode == "yl")
+    dx.push_back(1.0);
+    dy.push_back(0.0);
+     // b>d
+    children.push_back("d");
+    parents.push_back("b");
+    dx.push_back(0.0);
+    dy.push_back(1.0);
+     // d>e
+    children.push_back("e");
+    parents.push_back("d");
+    dx.push_back(0.0);
+    dy.push_back(1.0);
+}
+
+void push_back_v(std::vector<std::string>& children, std::vector<std::string>& parents, 
+                 std::vector<double>& dx, std::vector<double>& dy)
+{
+  /*
+    "a" ------(0,1)-----> "f"
+    v  (1,0)              v  (0,1)
+    "b"                   "g" 
+    v  (1,0)
+    "c"
+  */
+  // a>b
+  children.push_back("b");
+  parents.push_back("a");
+  dx.push_back(1.0);
+  dy.push_back(0.0);
+  // b>c
+  children.push_back("c");
+  parents.push_back("b");
+  dx.push_back(1.0);
+  dy.push_back(0.0);
+  // a>f
+  children.push_back("f");
+  parents.push_back("a");
+  dx.push_back(0.0);
+  dy.push_back(1.0);
+  // f>g
+  children.push_back("g");
+  parents.push_back("f");
+  dx.push_back(0.0);
+  dy.push_back(1.0);
+
+}
+
+void push_back_1(std::vector<std::string>& children, std::vector<std::string>& parents, 
+                 std::vector<double>& dx, std::vector<double>& dy)
+{
+  children.push_back("2");
+  parents.push_back("1");
+  dx.push_back(1.0);
+  dy.push_back(0.0);
+}
+
+void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & time, const ros::Duration& interpolation_space = ros::Duration())
+{
+  ROS_DEBUG("Clearing Buffer Core for new test setup");
+  mBC.clear();
+  
+  ROS_DEBUG("Setting up test tree for formation %s", mode.c_str());
+
+  std::vector<std::string> children;
+  std::vector<std::string> parents;
+  std::vector<double> dx, dy;
+  
+  if (mode == "i")
   {
-
+    push_back_i(children, parents, dx, dy);
   }
-
-  else if (mode == "yr")
+  else if (mode == "y")
   {
-
+    push_back_y(children, parents, dx, dy);
   }
+
   else if (mode == "v")
   {
-
+    push_back_v(children, parents, dx, dy);
   }
 
-  else if (mode == "w")
-  {
-
-  }  
   else if (mode == "ring_45")
   {
     /* Form a ring of transforms at every 45 degrees on the unit circle.  */
 
     std::vector<std::string> frames;
+        
 
-
-
+    
     frames.push_back("a");
     frames.push_back("b");
     frames.push_back("c");
@@ -141,7 +205,7 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
     frames.push_back("g");
     frames.push_back("h");
     frames.push_back("i");
-
+    
     for (uint8_t iteration = 0; iteration < 2; ++iteration)
     {
       double direction = 1;
@@ -167,7 +231,7 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
           ts.header.stamp = time - (interpolation_space * .5);
         else
           ts.header.stamp = ros::Time();
-
+            
         ts.header.frame_id = frame_prefix + frames[i-1];
         if (i > 1)
           ts.child_frame_id = frame_prefix + frames[i];
@@ -178,30 +242,50 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
         {
           ts.header.stamp = time + interpolation_space * .5;
           EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-
+        
         }
       }
     }
     return; // nonstandard setup return before standard executinog
-  }
+  }  
   else if (mode == "1")
+  {
+    push_back_1(children, parents, dx, dy);
+    
+  }  
+  else if (mode =="1_v")
+  {
+    push_back_1(children, parents, dx, dy);
+    push_back_v(children, parents, dx, dy);
+  }
+  else
+    EXPECT_FALSE("Undefined mode for tree setup.  Test harness improperly setup.");
+
+
+  /// Standard 
+  for (uint64_t i = 0; i <  children.size(); i++)
   {
     geometry_msgs::TransformStamped ts;
     setIdentity(ts.transform);
-    ts.transform.translation.x = 1;
+    ts.transform.translation.x = dx[i];
+    ts.transform.translation.y = dy[i];
     if (time > ros::Time() + (interpolation_space * .5))
       ts.header.stamp = time - (interpolation_space * .5);
     else
       ts.header.stamp = ros::Time();
-    
-    ts.header.frame_id = "a";
-    ts.child_frame_id = "b";
+            
+    ts.header.frame_id = parents[i];
+    ts.child_frame_id = children[i];
     EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-    
-  }  
-  else
-    EXPECT_FALSE("Undefined mode for tree setup.  Test harness improperly setup.");
+    if (interpolation_space > ros::Duration())
+    {
+      ts.header.stamp = time + interpolation_space * .5;
+      EXPECT_TRUE(mBC.setTransform(ts, "authority"));
+      
+    }
+  }
 }
+
 
 TEST(BufferCore_setTransform, NoInsertOnSelfTransform)
 {
@@ -556,19 +640,15 @@ TEST(BufferCore_lookupTransform, i_configuration)
   ros::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
-  std::vector<std::string> source_frames;
-  source_frames.push_back("a");
-  source_frames.push_back("b");
-  source_frames.push_back("c");
+  std::vector<std::string> frames;
+  frames.push_back("a");
+  frames.push_back("b");
+  frames.push_back("c");
   std::string source_frame;
-  permuter.addOptionSet(source_frames, &source_frame);
+  permuter.addOptionSet(frames, &source_frame);
   
-  std::vector<std::string> target_frames;
-  target_frames.push_back("a");
-  target_frames.push_back("b");
-  target_frames.push_back("c");
   std::string target_frame;
-  permuter.addOptionSet(target_frames, &target_frame);
+  permuter.addOptionSet(frames, &target_frame);
 
   while  (permuter.step())
   {
@@ -613,12 +693,269 @@ TEST(BufferCore_lookupTransform, i_configuration)
     }
     else
     {
-      EXPECT_FALSE("Shouldn't get here");
+      EXPECT_FALSE("i configuration: Shouldn't get here");
       printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
     }
     
   }
 }
+
+/* Check 1 result return false if test parameters unmet */
+bool check_1_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const ros::Time& eval_time, double epsilon)
+{
+  //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
+  EXPECT_EQ(outpose.header.stamp, eval_time);
+  EXPECT_EQ(outpose.header.frame_id, source_frame);
+  EXPECT_EQ(outpose.child_frame_id, target_frame);
+  EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
+    
+  //Zero distance
+  if (source_frame == target_frame)
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+  }
+  else if (source_frame == "1" && target_frame =="2")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+  }
+  else if (source_frame == "2" && target_frame =="1")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+  }
+  else
+  {
+    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
+    return false;
+  }
+  return true;
+}
+
+/* Check v result return false if test parameters unmet */
+bool check_v_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const ros::Time& eval_time, double epsilon)
+{
+  //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
+  EXPECT_EQ(outpose.header.stamp, eval_time);
+  EXPECT_EQ(outpose.header.frame_id, source_frame);
+  EXPECT_EQ(outpose.child_frame_id, target_frame);
+  EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
+    
+  //Zero distance
+  if (source_frame == target_frame)
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+  }
+  else if ((source_frame == "a" && target_frame =="b") ||
+           (source_frame == "b" && target_frame =="c"))
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  }
+  else if ((source_frame == "b" && target_frame =="a") ||
+           (source_frame == "c" && target_frame =="b"))
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  }
+  else if ((source_frame == "a" && target_frame =="f") ||
+           (source_frame == "f" && target_frame =="g"))
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 1, epsilon);
+  }
+  else if ((source_frame == "f" && target_frame =="a") ||
+           (source_frame == "g" && target_frame =="f"))
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -1, epsilon);
+  }
+  else if (source_frame == "a" && target_frame =="g")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 2, epsilon);
+  }
+  else if (source_frame == "g" && target_frame =="a")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -2, epsilon);
+  }
+  else if (source_frame == "a" && target_frame =="c")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 2, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  }
+  else if (source_frame == "c" && target_frame =="a")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  }
+  else if (source_frame == "b" && target_frame =="f")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 1, epsilon);
+  }
+  else if (source_frame == "f" && target_frame =="b")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -1, epsilon);
+  }
+  else if (source_frame == "c" && target_frame =="f")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 1, epsilon);
+  }
+  else if (source_frame == "f" && target_frame =="c")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 2, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -1, epsilon);
+  }
+  else if (source_frame == "b" && target_frame =="g")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 2, epsilon);
+  }
+  else if (source_frame == "g" && target_frame =="b")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -2, epsilon);
+  }
+  else if (source_frame == "c" && target_frame =="g")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 2, epsilon);
+  }
+  else if (source_frame == "g" && target_frame =="c")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 2, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -2, epsilon);
+  }
+  else
+  {
+    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
+    return false;
+  }
+  return true;
+}
+
+/* Check v result return false if test parameters unmet */
+bool check_y_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const ros::Time& eval_time, double epsilon)
+{
+  //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
+  EXPECT_EQ(outpose.header.stamp, eval_time);
+  EXPECT_EQ(outpose.header.frame_id, source_frame);
+  EXPECT_EQ(outpose.child_frame_id, target_frame);
+  EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
+  EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
+    
+  //Zero distance
+  if (source_frame == target_frame)
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+  }
+  else if ((source_frame == "a" && target_frame =="b") ||
+           (source_frame == "b" && target_frame =="c"))
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  }
+  else if ((source_frame == "b" && target_frame =="a") ||
+           (source_frame == "c" && target_frame =="b"))
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  }
+  else if ((source_frame == "b" && target_frame =="d") ||
+           (source_frame == "d" && target_frame =="e"))
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 1, epsilon);
+  }
+  else if ((source_frame == "d" && target_frame =="b") ||
+           (source_frame == "e" && target_frame =="d"))
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -1, epsilon);
+  }
+  else if (source_frame == "b" && target_frame =="e")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 2, epsilon);
+  }
+  else if (source_frame == "e" && target_frame =="b")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -2, epsilon);
+  }
+  else if (source_frame == "a" && target_frame =="c")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 2, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  }
+  else if (source_frame == "c" && target_frame =="a")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
+  }
+  else if (source_frame == "a" && target_frame =="d")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 1, epsilon);
+  }
+  else if (source_frame == "d" && target_frame =="a")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -1, epsilon);
+  }
+  else if (source_frame == "c" && target_frame =="d")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 1, epsilon);
+  }
+  else if (source_frame == "d" && target_frame =="c")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -1, epsilon);
+  }
+  else if (source_frame == "a" && target_frame =="e")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 2, epsilon);
+  }
+  else if (source_frame == "e" && target_frame =="a")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -2, epsilon);
+  }
+  else if (source_frame == "c" && target_frame =="e")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, 2, epsilon);
+  }
+  else if (source_frame == "e" && target_frame =="c")
+  {
+    EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
+    EXPECT_NEAR(outpose.transform.translation.y, -2, epsilon);
+  }
+  else
+  {
+    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
+    return false;
+  }
+  return true;
+}
+
+
 TEST(BufferCore_lookupTransform, one_link_configuration)
 {
   double epsilon = 1e-6;
@@ -641,17 +978,14 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
   ros::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
-  std::vector<std::string> source_frames;
-  source_frames.push_back("a");
-  source_frames.push_back("b");
+  std::vector<std::string> frames;
+  frames.push_back("1");
+  frames.push_back("2");
   std::string source_frame;
-  permuter.addOptionSet(source_frames, &source_frame);
+  permuter.addOptionSet(frames, &source_frame);
   
-  std::vector<std::string> target_frames;
-  target_frames.push_back("a");
-  target_frames.push_back("b");
   std::string target_frame;
-  permuter.addOptionSet(target_frames, &target_frame);
+  permuter.addOptionSet(frames, &target_frame);
 
   while  (permuter.step())
   {
@@ -660,76 +994,169 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
     setupTree(mBC, "1", eval_time, interpolation_space);
 
     geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
-    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
-    EXPECT_EQ(outpose.header.stamp, eval_time);
-    EXPECT_EQ(outpose.header.frame_id, source_frame);
-    EXPECT_EQ(outpose.child_frame_id, target_frame);
-    EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
-    EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-    EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
-    EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
-    EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
-    EXPECT_NEAR(outpose.transform.rotation.w, 1, epsilon);
-    
-    //Zero distance
-    if (source_frame == target_frame)
-    {
-      EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
-    }
-    else if (source_frame == "a" && target_frame =="b")
-    {
-      EXPECT_NEAR(outpose.transform.translation.x, 1, epsilon);
-    }
-    else if (source_frame == "b" && target_frame =="a")
-    {
-      EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
-    }
-    else
-    {
-      EXPECT_FALSE("Shouldn't get here");
-      printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
-    }
-    
+
+    EXPECT_TRUE(check_1_result(outpose, source_frame, target_frame, eval_time, epsilon));
   }
 }
 
-TEST(BufferCore_lookupTransform, invalid_arguments)
+
+TEST(BufferCore_lookupTransform, v_configuration)
 {
-  tf2::BufferCore mBC;
+  double epsilon = 1e-6;
   
-  setupTree(mBC, "i", ros::Time(1.0));
+
+
+  rostest::Permuter permuter;
+
+  std::vector<ros::Time> times;
+  times.push_back(ros::Time(1.0));
+  times.push_back(ros::Time(10.0));
+  times.push_back(ros::Time(0.0));
+  ros::Time eval_time;
+  permuter.addOptionSet(times, &eval_time);
+
+  std::vector<ros::Duration> durations;
+  durations.push_back(ros::Duration(1.0));
+  durations.push_back(ros::Duration(0.001));
+  durations.push_back(ros::Duration(0.1));
+  ros::Duration interpolation_space;
+  //  permuter.addOptionSet(durations, &interpolation_space);
+
+  std::vector<std::string> frames;
+  frames.push_back("a");
+  frames.push_back("b");
+  frames.push_back("c");
+  frames.push_back("f");
+  frames.push_back("g");
+  std::string source_frame;
+  permuter.addOptionSet(frames, &source_frame);
   
-  EXPECT_NO_THROW(mBC.lookupTransform("b", "a", ros::Time()));
+  std::string target_frame;
+  permuter.addOptionSet(frames, &target_frame);
 
-  //Empty frame_id
-  EXPECT_THROW(mBC.lookupTransform("", "a", ros::Time()), tf2::InvalidArgumentException);
-  EXPECT_THROW(mBC.lookupTransform("b", "", ros::Time()), tf2::InvalidArgumentException);
+  while  (permuter.step())
+  {
 
-  //frame_id with /
-  EXPECT_THROW(mBC.lookupTransform("/b", "a", ros::Time()), tf2::InvalidArgumentException);
-  EXPECT_THROW(mBC.lookupTransform("b", "/a", ros::Time()), tf2::InvalidArgumentException);
+    tf2::BufferCore mBC;
+    setupTree(mBC, "v", eval_time, interpolation_space);
 
-};
+    geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
 
-TEST(BufferCore_canTransform, invalid_arguments)
+    EXPECT_TRUE(check_v_result(outpose, source_frame, target_frame, eval_time, epsilon));
+  }
+}
+
+
+TEST(BufferCore_lookupTransform, y_configuration)
 {
-  tf2::BufferCore mBC;
-
-  setupTree(mBC, "i", ros::Time(1.0));
+  double epsilon = 1e-6;
   
-  EXPECT_TRUE(mBC.canTransform("b", "a", ros::Time()));
+
+
+  rostest::Permuter permuter;
+
+  std::vector<ros::Time> times;
+  times.push_back(ros::Time(1.0));
+  times.push_back(ros::Time(10.0));
+  times.push_back(ros::Time(0.0));
+  ros::Time eval_time;
+  permuter.addOptionSet(times, &eval_time);
+
+  std::vector<ros::Duration> durations;
+  durations.push_back(ros::Duration(1.0));
+  durations.push_back(ros::Duration(0.001));
+  durations.push_back(ros::Duration(0.1));
+  ros::Duration interpolation_space;
+  //  permuter.addOptionSet(durations, &interpolation_space);
+
+  std::vector<std::string> frames;
+  frames.push_back("a");
+  frames.push_back("b");
+  frames.push_back("c");
+  frames.push_back("d");
+  frames.push_back("e");
+  std::string source_frame;
+  permuter.addOptionSet(frames, &source_frame);
   
+  std::string target_frame;
+  permuter.addOptionSet(frames, &target_frame);
+
+  while  (permuter.step())
+  {
+
+    tf2::BufferCore mBC;
+    setupTree(mBC, "y", eval_time, interpolation_space);
+
+    geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
+
+    EXPECT_TRUE(check_y_result(outpose, source_frame, target_frame, eval_time, epsilon));
+  }
+}
+
+TEST(BufferCore_lookupTransform, multi_configuration)
+{
+  double epsilon = 1e-6;
   
-  //Empty frame_id
-  EXPECT_FALSE(mBC.canTransform("", "a", ros::Time()));
-  EXPECT_FALSE(mBC.canTransform("b", "", ros::Time()));
 
-  //frame_id with /
-  EXPECT_FALSE(mBC.canTransform("/b", "a", ros::Time()));
-  EXPECT_FALSE(mBC.canTransform("b", "/a", ros::Time()));
 
-};
+  rostest::Permuter permuter;
 
+  std::vector<ros::Time> times;
+  times.push_back(ros::Time(1.0));
+  times.push_back(ros::Time(10.0));
+  times.push_back(ros::Time(0.0));
+  ros::Time eval_time;
+  permuter.addOptionSet(times, &eval_time);
+
+  std::vector<ros::Duration> durations;
+  durations.push_back(ros::Duration(1.0));
+  durations.push_back(ros::Duration(0.001));
+  durations.push_back(ros::Duration(0.1));
+  ros::Duration interpolation_space;
+  //  permuter.addOptionSet(durations, &interpolation_space);
+
+  std::vector<std::string> frames;
+  frames.push_back("1");
+  frames.push_back("2");
+  frames.push_back("a");
+  frames.push_back("b");
+  frames.push_back("c");
+  frames.push_back("f");
+  frames.push_back("g");
+  std::string source_frame;
+  permuter.addOptionSet(frames, &source_frame);
+  
+  std::string target_frame;
+  permuter.addOptionSet(frames, &target_frame);
+
+  while  (permuter.step())
+  {
+
+    tf2::BufferCore mBC;
+    setupTree(mBC, "1_v", eval_time, interpolation_space);
+
+    if (mBC.canTransform(source_frame, target_frame, eval_time))
+    {
+      geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
+      
+      if ((source_frame == "1" || source_frame =="2") && (target_frame =="1" || target_frame == "2"))
+        EXPECT_TRUE(check_1_result(outpose, source_frame, target_frame, eval_time, epsilon));
+      else if ((source_frame == "a" || source_frame == "b" || source_frame == "c" || source_frame == "f" || source_frame == "g") && 
+               (target_frame == "a" || target_frame == "b" || target_frame == "c" || target_frame == "f" || target_frame == "g"))
+        EXPECT_TRUE(check_v_result(outpose, source_frame, target_frame, eval_time, epsilon));
+      else
+        EXPECT_FALSE("Frames unhandled");
+    }
+    else
+      EXPECT_TRUE(((source_frame == "a" || source_frame =="b" || source_frame == "c" || source_frame == "f" || source_frame == "g") && 
+                   (target_frame == "1" || target_frame == "2") )
+                  || 
+                  ((target_frame == "a" || target_frame =="b" || target_frame == "c" || target_frame == "f" || target_frame == "g") && 
+                   (source_frame == "1" || source_frame == "2"))
+                  );
+      
+  }      
+}
 
 #define CHECK_QUATERNION_NEAR(_q1, _x, _y, _z, _w, _epsilon)                 \
 	   {                        											 \
@@ -949,6 +1376,7 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         EXPECT_TRUE(mBC.setTransform(ts3, "authority"));
     }
 
+
     for (ros::Time t = t0 + half_step; t < t1; t += step)
     {
     	ros::Time t2 = t + half_step;
@@ -1025,10 +1453,17 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
   frames.push_back("g");
   frames.push_back("h");
   frames.push_back("i");
-
+  /*  frames.push_back("inverse_b");
+  frames.push_back("inverse_c");
+  frames.push_back("inverse_d");
+  frames.push_back("inverse_e");
+  frames.push_back("inverse_f");
+  frames.push_back("inverse_g");
+  frames.push_back("inverse_h");
+  frames.push_back("inverse_i");*/
   std::string source_frame;
   permuter.addOptionSet(frames, &source_frame);
-
+  
   std::string target_frame;
   permuter.addOptionSet(frames, &target_frame);
 
@@ -1041,13 +1476,13 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
     geometry_msgs::TransformStamped outpose = mBC.lookupTransform(source_frame, target_frame, eval_time);
 
 
-    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
+    //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
     EXPECT_EQ(outpose.header.stamp, eval_time);
     EXPECT_EQ(outpose.header.frame_id, source_frame);
     EXPECT_EQ(outpose.child_frame_id, target_frame);
 
 
-
+    
     //Zero distance or all the way
     if (source_frame == target_frame               ||
         (source_frame == "a" && target_frame == "i") ||
@@ -1059,7 +1494,6 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, 0, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 0, epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-
       EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
       EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
       EXPECT_NEAR(outpose.transform.rotation.z, 0, epsilon);
@@ -1079,7 +1513,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/8), cos(M_PI/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI/8), epsilon);
     }
     // Inverse Chaining 1
     else if ((source_frame == "b" && target_frame =="a") ||
@@ -1095,7 +1532,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/8), cos(-M_PI/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI/8), epsilon);
     }
     // Chaining 2
     else if ((source_frame == "a" && target_frame =="c") ||
@@ -1110,7 +1550,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 1 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/4), cos(M_PI/4), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI/4), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI/4), epsilon);
     }
     // Inverse Chaining 2
     else if ((source_frame == "c" && target_frame =="a") ||
@@ -1125,7 +1568,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -1 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/4), cos(-M_PI/4), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI/4), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI/4), epsilon);
     }
     // Chaining 3
     else if ((source_frame == "a" && target_frame =="d") ||
@@ -1139,7 +1585,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2)/2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*3/8), cos(M_PI*3/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI*3/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI*3/8), epsilon);
     }
     // Inverse Chaining 3
     else if ((target_frame == "a" && source_frame =="d") ||
@@ -1153,7 +1602,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2)/2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, - sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*3/8), cos(-M_PI*3/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI*3/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI*3/8), epsilon);
     }
     // Chaining 4
     else if ((source_frame == "a" && target_frame =="e") ||
@@ -1166,7 +1618,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 0 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI/2), cos(M_PI/2), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI/2), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI/2), epsilon);
     }
     // Inverse Chaining 4
     else if ((target_frame == "a" && source_frame =="e") ||
@@ -1179,7 +1634,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 0 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI/2), cos(-M_PI/2), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI/2), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI/2), epsilon);
     }
     // Chaining 5
     else if ((source_frame == "a" && target_frame =="f") ||
@@ -1191,7 +1649,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2) /2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, - sqrt(2) /2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*5/8), cos(M_PI*5/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI*5/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI*5/8), epsilon);
     }
     // Inverse Chaining 5
     else if ((target_frame == "a" && source_frame =="f") ||
@@ -1203,7 +1664,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1 - sqrt(2)/2, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*5/8), cos(-M_PI*5/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI*5/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI*5/8), epsilon);
     }
     // Chaining 6
     else if ((source_frame == "a" && target_frame =="g") ||
@@ -1214,7 +1678,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -1 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*3/4), cos(M_PI*3/4), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI*6/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI*6/8), epsilon);
     }
     // Inverse Chaining 6
     else if ((target_frame == "a" && source_frame =="g") ||
@@ -1225,7 +1692,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, -1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, 1 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*3/4), cos(-M_PI*3/4), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI*6/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI*6/8), epsilon);
     }
     // Chaining 7
     else if ((source_frame == "a" && target_frame =="h") ||
@@ -1235,7 +1705,10 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, -sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(M_PI*7/8), cos(M_PI*7/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(M_PI*7/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(M_PI*7/8), epsilon);
     }
     // Inverse Chaining 7
     else if ((target_frame == "a" && source_frame =="h") ||
@@ -1245,17 +1718,141 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
       EXPECT_NEAR(outpose.transform.translation.x, sqrt(2)/2 - 1, epsilon);
       EXPECT_NEAR(outpose.transform.translation.y, sqrt(2)/2 , epsilon);
       EXPECT_NEAR(outpose.transform.translation.z, 0, epsilon);
-      CHECK_QUATERNION_NEAR(outpose.transform.rotation, 0, 0, sin(-M_PI*7/8), cos(-M_PI*7/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.x, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.y, 0, epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.z, sin(-M_PI*7/8), epsilon);
+      EXPECT_NEAR(outpose.transform.rotation.w, cos(-M_PI*7/8), epsilon);
     }
     else
     {
       EXPECT_FALSE("Ring_45 testing Shouldn't get here");
       printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());
     }
-
+    
   }
 }
 
+TEST(BufferCore_lookupTransform, invalid_arguments)
+{
+  tf2::BufferCore mBC;
+  
+  setupTree(mBC, "i", ros::Time(1.0));
+  
+  EXPECT_NO_THROW(mBC.lookupTransform("b", "a", ros::Time()));
+
+  //Empty frame_id
+  EXPECT_THROW(mBC.lookupTransform("", "a", ros::Time()), tf2::InvalidArgumentException);
+  EXPECT_THROW(mBC.lookupTransform("b", "", ros::Time()), tf2::InvalidArgumentException);
+
+  //frame_id with /
+  EXPECT_THROW(mBC.lookupTransform("/b", "a", ros::Time()), tf2::InvalidArgumentException);
+  EXPECT_THROW(mBC.lookupTransform("b", "/a", ros::Time()), tf2::InvalidArgumentException);
+
+};
+
+TEST(BufferCore_canTransform, invalid_arguments)
+{
+  tf2::BufferCore mBC;
+
+  setupTree(mBC, "i", ros::Time(1.0));
+  
+  EXPECT_TRUE(mBC.canTransform("b", "a", ros::Time()));
+  
+  
+  //Empty frame_id
+  EXPECT_FALSE(mBC.canTransform("", "a", ros::Time()));
+  EXPECT_FALSE(mBC.canTransform("b", "", ros::Time()));
+
+  //frame_id with /
+  EXPECT_FALSE(mBC.canTransform("/b", "a", ros::Time()));
+  EXPECT_FALSE(mBC.canTransform("b", "/a", ros::Time()));
+
+};
+
+struct TransformableHelper
+{
+  TransformableHelper()
+  : called(false)
+  {}
+
+  void callback(tf2::TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
+          ros::Time time, tf2::TransformableResult result)
+  {
+    called = true;
+  }
+
+  bool called;
+};
+
+TEST(BufferCore_transformableCallbacks, alreadyTransformable)
+{
+  tf2::BufferCore b;
+  TransformableHelper h;
+
+  geometry_msgs::TransformStamped t;
+  t.header.stamp = ros::Time(1);
+  t.header.frame_id = "a";
+  t.child_frame_id = "b";
+  t.transform.rotation.w = 1.0;
+  b.setTransform(t, "me");
+
+  tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
+  EXPECT_EQ(b.addTransformableRequest(cb_handle, "a", "b", ros::Time(1)), 0U);
+}
+
+TEST(BufferCore_transformableCallbacks, waitForNewTransform)
+{
+  tf2::BufferCore b;
+  TransformableHelper h;
+  tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
+  EXPECT_GT(b.addTransformableRequest(cb_handle, "a", "b", ros::Time(10)), 0U);
+
+  geometry_msgs::TransformStamped t;
+  for (uint32_t i = 1; i <= 10; ++i)
+  {
+    t.header.stamp = ros::Time(i);
+    t.header.frame_id = "a";
+    t.child_frame_id = "b";
+    t.transform.rotation.w = 1.0;
+    b.setTransform(t, "me");
+
+    if (i < 10)
+    {
+      ASSERT_FALSE(h.called);
+    }
+    else
+    {
+      ASSERT_TRUE(h.called);
+    }
+  }
+}
+
+TEST(BufferCore_transformableCallbacks, waitForOldTransform)
+{
+  tf2::BufferCore b;
+  TransformableHelper h;
+  tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
+  EXPECT_GT(b.addTransformableRequest(cb_handle, "a", "b", ros::Time(1)), 0U);
+
+  geometry_msgs::TransformStamped t;
+  for (uint32_t i = 10; i > 0; --i)
+  {
+    t.header.stamp = ros::Time(i);
+    t.header.frame_id = "a";
+    t.child_frame_id = "b";
+    t.transform.rotation.w = 1.0;
+    b.setTransform(t, "me");
+
+    if (i > 1)
+    {
+      ASSERT_FALSE(h.called);
+    }
+    else
+    {
+      ASSERT_TRUE(h.called);
+    }
+  }
+}
 
 /*
 TEST(tf, Exceptions)

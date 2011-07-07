@@ -32,6 +32,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 include_directories (src/bt) 
 
+add_definitions(-DBT_USE_DOUBLE_PRECISION)
 
 #CPP Libraries
 rosbuild_add_library(tf2 src/cache.cpp src/buffer_core.cpp src/static_cache.cpp)
@@ -69,3 +70,8 @@ target_link_libraries(test_static_cache_unittest tf2)
 
 rosbuild_add_gtest(test_simple test/simple_tf2_core.cpp)
 target_link_libraries(test_simple tf2)
+
+rosbuild_add_executable(speed_test EXCLUDE_FROM_ALL test/speed_test.cpp)
+target_link_libraries(speed_test tf2)
+rosbuild_declare_test(speed_test)
+
