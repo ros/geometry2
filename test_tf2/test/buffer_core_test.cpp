@@ -1308,17 +1308,9 @@ TEST(BufferCore_lookupTransform, compound_xfm_configuration)
     // b -> c -> d
     geometry_msgs::TransformStamped out_bd = mBC.lookupTransform("b", "d", ros::Time());
     CHECK_TRANSFORMS_NEAR(out_bd, expected_bd, epsilon);
-	EXPECT_NEAR(out_bd.transform.rotation.x, expected_bd.getRotation().x(), epsilon);
-	EXPECT_NEAR(out_bd.transform.rotation.y, expected_bd.getRotation().y(), epsilon);
-	EXPECT_NEAR(out_bd.transform.rotation.z, expected_bd.getRotation().z(), epsilon);
-	EXPECT_NEAR(out_bd.transform.rotation.w, expected_bd.getRotation().w(), epsilon);
 
     geometry_msgs::TransformStamped out_db = mBC.lookupTransform("d", "b", ros::Time());
     CHECK_TRANSFORMS_NEAR(out_db, expected_db, epsilon);
-	EXPECT_NEAR(out_db.transform.rotation.x, expected_db.getRotation().x(), epsilon);
-	EXPECT_NEAR(out_db.transform.rotation.y, expected_db.getRotation().y(), epsilon);
-	EXPECT_NEAR(out_db.transform.rotation.z, expected_db.getRotation().z(), epsilon);
-	EXPECT_NEAR(out_db.transform.rotation.w, expected_db.getRotation().w(), epsilon);
 }
 
 // Time varying transforms, testing interpolation
