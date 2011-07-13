@@ -33,6 +33,10 @@
 #include "tf2/time_cache.h"
 #include "tf2/exceptions.h"
 #include "tf2_msgs/TF2Error.h"
+
+#include <ros/assert.h>
+#include <ros/console.h>
+
 //legacy
 //#include "tf/tf.h"
 //#include "tf/transform_datatypes.h"
