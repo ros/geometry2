@@ -190,7 +190,7 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<KDL::Frame>& ou
   out.p[0] = msg.pose.position.x;
   out.p[1] = msg.pose.position.y;
   out.p[2] = msg.pose.position.z;
-  out.M.Quaternion(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w);
+  out.M = KDL::Rotation::Quaternion(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w);
 }
 
 
