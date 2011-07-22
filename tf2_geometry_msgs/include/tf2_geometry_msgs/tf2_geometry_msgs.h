@@ -73,6 +73,14 @@ template <>
     t_out.header.stamp = v_out.stamp_;
     t_out.header.frame_id = v_out.frame_id_;
   }
+geometry_msgs::Vector3Stamped toMsg(const geometry_msgs::Vector3Stamped& in)
+{
+  return in;
+}
+void fromMsg(const geometry_msgs::Vector3Stamped& msg, geometry_msgs::Vector3Stamped& out)
+{
+  out = msg;
+}
 
 
 
@@ -100,6 +108,14 @@ template <>
     t_out.header.stamp = v_out.stamp_;
     t_out.header.frame_id = v_out.frame_id_;
   }
+geometry_msgs::PointStamped toMsg(const geometry_msgs::PointStamped& in)
+{
+  return in;
+}
+void fromMsg(const geometry_msgs::PointStamped& msg, geometry_msgs::PointStamped& out)
+{
+  out = msg;
+}
 
 
 /*****************/
@@ -130,6 +146,15 @@ template <>
     t_out.header.stamp = v_out.stamp_;
     t_out.header.frame_id = v_out.frame_id_;
   }
+geometry_msgs::PoseStamped toMsg(const geometry_msgs::PoseStamped& in)
+{
+  return in;
+}
+void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& out)
+{
+  out = msg;
+}
+
 
 
 

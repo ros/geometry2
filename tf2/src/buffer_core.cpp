@@ -33,6 +33,10 @@
 #include "tf2/time_cache.h"
 #include "tf2/exceptions.h"
 #include "tf2_msgs/TF2Error.h"
+
+#include <ros/assert.h>
+#include <ros/console.h>
+
 //legacy
 //#include "tf/tf.h"
 //#include "tf/transform_datatypes.h"
@@ -505,6 +509,14 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
 {
   boost::mutex::scoped_lock lock(frame_mutex_);
 
+  if (target_frame == source_frame) {
+    geometry_msgs::TransformStamped identity;
+    identity.header.frame_id = target_frame;
+    identity.header.stamp = time;
+    identity.transform.rotation.w = 1;
+    return identity;
+  }
+
   CompactFrameID target_id = validateFrameId("lookupTransform argument target_frame", target_frame);
   CompactFrameID source_id = validateFrameId("lookupTransform argument source_frame", source_frame);
 
@@ -647,6 +659,11 @@ bool BufferCore::canTransformNoLock(CompactFrameID target_id, CompactFrameID sou
   if (target_id == 0 || source_id == 0)
   {
     return false;
+  }
+
+  if (target_id == source_id)
+  {
+    return true;
   }
 
   CanTransformAccum accum;
