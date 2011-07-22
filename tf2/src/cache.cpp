@@ -141,7 +141,7 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
   }
   else if (target_time < earliest_time)
   {
-    createExtrapolationException2(target_time, earliest_time, error_str);
+    createExtrapolationException3(target_time, earliest_time, error_str);
     return 0;
   }
 

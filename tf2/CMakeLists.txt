@@ -71,7 +71,7 @@ target_link_libraries(test_static_cache_unittest tf2)
 rosbuild_add_gtest(test_simple test/simple_tf2_core.cpp)
 target_link_libraries(test_simple tf2)
 
-rosbuild_add_executable(speed_test EXCLUDE_FROM_ALL test/speed_test.cpp)
-target_link_libraries(speed_test tf2)
-rosbuild_declare_test(speed_test)
+rosbuild_add_executable(bin/speed_test EXCLUDE_FROM_ALL test/speed_test.cpp)
+target_link_libraries(bin/speed_test tf2)
+rosbuild_declare_test(bin/speed_test)
 
