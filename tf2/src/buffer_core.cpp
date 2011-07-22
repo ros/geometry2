@@ -512,6 +512,14 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   CompactFrameID target_id = validateFrameId("lookupTransform argument target_frame", target_frame);
   CompactFrameID source_id = validateFrameId("lookupTransform argument source_frame", source_frame);
 
+  if (target_id == source_id) {
+    geometry_msgs::TransformStamped identity;
+    identity.header.frame_id = target_frame;
+    identity.header.stamp = time;
+    identity.transform.rotation.w = 1;
+    return identity;
+  }
+
   std::string error_string;
   TransformAccum accum;
   int retval = walkToTopParent(accum, time, target_id, source_id, &error_string);
@@ -651,6 +659,11 @@ bool BufferCore::canTransformNoLock(CompactFrameID target_id, CompactFrameID sou
   if (target_id == 0 || source_id == 0)
   {
     return false;
+  }
+
+  if (target_id == source_id)
+  {
+    return true;
   }
 
   CanTransformAccum accum;
