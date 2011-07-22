@@ -509,16 +509,16 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
 {
   boost::mutex::scoped_lock lock(frame_mutex_);
 
-  CompactFrameID target_id = validateFrameId("lookupTransform argument target_frame", target_frame);
-  CompactFrameID source_id = validateFrameId("lookupTransform argument source_frame", source_frame);
-
-  if (target_id == source_id) {
+  if (target_frame == source_frame) {
     geometry_msgs::TransformStamped identity;
     identity.header.frame_id = target_frame;
     identity.header.stamp = time;
     identity.transform.rotation.w = 1;
     return identity;
   }
+
+  CompactFrameID target_id = validateFrameId("lookupTransform argument target_frame", target_frame);
+  CompactFrameID source_id = validateFrameId("lookupTransform argument source_frame", source_frame);
 
   std::string error_string;
   TransformAccum accum;
