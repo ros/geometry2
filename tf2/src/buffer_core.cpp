@@ -189,7 +189,7 @@ void BufferCore::clear()
   //old_tf_.clear();
 
 
-  boost::mutex::scoped_lock(frame_mutex_);
+  boost::mutex::scoped_lock lock(frame_mutex_);
   if ( frames_.size() > 1 )
   {
     for (std::vector< TimeCacheInterface*>::iterator  cache_it = frames_.begin() + 1; cache_it != frames_.end(); ++cache_it)
