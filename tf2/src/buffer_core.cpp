@@ -986,7 +986,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
 std::string BufferCore::allFramesAsYAML() const
 {
   std::stringstream mstream;
-  boost::mutex::scoped_lock(frame_mutex_);
+  boost::mutex::scoped_lock lock(frame_mutex_);
 
   TransformStorage temp;
 
