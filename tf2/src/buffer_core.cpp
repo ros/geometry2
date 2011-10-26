@@ -513,6 +513,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
     geometry_msgs::TransformStamped identity;
     identity.header.frame_id = target_frame;
     identity.header.stamp = time;
+    identity.child_frame_id = source_frame;
     identity.transform.rotation.w = 1;
     return identity;
   }
