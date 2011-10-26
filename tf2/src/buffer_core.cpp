@@ -726,7 +726,6 @@ tf2::TimeCacheInterface* BufferCore::getFrame(CompactFrameID frame_id) const
 CompactFrameID BufferCore::lookupFrameNumber(const std::string& frameid_str) const
 {
   CompactFrameID retval;
-  boost::mutex::scoped_lock(frame_mutex_);
   M_StringToCompactFrameID::const_iterator map_it = frameIDs_.find(frameid_str);
   if (map_it == frameIDs_.end())
   {
@@ -779,12 +778,15 @@ void BufferCore::createConnectivityErrorString(CompactFrameID source_frame, Comp
 
 std::string BufferCore::allFramesAsString() const
 {
+  boost::mutex::scoped_lock lock(frame_mutex_);
+  return this->allFramesAsStringNoLock();
+}
+
+std::string BufferCore::allFramesAsStringNoLock() const
+{
   std::stringstream mstream;
-  boost::mutex::scoped_lock(frame_mutex_);
 
   TransformStorage temp;
-
-
 
   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
 

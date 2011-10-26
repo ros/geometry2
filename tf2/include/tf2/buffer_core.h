@@ -232,6 +232,12 @@ public:
 private:
 
 
+  /** \brief A way to see what frames have been cached
+   * Useful for debugging. Use this call internally. 
+   */
+  std::string allFramesAsStringNoLock() const;  
+
+
   /******************** Internal Storage ****************/
   
   /** \brief The pointers to potential frames that the tree can be made of.
