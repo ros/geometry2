@@ -6,8 +6,8 @@
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/geometry_experimental</url>
+  <depend stack="actionlib" /> <!-- actionlib -->
   <depend stack="bullet" /> <!-- bullet -->
-  <depend stack="common" /> <!-- actionlib -->
   <depend stack="common_msgs" /> <!-- actionlib_msgs, geometry_msgs -->
   <depend stack="geometry" /> <!-- tf -->
   <depend stack="orocos_kinematics_dynamics" /> <!-- kdl -->
