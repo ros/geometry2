@@ -5,7 +5,7 @@
   <author>Maintained by Tully Foote, Eitan Marder-Eppstein, Wim Meeussen</author>
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/geometry2</url>
+  <url>http://ros.org/wiki/geometry_experimental</url>
   <depend stack="actionlib" /> <!-- actionlib -->
   <depend stack="bullet" /> <!-- bullet -->
   <depend stack="common_msgs" /> <!-- actionlib_msgs, geometry_msgs -->
