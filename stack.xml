@@ -1,11 +1,11 @@
 <stack>
-  <description brief="experimental geometry and math libraries">
-    The experimental geometric and math libraries used in ros.
+  <description brief="Second generation Transform Library">
+    The second generation Transform Library in ros..
   </description>
-  <author>Maintained by Tully Foote tfoote@willowgarage.com</author>
+  <author>Maintained by Tully Foote, Eitan Marder-Eppstein, Wim Meeussen</author>
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/geometry_experimental</url>
+  <url>http://ros.org/wiki/geometry2</url>
   <depend stack="actionlib" /> <!-- actionlib -->
   <depend stack="bullet" /> <!-- bullet -->
   <depend stack="common_msgs" /> <!-- actionlib_msgs, geometry_msgs -->
