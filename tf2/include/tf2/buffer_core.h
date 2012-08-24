@@ -40,7 +40,6 @@
 #include "ros/time.h"
 //#include "geometry_msgs/TwistStamped.h"
 #include "geometry_msgs/TransformStamped.h"
-#include "LinearMath/btTransform.h"
 
 //////////////////////////backwards startup for porting
 //#include "tf/tf.h"
