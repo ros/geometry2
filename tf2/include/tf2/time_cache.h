@@ -38,9 +38,6 @@
 
 #include <sstream>
 
-#include <LinearMath/btVector3.h>
-#include <LinearMath/btQuaternion.h>
-
 #include <ros/message_forward.h>
 #include <ros/time.h>
 
