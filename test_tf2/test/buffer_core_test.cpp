@@ -1196,7 +1196,7 @@ TEST(BufferCore_lookupTransform, compound_xfm_configuration)
     tsa.transform.translation.y = 1.0;
     tsa.transform.translation.z = 1.0;
     btQuaternion q1;
-    q1.setRPY(0.25, .5, .75);
+    q1.setEuler(0.25, .5, .75);
     tsa.transform.rotation.x = q1.x();
     tsa.transform.rotation.y = q1.y();
     tsa.transform.rotation.z = q1.z();
@@ -1210,7 +1210,7 @@ TEST(BufferCore_lookupTransform, compound_xfm_configuration)
     tsb.transform.translation.y =  0.0;
     tsb.transform.translation.z = -1.0;
     btQuaternion q2;
-    q2.setRPY(1.0, 0.25, 0.5);
+    q2.setEuler(1.0, 0.25, 0.5);
     tsb.transform.rotation.x = q2.x();
     tsb.transform.rotation.y = q2.y();
     tsb.transform.rotation.z = q2.z();
@@ -1224,7 +1224,7 @@ TEST(BufferCore_lookupTransform, compound_xfm_configuration)
     tsc.transform.translation.y =  2.0;
     tsc.transform.translation.z =  0.5;
     btQuaternion q3;
-    q3.setRPY(0.25, .75, 1.25);
+    q3.setEuler(0.25, .75, 1.25);
     tsc.transform.rotation.x = q3.x();
     tsc.transform.rotation.y = q3.y();
     tsc.transform.rotation.z = q3.z();
@@ -1238,7 +1238,7 @@ TEST(BufferCore_lookupTransform, compound_xfm_configuration)
     tsd.transform.translation.y =  -1;
     tsd.transform.translation.z =  1.5;
     btQuaternion q4;
-    q4.setRPY(-0.5, 1.0, -.75);
+    q4.setEuler(-0.5, 1.0, -.75);
     tsd.transform.rotation.x = q4.x();
     tsd.transform.rotation.y = q4.y();
     tsd.transform.rotation.z = q4.z();
@@ -1362,7 +1362,7 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         ts2.transform.translation.x = cos(theta * dt);
         ts2.transform.translation.y = sin(theta * dt);
         btQuaternion q;
-        q.setRPY(0,0,theta*dt);
+        q.setEuler(0,0,theta*dt);
         ts2.transform.rotation.z = q.z();
         ts2.transform.rotation.w = q.w();
         EXPECT_TRUE(mBC.setTransform(ts2, "authority"));
@@ -1391,7 +1391,7 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         EXPECT_NEAR(out_ac.transform.translation.y, sin(theta * dt), epsilon);
         EXPECT_NEAR(out_ac.transform.translation.z, vel * dt, 		 epsilon);
         btQuaternion q;
-        q.setRPY(0,0,theta*dt);
+        q.setEuler(0,0,theta*dt);
         CHECK_QUATERNION_NEAR(out_ac.transform.rotation, 0, 0, q.z(), q.w(), epsilon);
 
         geometry_msgs::TransformStamped out_ad = mBC.lookupTransform("a", "d", t);
@@ -1402,7 +1402,7 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         EXPECT_NEAR(out_cd.transform.translation.y,  0,  			              epsilon);
         EXPECT_NEAR(out_cd.transform.translation.z, cos(theta * dt2) - vel * dt2, epsilon);
         btQuaternion mq;
-        mq.setRPY(0,0,-theta*dt2);
+        mq.setEuler(0,0,-theta*dt2);
         CHECK_QUATERNION_NEAR(out_cd.transform.rotation, 0, 0, mq.z(), mq.w(), epsilon);
     }
 
@@ -1418,7 +1418,7 @@ TEST(BufferCore_lookupTransform, helix_configuration)
         EXPECT_NEAR(out_cd2.transform.translation.y,  0,  			              epsilon);
         EXPECT_NEAR(out_cd2.transform.translation.z, cos(theta * dt2) - vel * dt, epsilon);
         btQuaternion mq2;
-        mq2.setRPY(0,0,-theta*dt);
+        mq2.setEuler(0,0,-theta*dt);
         CHECK_QUATERNION_NEAR(out_cd2.transform.rotation, 0, 0, mq2.z(), mq2.w(), epsilon);
     }
 }
