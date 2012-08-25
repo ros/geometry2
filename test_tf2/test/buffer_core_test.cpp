@@ -33,6 +33,7 @@
 #include <sys/time.h>
 #include <ros/ros.h>
 #include "LinearMath/btVector3.h"
+#include "LinearMath/btTransform.h"
 #include "rostest/permuter.h"
 
 void seed_rand()
