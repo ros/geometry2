@@ -33,7 +33,9 @@ rosbuild_add_gtest(buffer_core_test test/buffer_core_test.cpp)
 rosbuild_add_gtest(test_message_filter test/test_message_filter.cpp)
 rosbuild_add_gtest(test_convert test/test_convert.cpp)
 
+rosbuild_add_boost_directories()
 rosbuild_add_executable(test_buffer_server test/test_buffer_server.cpp)
+rosbuild_link_boost(test_buffer_server thread)
 
 rosbuild_add_executable(test_buffer_client test/test_buffer_client.cpp)
 rosbuild_add_gtest_build_flags(test_buffer_client)
