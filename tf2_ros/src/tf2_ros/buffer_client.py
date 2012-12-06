@@ -123,6 +123,8 @@ class BufferClient(tf2_ros.BufferInterface):
         return self.__process_result(self.client.get_result())
 
     def __process_result(self, result):
+        if result == None or result.error == None:
+            raise tf2.TransformException("The BufferServer returned None for result or result.error!  Something is likely wrong with the server.")
         if result.error.error != result.error.NO_ERROR:
             if result.error.error == result.error.LOOKUP_ERROR:
                 raise tf2.LookupException(result.error.error_string)
