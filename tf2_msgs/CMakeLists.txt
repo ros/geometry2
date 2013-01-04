@@ -16,8 +16,5 @@ catkin_package(
    INCLUDE_DIRS include
    CATKIN_DEPENDS message_generation geometry_msgs actionlib_msgs)
 
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
 
 

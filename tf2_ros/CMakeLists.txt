@@ -49,7 +49,7 @@ target_link_libraries(test_listener ${PROJECT_NAME} ${catkin_LIBRARIES})
 add_executable(static_transform_publisher src/static_transform_broadcaster_program.cpp)
 target_link_libraries(static_transform_publisher ${PROJECT_NAME} ${catkin_LIBRARIES} )
 
-install(TARGETS ${PROJECT_NAME} buffer_server test_listener static_transform_publisher
+install(TARGETS ${PROJECT_NAME} buffer_server static_transform_publisher
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
