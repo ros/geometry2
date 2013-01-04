@@ -1,0 +1,30 @@
+<package>
+  <name>geometry-experimental</name>
+  <version>0.2.4</version>
+  <description>
+    The second generation Transform Library in ros..
+  </description>
+  <author>Tully Foote</author>
+  <author>Eitan Marder-Eppstein</author>
+  <author>Wim Meeussen</author>
+  <maintainer email="tfoote@willowgarage.com">Tully Foote</maintainer>
+  <license>BSD</license>
+  <license>LGPL</license>
+
+  <url type="website">http://www.ros.org/wiki/geometry_experimental</url>
+    
+  <run_depend>test_tf2</run_depend>
+  <run_depend>tf2</run_depend>
+  <run_depend>tf2_bullet</run_depend>
+  <run_depend>tf2_geometry_msgs</run_depend>
+  <run_depend>tf2_kdl</run_depend>
+  <run_depend>tf2_msgs</run_depend>
+  <run_depend>tf2_ros</run_depend>
+  <run_depend>tf2_tools</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
+
+

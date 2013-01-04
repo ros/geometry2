@@ -1,3 +1,0 @@
-<launch>
-  <test test-name="test_tf_bullet" pkg="tf2_bullet" type="test_bullet" time-limit="120" />
-</launch>
