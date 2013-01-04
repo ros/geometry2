@@ -1,3 +1,0 @@
-<launch>
-  <test test-name="test_tf_kdl" pkg="tf2_kdl" type="test_kdl" time-limit="120" />
-</launch>
