@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2_geometry_msgs)
 
-find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_ros orocos_kdl)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_ros orocos_kdl tf2)
 find_package(Boost COMPONENTS thread REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
-   CATKIN_DEPENDS  geometry_msgs tf2_ros orocos_kdl)
+   CATKIN_DEPENDS  geometry_msgs tf2_ros orocos_kdl tf2)
 
 
 include_directories(include 
