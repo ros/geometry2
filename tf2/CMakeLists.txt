@@ -33,7 +33,6 @@ include_directories(${PYTHON_INCLUDE_PATH})
 link_libraries(${PYTHON_LIBRARIES})
 add_library(tf2_py src/tf2_py.cpp)
 target_link_libraries(tf2_py tf2)
-set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
 add_dependencies(tf2_py tf2_msgs_gencpp)
 
 set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
