@@ -18,6 +18,7 @@ add_definitions(-DBT_USE_DOUBLE_PRECISION)
 #CPP Libraries
 add_library(tf2 src/cache.cpp src/buffer_core.cpp src/static_cache.cpp)
 target_link_libraries(tf2 ${Boost_LIBRARIES})
+add_dependencies(tf2 tf2_msgs_gencpp)
 
 #BEGIN Python Libraries
 find_package(PythonLibs REQUIRED)
@@ -33,6 +34,7 @@ link_libraries(${PYTHON_LIBRARIES})
 add_library(tf2_py src/tf2_py.cpp)
 target_link_libraries(tf2_py tf2)
 set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
+add_dependencies(tf2_py tf2_msgs_gencpp)
 
 set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
 #!! rosbuild_add_compile_flags(tf2_py ${SSE_FLAGS}) #conditionally adds sse flags if available
@@ -40,17 +42,20 @@ set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-ini
 
 catkin_add_gtest(test_cache_unittest test/cache_unittest.cpp)
 target_link_libraries(test_cache_unittest tf2)
+add_dependencies(test_cache_unittest tf2_msgs_gencpp)
 
 catkin_add_gtest(test_static_cache_unittest test/static_cache_test.cpp)
 target_link_libraries(test_static_cache_unittest tf2)
+add_dependencies(test_static_cache_unittest tf2_msgs_gencpp)
 
 catkin_add_gtest(test_simple test/simple_tf2_core.cpp)
 target_link_libraries(test_simple tf2)
+add_dependencies(test_simple tf2_msgs_gencpp)
 
 add_executable(speed_test EXCLUDE_FROM_ALL test/speed_test.cpp)
 target_link_libraries(speed_test tf2)
 add_dependencies(tests speed_test)
-
+add_dependencies(tests tf2_msgs_gencpp)
 
 install(TARGETS tf2 tf2_py
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
