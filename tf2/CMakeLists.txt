@@ -4,6 +4,8 @@ project(tf2)
 find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_msgs rospy roscpp rosconsole)
 find_package(Boost REQUIRED COMPONENTS thread signals)
 
+catkin_python_setup()
+
 catkin_package(
    INCLUDE_DIRS include
    LIBRARIES tf2 
