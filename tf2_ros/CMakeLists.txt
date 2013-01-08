@@ -37,9 +37,11 @@ add_library(${PROJECT_NAME} src/buffer.cpp
                             src/static_transform_broadcaster.cpp)
 add_dependencies(${PROJECT_NAME} tf2_msgs_gencpp)
 
-add_executable(buffer_server src/buffer_server_main.cpp)
-target_link_libraries(buffer_server ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-add_dependencies(buffer_server tf2_msgs_gencpp)
+add_executable(${PROJECT_NAME}_buffer_server src/buffer_server_main.cpp)
+target_link_libraries(${PROJECT_NAME}_buffer_server ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_buffer_server tf2_msgs_gencpp)
+set_target_properties(${PROJECT_NAME}_buffer_server PROPERTIES OUTPUT_NAME buffer_server )
+
 
 catkin_add_gtest(test_listener test/listener_unittest.cpp)
 target_link_libraries(test_listener ${PROJECT_NAME} ${catkin_LIBRARIES})
@@ -49,11 +51,12 @@ add_dependencies(test_listener tf2_msgs_gencpp)
 ##add_dependencies(tests test_listener)
 
 
-add_executable(static_transform_publisher src/static_transform_broadcaster_program.cpp)
-target_link_libraries(static_transform_publisher ${PROJECT_NAME} ${catkin_LIBRARIES} )
-add_dependencies(static_transform_publisher tf2_msgs_gencpp)
+add_executable(${PROJECT_NAME}_static_transform_publisher src/static_transform_broadcaster_program.cpp)
+target_link_libraries(${PROJECT_NAME}_static_transform_publisher ${PROJECT_NAME} ${catkin_LIBRARIES} )
+add_dependencies(${PROJECT_NAME}_static_transform_publisher tf2_msgs_gencpp)
+set_target_properties(${PROJECT_NAME}_static_transform_publisher PROPERTIES OUTPUT_NAME static_transform_publisher )
 
-install(TARGETS ${PROJECT_NAME} buffer_server static_transform_publisher
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_buffer_server ${PROJECT_NAME}_static_transform_publisher
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
