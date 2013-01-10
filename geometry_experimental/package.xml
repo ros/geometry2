@@ -1,5 +1,5 @@
 <package>
-  <name>geometry-experimental</name>
+  <name>geometry_experimental</name>
   <version>0.2.4</version>
   <description>
     The second generation Transform Library in ros..
