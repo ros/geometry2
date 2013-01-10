@@ -27,7 +27,6 @@
 
 # author: Wim Meeussen
 
-import roslib; roslib.load_manifest('tf2_geometry_msgs')
 from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped
 import PyKDL
 import rospy
