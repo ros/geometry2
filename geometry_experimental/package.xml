@@ -1,6 +1,6 @@
 <package>
   <name>geometry_experimental</name>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
   <description>
     The second generation Transform Library in ros..
   </description>
