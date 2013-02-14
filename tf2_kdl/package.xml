@@ -1,0 +1,20 @@
+<package>
+  <name>tf2_kdl</name>
+  <version>0.2.4</version>
+  <description>
+    KDL binding for tf2
+  </description>
+  <maintainer email="tfoote@willowgarage.com">Tully Foote</maintainer>
+  <author>Wim Meeussen</author>
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/tf2</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+ 
+  <build_depend>orocos_kdl</build_depend>
+  <build_depend>tf2</build_depend>
+
+  <run_depend>orocos_kdl</run_depend>
+  <run_depend>tf2</run_depend>
+</package>
