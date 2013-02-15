@@ -14,7 +14,9 @@
  
   <build_depend>orocos_kdl</build_depend>
   <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
 
   <run_depend>orocos_kdl</run_depend>
   <run_depend>tf2</run_depend>
+  <run_depend>tf2_ros</run_depend>
 </package>
