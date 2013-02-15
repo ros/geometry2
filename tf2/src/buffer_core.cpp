@@ -36,7 +36,7 @@
 
 #include <ros/assert.h>
 #include <ros/console.h>
-#include "LinearMath/btTransform.h"
+#include "tf2/LinearMath/btTransform.h"
 
 //legacy
 //#include "tf/tf.h"

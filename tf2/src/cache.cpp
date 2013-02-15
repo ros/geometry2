@@ -32,9 +32,9 @@
 #include "tf2/time_cache.h"
 #include "tf2/exceptions.h"
 
-#include <LinearMath/btVector3.h>
-#include <LinearMath/btQuaternion.h>
-#include "LinearMath/btTransform.h"
+#include <tf2/LinearMath/btVector3.h>
+#include <tf2/LinearMath/btQuaternion.h>
+#include <tf2/LinearMath/btTransform.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <ros/assert.h>
 
