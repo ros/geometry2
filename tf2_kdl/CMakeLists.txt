@@ -22,7 +22,8 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}_test_kdl test/test_tf2_kdl.cpp)
-target_link_libraries(${PROJECT_NAME}_test_kdl ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+find_package (Threads)
+target_link_libraries(${PROJECT_NAME}_test_kdl ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 
