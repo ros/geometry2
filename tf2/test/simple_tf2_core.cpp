@@ -31,7 +31,7 @@
 #include <tf2/buffer_core.h>
 #include <sys/time.h>
 #include <ros/ros.h>
-#include "LinearMath/btVector3.h"
+#include "tf2/LinearMath/btVector3.h"
 #include "tf2/exceptions.h"
 
 void seed_rand()

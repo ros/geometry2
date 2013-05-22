@@ -30,8 +30,7 @@
 #include <gtest/gtest.h>
 #include <tf2/time_cache.h>
 #include <sys/time.h>
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btMatrix3x3.h"
+#include "tf2/LinearMath/btQuaternion.h"
 #include <stdexcept>
 
 #include <geometry_msgs/TransformStamped.h>
