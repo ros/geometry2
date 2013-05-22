@@ -8,10 +8,7 @@ catkin_package(
   INCLUDE_DIRS include
 )
 
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
+catkin_python_setup()
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
@@ -21,9 +18,9 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
 
-add_executable(${PROJECT_NAME}_test_kdl test/test_tf2_kdl.cpp)
+catkin_add_gtest(test_kdl test/test_tf2_kdl.cpp)
 find_package (Threads)
-target_link_libraries(${PROJECT_NAME}_test_kdl ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_kdl ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 
@@ -31,3 +28,8 @@ add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 #rosbuild_add_gtest_build_flags(test_kdl)
 #rosbuild_add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 
+
+
+install(PROGRAMS scripts/test.py
+         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
