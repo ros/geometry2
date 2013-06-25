@@ -29,6 +29,7 @@
 
 /** \author Josh Faust */
 
+
 #include <tf2_ros/message_filter.h>
 #include <tf2/buffer_core.h>
 #include <geometry_msgs/PointStamped.h>
@@ -96,7 +97,7 @@ TEST(MessageFilter, noTransformsSameFrame)
   EXPECT_EQ(1, n.count_);
 }
 
-geometry_msgs::TransformStamped createTransform(btQuaternion q, btVector3 v, ros::Time stamp, const std::string& frame1, const std::string& frame2)
+geometry_msgs::TransformStamped createTransform(Quaternion q, Vector3 v, ros::Time stamp, const std::string& frame1, const std::string& frame2)
 {
   geometry_msgs::TransformStamped t;
   t.header.frame_id = frame1;
@@ -120,7 +121,7 @@ TEST(MessageFilter, preexistingTransforms)
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   ros::Time stamp(1);
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp, "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
@@ -148,7 +149,7 @@ TEST(MessageFilter, postTransforms)
 
   EXPECT_EQ(0, n.count_);
 
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp, "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
 
   EXPECT_EQ(1, n.count_);
 }
@@ -175,7 +176,7 @@ TEST(MessageFilter, queueSize)
   EXPECT_EQ(0, n.count_);
   EXPECT_EQ(10, n.failure_count_);
 
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp, "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
 
   EXPECT_EQ(10, n.count_);
 }
@@ -189,7 +190,7 @@ TEST(MessageFilter, setTargetFrame)
   filter.setTargetFrame("frame1000");
 
   ros::Time stamp(1);
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp, "frame1000", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1000", "frame2"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
@@ -214,7 +215,7 @@ TEST(MessageFilter, multipleTargetFrames)
   filter.setTargetFrames(target_frames);
 
   ros::Time stamp(1);
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp, "frame1", "frame3"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame3"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
@@ -225,7 +226,7 @@ TEST(MessageFilter, multipleTargetFrames)
 
   //ros::Time::setNow(ros::Time::now() + ros::Duration(1.0));
 
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp, "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
 
   EXPECT_EQ(1, n.count_); // frame2->frame3 now exists
 }
@@ -240,7 +241,7 @@ TEST(MessageFilter, tolerance)
   filter.setTolerance(offset);
 
   ros::Time stamp(1);
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp, "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
@@ -249,7 +250,7 @@ TEST(MessageFilter, tolerance)
 
   EXPECT_EQ(0, n.count_); //No return due to lack of space for offset
 
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp + (offset * 1.1), "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp + (offset * 1.1), "frame1", "frame2"), "me");
 
   EXPECT_EQ(1, n.count_); // Now have data for the message published earlier
 
@@ -267,8 +268,8 @@ TEST(MessageFilter, outTheBackFailure)
   filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
   ros::Time stamp(1);
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp, "frame1", "frame2"), "me");
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp + ros::Duration(10000), "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp + ros::Duration(10000), "frame1", "frame2"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
@@ -295,7 +296,7 @@ TEST(MessageFilter, outTheBackFailure2)
   EXPECT_EQ(0, n.count_);
   EXPECT_EQ(0, n.failure_count_);
 
-  bc.setTransform(createTransform(btQuaternion(0,0,0,1), btVector3(1,2,3), stamp + ros::Duration(10000), "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp + ros::Duration(10000), "frame1", "frame2"), "me");
 
   EXPECT_EQ(1, n.failure_count_);
 }

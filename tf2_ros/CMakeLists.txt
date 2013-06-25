@@ -71,11 +71,12 @@ set_target_properties(${PROJECT_NAME}_static_transform_publisher
 )
 
 # tf2_ros_test_listener
-catkin_add_gtest(${PROJECT_NAME}_test_listener test/listener_unittest.cpp)
+add_executable(${PROJECT_NAME}_test_listener test/listener_unittest.cpp)
 add_dependencies(${PROJECT_NAME}_test_listener tf2_msgs_gencpp)
 target_link_libraries(${PROJECT_NAME}_test_listener
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
+  ${GTEST_LIBRARIES}
 )
 
 # Install rules

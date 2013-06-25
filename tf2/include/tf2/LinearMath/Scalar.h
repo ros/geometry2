@@ -17,8 +17,6 @@ subject to the following restrictions:
 #ifndef TF2_SCALAR_H
 #define TF2_SCALAR_H
 
-#define TF2_USE_DOUBLE_PRECISION
-
 #ifdef TF2_MANAGED_CODE
 //Aligned data types not supported in managed code
 #pragma unmanaged
@@ -30,14 +28,6 @@ subject to the following restrictions:
 #include <cstdlib>
 #include <cfloat>
 #include <float.h>
-
-/* SVN $Revision$ on $Date$ from http://bullet.googlecode.com*/
-#define TF2_BULLET_VERSION 276
-
-inline int	tf2GetVersion()
-{
-	return TF2_BULLET_VERSION;
-}
 
 #if defined(DEBUG) || defined (_DEBUG)
 #define TF2_DEBUG
@@ -71,10 +61,6 @@ inline int	tf2GetVersion()
  			#define tf2Fsel(a,b,c) __fsel((a),(b),(c))
 		#else
 
-#if (defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (TF2_USE_DOUBLE_PRECISION))
-			#define TF2_USE_SSE
-			#include <emmintrin.h>
-#endif
 
 		#endif//_XBOX
 
@@ -140,32 +126,6 @@ inline int	tf2GetVersion()
 #else
 	//non-windows systems
 
-#if (defined (__APPLE__) && defined (__i386__) && (!defined (TF2_USE_DOUBLE_PRECISION)))
-	#define TF2_USE_SSE
-	#include <emmintrin.h>
-
-	#define TF2SIMD_FORCE_INLINE inline
-///@todo: check out alignment methods for other platforms/compilers
-	#define ATTRIBUTE_ALIGNED16(a) a __attribute__ ((aligned (16)))
-	#define ATTRIBUTE_ALIGNED64(a) a __attribute__ ((aligned (64)))
-	#define ATTRIBUTE_ALIGNED128(a) a __attribute__ ((aligned (128)))
-	#ifndef assert
-	#include <assert.h>
-	#endif
-
-	#if defined(DEBUG) || defined (_DEBUG)
-		#define tf2Assert assert
-	#else
-		#define tf2Assert(x)
-	#endif
-
-	//tf2FullAssert is optional, slows down a lot
-	#define tf2FullAssert(x)
-	#define tf2Likely(_c)  _c
-	#define tf2Unlikely(_c) _c
-
-#else
-
 		#define TF2SIMD_FORCE_INLINE inline
 		///@todo: check out alignment methods for other platforms/compilers
 		///#define ATTRIBUTE_ALIGNED16(a) a __attribute__ ((aligned (16)))
@@ -188,7 +148,6 @@ inline int	tf2GetVersion()
 		#define tf2FullAssert(x)
 		#define tf2Likely(_c)  _c
 		#define tf2Unlikely(_c) _c
-#endif //__APPLE__ 
 
 #endif // LIBSPE2
 
@@ -197,16 +156,9 @@ inline int	tf2GetVersion()
 
 
 ///The tf2Scalar type abstracts floating point numbers, to easily switch between double and single floating point precision.
-#if defined(TF2_USE_DOUBLE_PRECISION)
 typedef double tf2Scalar;
 //this number could be bigger in double precision
 #define TF2_LARGE_FLOAT 1e30
-#else
-typedef float tf2Scalar;
-//keep TF2_LARGE_FLOAT*TF2_LARGE_FLOAT < FLT_MAX
-#define TF2_LARGE_FLOAT 1e18f
-#endif
-
 
 
 #define TF2_DECLARE_ALIGNED_ALLOCATOR() \
@@ -221,7 +173,6 @@ typedef float tf2Scalar;
 
 
 
-#if defined(TF2_USE_DOUBLE_PRECISION) || defined(TF2_FORCE_DOUBLE_FUNCTIONS)
 		
 TF2SIMD_FORCE_INLINE tf2Scalar tf2Sqrt(tf2Scalar x) { return sqrt(x); }
 TF2SIMD_FORCE_INLINE tf2Scalar tf2Fabs(tf2Scalar x) { return fabs(x); }
@@ -237,54 +188,6 @@ TF2SIMD_FORCE_INLINE tf2Scalar tf2Log(tf2Scalar x) { return log(x); }
 TF2SIMD_FORCE_INLINE tf2Scalar tf2Pow(tf2Scalar x,tf2Scalar y) { return pow(x,y); }
 TF2SIMD_FORCE_INLINE tf2Scalar tf2Fmod(tf2Scalar x,tf2Scalar y) { return fmod(x,y); }
 
-#else
-		
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Sqrt(tf2Scalar y) 
-{ 
-#ifdef USE_APPROXIMATION
-    double x, z, tempf;
-    unsigned long *tfptr = ((unsigned long *)&tempf) + 1;
-
-	tempf = y;
-	*tfptr = (0xbfcdd90a - *tfptr)>>1; /* estimate of 1/sqrt(y) */
-	x =  tempf;
-	z =  y*tf2Scalar(0.5);                        /* hoist out the “/2”    */
-	x = (tf2Scalar(1.5)*x)-(x*x)*(x*z);         /* iteration formula     */
-	x = (tf2Scalar(1.5)*x)-(x*x)*(x*z);
-	x = (tf2Scalar(1.5)*x)-(x*x)*(x*z);
-	x = (tf2Scalar(1.5)*x)-(x*x)*(x*z);
-	x = (tf2Scalar(1.5)*x)-(x*x)*(x*z);
-	return x*y;
-#else
-	return sqrtf(y); 
-#endif
-}
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Fabs(tf2Scalar x) { return fabsf(x); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Cos(tf2Scalar x) { return cosf(x); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Sin(tf2Scalar x) { return sinf(x); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Tan(tf2Scalar x) { return tanf(x); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Acos(tf2Scalar x) { 
-	if (x<tf2Scalar(-1))	
-		x=tf2Scalar(-1); 
-	if (x>tf2Scalar(1))	
-		x=tf2Scalar(1);
-	return acosf(x); 
-}
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Asin(tf2Scalar x) { 
-	if (x<tf2Scalar(-1))	
-		x=tf2Scalar(-1); 
-	if (x>tf2Scalar(1))	
-		x=tf2Scalar(1);
-	return asinf(x); 
-}
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Atan(tf2Scalar x) { return atanf(x); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Atan2(tf2Scalar x, tf2Scalar y) { return atan2f(x, y); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Exp(tf2Scalar x) { return expf(x); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Log(tf2Scalar x) { return logf(x); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Pow(tf2Scalar x,tf2Scalar y) { return powf(x,y); }
-TF2SIMD_FORCE_INLINE tf2Scalar tf2Fmod(tf2Scalar x,tf2Scalar y) { return fmodf(x,y); }
-	
-#endif
 
 #define TF2SIMD_2_PI         tf2Scalar(6.283185307179586232)
 #define TF2SIMD_PI           (TF2SIMD_2_PI * tf2Scalar(0.5))
@@ -296,13 +199,8 @@ TF2SIMD_FORCE_INLINE tf2Scalar tf2Fmod(tf2Scalar x,tf2Scalar y) { return fmodf(x
 #define tf2RecipSqrt(x) ((tf2Scalar)(tf2Scalar(1.0)/tf2Sqrt(tf2Scalar(x))))		/* reciprocal square root */
 
 
-#ifdef TF2_USE_DOUBLE_PRECISION
 #define TF2SIMD_EPSILON      DBL_EPSILON
 #define TF2SIMD_INFINITY     DBL_MAX
-#else
-#define TF2SIMD_EPSILON      FLT_EPSILON
-#define TF2SIMD_INFINITY     FLT_MAX
-#endif
 
 TF2SIMD_FORCE_INLINE tf2Scalar tf2Atan2Fast(tf2Scalar y, tf2Scalar x) 
 {

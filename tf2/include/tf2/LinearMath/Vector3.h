@@ -85,7 +85,6 @@ public:
 		m_floats[3] = tf2Scalar(0.);
 	}
 
-	
 /**@brief Add a vector to this one 
  * @param The vector to add to this one */
 	TF2SIMD_FORCE_INLINE Vector3& operator+=(const Vector3& v)
@@ -623,7 +622,6 @@ public:
 ///tf2SwapVector3Endian swaps vector endianness, useful for network and cross-platform serialization
 TF2SIMD_FORCE_INLINE void	tf2SwapScalarEndian(const tf2Scalar& sourceVal, tf2Scalar& destVal)
 {
-	#ifdef TF2_USE_DOUBLE_PRECISION
 	unsigned char* dest = (unsigned char*) &destVal;
 	unsigned char* src  = (unsigned char*) &sourceVal;
 	dest[0] = src[7];
@@ -634,14 +632,6 @@ TF2SIMD_FORCE_INLINE void	tf2SwapScalarEndian(const tf2Scalar& sourceVal, tf2Sca
     dest[5] = src[2];
     dest[6] = src[1];
     dest[7] = src[0];
-#else
-	unsigned char* dest = (unsigned char*) &destVal;
-	unsigned char* src  = (unsigned char*) &sourceVal;
-	dest[0] = src[3];
-    dest[1] = src[2];
-    dest[2] = src[1];
-    dest[3] = src[0];
-#endif //TF2_USE_DOUBLE_PRECISION
 }
 ///tf2SwapVector3Endian swaps vector endianness, useful for network and cross-platform serialization
 TF2SIMD_FORCE_INLINE void	tf2SwapVector3Endian(const Vector3& sourceVec, Vector3& destVec)
@@ -737,7 +727,6 @@ TF2SIMD_FORCE_INLINE void	Vector3::deSerialize(const struct	Vector3Data& dataIn)
 	for (int i=0;i<4;i++)
 		m_floats[i] = dataIn.m_floats[i];
 }
-
 
 }
 

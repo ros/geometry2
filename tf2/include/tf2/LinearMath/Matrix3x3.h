@@ -22,6 +22,7 @@ subject to the following restrictions:
 namespace tf2
 {
 
+
 #define Matrix3x3Data	Matrix3x3DoubleData 
 
 
@@ -63,6 +64,8 @@ public:
 		m_el[1] = other.m_el[1];
 		m_el[2] = other.m_el[2];
 	}
+
+
 	/** @brief Assignment Operator */
 	TF2SIMD_FORCE_INLINE Matrix3x3& operator=(const Matrix3x3& other)
 	{
@@ -71,6 +74,7 @@ public:
 		m_el[2] = other.m_el[2];
 		return *this;
 	}
+
 
 	/** @brief Get a column of the matrix as a vector 
 	*  @param i Column number 0 indexed */

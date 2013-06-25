@@ -17,8 +17,8 @@ include_directories(include
 
 link_directories(${orocos_kdl_LIBRARY_DIRS})
 
-catkin_add_gtest(test_geometry_msgs test/test_tf2_geometry_msgs.cpp)
-target_link_libraries(test_geometry_msgs ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+add_executable(test_geometry_msgs test/test_tf2_geometry_msgs.cpp)
+target_link_libraries(test_geometry_msgs ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${orocos_kdl_LIBRARIES})
 add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 
 #install(TARGETS test_geometry_msgs

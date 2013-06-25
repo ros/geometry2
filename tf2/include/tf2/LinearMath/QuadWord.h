@@ -26,7 +26,6 @@ subject to the following restrictions:
 
 namespace tf2
 {
-
 /**@brief The QuadWord class is base class for Vector3 and Quaternion. 
  * Some issues under PS3 Linux with IBM 2.1 SDK, gcc compiler prevent from using aligned quadword.
  */

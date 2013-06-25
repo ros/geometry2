@@ -27,8 +27,6 @@ namespace tf2
 #define TransformData TransformDoubleData
 
 
-
-
 /**@brief The Transform class supports rigid transforms with only translation and rotation and no scaling/shear.
  *It can be used in combination with Vector3, Quaternion and Matrix3x3 linear algebra classes. */
 class Transform {
@@ -72,7 +70,6 @@ public:
 		m_origin = other.m_origin;
 		return *this;
 	}
-
 
   /**@brief Set the current transform as the value of the product of two transforms
    * @param t1 Transform 1

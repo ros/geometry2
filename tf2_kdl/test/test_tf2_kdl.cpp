@@ -31,7 +31,7 @@
 
 
 #include <tf2_kdl/tf2_kdl.h>
-#include <ros/ros.h>
+//#include <ros/ros.h>
 #include <kdl/frames_io.hpp>
 #include <gtest/gtest.h>
 
@@ -111,7 +111,7 @@ int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "test");
   ros::NodeHandle n;
-  
+
   tf_buffer = new tf2::Buffer();
 
   // populate buffer

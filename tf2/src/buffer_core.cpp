@@ -561,10 +561,10 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   geometry_msgs::TransformStamped temp1 =  lookupTransform(fixed_frame, source_frame, source_time);
   geometry_msgs::TransformStamped temp2 =  lookupTransform(target_frame, fixed_frame, target_time);
   
-  tf2::Transform tf21, bt2;
-  transformMsgToTF2(temp1.transform, tf21);
-  transformMsgToTF2(temp2.transform, tf22);
-  transformTF2ToMsg(tf22*bt1, output.transform);
+  tf2::Transform tf1, tf2;
+  transformMsgToTF2(temp1.transform, tf1);
+  transformMsgToTF2(temp2.transform, tf2);
+  transformTF2ToMsg(tf2*tf1, output.transform);
   output.header.stamp = temp2.header.stamp;
   output.header.frame_id = target_frame;
   output.child_frame_id = source_frame;
