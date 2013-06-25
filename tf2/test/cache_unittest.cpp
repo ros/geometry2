@@ -30,7 +30,7 @@
 #include <gtest/gtest.h>
 #include <tf2/time_cache.h>
 #include <sys/time.h>
-#include "tf2/LinearMath/btQuaternion.h"
+#include "tf2/LinearMath/Quaternion.h"
 #include <stdexcept>
 
 #include <geometry_msgs/TransformStamped.h>
@@ -306,7 +306,7 @@ TEST(Bullet, Slerp)
   uint64_t runs = 100;
   seed_rand();
 
-  btQuaternion q1, q2;
+  tf2::Quaternion q1, q2;
   q1.setEuler(0,0,0);
   
   for (uint64_t i = 0 ; i < runs ; i++)
@@ -316,7 +316,7 @@ TEST(Bullet, Slerp)
                 1.0 * get_rand());
     
     
-    btQuaternion q3 = slerp(q1,q2,0.5);
+    tf2::Quaternion q3 = slerp(q1,q2,0.5);
     
     EXPECT_NEAR(q3.angle(q1), q2.angle(q3), 1e-5);
   }
@@ -336,7 +336,7 @@ TEST(TimeCache, AngularInterpolation)
   std::vector<double> rollvalues(2);
   uint64_t offset = 200;
 
-  std::vector<btQuaternion> quats(2);
+  std::vector<tf2::Quaternion> quats(2);
 
   TransformStorage stor;
   setIdentity(stor);
@@ -359,10 +359,10 @@ TEST(TimeCache, AngularInterpolation)
     for (int pos = 0; pos < 100 ; pos ++)
     {
       EXPECT_TRUE(cache.getData(ros::Time().fromNSec(offset + pos), stor)); //get the transform for the position
-      btQuaternion quat (stor.rotation_);
+      tf2::Quaternion quat (stor.rotation_);
 
       //Generate a ground truth quaternion directly calling slerp
-      btQuaternion ground_truth = quats[0].slerp(quats[1], pos/100.0);
+      tf2::Quaternion ground_truth = quats[0].slerp(quats[1], pos/100.0);
       
       //Make sure the transformed one and the direct call match
       EXPECT_NEAR(0, angle(ground_truth, quat), epsilon);

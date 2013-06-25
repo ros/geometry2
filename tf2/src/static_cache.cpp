@@ -32,7 +32,7 @@
 #include "tf2/time_cache.h"
 #include "tf2/exceptions.h"
 
-#include "tf2/LinearMath/btTransform.h"
+#include "tf2/LinearMath/Transform.h"
 
 
 using namespace tf2;

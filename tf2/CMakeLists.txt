@@ -14,7 +14,6 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories (src/bt) 
 
-add_definitions(-DBT_USE_DOUBLE_PRECISION)
 # export user definitions
 
 #CPP Libraries

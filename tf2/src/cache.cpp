@@ -32,9 +32,9 @@
 #include "tf2/time_cache.h"
 #include "tf2/exceptions.h"
 
-#include <tf2/LinearMath/btVector3.h>
-#include <tf2/LinearMath/btQuaternion.h>
-#include <tf2/LinearMath/btTransform.h>
+#include <tf2/LinearMath/Vector3.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Transform.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <ros/assert.h>
 
@@ -51,9 +51,9 @@ TransformStorage::TransformStorage(const geometry_msgs::TransformStamped& data, 
 , child_frame_id_(child_frame_id)
 {
   const geometry_msgs::Quaternion& o = data.transform.rotation;
-  rotation_ = btQuaternion(o.x, o.y, o.z, o.w);
+  rotation_ = tf2::Quaternion(o.x, o.y, o.z, o.w);
   const geometry_msgs::Vector3& v = data.transform.translation;
-  translation_ = btVector3(v.x, v.y, v.z);
+  translation_ = tf2::Vector3(v.x, v.y, v.z);
 }
 
 TimeCache::TimeCache(ros::Duration max_storage_time)
@@ -175,7 +175,7 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
     return;
   }
   //Calculate the ratio
-  btScalar ratio = (time.toSec() - one.stamp_.toSec()) / (two.stamp_.toSec() - one.stamp_.toSec());
+  tf2Scalar ratio = (time.toSec() - one.stamp_.toSec()) / (two.stamp_.toSec() - one.stamp_.toSec());
 
   //Interpolate translation
   output.translation_.setInterpolate3(one.translation_, two.translation_, ratio);
