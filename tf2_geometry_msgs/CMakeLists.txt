@@ -1,20 +1,25 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2_geometry_msgs)
 
-find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_ros orocos_kdl tf2)
+find_package(orocos_kdl)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs rostest tf2_ros tf2)
 find_package(Boost COMPONENTS thread REQUIRED)
 
 catkin_package(
    INCLUDE_DIRS include
-   CATKIN_DEPENDS  geometry_msgs tf2_ros orocos_kdl tf2)
+   DEPENDS orocos_kdl 
+   CATKIN_DEPENDS  geometry_msgs tf2_ros tf2)
 
 
 include_directories(include 
                     ${catkin_INCLUDE_DIRS}   
 )
 
-#!!add_executable(test_geometry_msgs test/test_tf2_geometry_msgs.cpp)
-#!!catkin_add_gtest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
+link_directories(${orocos_kdl_LIBRARY_DIRS})
+
+catkin_add_gtest(test_geometry_msgs test/test_tf2_geometry_msgs.cpp)
+target_link_libraries(test_geometry_msgs ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 
 #install(TARGETS test_geometry_msgs
 #  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -25,3 +30,4 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 catkin_python_setup()
+

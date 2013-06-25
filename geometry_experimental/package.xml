@@ -15,7 +15,9 @@
     
   <buildtool_depend>catkin</buildtool_depend>
 
+  <run_depend>test_tf2</run_depend>
   <run_depend>tf2</run_depend>
+  <run_depend>tf2_bullet</run_depend>
   <run_depend>tf2_geometry_msgs</run_depend>
   <run_depend>tf2_kdl</run_depend>
   <run_depend>tf2_msgs</run_depend>

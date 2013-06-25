@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="test_static_pub_ab" args="1 0 0 0 0 0 1 a b" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="test_static_pub_bc" args="0 1 0 0 0 0 1 b c" />
+  <test test-name="test_static_publisher" pkg="test_tf2" type="test_static_publisher" args="--text" />
+</launch>
