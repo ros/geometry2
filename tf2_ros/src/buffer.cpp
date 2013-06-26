@@ -32,7 +32,7 @@
 
 #include "tf2_ros/buffer.h"
 
-namespace tf2
+namespace tf2_ros
 {
 
 Buffer::Buffer(ros::Duration cache_time, bool debug) : BufferCore(cache_time)

@@ -36,7 +36,7 @@
 *********************************************************************/
 #include <tf2_ros/buffer_server.h>
 
-namespace tf2
+namespace tf2_ros
 {
   BufferServer::BufferServer(const Buffer& buffer, const std::string& ns, bool auto_start, ros::Duration check_period): 
     buffer_(buffer),

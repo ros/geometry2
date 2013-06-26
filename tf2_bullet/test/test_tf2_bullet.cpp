@@ -36,7 +36,7 @@
 #include <gtest/gtest.h>
 
 
-tf2::Buffer* tf_buffer;
+tf2_ros::Buffer* tf_buffer;
 static const double EPS = 1e-3;
 
 TEST(TfBullet, Transform)
@@ -82,12 +82,12 @@ TEST(TfBullet, ConvertVector)
   btVector3 v(1,2,3);
 
   btVector3 v1 = v;
-  tf2::convert(v1, v1);
+  tf2_ros::convert(v1, v1);
 
   EXPECT_EQ(v, v1);
 
   btVector3 v2(3,4,5);
-  tf2::convert(v1, v2);
+  tf2_ros::convert(v1, v2);
 
   EXPECT_EQ(v, v2);
   EXPECT_EQ(v1, v2);
@@ -100,7 +100,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "test");
   ros::NodeHandle n;
 
-  tf_buffer = new tf2::Buffer();
+  tf_buffer = new tf2_ros::Buffer();
 
   // populate buffer
   geometry_msgs::TransformStamped t;

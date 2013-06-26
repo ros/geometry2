@@ -32,7 +32,7 @@
 #include "tf2_ros/transform_listener.h"
 
 
-using namespace tf2;
+using namespace tf2_ros;
 
 
 TransformListener::TransformListener(tf2::BufferCore& buffer, bool spin_thread):
@@ -120,7 +120,7 @@ void TransformListener::subscription_callback_impl(const tf2_msgs::TFMessageCons
       buffer_.setTransform(msg_in.transforms[i], authority, is_static);
     }
     
-    catch (TransformException& ex)
+    catch (tf2::TransformException& ex)
     {
       ///\todo Use error reporting
       std::string temp = ex.what();

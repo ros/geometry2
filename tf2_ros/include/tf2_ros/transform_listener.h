@@ -41,7 +41,7 @@
 
 #include "boost/thread.hpp"
 
-namespace tf2{
+namespace tf2_ros{
 
 class TransformListener 
 {

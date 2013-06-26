@@ -35,7 +35,7 @@
 #include "tf2_msgs/TFMessage.h"
 #include "tf2_ros/transform_broadcaster.h"
 
-namespace tf2 {
+namespace tf2_ros {
 
 TransformBroadcaster::TransformBroadcaster()
 {

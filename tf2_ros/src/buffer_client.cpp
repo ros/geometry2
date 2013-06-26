@@ -36,7 +36,7 @@
 *********************************************************************/
 #include <tf2_ros/buffer_client.h>
 
-namespace tf2
+namespace tf2_ros
 {
   BufferClient::BufferClient(std::string ns, double check_frequency, ros::Duration timeout_padding): 
     client_(ns), 
@@ -93,11 +93,11 @@ namespace tf2
     {
       //make sure to cancel the goal the server is pursuing
       client_.cancelGoal();
-      throw TimeoutException("The LookupTransform goal sent to the BufferServer did not come back in the specified time. Something is likely wrong with the server.");
+      throw tf2::TimeoutException("The LookupTransform goal sent to the BufferServer did not come back in the specified time. Something is likely wrong with the server.");
     }
 
     if(client_.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
-      throw TimeoutException("The LookupTransform goal sent to the BufferServer did not come back with SUCCEEDED status. Something is likely wrong with the server.");
+      throw tf2::TimeoutException("The LookupTransform goal sent to the BufferServer did not come back with SUCCEEDED status. Something is likely wrong with the server.");
 
     //process the result for errors and return it
     return processResult(*client_.getResult());
@@ -109,21 +109,21 @@ namespace tf2
     if(result.error.error != result.error.NO_ERROR){
       //otherwise, we'll have to throw the appropriate exception
       if(result.error.error == result.error.LOOKUP_ERROR)
-        throw LookupException(result.error.error_string);
+        throw tf2::LookupException(result.error.error_string);
 
       if(result.error.error == result.error.CONNECTIVITY_ERROR)
-        throw ConnectivityException(result.error.error_string);
+        throw tf2::ConnectivityException(result.error.error_string);
 
       if(result.error.error == result.error.EXTRAPOLATION_ERROR)
-        throw ExtrapolationException(result.error.error_string);
+        throw tf2::ExtrapolationException(result.error.error_string);
 
       if(result.error.error == result.error.INVALID_ARGUMENT_ERROR)
-        throw InvalidArgumentException(result.error.error_string);
+        throw tf2::InvalidArgumentException(result.error.error_string);
 
       if(result.error.error == result.error.TIMEOUT_ERROR)
-        throw TimeoutException(result.error.error_string);
+        throw tf2::TimeoutException(result.error.error_string);
 
-      throw TransformException(result.error.error_string);
+      throw tf2::TransformException(result.error.error_string);
     }
 
     return result.transform;

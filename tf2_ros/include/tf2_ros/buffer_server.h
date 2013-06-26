@@ -42,7 +42,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2_ros/buffer.h>
 
-namespace tf2
+namespace tf2_ros
 {
   class BufferServer
   {

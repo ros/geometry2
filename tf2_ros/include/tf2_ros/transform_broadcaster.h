@@ -37,7 +37,7 @@
 
 #include "ros/ros.h"
 #include "geometry_msgs/TransformStamped.h"
-namespace tf2
+namespace tf2_ros
 {
 
 

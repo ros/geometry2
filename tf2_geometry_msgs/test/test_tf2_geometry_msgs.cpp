@@ -36,7 +36,7 @@
 #include <gtest/gtest.h>
 
 
-tf2::Buffer* tf_buffer;
+tf2_ros::Buffer* tf_buffer;
 static const double EPS = 1e-3;
 
 
@@ -128,7 +128,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "test");
   ros::NodeHandle n;
 
-  tf_buffer = new tf2::Buffer();
+  tf_buffer = new tf2_ros::Buffer();
 
   // populate buffer
   geometry_msgs::TransformStamped t;

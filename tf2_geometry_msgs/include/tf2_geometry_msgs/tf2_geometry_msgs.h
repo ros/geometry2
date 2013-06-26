@@ -38,7 +38,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <kdl/frames.hpp>
 
-namespace tf2
+namespace tf2_ros
 {
     
 KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)

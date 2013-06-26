@@ -34,7 +34,7 @@ int main(int argc, char ** argv)
 {
   //Initialize ROS
   ros::init(argc, argv,"static_transform_publisher", ros::init_options::AnonymousName);
-  tf2::StaticTransformBroadcaster broadcaaster;
+  tf2_ros::StaticTransformBroadcaster broadcaaster;
 
   if(argc == 10)
   {

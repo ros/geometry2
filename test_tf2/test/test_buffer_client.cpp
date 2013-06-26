@@ -45,7 +45,7 @@ static const double EPS = 1e-3;
 
 TEST(tf2_ros, buffer_client)
 {
-  tf2::BufferClient client("tf_action");
+  tf2_ros::BufferClient client("tf_action");
 
   //make sure that things are set up
   client.waitForServer();
@@ -75,7 +75,7 @@ TEST(tf2_ros, buffer_client)
 
 TEST(tf2_ros, buffer_client_different_types)
 {
-  tf2::BufferClient client("tf_action");
+  tf2_ros::BufferClient client("tf_action");
 
   //make sure that things are set up
   client.waitForServer();

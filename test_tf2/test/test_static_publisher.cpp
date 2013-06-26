@@ -39,8 +39,8 @@
 
 TEST(StaticTranformPublsher, a_b_different_times)
 {
-  tf2::Buffer mB;
-  tf2::TransformListener tfl(mB);
+  tf2_ros::Buffer mB;
+  tf2_ros::TransformListener tfl(mB);
   EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(), ros::Duration(1.0)));
   EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(100), ros::Duration(1.0)));
   EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(1000), ros::Duration(1.0)));
@@ -48,8 +48,8 @@ TEST(StaticTranformPublsher, a_b_different_times)
 
 TEST(StaticTranformPublsher, a_c_different_times)
 {
-  tf2::Buffer mB;
-  tf2::TransformListener tfl(mB);
+  tf2_ros::Buffer mB;
+  tf2_ros::TransformListener tfl(mB);
   EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(), ros::Duration(1.0)));
   EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(100), ros::Duration(1.0)));
   EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(1000), ros::Duration(1.0)));
@@ -57,8 +57,8 @@ TEST(StaticTranformPublsher, a_c_different_times)
 
 TEST(StaticTranformPublsher, a_d_different_times)
 {
-  tf2::Buffer mB;
-  tf2::TransformListener tfl(mB);
+  tf2_ros::Buffer mB;
+  tf2_ros::TransformListener tfl(mB);
   geometry_msgs::TransformStamped ts;
   ts.transform.rotation.w = 1;
   ts.header.frame_id = "c";

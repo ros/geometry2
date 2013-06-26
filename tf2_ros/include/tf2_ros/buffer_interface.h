@@ -38,7 +38,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <sstream>
 
-namespace tf2
+namespace tf2_ros
 {
   
 /**\brief The templated function expected to be able to do a transform

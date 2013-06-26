@@ -42,9 +42,9 @@
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "buffer_server_test");
-  tf2::Buffer buffer;
-  tf2::TransformListener tfl(buffer);
-  tf2::BufferServer server(buffer, "tf_action");
+  tf2_ros::Buffer buffer;
+  tf2_ros::TransformListener tfl(buffer);
+  tf2_ros::BufferServer server(buffer, "tf_action");
 
   ros::spin();
 }

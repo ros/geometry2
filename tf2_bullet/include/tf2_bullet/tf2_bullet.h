@@ -37,7 +37,7 @@
 #include <geometry_msgs/PointStamped.h>
 
 
-namespace tf2
+namespace tf2_ros
 {
     
 btTransform transformToBullet(const geometry_msgs::TransformStamped& t)

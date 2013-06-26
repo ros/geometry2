@@ -36,7 +36,7 @@
 #include <gtest/gtest.h>
 
 
-tf2::Buffer* tf_buffer;
+tf2_ros::Buffer* tf_buffer;
 static const double EPS = 1e-3;
 
 TEST(TfKDL, Frame)
@@ -95,12 +95,12 @@ TEST(TfKDL, ConvertVector)
   tf2::Stamped<KDL::Vector> v(KDL::Vector(1,2,3), ros::Time(), "my_frame");
 
   tf2::Stamped<KDL::Vector> v1 = v;
-  tf2::convert(v1, v1);
+  tf2_ros::convert(v1, v1);
 
   EXPECT_EQ(v, v1);
 
   tf2::Stamped<KDL::Vector> v2(KDL::Vector(3,4,5), ros::Time(), "my_frame2");
-  tf2::convert(v1, v2);
+  tf2_ros::convert(v1, v2);
 
   EXPECT_EQ(v, v2);
   EXPECT_EQ(v1, v2);
@@ -112,7 +112,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "test");
   ros::NodeHandle n;
 
-  tf_buffer = new tf2::Buffer();
+  tf_buffer = new tf2_ros::Buffer();
 
   // populate buffer
   geometry_msgs::TransformStamped t;
