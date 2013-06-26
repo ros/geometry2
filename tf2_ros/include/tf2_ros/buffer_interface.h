@@ -37,66 +37,11 @@
 #include <tf2/exceptions.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <sstream>
+#include <tf2/convert.h>
 
 namespace tf2_ros
 {
   
-/**\brief The templated function expected to be able to do a transform
- *
- * This is the method which tf2 will use to try to apply a transform for any given datatype.   
- * \param data_in The data to be transformed.
- * \param data_out A reference to the output data.  Note this can point to data in and the method should be mutation safe.
- * \param transform The transform to apply to data_in to fill data_out.  
- * 
- * This method needs to be implemented by client library developers
- */
-template <class T>
-  void doTransform(const T& data_in, T& data_out, const geometry_msgs::TransformStamped& transform);
-
-/**\brief Get the timestamp from data 
- * \param t The data input.
- * \return The timestamp associated with the data. 
- */
-template <class T>
-  const ros::Time& getTimestamp(const T& t);
-
-/**\brief Get the frame_id from data 
- * \param t The data input.
- * \return The frame_id associated with the data. 
- */
-template <class T>
-  const std::string& getFrameId(const T& t);
-
-
-
-/* An implementation for Stamped<P> datatypes */
-template <class P>
-  const ros::Time& getTimestamp(const tf2::Stamped<P>& t)
-  {
-    return t.stamp_;
-  }
-
-/* An implementation for Stamped<P> datatypes */
-template <class P>
-  const std::string& getFrameId(const tf2::Stamped<P>& t)
-  {
-    return t.frame_id_;
-  }
-
-template <class A, class B>
-  void convert(const A& a, B& b)
-  {
-    //printf("In double type convert\n");
-    fromMsg(toMsg(a), b);
-  }
-
-template <class A>
-  void convert(const A& a1, A& a2)
-  {
-    //printf("In single type convert\n");
-    if(&a1 != &a2)
-      a2 = a1;
-  }
 
 // extend the TFCore class and the TFCpp class
 class BufferInterface
@@ -168,7 +113,7 @@ public:
 		 const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     // do the transform
-    doTransform(in, out, lookupTransform(target_frame, getFrameId(in), getTimestamp(in), timeout));
+    tf2::doTransform(in, out, lookupTransform(target_frame, tf2::getFrameId(in), tf2::getTimestamp(in), timeout));
     return out;
   }
 
@@ -188,7 +133,7 @@ public:
         const std::string& target_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     A copy = transform(in, target_frame, timeout);
-    convert(copy, out);
+    tf2::convert(copy, out);
     return out;
   }
 
@@ -199,9 +144,9 @@ public:
 		 const std::string& fixed_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
     // do the transform
-    doTransform(in, out, lookupTransform(target_frame, target_time, 
-					     getFrameId(in), getTimestamp(in), 
-					     fixed_frame, timeout));
+    tf2::doTransform(in, out, lookupTransform(target_frame, target_time, 
+                                              tf2::getFrameId(in), tf2::getTimestamp(in), 
+                                              fixed_frame, timeout));
     return out;
   }
 
@@ -224,7 +169,7 @@ public:
   {
     // do the transform
     A copy = transform(in, target_frame, target_time, fixed_frame, timeout);
-    convert(copy, out);
+    tf2::convert(copy, out);
     return out;
   }
 

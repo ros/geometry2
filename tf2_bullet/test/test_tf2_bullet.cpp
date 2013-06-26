@@ -34,7 +34,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <ros/ros.h>
 #include <gtest/gtest.h>
-
+#include <tf2/convert.h>
 
 tf2_ros::Buffer* tf_buffer;
 static const double EPS = 1e-3;
@@ -82,12 +82,12 @@ TEST(TfBullet, ConvertVector)
   btVector3 v(1,2,3);
 
   btVector3 v1 = v;
-  tf2_ros::convert(v1, v1);
+  tf2::convert(v1, v1);
 
   EXPECT_EQ(v, v1);
 
   btVector3 v2(3,4,5);
-  tf2_ros::convert(v1, v2);
+  tf2::convert(v1, v2);
 
   EXPECT_EQ(v, v2);
   EXPECT_EQ(v1, v2);

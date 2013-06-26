@@ -35,10 +35,10 @@
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
 #include <gtest/gtest.h>
-#include <tf2_ros/buffer_interface.h>
+#include <tf2/convert.h>
 #include <tf2_kdl/tf2_kdl.h>
 #include <tf2_bullet/tf2_bullet.h>
-#include <ros/ros.h>
+#include <ros/time.h>
 
 TEST(tf2Convert, kdlToBullet)
 {
@@ -48,10 +48,10 @@ TEST(tf2Convert, kdlToBullet)
 
   tf2::Stamped<btVector3> b1 = b;
   tf2::Stamped<KDL::Vector> k1;
-  tf2_ros::convert(b1, k1);
+  tf2::convert(b1, k1);
 
   tf2::Stamped<btVector3> b2;
-  tf2_ros::convert(k1, b2);
+  tf2::convert(k1, b2);
 
   EXPECT_EQ(b.frame_id_, b2.frame_id_);
   EXPECT_NEAR(b.stamp_.toSec(), b2.stamp_.toSec(), epsilon);

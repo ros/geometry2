@@ -32,12 +32,12 @@
 #ifndef TF2_BULLET_H
 #define TF2_BULLET_H
 
-#include <tf2_ros/buffer.h>
+#include <tf2/convert.h>
 #include <LinearMath/btTransform.h>
 #include <geometry_msgs/PointStamped.h>
 
 
-namespace tf2_ros
+namespace tf2
 {
     
 btTransform transformToBullet(const geometry_msgs::TransformStamped& t)

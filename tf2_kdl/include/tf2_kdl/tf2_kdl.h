@@ -32,7 +32,7 @@
 #ifndef TF2_KDL_H
 #define TF2_KDL_H
 
-#include <tf2_ros/buffer.h>
+#include <tf2/convert.h>
 #include <kdl/frames.hpp>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/TwistStamped.h>
@@ -40,7 +40,7 @@
 #include <geometry_msgs/PoseStamped.h>
 
 
-namespace tf2_ros
+namespace tf2
 {
     
 KDL::Frame transformToKDL(const geometry_msgs::TransformStamped& t)

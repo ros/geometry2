@@ -36,6 +36,7 @@
 #include <tf2/buffer_core.h>
 #include <tf2_msgs/FrameGraph.h>
 #include <ros/ros.h>
+#include <tf2/convert.h>
 
 
 namespace tf2_ros

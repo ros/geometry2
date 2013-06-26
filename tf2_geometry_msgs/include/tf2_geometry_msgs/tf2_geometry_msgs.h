@@ -32,13 +32,13 @@
 #ifndef TF2_GEOMETRY_MSGS_H
 #define TF2_GEOMETRY_MSGS_H
 
-#include <tf2_ros/buffer.h>
+#include <tf2/convert.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <kdl/frames.hpp>
 
-namespace tf2_ros
+namespace tf2
 {
     
 KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
