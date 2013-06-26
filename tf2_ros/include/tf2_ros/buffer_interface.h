@@ -206,9 +206,9 @@ public:
   }
 
 
-  // transform, simple api, no pre-allocation
+  // transform, advanced api, no pre-allocation
   template <class T>
-    T& transform(const T& in, 
+    T transform(const T& in, 
 		 const std::string& target_frame, const ros::Time& target_time,
 		 const std::string& fixed_frame, ros::Duration timeout=ros::Duration(0.0)) const
   {
