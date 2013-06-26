@@ -17,7 +17,7 @@ include_directories(include
 
 link_directories(${orocos_kdl_LIBRARY_DIRS})
 
-add_executable(test_geometry_msgs test/test_tf2_geometry_msgs.cpp)
+add_executable(test_geometry_msgs EXCLUDE_FROM_ALL test/test_tf2_geometry_msgs.cpp)
 target_link_libraries(test_geometry_msgs ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${orocos_kdl_LIBRARIES})
 add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 
@@ -31,3 +31,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 catkin_python_setup()
 
+if(TARGET tests)
+  add_dependencies(tests test_geometry_msgs)
+endif()

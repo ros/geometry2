@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2)
 
-find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_msgs rospy roscpp rosconsole)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_msgs rospy rosconsole rostime)
 find_package(Boost REQUIRED COMPONENTS thread signals)
 
 catkin_python_setup()
@@ -9,7 +9,7 @@ catkin_python_setup()
 catkin_package(
    INCLUDE_DIRS include
    LIBRARIES tf2 
-   CATKIN_DEPENDS geometry_msgs tf2_msgs rospy rosconsole roscpp)
+   CATKIN_DEPENDS geometry_msgs tf2_msgs rospy rosconsole rostime)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories (src/bt) 

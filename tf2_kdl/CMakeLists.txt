@@ -16,7 +16,7 @@ link_directories(${orocos_kdl_LIBRARY_DIRS})
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
 
-add_executable(test_kdl test/test_tf2_kdl.cpp)
+add_executable(test_kdl EXCLUDE_FROM_ALL test/test_tf2_kdl.cpp)
 find_package (Threads)
 target_link_libraries(test_kdl ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${orocos_kdl_LIBRARIES} ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
@@ -29,3 +29,6 @@ install(PROGRAMS scripts/test.py
          DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+if(TARGET tests)
+  add_dependencies(tests test_kdl)
+endif()

@@ -71,7 +71,7 @@ set_target_properties(${PROJECT_NAME}_static_transform_publisher
 )
 
 # tf2_ros_test_listener
-add_executable(${PROJECT_NAME}_test_listener test/listener_unittest.cpp)
+add_executable(${PROJECT_NAME}_test_listener EXCLUDE_FROM_ALL test/listener_unittest.cpp)
 add_dependencies(${PROJECT_NAME}_test_listener tf2_msgs_gencpp)
 target_link_libraries(${PROJECT_NAME}_test_listener
   ${PROJECT_NAME}
@@ -91,3 +91,8 @@ install(TARGETS
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
+
+
+if(TARGET tests)
+  add_dependencies(tests ${PROJECT_NAME}_test_listener)
+endif()

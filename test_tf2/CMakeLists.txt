@@ -18,18 +18,27 @@ target_link_libraries(test_message_filter ${Boost_LIBRARIES} ${catkin_LIBRARIES}
 catkin_add_gtest(test_convert test/test_convert.cpp)
 target_link_libraries(test_convert ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
-add_executable(test_buffer_server test/test_buffer_server.cpp)
+add_executable(test_buffer_server EXCLUDE_FROM_ALL test/test_buffer_server.cpp)
 target_link_libraries(test_buffer_server ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
 
-add_executable(test_buffer_client test/test_buffer_client.cpp)
+add_executable(test_buffer_client EXCLUDE_FROM_ALL test/test_buffer_client.cpp)
 target_link_libraries(test_buffer_client ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
 
 
 add_rostest(test/buffer_client_tester.launch)
 
-add_executable(test_static_publisher test/test_static_publisher.cpp)
+add_executable(test_static_publisher EXCLUDE_FROM_ALL test/test_static_publisher.cpp)
 target_link_libraries(test_static_publisher ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
 
 add_rostest(test/static_publisher.launch)
 
 
+if(TARGET tests)
+  add_dependencies(tests test_buffer_server test_buffer_client test_static_publisher)
+endif()
+
+
+# used as a test fixture
+if(TARGET tf2_ros_static_transform_publisher)
+  add_dependencies(tests tf2_ros_static_transform_publisher)
+endif()

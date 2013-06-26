@@ -118,6 +118,5 @@ TEST(tf2_canTransform, One_Exists)
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::Time::init(); //needed for ros::TIme::now()
-  ros::init(argc, argv, "tf_unittest");
   return RUN_ALL_TESTS();
 }
