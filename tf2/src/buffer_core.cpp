@@ -34,8 +34,8 @@
 #include "tf2/exceptions.h"
 #include "tf2_msgs/TF2Error.h"
 
-#include <ros/assert.h>
-#include <ros/console.h>
+#include <assert.h>
+#include <console_bridge/console.h>
 #include "tf2/LinearMath/Transform.h"
 
 //legacy
@@ -128,7 +128,7 @@ bool BufferCore::warnFrameId(const char* function_name_arg, const std::string& f
   {
     std::stringstream ss;
     ss << "Invalid argument passed to "<< function_name_arg <<" in tf2 frame_ids cannot be empty";
-    ROS_WARN("%s",ss.str().c_str());
+    logWarn("%s",ss.str().c_str());
     return true;
   }
 
@@ -136,7 +136,7 @@ bool BufferCore::warnFrameId(const char* function_name_arg, const std::string& f
   {
     std::stringstream ss;
     ss << "Invalid argument \"" << frame_id << "\" passed to "<< function_name_arg <<" in tf2 frame_ids cannot start with a '/' like: ";
-    ROS_WARN("%s",ss.str().c_str());
+    logWarn("%s",ss.str().c_str());
     return true;
   }
 
@@ -221,26 +221,26 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
   bool error_exists = false;
   if (stripped.child_frame_id == stripped.header.frame_id)
   {
-    ROS_ERROR("TF_SELF_TRANSFORM: Ignoring transform from authority \"%s\" with frame_id and child_frame_id  \"%s\" because they are the same",  authority.c_str(), stripped.child_frame_id.c_str());
+    logError("TF_SELF_TRANSFORM: Ignoring transform from authority \"%s\" with frame_id and child_frame_id  \"%s\" because they are the same",  authority.c_str(), stripped.child_frame_id.c_str());
     error_exists = true;
   }
 
   if (stripped.child_frame_id == "")
   {
-    ROS_ERROR("TF_NO_CHILD_FRAME_ID: Ignoring transform from authority \"%s\" because child_frame_id not set ", authority.c_str());
+    logError("TF_NO_CHILD_FRAME_ID: Ignoring transform from authority \"%s\" because child_frame_id not set ", authority.c_str());
     error_exists = true;
   }
 
   if (stripped.header.frame_id == "")
   {
-    ROS_ERROR("TF_NO_FRAME_ID: Ignoring transform with child_frame_id \"%s\"  from authority \"%s\" because frame_id not set", stripped.child_frame_id.c_str(), authority.c_str());
+    logError("TF_NO_FRAME_ID: Ignoring transform with child_frame_id \"%s\"  from authority \"%s\" because frame_id not set", stripped.child_frame_id.c_str(), authority.c_str());
     error_exists = true;
   }
 
   if (std::isnan(stripped.transform.translation.x) || std::isnan(stripped.transform.translation.y) || std::isnan(stripped.transform.translation.z)||
       std::isnan(stripped.transform.rotation.x) ||       std::isnan(stripped.transform.rotation.y) ||       std::isnan(stripped.transform.rotation.z) ||       std::isnan(stripped.transform.rotation.w))
   {
-    ROS_ERROR("TF_NAN_INPUT: Ignoring transform for child_frame_id \"%s\" from authority \"%s\" because of a nan value in the transform (%f %f %f) (%f %f %f %f)",
+    logError("TF_NAN_INPUT: Ignoring transform for child_frame_id \"%s\" from authority \"%s\" because of a nan value in the transform (%f %f %f) (%f %f %f %f)",
               stripped.child_frame_id.c_str(), authority.c_str(),
               stripped.transform.translation.x, stripped.transform.translation.y, stripped.transform.translation.z,
               stripped.transform.rotation.x, stripped.transform.rotation.y, stripped.transform.rotation.z, stripped.transform.rotation.w
@@ -264,7 +264,7 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
     }
     else
     {
-      ROS_WARN("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", stripped.child_frame_id.c_str(), stripped.header.stamp.toSec(), authority.c_str());
+      logWarn("TF_OLD_DATA ignoring data from the past for frame %s at time %g according to authority %s\nPossible reasons are listed at ", stripped.child_frame_id.c_str(), stripped.header.stamp.toSec(), authority.c_str());
       return false;
     }
   }
@@ -536,8 +536,8 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
     case tf2_msgs::TF2Error::LOOKUP_ERROR:
       throw LookupException(error_string);
     default:
-      ROS_ERROR("Unknown error code: %d", retval);
-      ROS_BREAK();
+      logError("Unknown error code: %d", retval);
+      assert(0);
     }
   }
 

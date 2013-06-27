@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2)
 
-find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_msgs rospy rosconsole rostime)
+find_package(console_bridge REQUIRED)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_msgs rospy rostime)
 find_package(Boost REQUIRED COMPONENTS thread signals)
 
 catkin_python_setup()
@@ -9,7 +10,8 @@ catkin_python_setup()
 catkin_package(
    INCLUDE_DIRS include
    LIBRARIES tf2 
-   CATKIN_DEPENDS geometry_msgs tf2_msgs rospy rosconsole rostime)
+   DEPENDS console_bridge
+   CATKIN_DEPENDS geometry_msgs tf2_msgs rospy rostime)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories (src/bt) 
@@ -33,7 +35,7 @@ include_directories(${PYTHON_INCLUDE_PATH})
 
 link_libraries(${PYTHON_LIBRARIES})
 add_library(tf2_py src/tf2_py.cpp)
-target_link_libraries(tf2_py tf2 ${catkin_LIBRARIES})
+target_link_libraries(tf2_py tf2 ${catkin_LIBRARIES} ${console_bridge_LIBRARIES})
 add_dependencies(tf2_py tf2_msgs_gencpp)
 
 set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
@@ -46,19 +48,19 @@ set_target_properties(tf2_py PROPERTIES
 #END Python Libraries
 
 catkin_add_gtest(test_cache_unittest test/cache_unittest.cpp)
-target_link_libraries(test_cache_unittest tf2)
+target_link_libraries(test_cache_unittest tf2  ${console_bridge_LIBRARIES})
 add_dependencies(test_cache_unittest tf2_msgs_gencpp)
 
 catkin_add_gtest(test_static_cache_unittest test/static_cache_test.cpp)
-target_link_libraries(test_static_cache_unittest tf2)
+target_link_libraries(test_static_cache_unittest tf2  ${console_bridge_LIBRARIES})
 add_dependencies(test_static_cache_unittest tf2_msgs_gencpp)
 
 catkin_add_gtest(test_simple test/simple_tf2_core.cpp)
-target_link_libraries(test_simple tf2)
+target_link_libraries(test_simple tf2  ${console_bridge_LIBRARIES})
 add_dependencies(test_simple tf2_msgs_gencpp)
 
 add_executable(speed_test EXCLUDE_FROM_ALL test/speed_test.cpp)
-target_link_libraries(speed_test tf2)
+target_link_libraries(speed_test tf2  ${console_bridge_LIBRARIES})
 add_dependencies(tests speed_test)
 add_dependencies(tests tf2_msgs_gencpp)
 

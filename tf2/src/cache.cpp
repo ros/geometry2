@@ -36,7 +36,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
 #include <geometry_msgs/TransformStamped.h>
-#include <ros/assert.h>
+#include <assert.h>
 
 using namespace tf2;
 
@@ -215,7 +215,7 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out, std::string
   }
   else
   {
-    ROS_BREAK();
+    assert(0);
   }
 
   return true;

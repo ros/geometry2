@@ -30,7 +30,7 @@
 #include <tf2/buffer_core.h>
 
 #include <ros/time.h>
-#include <ros/assert.h>
+#include <console_bridge/console.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -94,15 +94,15 @@ int main(int argc, char** argv)
     }
   }
 
-  //ROS_INFO_STREAM(bc.allFramesAsYAML());
+  //logInfo_STREAM(bc.allFramesAsYAML());
 
   std::string v_frame0 = boost::lexical_cast<std::string>(num_levels - 1);
   std::string v_frame1 = boost::lexical_cast<std::string>(num_levels/2 - 1);
-  ROS_INFO("%s to %s", v_frame0.c_str(), v_frame1.c_str());
+  logInform("%s to %s", v_frame0.c_str(), v_frame1.c_str());
   geometry_msgs::TransformStamped out_t;
 
   const uint32_t count = 1000000;
-  ROS_INFO("Doing %d %d-level tests", count, num_levels);
+  logInform("Doing %d %d-level tests", count, num_levels);
 
 #if 01
   {
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("lookupTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    logInform("lookupTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("lookupTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    logInform("lookupTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("lookupTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    logInform("lookupTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("lookupTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    logInform("lookupTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("canTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    logInform("canTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -184,7 +184,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("canTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    logInform("canTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -198,7 +198,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("canTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    logInform("canTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    ROS_INFO("canTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    logInform("canTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 }
