@@ -12,7 +12,7 @@
   <author>Tully Foote</author>
   <author>Eitan Marder-Eppstein</author>
   <author>Wim Meeussen</author>
-  <maintainer email="tfoote@willowgarage.com">Tully Foote</maintainer>
+  <maintainer email="tfoote@osrfoundation.org">Tully Foote</maintainer>
   <license>BSD</license>
 
   <url type="website">http://www.ros.org/wiki/tf2</url>

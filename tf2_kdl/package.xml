@@ -4,7 +4,7 @@
   <description>
     KDL binding for tf2
   </description>
-  <maintainer email="tfoote@willowgarage.com">Tully Foote</maintainer>
+  <maintainer email="tfoote@osrfoundation.org">Tully Foote</maintainer>
   <author>Wim Meeussen</author>
   <license>BSD</license>
 

@@ -1,12 +1,12 @@
 <package>
   <name>test_tf2</name>
-  <version>0.2.4</version>
+  <version>0.3.6</version>
   <description>
     tf2 unit tests
   </description>
   <author>Tully Foote</author>
   <author>Eitan Marder-Eppstein</author>
-  <maintainer email="tfoote@willowgarage.com">Tully Foote</maintainer>
+  <maintainer email="tfoote@osrfoundation.org">Tully Foote</maintainer>
   <license>BSD</license>
   <license>LGPL</license>
 
