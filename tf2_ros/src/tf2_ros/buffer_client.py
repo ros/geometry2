@@ -38,7 +38,7 @@ PKG = 'tf2_ros'
 import roslib; roslib.load_manifest(PKG)
 import rospy
 import actionlib
-import tf2
+import tf2_py as tf2
 import tf2_ros
 
 from tf2_msgs.msg import LookupTransformAction, LookupTransformGoal

@@ -30,7 +30,7 @@
 
 import roslib; roslib.load_manifest('tf2_tools')
 import rospy
-import tf2
+import tf2_py as tf2
 import yaml
 import subprocess
 from tf2_msgs.srv import FrameGraph

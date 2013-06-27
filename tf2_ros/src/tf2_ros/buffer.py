@@ -29,7 +29,7 @@
 
 import roslib; roslib.load_manifest('tf2_ros')
 import rospy
-import tf2
+import tf2_py as tf2
 import tf2_ros
 from tf2_msgs.srv import FrameGraph, FrameGraphResponse
 import rosgraph.masterapi

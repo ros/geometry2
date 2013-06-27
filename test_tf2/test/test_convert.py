@@ -40,7 +40,7 @@ import roslib; roslib.load_manifest(PKG)
 import sys
 import unittest
 
-import tf2
+import tf2_py as tf2
 import tf2_ros
 import tf2_geometry_msgs
 from geometry_msgs.msg import PointStamped
