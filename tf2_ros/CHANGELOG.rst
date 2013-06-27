@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.0 (2013-06-27)
+------------------
 * splitting rospy dependency into tf2_py so tf2 is pure c++ library.
 * moving convert methods back into tf2 because it does not have any ros dependencies beyond ros::Time which is already a dependency of tf2
 * Cleaning up unnecessary dependency on roscpp

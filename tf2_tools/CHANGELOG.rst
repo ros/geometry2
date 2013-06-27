@@ -2,8 +2,8 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.0 (2013-06-27)
+------------------
 * splitting rospy dependency into tf2_py so tf2 is pure c++ library.
 * Restoring test packages and bullet packages.
   reverting 3570e8c42f9b394ecbfd9db076b920b41300ad55 to get back more of the packages previously implemented
