@@ -12,11 +12,11 @@
     
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>tf2_ros</build_depend>
+  <build_depend>tf2</build_depend>
   <build_depend>bullet</build_depend>
   <build_depend>geometry_msgs</build_depend>
 
-  <run_depend>tf2_ros</run_depend>
+  <run_depend>tf2</run_depend>
   <run_depend>bullet</run_depend>
   <run_depend>geometry_msgs</run_depend>
 

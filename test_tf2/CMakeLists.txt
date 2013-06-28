@@ -33,8 +33,14 @@ target_link_libraries(test_static_publisher ${Boost_LIBRARIES} ${catkin_LIBRARIE
 add_rostest(test/static_publisher.launch)
 
 
+add_executable(test_tf2_bullet EXCLUDE_FROM_ALL test/test_tf2_bullet.cpp)
+target_link_libraries(test_tf2_bullet ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+
+add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test_tf2_bullet.launch)
+
+
 if(TARGET tests)
-  add_dependencies(tests test_buffer_server test_buffer_client test_static_publisher)
+  add_dependencies(tests test_buffer_server test_buffer_client test_static_publisher test_tf2_bullet)
 endif()
 
 
