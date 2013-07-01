@@ -12,8 +12,8 @@ catkin_package()
 catkin_add_gtest(buffer_core_test test/buffer_core_test.cpp)
 target_link_libraries(buffer_core_test ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
-catkin_add_gtest(test_message_filter test/test_message_filter.cpp)
-target_link_libraries(test_message_filter ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+catkin_add_gtest(test_tf2_message_filter test/test_message_filter.cpp)
+target_link_libraries(test_tf2_message_filter ${Boost_LIBRARIES} ${catkin_LIBRARIES})
 
 catkin_add_gtest(test_convert test/test_convert.cpp)
 target_link_libraries(test_convert ${Boost_LIBRARIES} ${catkin_LIBRARIES})
