@@ -228,8 +228,35 @@ public:
   /// \brief Internal use only
   void cancelTransformableRequest(TransformableRequestHandle handle);
 
-private:
 
+
+  /* Backwards compatability section for tf::Transformer you should not use these
+   */
+
+
+
+
+  /**@brief Check if a frame exists in the tree
+   * @param frame_id_str The frame id in question  */
+  bool _frameExists(const std::string& frame_id_str) const;
+
+  /**@brief Fill the parent of a frame.
+   * @param frame_id The frame id of the frame in question
+   * @param parent The reference to the string to fill the parent
+   * Returns true unless "NO_PARENT" */
+  bool _getParent(const std::string& frame_id, ros::Time time, std::string& parent) const;
+
+  /** \brief A way to get a std::vector of available frame ids */
+  void _getFrameStrings(std::vector<std::string>& ids) const;
+
+
+  CompactFrameID _lookupFrameNumber(const std::string& frameid_str) const { 
+    return lookupFrameNumber(frameid_str); 
+  }
+  CompactFrameID _lookupOrInsertFrameNumber(const std::string& frameid_str) {
+    return lookupOrInsertFrameNumber(frameid_str); 
+  }
+private:
 
   /** \brief A way to see what frames have been cached
    * Useful for debugging. Use this call internally. 
@@ -327,7 +354,12 @@ private:
   /////////////////////////////////// Backwards hack for quick startup /////////////////////////
   //Using tf for now will be replaced fully
   //  tf::Transformer old_tf_;
-};
   
-}
+};
+
+
+
+
+};
+
 #endif //TF2_CORE_H

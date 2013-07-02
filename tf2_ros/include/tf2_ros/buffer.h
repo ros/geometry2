@@ -55,7 +55,7 @@ namespace tf2_ros
      * @param debug Whether to advertise the view_frames service that exposes debugging information from the buffer
      * @return 
      */
-    Buffer(ros::Duration cache_time = ros::Duration(BufferCore::DEFAULT_CACHE_TIME), bool debug = true);
+    Buffer(ros::Duration cache_time = ros::Duration(BufferCore::DEFAULT_CACHE_TIME), bool debug = false);
 
     /** \brief Get the transform between two frames by frame ID.
      * \param target_frame The frame to which data should be transformed

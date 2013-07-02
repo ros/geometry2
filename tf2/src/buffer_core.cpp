@@ -319,6 +319,10 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
   CompactFrameID frame = source_id;
   CompactFrameID top_parent = frame;
   uint32_t depth = 0;
+
+  std::string extrapolation_error_string;
+  bool extrapolation_might_have_occurred = false;
+
   while (frame != 0)
   {
     TimeCacheInterface* cache = getFrame(frame);
@@ -330,11 +334,12 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
       break;
     }
 
-    CompactFrameID parent = f.gather(cache, time, 0);
+    CompactFrameID parent = f.gather(cache, time, &extrapolation_error_string);
     if (parent == 0)
     {
       // Just break out here... there may still be a path from source -> target
       top_parent = frame;
+      extrapolation_might_have_occurred = true;
       break;
     }
 
@@ -416,6 +421,19 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
 
   if (frame != top_parent)
   {
+    if (extrapolation_might_have_occurred)
+    {
+      if (error_string)
+      {
+        std::stringstream ss;
+        ss << extrapolation_error_string << ", when looking up transform from frame [" << lookupFrameString(source_id) << "] to frame [" << lookupFrameString(target_id) << "]";
+        *error_string = ss.str();
+      }
+
+      return tf2_msgs::TF2Error::EXTRAPOLATION_ERROR;
+      
+    }
+
     createConnectivityErrorString(source_id, target_id, error_string);
     return tf2_msgs::TF2Error::CONNECTIVITY_ERROR;
   }
@@ -513,12 +531,25 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
   if (target_frame == source_frame) {
     geometry_msgs::TransformStamped identity;
     identity.header.frame_id = target_frame;
-    identity.header.stamp = time;
     identity.child_frame_id = source_frame;
     identity.transform.rotation.w = 1;
+
+    if (time == ros::Time())
+    {
+      CompactFrameID target_id = lookupFrameNumber(target_frame);
+      TimeCacheInterface* cache = getFrame(target_id);
+      if (cache)
+        identity.header.stamp = cache->getLatestTimestamp();
+      else
+        identity.header.stamp = time;
+    }
+    else
+      identity.header.stamp = time;
+
     return identity;
   }
 
+  //Identify case does not need to be validated above
   CompactFrameID target_id = validateFrameId("lookupTransform argument target_frame", target_frame);
   CompactFrameID source_id = validateFrameId("lookupTransform argument source_frame", source_frame);
 
@@ -687,6 +718,10 @@ bool BufferCore::canTransformInternal(CompactFrameID target_id, CompactFrameID s
 bool BufferCore::canTransform(const std::string& target_frame, const std::string& source_frame,
                            const ros::Time& time, std::string* error_msg) const
 {
+  // Short circuit if target_frame == source_frame
+  if (target_frame == source_frame)
+    return true;
+
   if (warnFrameId("canTransform argument target_frame", target_frame))
     return false;
   if (warnFrameId("canTransform argument source_frame", source_frame))
@@ -829,8 +864,9 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
 {
   if (source_id == target_id)
   {
+    TimeCacheInterface* cache = getFrame(source_id);
     //Set time to latest timestamp of frameid in case of target and source frame id are the same
-    time = ros::Time();                 ///\todo review was now();
+    time = cache->getLatestTimestamp();
     return tf2_msgs::TF2Error::NO_ERROR;
   }
 
@@ -1159,6 +1195,49 @@ void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
     transformable_requests_.erase(it, transformable_requests_.end());
   }
 }
+
+bool BufferCore::_frameExists(const std::string& frame_id_str) const
+{
+  boost::mutex::scoped_lock lock(frame_mutex_);
+  return frameIDs_.count(frame_id_str);
+}
+
+bool BufferCore::_getParent(const std::string& frame_id, ros::Time time, std::string& parent) const
+{
+
+  boost::mutex::scoped_lock lock(frame_mutex_);
+  CompactFrameID frame_number = lookupFrameNumber(frame_id);
+  TimeCacheInterface* frame = getFrame(frame_number);
+
+  if (! frame)
+    return false;
+      
+  CompactFrameID parent_id = frame->getParent(time, NULL);
+  if (parent_id == 0)
+    return false;
+
+  parent = lookupFrameString(parent_id);
+  return true;
+};
+
+void BufferCore::_getFrameStrings(std::vector<std::string> & vec) const
+{
+  vec.clear();
+
+  boost::mutex::scoped_lock lock(frame_mutex_);
+
+  TransformStorage temp;
+
+  //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
+  for (unsigned int counter = 1; counter < frameIDs_reverse.size(); counter ++)
+  {
+    vec.push_back(frameIDs_reverse[counter]);
+  }
+  return;
+}
+
+
+
 
 void BufferCore::testTransformableRequests()
 {
