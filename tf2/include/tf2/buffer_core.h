@@ -230,6 +230,16 @@ public:
 
 
 
+
+  // Tell the buffer that there are multiple threads serviciing it. 
+  // This is useful for derived classes to know if they can block or not. 
+  void setUsingDedicatedThread(bool value) { using_dedicated_thread_ = value;};
+  // Get the state of using_dedicated_thread_
+  bool isUsingDedicatedThread() const { return using_dedicated_thread_;};
+  
+
+
+
   /* Backwards compatability section for tf::Transformer you should not use these
    */
 
@@ -360,10 +370,11 @@ private:
   bool canTransformNoLock(CompactFrameID target_id, CompactFrameID source_id,
                       const ros::Time& time, std::string* error_msg) const;
 
-  /////////////////////////////////// Backwards hack for quick startup /////////////////////////
-  //Using tf for now will be replaced fully
-  //  tf::Transformer old_tf_;
+
+  //Whether it is safe to use canTransform with a timeout. (If another thread is not provided it will always timeout.)
+  bool using_dedicated_thread_;
   
+
 };
 
 

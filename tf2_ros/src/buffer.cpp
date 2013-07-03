@@ -32,10 +32,13 @@
 
 #include "tf2_ros/buffer.h"
 
+#include <ros/assert.h>
+
 namespace tf2_ros
 {
 
-Buffer::Buffer(ros::Duration cache_time, bool debug) : BufferCore(cache_time)
+Buffer::Buffer(ros::Duration cache_time, bool debug) :
+  BufferCore(cache_time)
 {
   if(debug && !ros::service::exists("~tf2_frames", false))
   {
@@ -67,6 +70,9 @@ bool
 Buffer::canTransform(const std::string& target_frame, const std::string& source_frame, 
 		     const ros::Time& time, const ros::Duration timeout, std::string* errstr) const
 {
+  if (!checkAndErrorDedicatedThreadPresent(errstr))
+    return false;
+
   // poll for transform if timeout is set
   ros::Time start_time = ros::Time::now();
   while (ros::Time::now() < start_time + timeout && 
@@ -81,6 +87,9 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
 		     const std::string& source_frame, const ros::Time& source_time,
 		     const std::string& fixed_frame, const ros::Duration timeout, std::string* errstr) const
 {
+  if (!checkAndErrorDedicatedThreadPresent(errstr))
+    return false;
+
   // poll for transform if timeout is set
   ros::Time start_time = ros::Time::now();
   while (ros::Time::now() < start_time + timeout && 
@@ -89,6 +98,28 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
   return canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
 }
 
+
+bool Buffer::getFrames(tf2_msgs::FrameGraph::Request& req, tf2_msgs::FrameGraph::Response& res) 
+{
+  res.frame_yaml = allFramesAsYAML();
+  return true;
+}
+
+
+
+bool Buffer::checkAndErrorDedicatedThreadPresent(std::string* error_str) const
+{
+  if (isUsingDedicatedThread())
+    return true;
+  
+
+
+  if (error_str)
+    *error_str = tf2_ros::threading_error;
+
+  ROS_ERROR("%s", tf2_ros::threading_error.c_str());
+  return false;
+}
 
 
 

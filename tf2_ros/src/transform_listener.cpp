@@ -83,6 +83,9 @@ void TransformListener::initWithThread()
   message_subscriber_tf_static_ = node_.subscribe(ops_tf_static);
 
   dedicated_listener_thread_ = new boost::thread(boost::bind(&TransformListener::dedicatedListenerThread, this));
+
+  //Tell the buffer we have a dedicated thread to enable timeouts
+  buffer_.setUsingDedicatedThread(true);
 }
 
 

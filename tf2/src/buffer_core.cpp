@@ -174,6 +174,7 @@ BufferCore::BufferCore(ros::Duration cache_time)
 : cache_time_(cache_time)
 , transformable_callbacks_counter_(0)
 , transformable_requests_counter_(0)
+, using_dedicated_thread_(false)
 {
   frameIDs_["NO_PARENT"] = 0;
   frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
