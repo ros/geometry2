@@ -256,6 +256,15 @@ public:
   CompactFrameID _lookupOrInsertFrameNumber(const std::string& frameid_str) {
     return lookupOrInsertFrameNumber(frameid_str); 
   }
+
+  int _getLatestCommonTime(CompactFrameID target_frame, CompactFrameID source_frame, ros::Time& time, std::string* error_string) const {
+    return getLatestCommonTime(target_frame, source_frame, time, error_string);
+  }
+
+  CompactFrameID _validateFrameId(const char* function_name_arg, const std::string& frame_id) const {
+    return validateFrameId(function_name_arg, frame_id);
+  }
+
 private:
 
   /** \brief A way to see what frames have been cached

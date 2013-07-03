@@ -866,7 +866,10 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
   {
     TimeCacheInterface* cache = getFrame(source_id);
     //Set time to latest timestamp of frameid in case of target and source frame id are the same
-    time = cache->getLatestTimestamp();
+    if (cache)
+      time = cache->getLatestTimestamp();
+    else
+      time = ros::Time();
     return tf2_msgs::TF2Error::NO_ERROR;
   }
 
