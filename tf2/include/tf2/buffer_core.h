@@ -34,6 +34,8 @@
 
 #include "transform_storage.h"
 
+#include <boost/signals.hpp>
+
 #include <string>
 
 #include "ros/duration.h"
@@ -243,7 +245,15 @@ public:
   /* Backwards compatability section for tf::Transformer you should not use these
    */
 
-
+  /**
+   * \brief Add a callback that happens when a new transform has arrived
+   *
+   * \param callback The callback, of the form void func();
+   * \return A boost::signals::connection object that can be used to remove this
+   * listener
+   */
+  boost::signals::connection _addTransformsChangedListener(boost::function<void(void)> callback);
+  void _removeTransformsChangedListener(boost::signals::connection c);
 
 
   /**@brief Check if a frame exists in the tree
@@ -329,6 +339,12 @@ private:
 
   struct RemoveRequestByCallback;
   struct RemoveRequestByID;
+
+  // Backwards compatability for tf message_filter
+  typedef boost::signal<void(void)> TransformsChangedSignal;
+  /// Signal which is fired whenever new transform data has arrived, from the thread the data arrived in
+  TransformsChangedSignal _transforms_changed_;
+
 
   /************************* Internal Functions ****************************/
 
