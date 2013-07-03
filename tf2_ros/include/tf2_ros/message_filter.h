@@ -414,6 +414,17 @@ public:
     return message_filters::Connection(boost::bind(&MessageFilter::disconnectFailure, this, _1), failure_signal_.connect(callback));
   }
 
+  virtual void setQueueSize( uint32_t new_queue_size )
+  {
+    queue_size_ = new_queue_size;
+  }
+
+  virtual uint32_t getQueueSize()
+  {
+    return queue_size_;
+  }
+
+
 private:
 
   void init()
