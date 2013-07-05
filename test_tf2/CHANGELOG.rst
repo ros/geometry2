@@ -2,6 +2,12 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.1 (2013-07-05)
+------------------
+* fixing test target dependencies
+* fixing colliding target names between geometry and geometry_experimental
+* stripping tf2_ros dependency from tf2_bullet.  Test was moved to test_tf2
+
 0.4.0 (2013-06-27)
 ------------------
 * splitting rospy dependency into tf2_py so tf2 is pure c++ library.

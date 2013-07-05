@@ -2,6 +2,9 @@
 Changelog for package geometry_experimental
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.1 (2013-07-05)
+------------------
+
 0.4.0 (2013-06-27)
 ------------------
 * Restoring test packages and bullet packages.

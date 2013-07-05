@@ -2,6 +2,12 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.1 (2013-07-05)
+------------------
+* adding queue accessors lost in the new API
+* exposing dedicated thread logic in BufferCore and checking in Buffer
+* adding methods to enable backwards compatability for passing through to tf::Transformer
+
 0.4.0 (2013-06-27)
 ------------------
 * splitting rospy dependency into tf2_py so tf2 is pure c++ library.

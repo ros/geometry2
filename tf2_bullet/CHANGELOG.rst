@@ -2,6 +2,10 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.1 (2013-07-05)
+------------------
+* stripping tf2_ros dependency from tf2_bullet.  Test was moved to test_tf2
+
 0.4.0 (2013-06-27)
 ------------------
 * moving convert methods back into tf2 because it does not have any ros dependencies beyond ros::Time which is already a dependency of tf2

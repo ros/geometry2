@@ -2,6 +2,13 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.1 (2013-07-05)
+------------------
+* adding old style callback notifications to BufferCore to enable backwards compatability of message filters
+* exposing dedicated thread logic in BufferCore and checking in Buffer
+* more methods to expose, and check for empty cache before getting latest timestamp
+* adding methods to enable backwards compatability for passing through to tf::Transformer
+
 0.4.0 (2013-06-27)
 ------------------
 * splitting rospy dependency into tf2_py so tf2 is pure c++ library.
