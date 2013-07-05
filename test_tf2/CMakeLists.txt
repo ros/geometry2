@@ -46,5 +46,5 @@ endif()
 
 # used as a test fixture
 if(TARGET tf2_ros_static_transform_publisher)
-  add_dependencies(tests tf2_ros_static_transform_publisher)
+  add_dependencies(tests tf2_ros_static_transform_publisher test_static_publisher)
 endif()
