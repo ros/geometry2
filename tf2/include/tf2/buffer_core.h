@@ -284,6 +284,10 @@ public:
     return validateFrameId(function_name_arg, frame_id);
   }
 
+  /**@brief Get the duration over which this transformer will cache */
+  ros::Duration getCacheLength() { return cache_time_;}
+
+
 private:
 
   /** \brief A way to see what frames have been cached
