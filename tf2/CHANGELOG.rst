@@ -2,6 +2,9 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.3 (2013-07-05)
+------------------
+
 0.4.2 (2013-07-05)
 ------------------
 * adding getCacheLength() to parallel old tf API
