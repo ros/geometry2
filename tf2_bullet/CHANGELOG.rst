@@ -2,6 +2,10 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2013-07-05)
+------------------
+* removing unused dependency on rostest
+
 0.4.1 (2013-07-05)
 ------------------
 * stripping tf2_ros dependency from tf2_bullet.  Test was moved to test_tf2

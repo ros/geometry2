@@ -2,6 +2,9 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2013-07-05)
+------------------
+
 0.4.1 (2013-07-05)
 ------------------
 * fixing test target dependencies

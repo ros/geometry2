@@ -2,6 +2,9 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2013-07-05)
+------------------
+
 0.4.1 (2013-07-05)
 ------------------
 * adding queue accessors lost in the new API

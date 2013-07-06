@@ -2,6 +2,11 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2013-07-05)
+------------------
+* adding getCacheLength() to parallel old tf API
+* removing legacy static const variable MAX_EXTRAPOLATION_DISTANCE copied from tf unnecessesarily
+
 0.4.1 (2013-07-05)
 ------------------
 * adding old style callback notifications to BufferCore to enable backwards compatability of message filters
