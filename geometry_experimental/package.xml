@@ -2,7 +2,7 @@
   <name>geometry_experimental</name>
   <version>0.4.2</version>
   <description>
-    The second generation Transform Library in ros..
+    The second generation Transform Library in ros.  This metapackage is deprecated, but is kept for backwards compatability. 
   </description>
   <author>Tully Foote</author>
   <author>Eitan Marder-Eppstein</author>
@@ -15,7 +15,6 @@
     
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>test_tf2</run_depend>
   <run_depend>tf2</run_depend>
   <run_depend>tf2_bullet</run_depend>
   <run_depend>tf2_geometry_msgs</run_depend>
