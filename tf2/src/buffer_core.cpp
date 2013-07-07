@@ -168,7 +168,7 @@ BufferCore::BufferCore(ros::Duration cache_time)
 , using_dedicated_thread_(false)
 {
   frameIDs_["NO_PARENT"] = 0;
-  frames_.push_back(NULL);// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
+  frames_.push_back(TimeCacheInterfacePtr());// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
   frameIDs_reverse.push_back("NO_PARENT");
 }
 
@@ -185,7 +185,7 @@ void BufferCore::clear()
   boost::mutex::scoped_lock lock(frame_mutex_);
   if ( frames_.size() > 1 )
   {
-    for (std::vector< TimeCacheInterface*>::iterator  cache_it = frames_.begin() + 1; cache_it != frames_.end(); ++cache_it)
+    for (std::vector<TimeCacheInterfacePtr>::iterator  cache_it = frames_.begin() + 1; cache_it != frames_.end(); ++cache_it)
     {
       (*cache_it)->clearList();
     }
@@ -246,7 +246,7 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
   {
     boost::mutex::scoped_lock lock(frame_mutex_);
     CompactFrameID frame_number = lookupOrInsertFrameNumber(stripped.child_frame_id);
-    TimeCacheInterface* frame = getFrame(frame_number);
+    TimeCacheInterfacePtr frame = getFrame(frame_number);
     if (frame == NULL)
       frame = allocateFrame(frame_number, is_static);
 
@@ -266,15 +266,14 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
   return true;
 }
 
-TimeCacheInterface* BufferCore::allocateFrame(CompactFrameID cfid, bool is_static)
+TimeCacheInterfacePtr BufferCore::allocateFrame(CompactFrameID cfid, bool is_static)
 {
-  TimeCacheInterface* frame_ptr = frames_[cfid];
-  if ( frame_ptr != NULL)
-    delete frame_ptr;
-  if (is_static)
-    frames_[cfid] = new StaticCache();
-  else
-    frames_[cfid] = new TimeCache(cache_time_);
+  TimeCacheInterfacePtr frame_ptr = frames_[cfid];
+  if (is_static) {
+    frames_[cfid] = TimeCacheInterfacePtr(new StaticCache());
+  } else {
+    frames_[cfid] = TimeCacheInterfacePtr(new TimeCache(cache_time_));
+  }
   
   return frames_[cfid];
 }
@@ -317,7 +316,7 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
 
   while (frame != 0)
   {
-    TimeCacheInterface* cache = getFrame(frame);
+    TimeCacheInterfacePtr cache = getFrame(frame);
 
     if (!cache)
     {
@@ -366,7 +365,7 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
   depth = 0;
   while (frame != top_parent)
   {
-    TimeCacheInterface* cache = getFrame(frame);
+    TimeCacheInterfacePtr cache = getFrame(frame);
 
     if (!cache)
     {
@@ -447,7 +446,7 @@ struct TransformAccum
   {
   }
 
-  CompactFrameID gather(TimeCacheInterface* cache, ros::Time time, std::string* error_string)
+  CompactFrameID gather(TimeCacheInterfacePtr cache, ros::Time time, std::string* error_string)
   {
     if (!cache->getData(time, st, error_string))
     {
@@ -529,7 +528,7 @@ geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& t
     if (time == ros::Time())
     {
       CompactFrameID target_id = lookupFrameNumber(target_frame);
-      TimeCacheInterface* cache = getFrame(target_id);
+      TimeCacheInterfacePtr cache = getFrame(target_id);
       if (cache)
         identity.header.stamp = cache->getLatestTimestamp();
       else
@@ -662,7 +661,7 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
 
 struct CanTransformAccum
 {
-  CompactFrameID gather(TimeCacheInterface* cache, ros::Time time, std::string* error_string)
+  CompactFrameID gather(TimeCacheInterfacePtr cache, ros::Time time, std::string* error_string)
   {
     return cache->getParent(time, error_string);
   }
@@ -742,10 +741,10 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
 }
 
 
-tf2::TimeCacheInterface* BufferCore::getFrame(CompactFrameID frame_id) const
+tf2::TimeCacheInterfacePtr BufferCore::getFrame(CompactFrameID frame_id) const
 {
   if (frame_id == 0 || frame_id > frames_.size()) /// @todo check larger values too
-    return NULL;
+    return TimeCacheInterfacePtr();
   else
   {
     return frames_[frame_id];
@@ -772,7 +771,7 @@ CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_
   if (map_it == frameIDs_.end())
   {
     retval = CompactFrameID(frames_.size());
-    frames_.push_back( NULL);//new TimeCache(cache_time_, max_extrapolation_distance_));
+    frames_.push_back(TimeCacheInterfacePtr());//new TimeCache(cache_time_, max_extrapolation_distance_));
     frameIDs_[frameid_str] = retval;
     frameIDs_reverse.push_back(frameid_str);
   }
@@ -822,7 +821,7 @@ std::string BufferCore::allFramesAsStringNoLock() const
   ///regular transforms
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)
   {
-    TimeCacheInterface* frame_ptr = getFrame(CompactFrameID(counter));
+    TimeCacheInterfacePtr frame_ptr = getFrame(CompactFrameID(counter));
     if (frame_ptr == NULL)
       continue;
     CompactFrameID frame_id_num;
@@ -856,7 +855,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
 {
   if (source_id == target_id)
   {
-    TimeCacheInterface* cache = getFrame(source_id);
+    TimeCacheInterfacePtr cache = getFrame(source_id);
     //Set time to latest timestamp of frameid in case of target and source frame id are the same
     if (cache)
       time = cache->getLatestTimestamp();
@@ -875,7 +874,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
   ros::Time common_time = ros::TIME_MAX;
   while (frame != 0)
   {
-    TimeCacheInterface* cache = getFrame(frame);
+    TimeCacheInterfacePtr cache = getFrame(frame);
 
     if (!cache)
     {
@@ -932,7 +931,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
   CompactFrameID common_parent = 0;
   while (true)
   {
-    TimeCacheInterface* cache = getFrame(frame);
+    TimeCacheInterfacePtr cache = getFrame(frame);
 
     if (!cache)
     {
@@ -1036,7 +1035,7 @@ std::string BufferCore::allFramesAsYAML() const
   {
     CompactFrameID cfid = CompactFrameID(counter);
     CompactFrameID frame_id_num;
-    TimeCacheInterface* cache = getFrame(cfid);
+    TimeCacheInterfacePtr cache = getFrame(cfid);
     if (!cache)
     {
       continue;
@@ -1218,7 +1217,7 @@ bool BufferCore::_getParent(const std::string& frame_id, ros::Time time, std::st
 
   boost::mutex::scoped_lock lock(frame_mutex_);
   CompactFrameID frame_number = lookupFrameNumber(frame_id);
-  TimeCacheInterface* frame = getFrame(frame_number);
+  TimeCacheInterfacePtr frame = getFrame(frame_number);
 
   if (! frame)
     return false;

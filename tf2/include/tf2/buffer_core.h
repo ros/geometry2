@@ -49,6 +49,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace tf2
 {
@@ -58,6 +59,7 @@ typedef uint32_t TransformableCallbackHandle;
 typedef uint64_t TransformableRequestHandle;
 
 class TimeCacheInterface;
+typedef boost::shared_ptr<TimeCacheInterface> TimeCacheInterfacePtr;
 
 enum TransformableResult
 {
@@ -300,7 +302,7 @@ private:
   
   /** \brief The pointers to potential frames that the tree can be made of.
    * The frames will be dynamically allocated at run time when set the first time. */
-  typedef std::vector<TimeCacheInterface*> V_TimeCacheInterface;
+  typedef std::vector<TimeCacheInterfacePtr> V_TimeCacheInterface;
   V_TimeCacheInterface frames_;
   
   /** \brief A mutex to protect testing and allocating new frames on the above vector. */
@@ -357,9 +359,9 @@ private:
    * This is an internal function which will get the pointer to the frame associated with the frame id
    * Possible Exception: tf::LookupException
    */
-  TimeCacheInterface* getFrame(CompactFrameID c_frame_id) const;
+  TimeCacheInterfacePtr getFrame(CompactFrameID c_frame_id) const;
 
-  TimeCacheInterface* allocateFrame(CompactFrameID cfid, bool is_static);
+  TimeCacheInterfacePtr allocateFrame(CompactFrameID cfid, bool is_static);
 
 
   bool warnFrameId(const char* function_name_arg, const std::string& frame_id) const;
