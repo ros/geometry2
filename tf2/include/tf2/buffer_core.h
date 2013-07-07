@@ -87,7 +87,7 @@ class BufferCore
 {
 public:
   /************* Constants ***********************/
-  static const double DEFAULT_CACHE_TIME = 10.0;  //!< The default amount of time to cache data in seconds
+  static const int DEFAULT_CACHE_TIME = 10;  //!< The default amount of time to cache data in seconds
   static const uint32_t MAX_GRAPH_DEPTH = 1000UL;  //!< The default amount of time to cache data in seconds
 
   /** Constructor

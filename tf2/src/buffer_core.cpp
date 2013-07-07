@@ -38,17 +38,8 @@
 #include <console_bridge/console.h>
 #include "tf2/LinearMath/Transform.h"
 
-//legacy
-//#include "tf/tf.h"
-//#include "tf/transform_datatypes.h"
-
 namespace tf2
 {
-
-// Must provide storage for non-integral static const class members.
-// Otherwise you get undefined symbol errors on OS X (why not on Linux?).
-// Thanks to Rob for pointing out the right way to do this.
-const double tf2::BufferCore::DEFAULT_CACHE_TIME;
 
 /** \brief convert Transform msg to Transform */
 void transformMsgToTF2(const geometry_msgs::Transform& msg, tf2::Transform& tf2)
