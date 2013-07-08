@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(tf2)
 
 find_package(console_bridge REQUIRED)
-find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_msgs rospy rostime)
-find_package(Boost REQUIRED COMPONENTS thread signals)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs rospy rostime tf2_msgs)
+find_package(Boost REQUIRED COMPONENTS signals system thread)
 
 catkin_package(
    INCLUDE_DIRS include
@@ -18,7 +18,7 @@ include_directories (src/bt)
 
 #CPP Libraries
 add_library(tf2 src/cache.cpp src/buffer_core.cpp src/static_cache.cpp)
-target_link_libraries(tf2 ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(tf2 ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${console_bridge_LIBRARIES})
 add_dependencies(tf2 tf2_msgs_gencpp)
 
 catkin_add_gtest(test_cache_unittest test/cache_unittest.cpp)
