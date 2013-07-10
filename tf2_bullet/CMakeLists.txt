@@ -12,9 +12,15 @@ include_directories(include ${bullet_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 catkin_package(INCLUDE_DIRS include ${bullet_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
-catkin_add_gtest(test_bullet test/test_tf2_bullet.cpp)
-target_link_libraries(test_bullet ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
 
 
 install(DIRECTORY include/${PACKAGE_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+
+
+if(CATKIN_ENABLE_TESTING)
+
+catkin_add_gtest(test_bullet test/test_tf2_bullet.cpp)
+target_link_libraries(test_bullet ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+
+endif()

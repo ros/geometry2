@@ -17,7 +17,7 @@
 
   <url type="website">http://www.ros.org/wiki/tf2</url>
     
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
 
   <build_depend>console_bridge</build_depend>
   <build_depend>geometry_msgs</build_depend>

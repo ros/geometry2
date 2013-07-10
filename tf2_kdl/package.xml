@@ -10,7 +10,7 @@
 
   <url type="website">http://ros.org/wiki/tf2</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
  
   <build_depend>eigen</build_depend> <!-- needed by kdl interally -->
   <build_depend>orocos_kdl</build_depend>
@@ -21,4 +21,7 @@
   <run_depend>orocos_kdl</run_depend>
   <run_depend>tf2</run_depend>
   <run_depend>tf2_ros</run_depend>
+
+  <test_depend>rostest</test_depend>
+
 </package>
