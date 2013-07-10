@@ -12,7 +12,7 @@
 
   <url type="website">http://www.ros.org/wiki/geometry_experimental</url>
     
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
 
   <build_depend>rosconsole</build_depend>
   <build_depend>roscpp</build_depend>
@@ -36,6 +36,7 @@
   <run_depend>tf2_kdl</run_depend>
   <run_depend>tf2_msgs</run_depend>
 
+  <test_depend>rostest</test_depend>
   <test_depend>rosunit</test_depend>
 
 </package>
