@@ -2,6 +2,9 @@
 Changelog for package geometry_experimental
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.4 (2013-07-09)
+------------------
+
 0.4.3 (2013-07-05)
 ------------------
 * removing test_tf2 from metapackage and update description

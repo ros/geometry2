@@ -2,6 +2,23 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.4 (2013-07-09)
+------------------
+* making repo use CATKIN_ENABLE_TESTING correctly and switching rostest to be a test_depend with that change.
+* tf2: Fixes a warning on OS X, but generally safer
+  Replaces the use of pointers with shared_ptrs,
+  this allows the polymorphism and makes it so that
+  the compiler doesn't yell at us about calling
+  delete on a class with a public non-virtual
+  destructor.
+* tf2: Fixes compiler warnings on OS X
+  This exploited a gcc specific extension and is not
+  C++ standard compliant. There used to be a "fix"
+  for OS X which no longer applies. I think it is ok
+  to use this as an int instead of a double, but
+  another way to fix it would be to use a define.
+* tf2: Fixes linkedit errors on OS X
+
 0.4.3 (2013-07-05)
 ------------------
 

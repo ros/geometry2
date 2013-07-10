@@ -2,6 +2,10 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.4 (2013-07-09)
+------------------
+* making repo use CATKIN_ENABLE_TESTING correctly and switching rostest to be a test_depend with that change.
+
 0.4.3 (2013-07-05)
 ------------------
 
