@@ -48,7 +48,7 @@ TEST(tf2_ros, buffer_client)
   tf2_ros::BufferClient client("tf_action");
 
   //make sure that things are set up
-  client.waitForServer();
+  EXPECT_TRUE(client.waitForServer(ros::Duration(1.0)));
 
   geometry_msgs::PointStamped p1;
   p1.header.frame_id = "a";
