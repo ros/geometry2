@@ -2,6 +2,13 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2013-07-11)
+------------------
+* fixing quaternion in unit test and adding a timeout on the waitForServer
+* fixing usage string to show quaternions and using quaternions in the test app
+* removing redundant declaration
+* disabling whole cmake invocation in test_tf2 when not CATKIN_ENABLE_TESTING
+
 0.4.4 (2013-07-09)
 ------------------
 

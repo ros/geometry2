@@ -2,6 +2,9 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2013-07-11)
+------------------
+
 0.4.4 (2013-07-09)
 ------------------
 * tf2_py: Fixes warning, implicit conversion of NULL

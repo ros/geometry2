@@ -2,6 +2,14 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2013-07-11)
+------------------
+* Revert "cherrypicking groovy patch for `#10 <https://github.com/ros/geometry_experimental/issues/10>`_ into hydro"
+  This reverts commit 296d4916706d64f719b8c1592ab60d3686f994e1.
+  It was not starting up correctly.
+* fixing usage string to show quaternions and using quaternions in the test app
+* cherrypicking groovy patch for `#10 <https://github.com/ros/geometry_experimental/issues/10>`_ into hydro
+
 0.4.4 (2013-07-09)
 ------------------
 * making repo use CATKIN_ENABLE_TESTING correctly and switching rostest to be a test_depend with that change.

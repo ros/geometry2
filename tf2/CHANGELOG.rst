@@ -2,6 +2,11 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2013-07-11)
+------------------
+* adding _chainAsVector method for https://github.com/ros/geometry/issues/18
+* adding _allFramesAsDot for backwards compatability https://github.com/ros/geometry/issues/18
+
 0.4.4 (2013-07-09)
 ------------------
 * making repo use CATKIN_ENABLE_TESTING correctly and switching rostest to be a test_depend with that change.
