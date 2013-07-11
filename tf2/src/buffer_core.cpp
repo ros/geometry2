@@ -1315,6 +1315,77 @@ void BufferCore::testTransformableRequests()
 }
 
 
+std::string BufferCore::_allFramesAsDot() const
+{
+  std::stringstream mstream;
+  mstream << "digraph G {" << std::endl;
+  boost::mutex::scoped_lock lock(frame_mutex_);
+
+  TransformStorage temp;
+
+  if (frames_.size() ==1)
+    mstream <<"\"no tf data recieved\"";
+
+  mstream.precision(3);
+  mstream.setf(std::ios::fixed,std::ios::floatfield);
+    
+   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
+  for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
+  {
+    unsigned int frame_id_num;
+    if(  getFrame(counter)->getData(ros::Time(), temp))
+      frame_id_num = temp.frame_id_;
+    else
+    {
+      frame_id_num = 0;
+    }
+    if (frame_id_num != 0)
+    {
+      std::string authority = "no recorded authority";
+      std::map<unsigned int, std::string>::const_iterator it = frame_authority_.find(counter);
+      if (it != frame_authority_.end())
+        authority = it->second;
+
+      double rate = getFrame(counter)->getListLength() / std::max((getFrame(counter)->getLatestTimestamp().toSec() -
+                                                                   getFrame(counter)->getOldestTimestamp().toSec() ), 0.0001);
+
+      mstream << std::fixed; //fixed point notation
+      mstream.precision(3); //3 decimal places
+      mstream << "\"" << frameIDs_reverse[frame_id_num] << "\"" << " -> "
+              << "\"" << frameIDs_reverse[counter] << "\"" << "[label=\""
+        //<< "Time: " << current_time.toSec() << "\\n"
+              << "Broadcaster: " << authority << "\\n"
+              << "Average rate: " << rate << " Hz\\n"
+              << "Most recent transform: " << (getFrame(counter)->getLatestTimestamp()).toSec() <<" \\n"
+        //    << "(time: " << getFrame(counter)->getLatestTimestamp().toSec() << ")\\n"
+        //    << "Oldest transform: " << (current_time - getFrame(counter)->getOldestTimestamp()).toSec() << " sec old \\n"
+        //    << "(time: " << (getFrame(counter)->getOldestTimestamp()).toSec() << ")\\n"
+              << "Buffer length: " << (getFrame(counter)->getLatestTimestamp()-getFrame(counter)->getOldestTimestamp()).toSec() << " sec\\n"
+              <<"\"];" <<std::endl;
+    }
+  }
+  
+  for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
+  {
+    unsigned int frame_id_num;
+    if(  getFrame(counter)->getData(ros::Time(), temp))
+      frame_id_num = temp.frame_id_;
+    else
+      {
+	frame_id_num = 0;
+      }
+
+    if(frameIDs_reverse[frame_id_num]=="NO_PARENT")
+    {
+      mstream << "edge [style=invis];" <<std::endl;
+      mstream << " subgraph cluster_legend { style=bold; color=black; label =\"view_frames Result\";\n"
+        //<< "\"Recorded at time: " << current_time.toSec() << "\"[ shape=plaintext ] ;\n "
+	      << "}" << "->" << "\"" << frameIDs_reverse[counter]<<"\";" <<std::endl;
+    }
+  }
+  mstream << "}";
+  return mstream.str();
+}
 
 
 } // namespace tf2

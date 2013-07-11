@@ -289,6 +289,12 @@ public:
   /**@brief Get the duration over which this transformer will cache */
   ros::Duration getCacheLength() { return cache_time_;}
 
+  /** \brief Backwards compatabilityA way to see what frames have been cached
+   * Useful for debugging
+   */
+  std::string _allFramesAsDot() const;
+
+
 
 private:
 
