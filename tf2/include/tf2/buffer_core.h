@@ -294,7 +294,10 @@ public:
    */
   std::string _allFramesAsDot() const;
 
-
+  /** \brief Backwards compatabilityA way to see what frames are in a chain
+   * Useful for debugging
+   */
+  void _chainAsVector(const std::string & target_frame, ros::Time target_time, const std::string & source_frame, ros::Time source_time, const std::string & fixed_frame, std::vector<std::string>& output) const;
 
 private:
 

@@ -1388,4 +1388,33 @@ std::string BufferCore::_allFramesAsDot() const
 }
 
 
+void BufferCore::_chainAsVector(const std::string & target_frame, ros::Time target_time, const std::string & source_frame, ros::Time source_time, const std::string& fixed_frame, std::vector<std::string>& output) const
+{
+  std::string error_string;
+
+  output.clear(); //empty vector
+
+  std::stringstream mstream;
+  boost::mutex::scoped_lock lock(frame_mutex_);
+
+  TransformStorage temp;
+
+  ///regular transforms
+  for (unsigned int counter = 1; counter < frames_.size(); counter ++)
+  {
+    TimeCacheInterfacePtr frame_ptr = getFrame(CompactFrameID(counter));
+    if (frame_ptr == NULL)
+      continue;
+    CompactFrameID frame_id_num;
+    if (frame_ptr->getData(ros::Time(), temp))
+        frame_id_num = temp.frame_id_;
+      else
+      {
+        frame_id_num = 0;
+      }
+      output.push_back(frameIDs_reverse[frame_id_num]);
+  }
+}
+
+
 } // namespace tf2
