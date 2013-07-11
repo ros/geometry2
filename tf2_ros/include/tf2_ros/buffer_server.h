@@ -58,7 +58,7 @@ namespace tf2_ros
 
     public:
       BufferServer(const Buffer& buffer, const std::string& ns,
-          bool auto_start = false, ros::Duration check_period = ros::Duration(0.01));
+          bool auto_start = true, ros::Duration check_period = ros::Duration(0.01));
 
       void start();
 
