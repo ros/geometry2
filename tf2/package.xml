@@ -2,7 +2,7 @@
   <name>tf2</name>
   <version>0.4.5</version>
   <description>
-    tf2 is the second generation of the transform libraray, which lets
+    tf2 is the second generation of the transform library, which lets
     the user keep track of multiple coordinate frames over time. tf2
     maintains the relationship between coordinate frames in a tree
     structure buffered in time, and lets the user transform points,
