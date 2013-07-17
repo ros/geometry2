@@ -453,7 +453,7 @@ static struct PyMethodDef buffer_core_methods[] =
 
 static PyMethodDef module_methods[] = {
   // {"Transformer", mkTransformer, METH_VARARGS},
-  {NULL, NULL, NULL},
+  {NULL, NULL, 0},
 };
 
 extern "C" void init_tf2()
