@@ -9,7 +9,7 @@ catkin_package(
    INCLUDE_DIRS include
    LIBRARIES tf2 
    DEPENDS console_bridge
-   CATKIN_DEPENDS geometry_msgs tf2_msgs rospy rostime)
+   CATKIN_DEPENDS geometry_msgs tf2_msgs rostime)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories (src/bt) 
