@@ -26,7 +26,6 @@ catkin_package(
   message_filters
   roscpp
   rosgraph
-  rospy
   tf2
   tf2_msgs
 )
