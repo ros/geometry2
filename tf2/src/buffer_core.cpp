@@ -168,7 +168,7 @@ BufferCore::BufferCore(ros::Duration cache_time)
 , using_dedicated_thread_(false)
 {
   frameIDs_["NO_PARENT"] = 0;
-  frames_.push_back(TimeCacheInterfacePtr());// new TimeCache(interpolating, cache_time, max_extrapolation_distance));//unused but needed for iteration over all elements
+  frames_.push_back(TimeCacheInterfacePtr(new StaticCache()));//unused but needed for iteration over all elements
   frameIDs_reverse.push_back("NO_PARENT");
 }
 
@@ -270,7 +270,7 @@ TimeCacheInterfacePtr BufferCore::allocateFrame(CompactFrameID cfid, bool is_sta
 {
   TimeCacheInterfacePtr frame_ptr = frames_[cfid];
   if (is_static) {
-    frames_[cfid] = TimeCacheInterfacePtr(new StaticCache());
+    frames_[cfid] = TimeCacheInterfacePtr(new StaticCache());//Unused but needs to be initialized for iteration and cleanup
   } else {
     frames_[cfid] = TimeCacheInterfacePtr(new TimeCache(cache_time_));
   }
@@ -744,7 +744,7 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
 tf2::TimeCacheInterfacePtr BufferCore::getFrame(CompactFrameID frame_id) const
 {
   if (frame_id == 0 || frame_id > frames_.size()) /// @todo check larger values too
-    return TimeCacheInterfacePtr();
+    return TimeCacheInterfacePtr(new StaticCache());
   else
   {
     return frames_[frame_id];
@@ -771,7 +771,7 @@ CompactFrameID BufferCore::lookupOrInsertFrameNumber(const std::string& frameid_
   if (map_it == frameIDs_.end())
   {
     retval = CompactFrameID(frames_.size());
-    frames_.push_back(TimeCacheInterfacePtr());//new TimeCache(cache_time_, max_extrapolation_distance_));
+    frames_.push_back(TimeCacheInterfacePtr(new StaticCache()));//Just a place holder for iteration
     frameIDs_[frameid_str] = retval;
     frameIDs_reverse.push_back(frameid_str);
   }
