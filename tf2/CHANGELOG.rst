@@ -2,6 +2,13 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.6 (2013-08-28)
+------------------
+* cleaner fix for `#19 <https://github.com/ros/geometry_experimental/issues/19>`_
+* fix pointer initialization.  Fixes `#19 <https://github.com/ros/geometry_experimental/issues/19>`_
+* fixes `#18 <https://github.com/ros/geometry_experimental/issues/18>`_ for hydro
+* package.xml: corrected typo in description
+
 0.4.5 (2013-07-11)
 ------------------
 * adding _chainAsVector method for https://github.com/ros/geometry/issues/18

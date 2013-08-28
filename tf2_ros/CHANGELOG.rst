@@ -2,6 +2,13 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.6 (2013-08-28)
+------------------
+* patching python implementation for `#24 <https://github.com/ros/geometry_experimental/issues/24>`_ as well
+* Stop waiting if time jumps backwards.  fixes `#24 <https://github.com/ros/geometry_experimental/issues/24>`_
+* patch to work around uninitiaized time. `#30 https://github.com/ros/geometry/issues/30`_
+* Removing unnecessary CATKIN_DEPENDS  `#18 <https://github.com/ros/geometry_experimental/issues/18>`_
+
 0.4.5 (2013-07-11)
 ------------------
 * Revert "cherrypicking groovy patch for `#10 <https://github.com/ros/geometry_experimental/issues/10>`_ into hydro"

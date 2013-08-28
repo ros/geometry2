@@ -2,6 +2,9 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.6 (2013-08-28)
+------------------
+
 0.4.5 (2013-07-11)
 ------------------
 * fixing quaternion in unit test and adding a timeout on the waitForServer
