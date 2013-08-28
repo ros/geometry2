@@ -271,7 +271,7 @@ TimeCacheInterfacePtr BufferCore::allocateFrame(CompactFrameID cfid, bool is_sta
 {
   TimeCacheInterfacePtr frame_ptr = frames_[cfid];
   if (is_static) {
-    frames_[cfid] = TimeCacheInterfacePtr();
+    frames_[cfid] = TimeCacheInterfacePtr(new StaticCache());
   } else {
     frames_[cfid] = TimeCacheInterfacePtr(new TimeCache(cache_time_));
   }
