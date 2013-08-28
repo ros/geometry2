@@ -1037,7 +1037,7 @@ std::string BufferCore::allFramesAsYAML() const
     CompactFrameID cfid = CompactFrameID(counter);
     CompactFrameID frame_id_num;
     TimeCacheInterfacePtr cache = getFrame(cfid);
-    if ((cache.get()) != 0)
+    if (!cache)
     {
       continue;
     }
