@@ -94,7 +94,7 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
   ros::Time start_time = now_fallback_to_wall();
   while (now_fallback_to_wall() < start_time + timeout && 
 	 !canTransform(target_frame, source_frame, time) &&
-         now_fallback_to_wall() > start_time) //don't wait if time jumped backwards
+         now_fallback_to_wall() >= start_time) //don't wait if time jumped backwards
     ros::Duration(0.01).sleep();
   return canTransform(target_frame, source_frame, time, errstr);
 }
@@ -112,7 +112,7 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
   ros::Time start_time = now_fallback_to_wall();
   while (now_fallback_to_wall() < start_time + timeout && 
 	 !canTransform(target_frame, target_time, source_frame, source_time, fixed_frame) &&
-         now_fallback_to_wall() > start_time) //don't wait if time jumped backwards
+         now_fallback_to_wall() >= start_time) //don't wait if time jumped backwards
     ros::Duration(0.01).sleep();
   return canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
 }
