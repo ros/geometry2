@@ -1030,14 +1030,14 @@ std::string BufferCore::allFramesAsYAML() const
 
   mstream.precision(3);
   mstream.setf(std::ios::fixed,std::ios::floatfield);
-    
+
    //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
   {
     CompactFrameID cfid = CompactFrameID(counter);
     CompactFrameID frame_id_num;
     TimeCacheInterfacePtr cache = getFrame(cfid);
-    if (!cache)
+    if ((cache.get()) != 0)
     {
       continue;
     }
@@ -1051,11 +1051,12 @@ std::string BufferCore::allFramesAsYAML() const
 
     std::string authority = "no recorded authority";
     std::map<CompactFrameID, std::string>::const_iterator it = frame_authority_.find(cfid);
-    if (it != frame_authority_.end())
+    if (it != frame_authority_.end()) {
       authority = it->second;
+    }
 
-    double rate = getFrame(cfid)->getListLength() / std::max((getFrame(cfid)->getLatestTimestamp().toSec() -
-                                                                 getFrame(cfid)->getOldestTimestamp().toSec() ), 0.0001);
+    double rate = cache->getListLength() / std::max((cache->getLatestTimestamp().toSec() -
+                                                     cache->getOldestTimestamp().toSec() ), 0.0001);
 
     mstream << std::fixed; //fixed point notation
     mstream.precision(3); //3 decimal places
@@ -1063,11 +1064,11 @@ std::string BufferCore::allFramesAsYAML() const
     mstream << "  parent: '" << frameIDs_reverse[frame_id_num] << "'" << std::endl;
     mstream << "  broadcaster: '" << authority << "'" << std::endl;
     mstream << "  rate: " << rate << std::endl;
-    mstream << "  most_recent_transform: " << (getFrame(cfid)->getLatestTimestamp()).toSec() << std::endl;
-    mstream << "  oldest_transform: " << (getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
-    mstream << "  buffer_length: " << (getFrame(cfid)->getLatestTimestamp()-getFrame(cfid)->getOldestTimestamp()).toSec() << std::endl;
+    mstream << "  most_recent_transform: " << (cache->getLatestTimestamp()).toSec() << std::endl;
+    mstream << "  oldest_transform: " << (cache->getOldestTimestamp()).toSec() << std::endl;
+    mstream << "  buffer_length: " << (cache->getLatestTimestamp() - cache->getOldestTimestamp()).toSec() << std::endl;
   }
-  
+
   return mstream.str();
 }
 
@@ -1324,64 +1325,67 @@ std::string BufferCore::_allFramesAsDot() const
 
   TransformStorage temp;
 
-  if (frames_.size() ==1)
+  if (frames_.size() == 1) {
     mstream <<"\"no tf data recieved\"";
+  }
 
   mstream.precision(3);
   mstream.setf(std::ios::fixed,std::ios::floatfield);
-    
-   //  for (std::vector< TimeCache*>::iterator  it = frames_.begin(); it != frames_.end(); ++it)
-  for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
+
+  for (unsigned int counter = 1; counter < frames_.size(); counter ++) // one referenced for 0 is no frame
   {
     unsigned int frame_id_num;
-    if(  getFrame(counter)->getData(ros::Time(), temp))
+    TimeCacheInterfacePtr counter_frame = getFrame(counter);
+    if (!counter_frame) {
+      continue;
+    }
+    if(!counter_frame->getData(ros::Time(), temp)) {
+      continue;
+    } else {
       frame_id_num = temp.frame_id_;
-    else
-    {
-      frame_id_num = 0;
     }
-    if (frame_id_num != 0)
-    {
-      std::string authority = "no recorded authority";
-      std::map<unsigned int, std::string>::const_iterator it = frame_authority_.find(counter);
-      if (it != frame_authority_.end())
-        authority = it->second;
+    std::string authority = "no recorded authority";
+    std::map<unsigned int, std::string>::const_iterator it = frame_authority_.find(counter);
+    if (it != frame_authority_.end())
+      authority = it->second;
 
-      double rate = getFrame(counter)->getListLength() / std::max((getFrame(counter)->getLatestTimestamp().toSec() -
-                                                                   getFrame(counter)->getOldestTimestamp().toSec() ), 0.0001);
+    double rate = counter_frame->getListLength() / std::max((counter_frame->getLatestTimestamp().toSec() -
+                                                             counter_frame->getOldestTimestamp().toSec()), 0.0001);
 
-      mstream << std::fixed; //fixed point notation
-      mstream.precision(3); //3 decimal places
-      mstream << "\"" << frameIDs_reverse[frame_id_num] << "\"" << " -> "
-              << "\"" << frameIDs_reverse[counter] << "\"" << "[label=\""
-        //<< "Time: " << current_time.toSec() << "\\n"
-              << "Broadcaster: " << authority << "\\n"
-              << "Average rate: " << rate << " Hz\\n"
-              << "Most recent transform: " << (getFrame(counter)->getLatestTimestamp()).toSec() <<" \\n"
-        //    << "(time: " << getFrame(counter)->getLatestTimestamp().toSec() << ")\\n"
-        //    << "Oldest transform: " << (current_time - getFrame(counter)->getOldestTimestamp()).toSec() << " sec old \\n"
-        //    << "(time: " << (getFrame(counter)->getOldestTimestamp()).toSec() << ")\\n"
-              << "Buffer length: " << (getFrame(counter)->getLatestTimestamp()-getFrame(counter)->getOldestTimestamp()).toSec() << " sec\\n"
-              <<"\"];" <<std::endl;
-    }
+    mstream << std::fixed; //fixed point notation
+    mstream.precision(3); //3 decimal places
+    mstream << "\"" << frameIDs_reverse[frame_id_num] << "\"" << " -> "
+            << "\"" << frameIDs_reverse[counter] << "\"" << "[label=\""
+      //<< "Time: " << current_time.toSec() << "\\n"
+            << "Broadcaster: " << authority << "\\n"
+            << "Average rate: " << rate << " Hz\\n"
+            << "Most recent transform: " << (counter_frame->getLatestTimestamp()).toSec() <<" \\n"
+      //    << "(time: " << getFrame(counter)->getLatestTimestamp().toSec() << ")\\n"
+      //    << "Oldest transform: " << (current_time - getFrame(counter)->getOldestTimestamp()).toSec() << " sec old \\n"
+      //    << "(time: " << (getFrame(counter)->getOldestTimestamp()).toSec() << ")\\n"
+            << "Buffer length: " << (counter_frame->getLatestTimestamp()-counter_frame->getOldestTimestamp()).toSec() << " sec\\n"
+            <<"\"];" <<std::endl;
   }
-  
+
   for (unsigned int counter = 1; counter < frames_.size(); counter ++)//one referenced for 0 is no frame
   {
     unsigned int frame_id_num;
-    if(  getFrame(counter)->getData(ros::Time(), temp))
+    TimeCacheInterfacePtr counter_frame = getFrame(counter);
+    if (!counter_frame) {
+      continue;
+    }
+    if (counter_frame->getData(ros::Time(), temp)) {
       frame_id_num = temp.frame_id_;
-    else
-      {
-	frame_id_num = 0;
-      }
+    } else {
+    	frame_id_num = 0;
+    }
 
     if(frameIDs_reverse[frame_id_num]=="NO_PARENT")
     {
       mstream << "edge [style=invis];" <<std::endl;
       mstream << " subgraph cluster_legend { style=bold; color=black; label =\"view_frames Result\";\n"
         //<< "\"Recorded at time: " << current_time.toSec() << "\"[ shape=plaintext ] ;\n "
-	      << "}" << "->" << "\"" << frameIDs_reverse[counter]<<"\";" <<std::endl;
+	      << "}" << "->" << "\"" << frameIDs_reverse[counter] << "\";" << std::endl;
     }
   }
   mstream << "}";
