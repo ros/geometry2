@@ -69,7 +69,8 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
             while (rospy.Time.now() < start_time + timeout and 
-                   not self.can_transform_core(target_frame, source_frame, time)):
+                   not self.can_transform_core(target_frame, source_frame, time) and
+                   not rospy.Time.now() < start_time):
                 rospy.Duration(0.05).sleep()
         return self.can_transform_core(target_frame, source_frame, time)
     
@@ -78,7 +79,8 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
             while (rospy.Time.now() < start_time + timeout and 
-                   not self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)):
+                   not self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame) and
+                   not rospy.Time.now() < start_time):
                 rospy.Duration(0.05).sleep()
         return self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
 
