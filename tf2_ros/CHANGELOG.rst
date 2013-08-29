@@ -2,6 +2,11 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.7 (2013-08-28)
+------------------
+* fixing new conditional to cover the case that time has not progressed yet port forward of `ros/geometry#35 <https://github.com/ros/geometry/issues/35>`_ in the python implementation
+* fixing new conditional to cover the case that time has not progressed yet port forward of `ros/geometry#35 <https://github.com/ros/geometry/issues/35>`_
+
 0.4.6 (2013-08-28)
 ------------------
 * patching python implementation for `#24 <https://github.com/ros/geometry_experimental/issues/24>`_ as well

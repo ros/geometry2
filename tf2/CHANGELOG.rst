@@ -2,6 +2,11 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.7 (2013-08-28)
+------------------
+* switching to use allFramesAsStringNoLock inside of getLatestCommonTime and walkToParent and locking in public API _getLatestCommonTime instead re `#23 <https://github.com/ros/geometry_experimental/issues/23>`_
+* Fixes a crash in tf's view_frames related to dot code generation in allFramesAsDot
+
 0.4.6 (2013-08-28)
 ------------------
 * cleaner fix for `#19 <https://github.com/ros/geometry_experimental/issues/19>`_
