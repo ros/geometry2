@@ -918,7 +918,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
       {
         std::stringstream ss;
         ss<<"The tf tree is invalid because it contains a loop." << std::endl
-          << allFramesAsString() << std::endl;
+          << allFramesAsStringNoLock() << std::endl;
         *error_string = ss.str();
       }
       return tf2_msgs::TF2Error::LOOKUP_ERROR;
@@ -978,7 +978,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
       {
         std::stringstream ss;
         ss<<"The tf tree is invalid because it contains a loop." << std::endl
-          << allFramesAsString() << std::endl;
+          << allFramesAsStringNoLock() << std::endl;
         *error_string = ss.str();
       }
       return tf2_msgs::TF2Error::LOOKUP_ERROR;

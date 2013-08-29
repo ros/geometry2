@@ -279,6 +279,7 @@ public:
   }
 
   int _getLatestCommonTime(CompactFrameID target_frame, CompactFrameID source_frame, ros::Time& time, std::string* error_string) const {
+    boost::mutex::scoped_lock lock(frame_mutex_);
     return getLatestCommonTime(target_frame, source_frame, time, error_string);
   }
 
