@@ -30,6 +30,7 @@
 #include <gtest/gtest.h>
 #include <tf2/buffer_core.h>
 #include "tf2/exceptions.h"
+#include <tf2_ros/static_transform_broadcaster.h>
 #include <sys/time.h>
 #include <ros/ros.h>
 #include "rostest/permuter.h"
@@ -80,6 +81,39 @@ TEST(StaticTranformPublsher, a_d_different_times)
   EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(10), ros::Duration(0)));
   EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(100), ros::Duration(0)));
 
+};
+
+TEST(StaticTranformPublsher, multiple_parent_test)
+{
+  tf2_ros::Buffer mB;
+  tf2_ros::TransformListener tfl(mB);
+  tf2_ros::StaticTransformBroadcaster stb;
+  geometry_msgs::TransformStamped ts;
+  ts.transform.rotation.w = 1;
+  ts.header.frame_id = "c";
+  ts.header.stamp = ros::Time(10.0);
+  ts.child_frame_id = "d";
+
+  stb.sendTransform(ts);
+  
+  // make sure listener has populated
+  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(100), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(1000), ros::Duration(1.0)));
+
+
+  // Publish new transform with child 'd', should replace old one in static tf
+  ts.header.frame_id = "new_parent";
+  stb.sendTransform(ts);
+  ts.child_frame_id = "other_child";
+  stb.sendTransform(ts);
+  ts.child_frame_id = "other_child2";
+  stb.sendTransform(ts);
+
+  EXPECT_TRUE(mB.canTransform("new_parent", "d", ros::Time(), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("new_parent", "other_child", ros::Time(), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("new_parent", "other_child2", ros::Time(), ros::Duration(1.0)));
+  EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(), ros::Duration(1.0)));
 };
 
 int main(int argc, char **argv){

@@ -57,7 +57,7 @@ void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::
     bool match_found = false;
     for (std::vector<geometry_msgs::TransformStamped>::iterator it_msg = net_message_.transforms.begin(); it_msg != net_message_.transforms.end(); ++it_msg)
     {
-      if (it_in->header.frame_id == it_msg->header.frame_id)
+      if (it_in->child_frame_id == it_msg->child_frame_id)
       {
         *it_msg = *it_in;
         match_found = true;
