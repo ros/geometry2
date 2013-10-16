@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <math.h>
 #include <cstdio>
 #include "tf2_ros/static_transform_broadcaster.h"
 
@@ -65,36 +66,47 @@ int main(int argc, char ** argv)
 
   return 0;
 } 
-/*  else if (argc == 10)
+  else if (argc == 9)
   {
-    ros::Duration sleeper(atof(argv[9])/1000.0);
-
     if (strcmp(argv[7], argv[8]) == 0)
-      ROS_FATAL("target_frame and source frame are the same (%s, %s) this cannot work", argv[7], argv[8]);
-
-    TransformSender tf_sender(atof(argv[1]), atof(argv[2]), atof(argv[3]),
-                              atof(argv[4]), atof(argv[5]), atof(argv[6]),
-                              ros::Time() + sleeper, //Future dating to allow slower sending w/o timeout
-                              argv[7], argv[8]);
-
-
-
-    while(tf_sender.node_.ok())
     {
-      tf_sender.send(ros::Time::now() + sleeper);
-      ROS_DEBUG("Sending transform from %s with parent %s\n", argv[7], argv[8]);
-      sleeper.sleep();
+      ROS_FATAL("target_frame and source frame are the same (%s, %s) this cannot work", argv[8], argv[9]);
+      return 1;
     }
-    return 0;
+    
+    geometry_msgs::TransformStamped msg;
+    msg.transform.translation.x = atof(argv[1]);
+    msg.transform.translation.y = atof(argv[2]);
+    msg.transform.translation.z = atof(argv[3]);
+    
+    double halfYaw = atof(argv[4]) * 0.5;
+    double halfPitch = atof(argv[5]) * 0.5;
+    double halfRoll = atof(argv[6]) * 0.5;
+    double cosYaw = cos(halfYaw);
+    double sinYaw = sin(halfYaw);
+    double cosPitch = cos(halfPitch);
+    double sinPitch = sin(halfPitch);
+    double cosRoll = cos(halfRoll);
+    double sinRoll = sin(halfRoll);
+    
+    msg.transform.rotation.x = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
+    msg.transform.rotation.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
+    msg.transform.rotation.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
+    msg.transform.rotation.w = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
 
-    }*/
+
+    broadcaaster.sendTransform(msg);
+    ROS_INFO("Spinning until killed publishing %s to %s", msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
+    ros::spin();
+    return 0;
+  }
   else
   {
     printf("A command line utility for manually sending a transform.\n");
     //printf("It will periodicaly republish the given transform. \n");
-    //printf("Usage: static_transform_publisher x y z yaw pitch roll frame_id child_frame_id \n");
-    //printf("OR \n");
     printf("Usage: static_transform_publisher x y z qx qy qz qw frame_id child_frame_id \n");
+    printf("OR \n");
+    printf("Usage: static_transform_publisher x y z yaw pitch roll frame_id child_frame_id \n");
     printf("\nThis transform is the transform of the coordinate frame from frame_id into the coordinate frame \n");
     printf("of the child_frame_id.  \n");
     ROS_ERROR("static_transform_publisher exited due to not having the right number of arguments");
