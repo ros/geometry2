@@ -82,6 +82,23 @@ ros::Time now_fallback_to_wall()
   }
 }
 
+/** This is a workaround for the case that we're running inside of
+    rospy and ros::Time is not initialized inside the c++ instance. 
+    This makes the system fall back to Wall time if not initialized.  
+    https://github.com/ros/geometry/issues/30
+*/
+void sleep_fallback_to_wall(const ros::Duration& d)
+{
+  try
+  {
+      d.sleep();
+  }
+  catch (ros::TimeNotInitializedException ex)
+  {
+    ros::WallDuration wd = ros::WallDuration(d.sec, d.nsec); 
+    wd.sleep();
+  }
+}
 
 bool
 Buffer::canTransform(const std::string& target_frame, const std::string& source_frame, 
@@ -95,7 +112,7 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
   while (now_fallback_to_wall() < start_time + timeout && 
 	 !canTransform(target_frame, source_frame, time) &&
          now_fallback_to_wall() >= start_time) //don't wait if time jumped backwards
-    ros::Duration(0.01).sleep();
+    sleep_fallback_to_wall(ros::Duration(0.01));
   return canTransform(target_frame, source_frame, time, errstr);
 }
 
@@ -113,7 +130,7 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
   while (now_fallback_to_wall() < start_time + timeout && 
 	 !canTransform(target_frame, target_time, source_frame, source_time, fixed_frame) &&
          now_fallback_to_wall() >= start_time) //don't wait if time jumped backwards
-    ros::Duration(0.01).sleep();
+    sleep_fallback_to_wall(ros::Duration(0.01));
   return canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
 }
 
