@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.8 (2013-11-06)
+------------------
 * moving python documentation to tf2_ros from tf2 to follow the code
 * removing legacy rospy dependency. implementation removed in 0.4.0 fixes `#27 <https://github.com/ros/geometry_experimental/issues/27>`_
 

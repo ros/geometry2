@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.8 (2013-11-06)
+------------------
 * fixing pytf failing to sleep https://github.com/ros/geometry/issues/30
 * moving python documentation to tf2_ros from tf2 to follow the code
 * Fixed static_transform_publisher duplicate check, added rostest.
