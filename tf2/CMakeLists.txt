@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(tf2)
 
 find_package(console_bridge REQUIRED)
-find_package(catkin REQUIRED COMPONENTS geometry_msgs rospy rostime tf2_msgs)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs rostime tf2_msgs)
 find_package(Boost REQUIRED COMPONENTS signals system thread)
 
 catkin_package(
