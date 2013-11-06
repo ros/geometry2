@@ -2,6 +2,9 @@
 Changelog for package geometry_experimental
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.4.7 (2013-08-28)
 ------------------
 

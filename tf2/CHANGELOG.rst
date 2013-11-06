@@ -2,6 +2,11 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* moving python documentation to tf2_ros from tf2 to follow the code
+* removing legacy rospy dependency. implementation removed in 0.4.0 fixes `#27 <https://github.com/ros/geometry_experimental/issues/27>`_
+
 0.4.7 (2013-08-28)
 ------------------
 * switching to use allFramesAsStringNoLock inside of getLatestCommonTime and walkToParent and locking in public API _getLatestCommonTime instead re `#23 <https://github.com/ros/geometry_experimental/issues/23>`_
