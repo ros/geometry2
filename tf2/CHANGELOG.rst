@@ -2,6 +2,9 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.4.8 (2013-11-06)
 ------------------
 * moving python documentation to tf2_ros from tf2 to follow the code

@@ -2,6 +2,9 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.4.8 (2013-11-06)
 ------------------
 * fixing pytf failing to sleep https://github.com/ros/geometry/issues/30

@@ -2,6 +2,9 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.4.8 (2013-11-06)
 ------------------
 * updating install rule for view_frames.py fixes `#44 <https://github.com/ros/geometry_experimental/issues/44>`_
