@@ -158,7 +158,7 @@ public:
   /**@brief Rotate this vector 
    * @param wAxis The axis to rotate about 
    * @param angle The angle to rotate by */
-	TF2SIMD_FORCE_INLINE Vector3 rotate( const Vector3& wAxis, const tf2Scalar angle );
+	TF2SIMD_FORCE_INLINE Vector3 rotate( const Vector3& wAxis, const tf2Scalar angle ) const;
 
   /**@brief Return the angle between this and another vector
    * @param v The other vector */
@@ -475,7 +475,7 @@ TF2SIMD_FORCE_INLINE Vector3 Vector3::normalized() const
 	return *this / length();
 } 
 
-TF2SIMD_FORCE_INLINE Vector3 Vector3::rotate( const Vector3& wAxis, const tf2Scalar angle )
+TF2SIMD_FORCE_INLINE Vector3 Vector3::rotate( const Vector3& wAxis, const tf2Scalar angle ) const
 {
 	// wAxis must be a unit lenght vector
 
