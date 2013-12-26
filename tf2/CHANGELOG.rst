@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.10 (2013-12-26)
+-------------------
 * updated error message. fixes `#38 <https://github.com/ros/geometry_experimental/issues/38>`_
 * tf2: add missing console bridge include directories (fix `#48 <https://github.com/ros/geometry_experimental/issues/48>`_)
 * Fix const correctness of tf2::Vector3 rotate() method
