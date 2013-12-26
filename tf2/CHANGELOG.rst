@@ -2,6 +2,15 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* updated error message. fixes `#38 <https://github.com/ros/geometry_experimental/issues/38>`_
+* tf2: add missing console bridge include directories (fix `#48 <https://github.com/ros/geometry_experimental/issues/48>`_)
+* Fix const correctness of tf2::Vector3 rotate() method
+  The method does not modify the class thus should be const.
+  This has already been fixed in Bullet itself.
+* Contributors: Dirk Thomas, Timo Röhling, Tully Foote
+
 0.4.9 (2013-11-06)
 ------------------
 
