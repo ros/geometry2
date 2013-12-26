@@ -405,6 +405,38 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
   Py_RETURN_NONE;
 }
 
+static PyObject *setTransformStatic(PyObject *self, PyObject *args)
+{
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  PyObject *py_transform;
+  char *authority;
+
+  if (!PyArg_ParseTuple(args, "Os", &py_transform, &authority))
+    return NULL;
+
+  geometry_msgs::TransformStamped transform;
+  PyObject *header = PyObject_BorrowAttrString(py_transform, "header");
+  transform.child_frame_id = PyString_AsString(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
+  transform.header.frame_id = PyString_AsString(PyObject_BorrowAttrString(header, "frame_id"));
+  if (rostime_converter(PyObject_BorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
+    return NULL;
+
+  PyObject *mtransform = PyObject_BorrowAttrString(py_transform, "transform");
+  PyObject *translation = PyObject_BorrowAttrString(mtransform, "translation");
+  transform.transform.translation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "x"));
+  transform.transform.translation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "y"));
+  transform.transform.translation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "z"));
+  PyObject *rotation = PyObject_BorrowAttrString(mtransform, "rotation");
+  transform.transform.rotation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "x"));
+  transform.transform.rotation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "y"));
+  transform.transform.rotation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "z"));
+  transform.transform.rotation.w = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "w"));
+
+  // only difference to above is is_static == True
+  bc->setTransform(transform, authority, true);
+  Py_RETURN_NONE;
+}
+
 static PyObject *clear(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
@@ -436,6 +468,7 @@ static struct PyMethodDef buffer_core_methods[] =
   {"all_frames_as_yaml", allFramesAsYAML, METH_VARARGS},
   {"all_frames_as_string", allFramesAsString, METH_VARARGS},
   {"set_transform", setTransform, METH_VARARGS},
+  {"set_transform_static", setTransformStatic, METH_VARARGS},
   {"can_transform_core", (PyCFunction)canTransformCore, METH_KEYWORDS},
   {"can_transform_full_core", (PyCFunction)canTransformFullCore, METH_KEYWORDS},
   //{"chain", (PyCFunction)chain, METH_KEYWORDS},

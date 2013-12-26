@@ -50,9 +50,15 @@ class TransformListenerThread(threading.Thread):
 
     def run(self):
         rospy.Subscriber("/tf", TFMessage, self.callback)
+        rospy.Subscriber("/tf_static", TFMessage, self.static_callback)
         rospy.spin()
 
     def callback(self, data):
         who = data._connection_header.get('callerid', "default_authority")
         for transform in data.transforms:
             self.buffer.set_transform(transform, who)
+
+    def static_callback(self, data):
+        who = data._connection_header.get('callerid', "default_authority")
+        for transform in data.transforms:
+            self.buffer.set_transform_static(transform, who)
