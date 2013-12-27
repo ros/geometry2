@@ -9,7 +9,7 @@ Changelog for package tf2
 * Fix const correctness of tf2::Vector3 rotate() method
   The method does not modify the class thus should be const.
   This has already been fixed in Bullet itself.
-* Contributors: Dirk Thomas, Timo Röhling, Tully Foote
+* Contributors: Dirk Thomas, Timo Rohling, Tully Foote
 
 0.4.9 (2013-11-06)
 ------------------
