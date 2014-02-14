@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.1 (2014-02-14)
+------------------
 * adding const to MessageEvent data
 * Contributors: Tully Foote
 
