@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.0 (2014-02-14)
+------------------
 * TF2 uses message events to get connection header information
 * Contributors: Kevin Watts
 
