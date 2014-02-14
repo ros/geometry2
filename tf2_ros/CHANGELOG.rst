@@ -2,6 +2,11 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* TF2 uses message events to get connection header information
+* Contributors: Kevin Watts
+
 0.4.10 (2013-12-26)
 -------------------
 * adding support for static transforms in python listener. Fixes `#46 <https://github.com/ros/geometry_experimental/issues/46>`_

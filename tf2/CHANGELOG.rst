@@ -2,6 +2,9 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.4.10 (2013-12-26)
 -------------------
 * updated error message. fixes `#38 <https://github.com/ros/geometry_experimental/issues/38>`_
