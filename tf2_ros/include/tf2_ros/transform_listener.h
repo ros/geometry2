@@ -60,9 +60,9 @@ private:
   void initWithThread();
 
   /// Callback function for ros message subscriptoin
-  void subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage>& msg_evt);
-  void static_subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage>& msg_evt);
-  void subscription_callback_impl(const ros::MessageEvent<tf2_msgs::TFMessage>& msg_evt, bool is_static);
+  void subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt);
+  void static_subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt);
+  void subscription_callback_impl(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt, bool is_static);
 
   ros::CallbackQueue tf_message_callback_queue_;
   boost::thread* dedicated_listener_thread_;

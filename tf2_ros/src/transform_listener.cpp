@@ -90,16 +90,16 @@ void TransformListener::initWithThread()
 
 
 
-void TransformListener::subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage>& msg_evt)
+void TransformListener::subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt)
 {
   subscription_callback_impl(msg_evt, false);
 }
-void TransformListener::static_subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage>& msg_evt)
+void TransformListener::static_subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt)
 {
   subscription_callback_impl(msg_evt, true);
 }
 
-void TransformListener::subscription_callback_impl(const ros::MessageEvent<tf2_msgs::TFMessage>& msg_evt, bool is_static)
+void TransformListener::subscription_callback_impl(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt, bool is_static)
 {
   const tf2_msgs::TFMessage& msg_in = *(msg_evt.getConstMessage());
   std::string authority = msg_evt.getPublisherName(); // lookup the authority
