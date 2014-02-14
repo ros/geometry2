@@ -2,6 +2,11 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* adding const to MessageEvent data
+* Contributors: Tully Foote
+
 0.5.0 (2014-02-14)
 ------------------
 * TF2 uses message events to get connection header information
