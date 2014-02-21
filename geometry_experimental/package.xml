@@ -1,6 +1,6 @@
 <package>
   <name>geometry_experimental</name>
-  <version>0.5.1</version>
+  <version>0.5.2</version>
   <description>
     The second generation Transform Library in ros.  This metapackage is deprecated, but is kept for backwards compatability. 
   </description>

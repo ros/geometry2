@@ -1,6 +1,6 @@
 <package>
   <name>tf2_ros</name>
-  <version>0.5.1</version>
+  <version>0.5.2</version>
   <description>
     This package contains the ROS bindings for the tf2 library, for both Python and C++. 
   </description>

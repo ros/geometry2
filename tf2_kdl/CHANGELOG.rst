@@ -2,8 +2,8 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.2 (2014-02-20)
+------------------
 * add cmake_modules dependency for eigen find_package rules
 * Contributors: Tully Foote
 
