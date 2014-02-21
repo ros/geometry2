@@ -2,6 +2,11 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* finding eigen from cmake_modules instead of from catkin
+* Contributors: Tully Foote
+
 0.5.2 (2014-02-20)
 ------------------
 * add cmake_modules dependency for eigen find_package rules
