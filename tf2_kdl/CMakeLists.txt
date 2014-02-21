@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2_kdl)
 
-find_package(Eigen REQUIRED)
 find_package(orocos_kdl)
-find_package(catkin REQUIRED COMPONENTS tf2 tf2_ros tf2_msgs)
+find_package(catkin REQUIRED COMPONENTS cmake_modules tf2 tf2_ros tf2_msgs)
+
+find_package(Eigen REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS}
