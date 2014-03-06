@@ -41,7 +41,7 @@ class TransformBroadcaster:
     """
 
     def __init__(self):
-        self.pub_tf = rospy.Publisher("/tf", TFMessage)
+        self.pub_tf = rospy.Publisher("/tf", TFMessage, queue_size=1)
 
     def sendTransform(self, transform):
         if not isinstance(transform, list):
