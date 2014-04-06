@@ -619,7 +619,7 @@ private:
     }
     else
     {
-      signalMessage(evt);
+      this->signalMessage(evt);
     }
   }
 
