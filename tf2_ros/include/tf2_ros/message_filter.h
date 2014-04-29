@@ -41,7 +41,6 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
-#include <boost/signals.hpp>
 
 #include <message_filters/connection.h>
 #include <message_filters/simple_filter.h>
