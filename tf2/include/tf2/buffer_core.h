@@ -34,7 +34,7 @@
 
 #include "transform_storage.h"
 
-#include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 
 #include <string>
 
@@ -250,11 +250,11 @@ public:
    * \brief Add a callback that happens when a new transform has arrived
    *
    * \param callback The callback, of the form void func();
-   * \return A boost::signals::connection object that can be used to remove this
+   * \return A boost::signals2::connection object that can be used to remove this
    * listener
    */
-  boost::signals::connection _addTransformsChangedListener(boost::function<void(void)> callback);
-  void _removeTransformsChangedListener(boost::signals::connection c);
+  boost::signals2::connection _addTransformsChangedListener(boost::function<void(void)> callback);
+  void _removeTransformsChangedListener(boost::signals2::connection c);
 
 
   /**@brief Check if a frame exists in the tree
@@ -356,7 +356,7 @@ private:
   struct RemoveRequestByID;
 
   // Backwards compatability for tf message_filter
-  typedef boost::signal<void(void)> TransformsChangedSignal;
+  typedef boost::signals2::signal<void(void)> TransformsChangedSignal;
   /// Signal which is fired whenever new transform data has arrived, from the thread the data arrived in
   TransformsChangedSignal _transforms_changed_;
 

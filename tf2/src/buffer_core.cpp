@@ -1195,13 +1195,13 @@ void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
 
 
 // backwards compability for tf methods
-boost::signals::connection BufferCore::_addTransformsChangedListener(boost::function<void(void)> callback)
+boost::signals2::connection BufferCore::_addTransformsChangedListener(boost::function<void(void)> callback)
 {
   boost::mutex::scoped_lock lock(transformable_requests_mutex_);
   return _transforms_changed_.connect(callback);
 }
 
-void BufferCore::_removeTransformsChangedListener(boost::signals::connection c)
+void BufferCore::_removeTransformsChangedListener(boost::signals2::connection c)
 {
   boost::mutex::scoped_lock lock(transformable_requests_mutex_);
   c.disconnect();

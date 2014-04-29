@@ -107,7 +107,7 @@ public:
   typedef boost::shared_ptr<M const> MConstPtr;
   typedef ros::MessageEvent<M const> MEvent;
   typedef boost::function<void(const MConstPtr&, FilterFailureReason)> FailureCallback;
-  typedef boost::signal<void(const MConstPtr&, FilterFailureReason)> FailureSignal;
+  typedef boost::signals2::signal<void(const MConstPtr&, FilterFailureReason)> FailureSignal;
 
   // If you hit this assert your message does not have a header, or does not have the HasHeader trait defined for it
   ROS_STATIC_ASSERT(ros::message_traits::HasHeader<M>::value);
