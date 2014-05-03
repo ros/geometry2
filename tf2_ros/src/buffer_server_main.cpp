@@ -63,7 +63,8 @@ int main(int argc, char** argv)
   // WIM: this works fine:
   tf2_ros::Buffer buffer_core(ros::Duration(buffer_size+0)); // WTF??
   tf2_ros::TransformListener listener(buffer_core);
-  tf2_ros::BufferServer buffer_server(buffer_core, "tf2_buffer_server");
+  tf2_ros::BufferServer buffer_server(buffer_core, "tf2_buffer_server", false);
+  buffer_server.start();
   // But you should probably read this instead:
   // http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=439
 
