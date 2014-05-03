@@ -48,7 +48,7 @@ TEST(tf2_ros, buffer_client)
   tf2_ros::BufferClient client("tf_action");
 
   //make sure that things are set up
-  EXPECT_TRUE(client.waitForServer(ros::Duration(1.0)));
+  ASSERT_TRUE(client.waitForServer(ros::Duration(4.0)));
 
   geometry_msgs::PointStamped p1;
   p1.header.frame_id = "a";
@@ -70,6 +70,7 @@ TEST(tf2_ros, buffer_client)
   catch(tf2::TransformException& ex)
   {
     ROS_ERROR("Failed to transform: %s", ex.what());
+    ASSERT_FALSE("Should not get here");
   }
 } 
 
@@ -78,7 +79,7 @@ TEST(tf2_ros, buffer_client_different_types)
   tf2_ros::BufferClient client("tf_action");
 
   //make sure that things are set up
-  client.waitForServer();
+  ASSERT_TRUE(client.waitForServer(ros::Duration(4.0)));
 
   tf2::Stamped<KDL::Vector> k1(KDL::Vector(0, 0, 0), ros::Time(), "a");
 
@@ -97,6 +98,7 @@ TEST(tf2_ros, buffer_client_different_types)
   catch(tf2::TransformException& ex)
   {
     ROS_ERROR("Failed to transform: %s", ex.what());
+    ASSERT_FALSE("Should not get here");
   }
 } 
 
@@ -104,6 +106,8 @@ int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "buffer_client_test");
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
   return RUN_ALL_TESTS();
 }
 
