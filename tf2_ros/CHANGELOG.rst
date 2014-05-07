@@ -2,6 +2,15 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* surpressing autostart on the server objects to not incur warnings
+* switch to boost signals2 following `ros/ros_comm#267 <https://github.com/ros/ros_comm/issues/267>`_, blocking `ros/geometry#23 <https://github.com/ros/geometry/issues/23>`_
+* fix compilation with gcc 4.9
+* make can_transform correctly wait
+* explicitly set the publish queue size for rospy
+* Contributors: Tully Foote, Vincent Rabaud, v4hn
+
 0.5.3 (2014-02-21)
 ------------------
 
