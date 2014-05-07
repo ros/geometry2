@@ -2,8 +2,8 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.4 (2014-05-07)
+------------------
 * Clean up warnings about autostart and add some assertions for coverage
 * Contributors: Tully Foote
 
