@@ -106,8 +106,6 @@ int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "buffer_client_test");
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
   return RUN_ALL_TESTS();
 }
 
