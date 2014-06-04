@@ -2,6 +2,12 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix sleeplogic in can_transform. 
+* explicitly set the publish queue size for rospy
+* Contributors: Tully Foote, v4hn
+
 0.4.10 (2013-12-26)
 -------------------
 * adding support for static transforms in python listener. Fixes `#46 <https://github.com/ros/geometry_experimental/issues/46>`_
