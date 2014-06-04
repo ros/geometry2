@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.11 (2014-06-04)
+-------------------
 * Fix sleeplogic in can_transform. 
 * explicitly set the publish queue size for rospy
 * Contributors: Tully Foote, v4hn
