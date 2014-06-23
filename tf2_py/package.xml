@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>tf2_py</name>
-  <version>0.5.4</version>
+  <version>0.5.5</version>
   <description>The tf2_py package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
