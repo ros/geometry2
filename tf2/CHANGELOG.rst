@@ -2,6 +2,12 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* convert to use console bridge from upstream debian package https://github.com/ros/rosdistro/issues/4633
+* Fix format string
+* Contributors: Austin, Tully Foote
+
 0.5.4 (2014-05-07)
 ------------------
 * switch to boost signals2 following `ros/ros_comm#267 <https://github.com/ros/ros_comm/issues/267>`_, blocking `ros/geometry#23 <https://github.com/ros/geometry/issues/23>`_
