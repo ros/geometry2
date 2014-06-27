@@ -70,6 +70,7 @@ private:
   ros::Subscriber message_subscriber_tf_;
   ros::Subscriber message_subscriber_tf_static_;
   tf2::BufferCore& buffer_;
+  ros::Time last_update_;
   bool using_dedicated_thread_;
  
   void dedicatedListenerThread()
