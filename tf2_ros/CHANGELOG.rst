@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.12 (2014-09-18)
+-------------------
 * python patch for `#57 <https://github.com/ros/geometry_experimental/issues/57>`_
   instead of patching lower level API expose the tuple to the user only if requested via optional argument
 * adding unit tests to cover `#43 <https://github.com/ros/geometry_experimental/issues/43>`_
