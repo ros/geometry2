@@ -101,6 +101,12 @@ void TransformListener::static_subscription_callback(const tf2_msgs::TFMessageCo
 
 void TransformListener::subscription_callback_impl(const tf2_msgs::TFMessageConstPtr& msg, bool is_static)
 {
+  ros::Time now = ros::Time::now();
+  if(now < last_update_){
+    ROS_WARN("Detected jump back in time. Clearing TF buffer.");
+    buffer_.clear();
+  }
+  last_update_ = now;
 
   const tf2_msgs::TFMessage& msg_in = *msg;
   for (unsigned int i = 0; i < msg_in.transforms.size(); i++)
