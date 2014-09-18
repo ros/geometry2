@@ -71,6 +71,7 @@ private:
   ros::Subscriber message_subscriber_tf_static_;
   tf2::BufferCore& buffer_;
   bool using_dedicated_thread_;
+  ros::Time last_update_;
  
   void dedicatedListenerThread()
   {
