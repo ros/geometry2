@@ -65,7 +65,7 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
 
 
     # can, simple api
-    def can_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+    def can_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0), return_debug_tuple=False):
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
             r= rospy.Rate(20)
@@ -73,10 +73,14 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
                    not self.can_transform_core(target_frame, source_frame, time)[0] and
                    rospy.Time.now() >= start_time):
                 r.sleep()
-        return self.can_transform_core(target_frame, source_frame, time)
+        core_result = self.can_transform_core(target_frame, source_frame, time)
+        if return_debug_tuple:
+            return core_result
+        return core_result[0]
     
     # can, advanced api
-    def can_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+    def can_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0),
+                           return_debug_tuple=False):
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
             r= rospy.Rate(20)
@@ -84,5 +88,8 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
                    not self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)[0] and
                    rospy.Time.now() >= start_time):
                 r.sleep()
-        return self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
+        core_result = self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
+        if return_debug_tuple:
+            return core_result
+        return core_result[0]
 
