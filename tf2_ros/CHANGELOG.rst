@@ -2,6 +2,15 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* python patch for `#57 <https://github.com/ros/geometry_experimental/issues/57>`_
+  instead of patching lower level API expose the tuple to the user only if requested via optional argument
+* adding unit tests to cover `#43 <https://github.com/ros/geometry_experimental/issues/43>`_
+* Make transform_listener reset tf buffer on loop detection
+  This makes tf2 work with `rosbag --clock --loop` as expected.
+* Contributors: Tully Foote, v4hn
+
 0.4.11 (2014-06-04)
 -------------------
 * Fix sleeplogic in can_transform. 
