@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.6 (2014-09-18)
+------------------
 * support if canTransform(...): in python `#57 <https://github.com/ros/geometry_experimental/issues/57>`_
 * Support clearing the cache when time jumps backwards `#68 <https://github.com/ros/geometry_experimental/issues/68>`_
 * Contributors: Tully Foote
