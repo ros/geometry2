@@ -108,14 +108,24 @@ find_package(catkin REQUIRED COMPONENTS
 # tf2_ros_test_listener
 add_executable(${PROJECT_NAME}_test_listener EXCLUDE_FROM_ALL test/listener_unittest.cpp)
 add_dependencies(${PROJECT_NAME}_test_listener tf2_msgs_gencpp)
+add_executable(${PROJECT_NAME}_test_time_reset EXCLUDE_FROM_ALL test/time_reset_test.cpp)
+add_dependencies(${PROJECT_NAME}_test_time_reset tf2_msgs_gencpp)
 target_link_libraries(${PROJECT_NAME}_test_listener
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${GTEST_LIBRARIES}
 )
 
+target_link_libraries(${PROJECT_NAME}_test_time_reset
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${GTEST_LIBRARIES}
+)
+
 add_dependencies(tests ${PROJECT_NAME}_test_listener)
+add_dependencies(tests ${PROJECT_NAME}_test_time_reset)
 
 add_rostest(test/transform_listener_unittest.launch)
+add_rostest(test/transform_listener_time_reset_test.launch)
 
 endif()
