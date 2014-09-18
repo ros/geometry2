@@ -2,6 +2,9 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.5 (2014-06-23)
 ------------------
 * convert to use console bridge from upstream debian package https://github.com/ros/rosdistro/issues/4633
