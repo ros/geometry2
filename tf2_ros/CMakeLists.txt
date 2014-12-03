@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2_ros)
 
+if(NOT ANDROID)
+set(TF2_PY tf2_py)
+endif()
+
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
@@ -11,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   tf2
   tf2_msgs
-  tf2_py
+  ${TF2_PY}
 )
 find_package(Boost REQUIRED COMPONENTS thread)
 
@@ -29,7 +33,7 @@ catkin_package(
   rosgraph
   tf2
   tf2_msgs
-  tf2_py
+  ${TF2_PY}
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -100,7 +104,7 @@ find_package(catkin REQUIRED COMPONENTS
   rostest
   tf2
   tf2_msgs
-  tf2_py
+  ${TF2_PY}
 )
 
 
