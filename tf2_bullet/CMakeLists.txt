@@ -12,9 +12,7 @@ include_directories(include ${bullet_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 catkin_package(INCLUDE_DIRS include ${bullet_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
-
-
-install(DIRECTORY include/${PACKAGE_NAME}/
+install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
 

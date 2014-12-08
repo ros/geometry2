@@ -18,7 +18,7 @@ link_directories(${orocos_kdl_LIBRARY_DIRS})
 include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
 
 
-install(DIRECTORY include/${PACKAGE_NAME}/
+install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
 install(PROGRAMS scripts/test.py
