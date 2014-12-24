@@ -2,8 +2,8 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.7 (2014-12-23)
+------------------
 * fixing install rules and adding backwards compatible include with #warning
 * Contributors: Tully Foote
 
