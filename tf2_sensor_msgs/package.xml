@@ -10,7 +10,7 @@
 
   <url type="website">http://www.ros.org/wiki/tf2_ros</url>
     
-  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
+  <buildtool_depend version_gte="0.5.6">catkin</buildtool_depend>
 
   <build_depend>cmake_modules</build_depend>
   <build_depend>eigen</build_depend>

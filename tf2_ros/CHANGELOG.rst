@@ -2,6 +2,13 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added 6 param transform again
+  Yes, using Euler angles is a bad habit. But it is much more convenient if you just need a rotation by 90° somewhere to set it up in Euler angles. So I added the option to supply only the 3 angles.
+* Remove tf2_py dependency for Android
+* Contributors: Achim Königs, Gary Servin
+
 0.5.6 (2014-09-18)
 ------------------
 * support if canTransform(...): in python `#57 <https://github.com/ros/geometry_experimental/issues/57>`_
