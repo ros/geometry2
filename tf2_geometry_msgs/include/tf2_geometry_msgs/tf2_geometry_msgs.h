@@ -40,7 +40,8 @@
 
 namespace tf2
 {
-    
+
+inline
 KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
   {
     return KDL::Frame(KDL::Rotation::Quaternion(t.transform.rotation.x, t.transform.rotation.y, 
@@ -55,14 +56,17 @@ KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
 
 // method to extract timestamp from object
 template <>
+inline
   const ros::Time& getTimestamp(const geometry_msgs::Vector3Stamped& t) {return t.header.stamp;}
-  
+
 // method to extract frame id from object
 template <>
+inline
   const std::string& getFrameId(const geometry_msgs::Vector3Stamped& t) {return t.header.frame_id;}
 
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const geometry_msgs::Vector3Stamped& t_in, geometry_msgs::Vector3Stamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
     tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(gmTransformToKDL(transform).M * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z), 
@@ -73,10 +77,12 @@ template <>
     t_out.header.stamp = v_out.stamp_;
     t_out.header.frame_id = v_out.frame_id_;
   }
+inline
 geometry_msgs::Vector3Stamped toMsg(const geometry_msgs::Vector3Stamped& in)
 {
   return in;
 }
+inline
 void fromMsg(const geometry_msgs::Vector3Stamped& msg, geometry_msgs::Vector3Stamped& out)
 {
   out = msg;
@@ -90,14 +96,17 @@ void fromMsg(const geometry_msgs::Vector3Stamped& msg, geometry_msgs::Vector3Sta
 
 // method to extract timestamp from object
 template <>
+inline
   const ros::Time& getTimestamp(const geometry_msgs::PointStamped& t)  {return t.header.stamp;}
 
 // method to extract frame id from object
 template <>
+inline
   const std::string& getFrameId(const geometry_msgs::PointStamped& t)  {return t.header.frame_id;}
 
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const geometry_msgs::PointStamped& t_in, geometry_msgs::PointStamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
     tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(gmTransformToKDL(transform) * KDL::Vector(t_in.point.x, t_in.point.y, t_in.point.z), 
@@ -108,10 +117,12 @@ template <>
     t_out.header.stamp = v_out.stamp_;
     t_out.header.frame_id = v_out.frame_id_;
   }
+inline
 geometry_msgs::PointStamped toMsg(const geometry_msgs::PointStamped& in)
 {
   return in;
 }
+inline
 void fromMsg(const geometry_msgs::PointStamped& msg, geometry_msgs::PointStamped& out)
 {
   out = msg;
@@ -124,14 +135,17 @@ void fromMsg(const geometry_msgs::PointStamped& msg, geometry_msgs::PointStamped
 
 // method to extract timestamp from object
 template <>
+inline
   const ros::Time& getTimestamp(const geometry_msgs::PoseStamped& t)  {return t.header.stamp;}
 
 // method to extract frame id from object
 template <>
+inline
   const std::string& getFrameId(const geometry_msgs::PoseStamped& t)  {return t.header.frame_id;}
 
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const geometry_msgs::PoseStamped& t_in, geometry_msgs::PoseStamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
     KDL::Vector v(t_in.pose.position.x, t_in.pose.position.y, t_in.pose.position.z);
@@ -146,10 +160,12 @@ template <>
     t_out.header.stamp = v_out.stamp_;
     t_out.header.frame_id = v_out.frame_id_;
   }
+inline
 geometry_msgs::PoseStamped toMsg(const geometry_msgs::PoseStamped& in)
 {
   return in;
 }
+inline
 void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& out)
 {
   out = msg;

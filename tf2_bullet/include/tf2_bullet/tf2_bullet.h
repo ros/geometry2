@@ -39,7 +39,7 @@
 
 namespace tf2
 {
-    
+inline
 btTransform transformToBullet(const geometry_msgs::TransformStamped& t)
   {
     return btTransform(btQuaternion(t.transform.rotation.x, t.transform.rotation.y, 
@@ -50,12 +50,14 @@ btTransform transformToBullet(const geometry_msgs::TransformStamped& t)
 
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const tf2::Stamped<btVector3>& t_in, tf2::Stamped<btVector3>& t_out, const geometry_msgs::TransformStamped& transform)
   {
     t_out = tf2::Stamped<btVector3>(transformToBullet(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
 
 //convert to vector message
+inline
 geometry_msgs::PointStamped toMsg(const tf2::Stamped<btVector3>& in)
 {
   geometry_msgs::PointStamped msg;
@@ -67,6 +69,7 @@ geometry_msgs::PointStamped toMsg(const tf2::Stamped<btVector3>& in)
   return msg;
 }
 
+inline
 void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<btVector3>& out)
 {
   out.stamp_ = msg.header.stamp;
@@ -79,6 +82,7 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<btVector3>& ou
 
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const tf2::Stamped<btTransform>& t_in, tf2::Stamped<btTransform>& t_out, const geometry_msgs::TransformStamped& transform)
   {
     t_out = tf2::Stamped<btTransform>(transformToBullet(transform) * t_in, transform.header.stamp, transform.header.frame_id);
