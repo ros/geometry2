@@ -33,8 +33,13 @@
 #define TF2_GEOMETRY_MSGS_H
 
 #include <tf2/convert.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Transform.h>
 #include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/QuaternionStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <kdl/frames.hpp>
 
@@ -172,7 +177,158 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& 
 }
 
 
+/****************/
+/** Quaternion **/
+/****************/
 
+inline
+geometry_msgs::Quaternion toMsg(const tf2::Quaternion& in)
+{
+  geometry_msgs::Quaternion out;
+  out.w = in.getW();
+  out.x = in.getX();
+  out.y = in.getY();
+  out.z = in.getZ();
+  return out;
+}
+
+inline
+void fromMsg(const geometry_msgs::Quaternion& in, tf2::Quaternion& out)
+{
+  // w at the end in the constructor
+  out = tf2::Quaternion(in.x, in.y, in.z, in.w);
+}
+
+
+/***********************/
+/** QuaternionStamped **/
+/***********************/
+
+// method to extract timestamp from object
+template <>
+inline
+const ros::Time& getTimestamp(const geometry_msgs::QuaternionStamped& t)  {return t.header.stamp;}
+
+// method to extract frame id from object
+template <>
+inline
+const std::string& getFrameId(const geometry_msgs::QuaternionStamped& t)  {return t.header.frame_id;}
+
+// this method needs to be implemented by client library developers
+template <>
+inline
+void doTransform(const geometry_msgs::QuaternionStamped& t_in, geometry_msgs::QuaternionStamped& t_out, const geometry_msgs::TransformStamped& transform)
+{
+  tf2::Quaternion q_out = tf2::Quaternion(transform.transform.rotation.x, transform.transform.rotation.y,
+                                          transform.transform.rotation.z, transform.transform.rotation.w)*
+                          tf2::Quaternion(t_in.quaternion.x, t_in.quaternion.y, t_in.quaternion.z, t_in.quaternion.w);
+  t_out.quaternion = toMsg(q_out);
+  t_out.header.stamp = transform.header.stamp;
+  t_out.header.frame_id = transform.header.frame_id;
+}
+inline
+geometry_msgs::QuaternionStamped toMsg(const geometry_msgs::QuaternionStamped& in)
+{
+  return in;
+}
+inline
+void fromMsg(const geometry_msgs::QuaternionStamped& msg, geometry_msgs::QuaternionStamped& out)
+{
+  out = msg;
+}
+
+
+/**********************/
+/** TransformStamped **/
+/**********************/
+
+// method to extract timestamp from object
+template <>
+inline
+const ros::Time& getTimestamp(const geometry_msgs::TransformStamped& t)  {return t.header.stamp;}
+
+// method to extract frame id from object
+template <>
+inline
+const std::string& getFrameId(const geometry_msgs::TransformStamped& t)  {return t.header.frame_id;}
+
+// this method needs to be implemented by client library developers
+template <>
+inline
+void doTransform(const geometry_msgs::TransformStamped& t_in, geometry_msgs::TransformStamped& t_out, const geometry_msgs::TransformStamped& transform)
+  {
+    KDL::Vector v(t_in.transform.translation.x, t_in.transform.translation.y,
+                  t_in.transform.translation.z);
+    KDL::Rotation r = KDL::Rotation::Quaternion(t_in.transform.rotation.x,
+                                                t_in.transform.rotation.y, t_in.transform.rotation.z, t_in.transform.rotation.w);
+
+    tf2::Stamped<KDL::Frame> v_out = tf2::Stamped<KDL::Frame>(gmTransformToKDL(transform) * KDL::Frame(r, v),
+                                                              transform.header.stamp, transform.header.frame_id);
+    t_out.transform.translation.x = v_out.p[0];
+    t_out.transform.translation.y = v_out.p[1];
+    t_out.transform.translation.z = v_out.p[2];
+    v_out.M.GetQuaternion(t_out.transform.rotation.x, t_out.transform.rotation.y,
+                          t_out.transform.rotation.z, t_out.transform.rotation.w);
+    t_out.header.stamp = v_out.stamp_;
+    t_out.header.frame_id = v_out.frame_id_;
+  }
+inline
+geometry_msgs::TransformStamped toMsg(const geometry_msgs::TransformStamped& in)
+{
+  return in;
+}
+inline
+void fromMsg(const geometry_msgs::TransformStamped& msg, geometry_msgs::TransformStamped& out)
+{
+  out = msg;
+}
+
+
+/***************/
+/** Transform **/
+/***************/
+
+inline
+geometry_msgs::Transform toMsg(const tf2::Transform& in)
+{
+  geometry_msgs::Transform out;
+  out.translation.x = in.getOrigin().getX();
+  out.translation.y = in.getOrigin().getY();
+  out.translation.z = in.getOrigin().getZ();
+  out.rotation = toMsg(in.getRotation());
+  return out;
+}
+
+inline
+void fromMsg(const geometry_msgs::Transform& in, tf2::Transform& out)
+{
+  out.setOrigin(tf2::Vector3(in.translation.x, in.translation.y, in.translation.z));
+  // w at the end in the constructor
+  out.setRotation(tf2::Quaternion(in.rotation.x, in.rotation.y, in.rotation.z, in.rotation.w));
+}
+
+
+/**********/
+/** Pose **/
+/**********/
+
+inline
+/** This section is about converting */
+void toMsg(const tf2::Transform& in, geometry_msgs::Pose& out )
+{
+  out.position.x = in.getOrigin().getX();
+  out.position.y = in.getOrigin().getY();
+  out.position.z = in.getOrigin().getZ();
+  out.orientation = toMsg(in.getRotation());
+}
+
+inline
+void fromMsg(const geometry_msgs::Pose& in, tf2::Transform& out)
+{
+  out.setOrigin(tf2::Vector3(in.position.x, in.position.y, in.position.z));
+  // w at the end in the constructor
+  out.setRotation(tf2::Quaternion(in.orientation.x, in.orientation.y, in.orientation.z, in.orientation.w));
+}
 
 } // namespace
 
