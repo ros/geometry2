@@ -93,7 +93,9 @@ int main(int argc, char ** argv)
     msg.transform.rotation.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
     msg.transform.rotation.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
     msg.transform.rotation.w = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
-
+    msg.header.stamp = ros::Time::now();
+    msg.header.frame_id = argv[7];
+    msg.child_frame_id = argv[8];
 
     broadcaaster.sendTransform(msg);
     ROS_INFO("Spinning until killed publishing %s to %s", msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
