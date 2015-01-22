@@ -81,7 +81,7 @@ int main(int argc, char ** argv)
     msg.transform.translation.z = atof(argv[3]);
 
     tf2::Quaternion quat;
-    quat.setRPY(atof(argv[3]), atof(argv[2]), atof(argv[1]));
+    quat.setRPY(atof(argv[6]), atof(argv[5]), atof(argv[4]));
     msg.transform.rotation.x = quat.x();
     msg.transform.rotation.y = quat.y();
     msg.transform.rotation.z = quat.z();
