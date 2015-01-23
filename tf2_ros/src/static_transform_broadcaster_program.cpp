@@ -36,7 +36,7 @@ int main(int argc, char ** argv)
 {
   //Initialize ROS
   ros::init(argc, argv,"static_transform_publisher", ros::init_options::AnonymousName);
-  tf2_ros::StaticTransformBroadcaster broadcaaster;
+  tf2_ros::StaticTransformBroadcaster broadcaster;
 
   if(argc == 10)
   {
@@ -61,7 +61,7 @@ int main(int argc, char ** argv)
   
 
 
-  broadcaaster.sendTransform(msg);
+  broadcaster.sendTransform(msg);
   ROS_INFO("Spinning until killed publishing %s to %s", msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
   ros::spin();
 
@@ -91,7 +91,7 @@ int main(int argc, char ** argv)
     msg.header.frame_id = argv[7];
     msg.child_frame_id = argv[8];
 
-    broadcaaster.sendTransform(msg);
+    broadcaster.sendTransform(msg);
     ROS_INFO("Spinning until killed publishing %s to %s", msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
     ros::spin();
     return 0;
