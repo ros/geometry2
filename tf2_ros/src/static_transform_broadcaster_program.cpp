@@ -27,7 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
 #include <cstdio>
 #include <tf2/LinearMath/Quaternion.h>
 #include "tf2_ros/static_transform_broadcaster.h"
