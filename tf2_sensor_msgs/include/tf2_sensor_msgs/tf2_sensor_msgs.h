@@ -33,6 +33,7 @@
 #include <tf2/convert.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/Imu.h>
+#include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <Eigen/Eigen>
 #include <Eigen/Geometry>
@@ -172,6 +173,62 @@ sensor_msgs::Imu toMsg(const sensor_msgs::Imu &in)
 
 inline
 void fromMsg(const sensor_msgs::Imu &msg, sensor_msgs::Imu &out)
+{
+  out = msg;
+}
+
+/*********************/
+/** Magnetic Field  **/
+/*********************/
+
+/**
+* method to extract timestamp from object
+*/
+template <>
+inline
+const ros::Time& getTimestamp(const sensor_msgs::MagneticField& p) {return p.header.stamp;}
+
+/**
+* method to extract frame id from object
+*/
+template <>
+inline
+const std::string& getFrameId(const sensor_msgs::MagneticField &p) {return p.header.frame_id;}
+
+/**
+* Transforms sensor_msgs::MagneticField data from one frame to another
+*/
+template <>
+inline
+void doTransform(const sensor_msgs::MagneticField &mag_in, sensor_msgs::MagneticField &mag_out, const geometry_msgs::TransformStamped& t_in)
+{
+
+  mag_out.header = t_in.header;
+
+  // Discard translation, only use orientation for Magnetic Field transform
+  Eigen::Quaternion<double> r(
+      t_in.transform.rotation.w, t_in.transform.rotation.x, t_in.transform.rotation.y, t_in.transform.rotation.z);
+  Eigen::Transform<double,3,Eigen::Affine> t(r);
+
+  Eigen::Vector3d mag = t * Eigen::Vector3d(
+      mag_in.magnetic_field.x, mag_in.magnetic_field.y, mag_in.magnetic_field.z);
+
+  mag_out.magnetic_field.x = mag.x();
+  mag_out.magnetic_field.y = mag.y();
+  mag_out.magnetic_field.z = mag.z();
+
+  transformCovariance(mag_in.magnetic_field_covariance, mag_out.magnetic_field_covariance, r);
+
+}
+
+inline
+sensor_msgs::MagneticField toMsg(const sensor_msgs::MagneticField &in)
+{
+  return in;
+}
+
+inline
+void fromMsg(const sensor_msgs::MagneticField &msg, sensor_msgs::MagneticField &out)
 {
   out = msg;
 }
