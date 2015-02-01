@@ -74,13 +74,12 @@ template <>
 inline
   void doTransform(const geometry_msgs::Vector3Stamped& t_in, geometry_msgs::Vector3Stamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(gmTransformToKDL(transform).M * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z), 
-								transform.header.stamp, transform.header.frame_id);
+    KDL::Vector v_out = gmTransformToKDL(transform).M * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z);
     t_out.vector.x = v_out[0];
     t_out.vector.y = v_out[1];
     t_out.vector.z = v_out[2];
-    t_out.header.stamp = v_out.stamp_;
-    t_out.header.frame_id = v_out.frame_id_;
+    t_out.header.stamp = transform.header.stamp;
+    t_out.header.frame_id = transform.header.frame_id;
   }
 inline
 geometry_msgs::Vector3Stamped toMsg(const geometry_msgs::Vector3Stamped& in)
@@ -114,13 +113,12 @@ template <>
 inline
   void doTransform(const geometry_msgs::PointStamped& t_in, geometry_msgs::PointStamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    tf2::Stamped<KDL::Vector> v_out = tf2::Stamped<KDL::Vector>(gmTransformToKDL(transform) * KDL::Vector(t_in.point.x, t_in.point.y, t_in.point.z), 
-								transform.header.stamp, transform.header.frame_id);
+    KDL::Vector v_out = gmTransformToKDL(transform) * KDL::Vector(t_in.point.x, t_in.point.y, t_in.point.z);
     t_out.point.x = v_out[0];
     t_out.point.y = v_out[1];
     t_out.point.z = v_out[2];
-    t_out.header.stamp = v_out.stamp_;
-    t_out.header.frame_id = v_out.frame_id_;
+    t_out.header.stamp = transform.header.stamp;
+    t_out.header.frame_id = transform.header.frame_id;
   }
 inline
 geometry_msgs::PointStamped toMsg(const geometry_msgs::PointStamped& in)
@@ -156,14 +154,13 @@ inline
     KDL::Vector v(t_in.pose.position.x, t_in.pose.position.y, t_in.pose.position.z);
     KDL::Rotation r = KDL::Rotation::Quaternion(t_in.pose.orientation.x, t_in.pose.orientation.y, t_in.pose.orientation.z, t_in.pose.orientation.w);
 
-    tf2::Stamped<KDL::Frame> v_out = tf2::Stamped<KDL::Frame>(gmTransformToKDL(transform) * KDL::Frame(r, v),
-							      transform.header.stamp, transform.header.frame_id);
+    KDL::Frame v_out = gmTransformToKDL(transform) * KDL::Frame(r, v);
     t_out.pose.position.x = v_out.p[0];
     t_out.pose.position.y = v_out.p[1];
     t_out.pose.position.z = v_out.p[2];
     v_out.M.GetQuaternion(t_out.pose.orientation.x, t_out.pose.orientation.y, t_out.pose.orientation.z, t_out.pose.orientation.w);
-    t_out.header.stamp = v_out.stamp_;
-    t_out.header.frame_id = v_out.frame_id_;
+    t_out.header.stamp = transform.header.stamp;
+    t_out.header.frame_id = transform.header.frame_id;
   }
 inline
 geometry_msgs::PoseStamped toMsg(const geometry_msgs::PoseStamped& in)
@@ -262,15 +259,14 @@ void doTransform(const geometry_msgs::TransformStamped& t_in, geometry_msgs::Tra
     KDL::Rotation r = KDL::Rotation::Quaternion(t_in.transform.rotation.x,
                                                 t_in.transform.rotation.y, t_in.transform.rotation.z, t_in.transform.rotation.w);
 
-    tf2::Stamped<KDL::Frame> v_out = tf2::Stamped<KDL::Frame>(gmTransformToKDL(transform) * KDL::Frame(r, v),
-                                                              transform.header.stamp, transform.header.frame_id);
+    KDL::Frame v_out = gmTransformToKDL(transform) * KDL::Frame(r, v);
     t_out.transform.translation.x = v_out.p[0];
     t_out.transform.translation.y = v_out.p[1];
     t_out.transform.translation.z = v_out.p[2];
     v_out.M.GetQuaternion(t_out.transform.rotation.x, t_out.transform.rotation.y,
                           t_out.transform.rotation.z, t_out.transform.rotation.w);
-    t_out.header.stamp = v_out.stamp_;
-    t_out.header.frame_id = v_out.frame_id_;
+    t_out.header.stamp = transform.header.stamp;
+    t_out.header.frame_id = transform.header.frame_id;
   }
 inline
 geometry_msgs::TransformStamped toMsg(const geometry_msgs::TransformStamped& in)
