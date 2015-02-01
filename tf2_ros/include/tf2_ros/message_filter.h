@@ -305,7 +305,6 @@ public:
       return;
     }
 
-    boost::mutex::scoped_lock lock(messages_mutex_);
     // iterate through the target frames and add requests for each of them
     MessageInfo info;
     info.handles.reserve(expected_success_count_);
@@ -350,6 +349,7 @@ public:
       }
     }
 
+    boost::mutex::scoped_lock lock(messages_mutex_);
     // We can transform already
     if (info.success_count == expected_success_count_)
     {
