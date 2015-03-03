@@ -170,6 +170,7 @@ BufferCore::BufferCore(ros::Duration cache_time)
   frameIDs_["NO_PARENT"] = 0;
   frames_.push_back(TimeCacheInterfacePtr());
   frameIDs_reverse.push_back("NO_PARENT");
+  ros::Time::init();
 }
 
 BufferCore::~BufferCore()
@@ -1023,6 +1024,7 @@ std::string BufferCore::allFramesAsYAML() const
   std::stringstream mstream;
   boost::mutex::scoped_lock lock(frame_mutex_);
 
+  ros::Time current_time = ros::Time::now();
   TransformStorage temp;
 
   if (frames_.size() ==1)
@@ -1066,6 +1068,7 @@ std::string BufferCore::allFramesAsYAML() const
     mstream << "  rate: " << rate << std::endl;
     mstream << "  most_recent_transform: " << (cache->getLatestTimestamp()).toSec() << std::endl;
     mstream << "  oldest_transform: " << (cache->getOldestTimestamp()).toSec() << std::endl;
+    mstream << "  transform_delay: " << (current_time - cache->getLatestTimestamp()).toSec() << std::endl;
     mstream << "  buffer_length: " << (cache->getLatestTimestamp() - cache->getOldestTimestamp()).toSec() << std::endl;
   }
 
@@ -1323,6 +1326,8 @@ std::string BufferCore::_allFramesAsDot() const
   mstream << "digraph G {" << std::endl;
   boost::mutex::scoped_lock lock(frame_mutex_);
 
+  ros::Time current_time = ros::Time::now();
+
   TransformStorage temp;
 
   if (frames_.size() == 1) {
@@ -1359,7 +1364,7 @@ std::string BufferCore::_allFramesAsDot() const
       //<< "Time: " << current_time.toSec() << "\\n"
             << "Broadcaster: " << authority << "\\n"
             << "Average rate: " << rate << " Hz\\n"
-            << "Most recent transform: " << (counter_frame->getLatestTimestamp()).toSec() <<" \\n"
+            << "Most recent transform: " << (counter_frame->getLatestTimestamp()).toSec() <<" ( "<<  (current_time - counter_frame->getLatestTimestamp()).toSec() << " sec old)\\n"
       //    << "(time: " << getFrame(counter)->getLatestTimestamp().toSec() << ")\\n"
       //    << "Oldest transform: " << (current_time - getFrame(counter)->getOldestTimestamp()).toSec() << " sec old \\n"
       //    << "(time: " << (getFrame(counter)->getOldestTimestamp()).toSec() << ")\\n"
@@ -1372,6 +1377,10 @@ std::string BufferCore::_allFramesAsDot() const
     unsigned int frame_id_num;
     TimeCacheInterfacePtr counter_frame = getFrame(counter);
     if (!counter_frame) {
+      mstream << "edge [style=invis];" <<std::endl;
+      mstream << " subgraph cluster_legend { style=bold; color=black; label =\"view_frames Result\";\n"
+              << "\"Recorded at time: " << current_time.toSec() << "\"[ shape=plaintext ] ;\n "
+	      << "}" << "->" << "\"" << frameIDs_reverse[counter] << "\";" << std::endl;
       continue;
     }
     if (counter_frame->getData(ros::Time(), temp)) {
@@ -1384,7 +1393,7 @@ std::string BufferCore::_allFramesAsDot() const
     {
       mstream << "edge [style=invis];" <<std::endl;
       mstream << " subgraph cluster_legend { style=bold; color=black; label =\"view_frames Result\";\n"
-        //<< "\"Recorded at time: " << current_time.toSec() << "\"[ shape=plaintext ] ;\n "
+              << "\"Recorded at time: " << current_time.toSec() << "\"[ shape=plaintext ] ;\n "
 	      << "}" << "->" << "\"" << frameIDs_reverse[counter] << "\";" << std::endl;
     }
   }
