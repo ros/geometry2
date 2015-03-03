@@ -42,7 +42,7 @@
 
 namespace tf2
 {
-    
+inline
 KDL::Frame transformToKDL(const geometry_msgs::TransformStamped& t)
   {
     return KDL::Frame(KDL::Rotation::Quaternion(t.transform.rotation.x, t.transform.rotation.y, 
@@ -56,12 +56,14 @@ KDL::Frame transformToKDL(const geometry_msgs::TransformStamped& t)
 // ---------------------
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const tf2::Stamped<KDL::Vector>& t_in, tf2::Stamped<KDL::Vector>& t_out, const geometry_msgs::TransformStamped& transform)
   {
     t_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
 
 //convert to vector message
+inline
 geometry_msgs::PointStamped toMsg(const tf2::Stamped<KDL::Vector>& in)
 {
   geometry_msgs::PointStamped msg;
@@ -73,6 +75,7 @@ geometry_msgs::PointStamped toMsg(const tf2::Stamped<KDL::Vector>& in)
   return msg;
 }
 
+inline
 void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<KDL::Vector>& out)
 {
   out.stamp_ = msg.header.stamp;
@@ -87,12 +90,14 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<KDL::Vector>& 
 // ---------------------
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const tf2::Stamped<KDL::Twist>& t_in, tf2::Stamped<KDL::Twist>& t_out, const geometry_msgs::TransformStamped& transform)
   {
     t_out = tf2::Stamped<KDL::Twist>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
 
 //convert to twist message
+inline
 geometry_msgs::TwistStamped toMsg(const tf2::Stamped<KDL::Twist>& in)
 {
   geometry_msgs::TwistStamped msg;
@@ -107,6 +112,7 @@ geometry_msgs::TwistStamped toMsg(const tf2::Stamped<KDL::Twist>& in)
   return msg;
 }
 
+inline
 void fromMsg(const geometry_msgs::TwistStamped& msg, tf2::Stamped<KDL::Twist>& out)
 {
   out.stamp_ = msg.header.stamp;
@@ -125,12 +131,14 @@ void fromMsg(const geometry_msgs::TwistStamped& msg, tf2::Stamped<KDL::Twist>& o
 // ---------------------
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const tf2::Stamped<KDL::Wrench>& t_in, tf2::Stamped<KDL::Wrench>& t_out, const geometry_msgs::TransformStamped& transform)
   {
     t_out = tf2::Stamped<KDL::Wrench>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
 
 //convert to wrench message
+inline
 geometry_msgs::WrenchStamped toMsg(const tf2::Stamped<KDL::Wrench>& in)
 {
   geometry_msgs::WrenchStamped msg;
@@ -145,6 +153,7 @@ geometry_msgs::WrenchStamped toMsg(const tf2::Stamped<KDL::Wrench>& in)
   return msg;
 }
 
+inline
 void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped<KDL::Wrench>& out)
 {
   out.stamp_ = msg.header.stamp;
@@ -165,12 +174,14 @@ void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped<KDL::Wrench>&
 // ---------------------
 // this method needs to be implemented by client library developers
 template <>
+inline
   void doTransform(const tf2::Stamped<KDL::Frame>& t_in, tf2::Stamped<KDL::Frame>& t_out, const geometry_msgs::TransformStamped& transform)
   {
     t_out = tf2::Stamped<KDL::Frame>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
 
 //convert to pose message
+inline
 geometry_msgs::PoseStamped toMsg(const tf2::Stamped<KDL::Frame>& in)
 {
   geometry_msgs::PoseStamped msg;
@@ -183,6 +194,7 @@ geometry_msgs::PoseStamped toMsg(const tf2::Stamped<KDL::Frame>& in)
   return msg;
 }
 
+inline
 void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<KDL::Frame>& out)
 {
   out.stamp_ = msg.header.stamp;
