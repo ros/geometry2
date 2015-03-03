@@ -27,15 +27,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
 #include <cstdio>
+#include <tf2/LinearMath/Quaternion.h>
 #include "tf2_ros/static_transform_broadcaster.h"
 
 int main(int argc, char ** argv)
 {
   //Initialize ROS
   ros::init(argc, argv,"static_transform_publisher", ros::init_options::AnonymousName);
-  tf2_ros::StaticTransformBroadcaster broadcaaster;
+  tf2_ros::StaticTransformBroadcaster broadcaster;
 
   if(argc == 10)
   {
@@ -60,7 +60,7 @@ int main(int argc, char ** argv)
   
 
 
-  broadcaaster.sendTransform(msg);
+  broadcaster.sendTransform(msg);
   ROS_INFO("Spinning until killed publishing %s to %s", msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
   ros::spin();
 
@@ -78,24 +78,19 @@ int main(int argc, char ** argv)
     msg.transform.translation.x = atof(argv[1]);
     msg.transform.translation.y = atof(argv[2]);
     msg.transform.translation.z = atof(argv[3]);
-    
-    double halfYaw = atof(argv[4]) * 0.5;
-    double halfPitch = atof(argv[5]) * 0.5;
-    double halfRoll = atof(argv[6]) * 0.5;
-    double cosYaw = cos(halfYaw);
-    double sinYaw = sin(halfYaw);
-    double cosPitch = cos(halfPitch);
-    double sinPitch = sin(halfPitch);
-    double cosRoll = cos(halfRoll);
-    double sinRoll = sin(halfRoll);
-    
-    msg.transform.rotation.x = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
-    msg.transform.rotation.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
-    msg.transform.rotation.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
-    msg.transform.rotation.w = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
 
+    tf2::Quaternion quat;
+    quat.setRPY(atof(argv[6]), atof(argv[5]), atof(argv[4]));
+    msg.transform.rotation.x = quat.x();
+    msg.transform.rotation.y = quat.y();
+    msg.transform.rotation.z = quat.z();
+    msg.transform.rotation.w = quat.w();
 
-    broadcaaster.sendTransform(msg);
+    msg.header.stamp = ros::Time::now();
+    msg.header.frame_id = argv[7];
+    msg.child_frame_id = argv[8];
+
+    broadcaster.sendTransform(msg);
     ROS_INFO("Spinning until killed publishing %s to %s", msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
     ros::spin();
     return 0;
