@@ -49,7 +49,7 @@ Buffer::Buffer(ros::Duration cache_time, bool debug) :
 
 geometry_msgs::TransformStamped 
 Buffer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
-			const ros::Time& time, const ros::Duration timeout) const
+                        const ros::Time& time, const ros::Duration timeout) const
 {
   canTransform(target_frame, source_frame, time, timeout);
   return lookupTransform(target_frame, source_frame, time);
@@ -58,8 +58,8 @@ Buffer::lookupTransform(const std::string& target_frame, const std::string& sour
 
 geometry_msgs::TransformStamped 
 Buffer::lookupTransform(const std::string& target_frame, const ros::Time& target_time,
-			const std::string& source_frame, const ros::Time& source_time,
-			const std::string& fixed_frame, const ros::Duration timeout) const
+                        const std::string& source_frame, const ros::Time& source_time,
+                        const std::string& fixed_frame, const ros::Duration timeout) const
 {
   canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout);
   return lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame);
@@ -102,7 +102,7 @@ void sleep_fallback_to_wall(const ros::Duration& d)
 
 bool
 Buffer::canTransform(const std::string& target_frame, const std::string& source_frame, 
-		     const ros::Time& time, const ros::Duration timeout, std::string* errstr) const
+                     const ros::Time& time, const ros::Duration timeout, std::string* errstr) const
 {
   if (!checkAndErrorDedicatedThreadPresent(errstr))
     return false;
@@ -120,8 +120,8 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
     
 bool
 Buffer::canTransform(const std::string& target_frame, const ros::Time& target_time,
-		     const std::string& source_frame, const ros::Time& source_time,
-		     const std::string& fixed_frame, const ros::Duration timeout, std::string* errstr) const
+                     const std::string& source_frame, const ros::Time& source_time,
+                     const std::string& fixed_frame, const ros::Duration timeout, std::string* errstr) const
 {
   if (!checkAndErrorDedicatedThreadPresent(errstr))
     return false;
