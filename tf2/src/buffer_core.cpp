@@ -275,7 +275,7 @@ TimeCacheInterfacePtr BufferCore::allocateFrame(CompactFrameID cfid, bool is_sta
   } else {
     frames_[cfid] = TimeCacheInterfacePtr(new TimeCache(cache_time_));
   }
-  
+
   return frames_[cfid];
 }
 
@@ -1073,6 +1073,11 @@ std::string BufferCore::allFramesAsYAML(double current_time) const
   }
 
   return mstream.str();
+}
+
+std::string BufferCore::allFramesAsYAML() const
+{
+  return this->allFramesAsYAML(0.0);
 }
 
 TransformableCallbackHandle BufferCore::addTransformableCallback(const TransformableCallback& cb)
