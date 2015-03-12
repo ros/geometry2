@@ -275,7 +275,7 @@ TimeCacheInterfacePtr BufferCore::allocateFrame(CompactFrameID cfid, bool is_sta
   } else {
     frames_[cfid] = TimeCacheInterfacePtr(new TimeCache(cache_time_));
   }
-  
+
   return frames_[cfid];
 }
 
@@ -1075,6 +1075,11 @@ std::string BufferCore::allFramesAsYAML(double current_time) const
   return mstream.str();
 }
 
+std::string BufferCore::allFramesAsYAML() const
+{
+  return this->allFramesAsYAML(0.0);
+}
+
 TransformableCallbackHandle BufferCore::addTransformableCallback(const TransformableCallback& cb)
 {
   boost::mutex::scoped_lock lock(transformable_callbacks_mutex_);
@@ -1404,6 +1409,10 @@ std::string BufferCore::_allFramesAsDot(double current_time) const
   return mstream.str();
 }
 
+std::string BufferCore::_allFramesAsDot() const
+{
+  return _allFramesAsDot(0.0);
+}
 
 void BufferCore::_chainAsVector(const std::string & target_frame, ros::Time target_time, const std::string & source_frame, ros::Time source_time, const std::string& fixed_frame, std::vector<std::string>& output) const
 {
