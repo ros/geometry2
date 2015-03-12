@@ -297,7 +297,8 @@ public:
   /** \brief Backwards compatabilityA way to see what frames have been cached
    * Useful for debugging
    */
-  std::string _allFramesAsDot(double current_time = 0) const;
+  std::string _allFramesAsDot(double current_time) const;
+  std::string _allFramesAsDot() const;
 
   /** \brief Backwards compatabilityA way to see what frames are in a chain
    * Useful for debugging

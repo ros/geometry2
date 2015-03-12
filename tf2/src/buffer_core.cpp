@@ -1409,6 +1409,10 @@ std::string BufferCore::_allFramesAsDot(double current_time) const
   return mstream.str();
 }
 
+std::string BufferCore::_allFramesAsDot() const
+{
+  return _allFramesAsDot(0.0);
+}
 
 void BufferCore::_chainAsVector(const std::string & target_frame, ros::Time target_time, const std::string & source_frame, ros::Time source_time, const std::string& fixed_frame, std::vector<std::string>& output) const
 {
