@@ -110,7 +110,10 @@ public:
   typedef boost::signals2::signal<void(const MConstPtr&, FilterFailureReason)> FailureSignal;
 
   // If you hit this assert your message does not have a header, or does not have the HasHeader trait defined for it
-  ROS_STATIC_ASSERT(ros::message_traits::HasHeader<M>::value);
+  // Actually, we need to check that the message has a header, or that it
+  // has the FrameId and Stamp traits. However I don't know how to do that
+  // so simply commenting out for now.
+  //ROS_STATIC_ASSERT(ros::message_traits::HasHeader<M>::value);
 
   /**
    * \brief Constructor
@@ -296,7 +299,7 @@ public:
 
     namespace mt = ros::message_traits;
     const MConstPtr& message = evt.getMessage();
-    const std::string& frame_id = *mt::FrameId<M>::pointer(*message);
+    const std::string frame_id = mt::FrameId<M>::value(*message);
     ros::Time stamp = mt::TimeStamp<M>::value(*message);
 
     if (frame_id.empty())
@@ -363,7 +366,7 @@ public:
         ++dropped_message_count_;
         const MessageInfo& front = messages_.front();
         TF2_ROS_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_,
-                                (*mt::FrameId<M>::pointer(*front.event.getMessage())).c_str(), mt::TimeStamp<M>::value(*front.event.getMessage()).toSec());
+                                (mt::FrameId<M>::value(*front.event.getMessage())).c_str(), mt::TimeStamp<M>::value(*front.event.getMessage()).toSec());
 
         V_TransformableRequestHandle::const_iterator it = front.handles.begin();
         V_TransformableRequestHandle::const_iterator end = front.handles.end();
@@ -476,7 +479,7 @@ private:
 
     bool can_transform = true;
     const MConstPtr& message = info.event.getMessage();
-    const std::string& frame_id = *mt::FrameId<M>::pointer(*message);
+    const std::string& frame_id = mt::FrameId<M>::value(*message);
     ros::Time stamp = mt::TimeStamp<M>::value(*message);
 
     if (result == tf2::TransformAvailable)
