@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.8 (2015-03-17)
+------------------
 * fix deadlock `#79 <https://github.com/ros/geometry_experimental/issues/79>`_
 * break out of loop if ros is shutdown. Fixes `#26 <https://github.com/ros/geometry_experimental/issues/26>`_
 * remove useless Makefile files

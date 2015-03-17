@@ -2,8 +2,8 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.8 (2015-03-17)
+------------------
 * remove useless Makefile files
 * tf2 optimizations
 * add conversions of type between tf2 and geometry_msgs

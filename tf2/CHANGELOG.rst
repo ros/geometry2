@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.8 (2015-03-17)
+------------------
 * change from default argument to overload to avoid linking issue `#84 <https://github.com/ros/geometry_experimental/issues/84>`_
 * remove useless Makefile files
 * Remove unused assignments in max/min functions
