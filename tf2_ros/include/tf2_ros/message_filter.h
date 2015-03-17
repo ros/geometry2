@@ -237,8 +237,7 @@ public:
    */
   void setTargetFrames(const V_string& target_frames)
   {
-    boost::mutex::scoped_lock list_lock(messages_mutex_);
-    boost::mutex::scoped_lock string_lock(target_frames_string_mutex_);
+    boost::mutex::scoped_lock frames_lock(target_frames_mutex_);
 
     target_frames_ = target_frames;
     expected_success_count_ = target_frames_.size() + (time_tolerance_.isZero() ? 0 : 1);
@@ -255,7 +254,7 @@ public:
    */
   std::string getTargetFramesString()
   {
-    boost::mutex::scoped_lock lock(target_frames_string_mutex_);
+    boost::mutex::scoped_lock lock(target_frames_mutex_);
     return target_frames_string_;
   };
 
@@ -264,7 +263,7 @@ public:
    */
   void setTolerance(const ros::Duration& tolerance)
   {
-    boost::mutex::scoped_lock list_lock(messages_mutex_);
+    boost::mutex::scoped_lock lock(target_frames_mutex_);
     time_tolerance_ = tolerance;
     expected_success_count_ = target_frames_.size() + (time_tolerance_.isZero() ? 0 : 1);
   }
@@ -309,8 +308,15 @@ public:
     MessageInfo info;
     info.handles.reserve(expected_success_count_);
     {
-      V_string::iterator it = target_frames_.begin();
-      V_string::iterator end = target_frames_.end();
+      V_string target_frames_copy;
+      // Copy target_frames_ to avoid deadlock from #79
+      {
+        boost::mutex::scoped_lock frames_lock(target_frames_mutex_);
+        target_frames_copy = target_frames_;
+      }
+
+      V_string::iterator it = target_frames_copy.begin();
+      V_string::iterator end = target_frames_copy.end();
       for (; it != end; ++it)
       {
         const std::string& target_frame = *it;
@@ -481,6 +487,7 @@ private:
 
     if (result == tf2::TransformAvailable)
     {
+      boost::mutex::scoped_lock frames_lock(target_frames_mutex_);
       // make sure we can still perform all the necessary transforms
       typename V_string::iterator it = target_frames_.begin();
       typename V_string::iterator end = target_frames_.end();
@@ -637,7 +644,7 @@ private:
   tf2::BufferCore& bc_; ///< The Transformer used to determine if transformation data is available
   V_string target_frames_; ///< The frames we need to be able to transform to before a message is ready
   std::string target_frames_string_;
-  boost::mutex target_frames_string_mutex_;
+  boost::mutex target_frames_mutex_; ///< A mutex to protect access to the target_frames_ list and target_frames_string.
   uint32_t queue_size_; ///< The maximum number of messages we queue up
   tf2::TransformableCallbackHandle callback_handle_;
 
@@ -684,4 +691,3 @@ private:
 } // namespace tf2
 
 #endif
-
