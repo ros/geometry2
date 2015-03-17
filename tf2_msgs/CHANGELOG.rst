@@ -2,6 +2,11 @@
 Changelog for package tf2_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove useless Makefile files
+* Contributors: Vincent Rabaud
+
 0.5.7 (2014-12-23)
 ------------------
 

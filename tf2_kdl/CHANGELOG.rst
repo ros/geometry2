@@ -2,6 +2,12 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove useless Makefile files
+* fix ODR violations
+* Contributors: Vincent Rabaud
+
 0.5.7 (2014-12-23)
 ------------------
 * fixing install rules and adding backwards compatible include with #warning

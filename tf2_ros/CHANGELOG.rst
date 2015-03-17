@@ -2,6 +2,14 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix deadlock `#79 <https://github.com/ros/geometry_experimental/issues/79>`_
+* break out of loop if ros is shutdown. Fixes `#26 <https://github.com/ros/geometry_experimental/issues/26>`_
+* remove useless Makefile files
+* Fix static broadcaster with rpy args
+* Contributors: Paul Bovbel, Tully Foote, Vincent Rabaud
+
 0.5.7 (2014-12-23)
 ------------------
 * Added 6 param transform again

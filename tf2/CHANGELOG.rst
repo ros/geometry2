@@ -2,6 +2,14 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* change from default argument to overload to avoid linking issue `#84 <https://github.com/ros/geometry_experimental/issues/84>`_
+* remove useless Makefile files
+* Remove unused assignments in max/min functions
+* change _allFramesAsDot() -> _allFramesAsDot(double current_time)
+* Contributors: Jon Binney, Kei Okada, Tully Foote, Vincent Rabaud
+
 0.5.7 (2014-12-23)
 ------------------
 
