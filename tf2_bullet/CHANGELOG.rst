@@ -2,6 +2,9 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.8 (2015-03-17)
 ------------------
 * remove useless Makefile files
