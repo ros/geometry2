@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.9 (2015-03-25)
+------------------
 * changed queue_size in Python transform boradcaster to match that in c++
 * Contributors: mrath
 

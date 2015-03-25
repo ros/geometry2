@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.9 (2015-03-25)
+------------------
 * fixing edge case where two no frame id lookups matched in getLatestCommonTime
 * Contributors: Tully Foote
 
