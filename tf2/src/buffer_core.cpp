@@ -854,6 +854,9 @@ struct TimeAndFrameIDFrameComparator
 
 int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID source_id, ros::Time & time, std::string * error_string) const
 {
+  // Error if one of the frames don't exist.
+  if (source_id == 0 || target_id == 0) return tf2_msgs::TF2Error::LOOKUP_ERROR;
+
   if (source_id == target_id)
   {
     TimeCacheInterfacePtr cache = getFrame(source_id);
