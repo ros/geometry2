@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2014, Open Source Robotics Foundation
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -62,19 +62,32 @@ TEST(tf2_ros_transform_listener, time_backwards)
   tfb.sendTransform(msg);
   msg.header.stamp = ros::Time(102, 0);
   tfb.sendTransform(msg);
+
+
+  // make sure it arrives
+  ros::spinOnce();
   sleep(1);
+
   // verify it's been set
   ASSERT_TRUE(buffer.canTransform("foo", "bar", ros::Time(101, 0)));
 
   c.clock = ros::Time(90);
   clock.publish(c);
 
-  //Send anoterh message to trigger clock test
+  // make sure it arrives
+  ros::spinOnce();
+  sleep(1);
+
+  //Send anoterh message to trigger clock test on an unrelated frame
   msg.header.stamp = ros::Time(110, 0);
   msg.header.frame_id = "foo2";
   msg.child_frame_id = "bar2";
   tfb.sendTransform(msg);
+
+  // make sure it arrives
+  ros::spinOnce();
   sleep(1);
+
   //verify the data's been cleared
   ASSERT_FALSE(buffer.canTransform("foo", "bar", ros::Time(101, 0)));
 
