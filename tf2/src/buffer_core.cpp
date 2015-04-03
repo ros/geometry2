@@ -559,13 +559,7 @@ struct TransformAccum
   tf2::Quaternion result_quat;
   tf2::Vector3 result_vec;
 };
-/*geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame,
-                                                            const std::string& source_frame,
-                                                            const ros::Time& time) const
-{
-  std::vector<> frame_chain;
-  return lookupTransform(target_frame, source_frame, time, frame_chain);
-}*/
+
 geometry_msgs::TransformStamped BufferCore::lookupTransform(const std::string& target_frame,
                                                             const std::string& source_frame,
                                                             const ros::Time& time) const
