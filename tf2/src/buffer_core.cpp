@@ -287,9 +287,21 @@ enum WalkEnding
   FullPath,
 };
 
+// TODO for Jade: Merge walkToTopParent functions; this is now a stub to preserve ABI
 template<typename F>
 int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string) const
 {
+  return walkToTopParent(f, time, target_id, source_id, error_string, NULL);
+}
+
+template<typename F>
+int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id,
+    CompactFrameID source_id, std::string* error_string, std::vector<CompactFrameID>
+    *frame_chain) const
+{
+  if (frame_chain)
+    frame_chain->clear();
+
   // Short circuit if zero length transform to allow lookups on non existant links
   if (source_id == target_id)
   {
@@ -318,6 +330,8 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
   while (frame != 0)
   {
     TimeCacheInterfacePtr cache = getFrame(frame);
+    if (frame_chain)
+      frame_chain->push_back(frame);
 
     if (!cache)
     {
@@ -364,9 +378,13 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
   // Now walk to the top parent from the target frame, accumulating its transform
   frame = target_id;
   depth = 0;
+  std::vector<CompactFrameID> reverse_frame_chain;
+
   while (frame != top_parent)
   {
     TimeCacheInterfacePtr cache = getFrame(frame);
+    if (frame_chain)
+      reverse_frame_chain.push_back(frame);
 
     if (!cache)
     {
@@ -390,6 +408,10 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
     if (frame == source_id)
     {
       f.finalize(SourceParentOfTarget, time);
+      if (frame_chain)
+      {
+        frame_chain->swap(reverse_frame_chain);
+      }
       return tf2_msgs::TF2Error::NO_ERROR;
     }
 
@@ -431,9 +453,33 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, 
   }
 
   f.finalize(FullPath, time);
+  if (frame_chain)
+  {
+    // Pruning: Compare the chains starting at the parent (end) until they differ
+    int m = reverse_frame_chain.size()-1;
+    int n = frame_chain->size()-1;
+    for (; m >= 0 && n >= 0; --m, --n)
+    {
+      if ((*frame_chain)[n] != reverse_frame_chain[m])
+        break;
+    }
+    // Erase all duplicate items from frame_chain
+    if (n > 0)
+      frame_chain->erase(frame_chain->begin() + (n-1), frame_chain->end());
 
+    if (m < reverse_frame_chain.size())
+    {
+      for (int i = m; i >= 0; --i)
+      {
+        frame_chain->push_back(reverse_frame_chain[i]);
+      }
+    }
+  }
+  
   return tf2_msgs::TF2Error::NO_ERROR;
 }
+
+
 
 struct TransformAccum
 {
@@ -1429,23 +1475,76 @@ void BufferCore::_chainAsVector(const std::string & target_frame, ros::Time targ
   std::stringstream mstream;
   boost::mutex::scoped_lock lock(frame_mutex_);
 
-  TransformStorage temp;
+  TransformAccum accum;
 
-  ///regular transforms
-  for (unsigned int counter = 1; counter < frames_.size(); counter ++)
+  // Get source frame/time using getFrame
+  CompactFrameID source_id = lookupFrameNumber(source_frame);
+  CompactFrameID fixed_id = lookupFrameNumber(fixed_frame);
+  CompactFrameID target_id = lookupFrameNumber(target_frame);
+
+  std::vector<CompactFrameID> source_frame_chain;
+  int retval = walkToTopParent(accum, source_time, fixed_id, source_id, &error_string, &source_frame_chain);
+
+  if (retval != tf2_msgs::TF2Error::NO_ERROR)
   {
-    TimeCacheInterfacePtr frame_ptr = getFrame(CompactFrameID(counter));
-    if (frame_ptr == NULL)
-      continue;
-    CompactFrameID frame_id_num;
-    if (frame_ptr->getData(ros::Time(), temp))
-        frame_id_num = temp.frame_id_;
-      else
-      {
-        frame_id_num = 0;
-      }
-      output.push_back(frameIDs_reverse[frame_id_num]);
+    switch (retval)
+    {
+    case tf2_msgs::TF2Error::CONNECTIVITY_ERROR:
+      throw ConnectivityException(error_string);
+    case tf2_msgs::TF2Error::EXTRAPOLATION_ERROR:
+      throw ExtrapolationException(error_string);
+    case tf2_msgs::TF2Error::LOOKUP_ERROR:
+      throw LookupException(error_string);
+    default:
+      logError("Unknown error code: %d", retval);
+      assert(0);
+    }
   }
+  if (source_time != target_time)
+  {
+    std::vector<CompactFrameID> target_frame_chain;
+    retval = walkToTopParent(accum, target_time, target_id, fixed_id, &error_string, &target_frame_chain);
+
+    if (retval != tf2_msgs::TF2Error::NO_ERROR)
+    {
+      switch (retval)
+      {
+      case tf2_msgs::TF2Error::CONNECTIVITY_ERROR:
+        throw ConnectivityException(error_string);
+      case tf2_msgs::TF2Error::EXTRAPOLATION_ERROR:
+        throw ExtrapolationException(error_string);
+      case tf2_msgs::TF2Error::LOOKUP_ERROR:
+        throw LookupException(error_string);
+      default:
+        logError("Unknown error code: %d", retval);
+        assert(0);
+      }
+    }
+    int m = target_frame_chain.size()-1;
+    int n = source_frame_chain.size()-1;
+    for (; m >= 0 && n >= 0; --m, --n)
+    {
+      if (source_frame_chain[n] != target_frame_chain[m])
+        break;
+    }
+    // Erase all duplicate items from frame_chain
+    if (n > 0)
+      source_frame_chain.erase(source_frame_chain.begin() + (n-1), source_frame_chain.end());
+
+    if (m < target_frame_chain.size())
+    {
+      for (unsigned int i = 0; i <= m; ++i)
+      {
+        source_frame_chain.push_back(target_frame_chain[i]);
+      }
+    }
+  }
+
+  // Write each element of source_frame_chain as string
+  for (unsigned int i = 0; i < source_frame_chain.size(); ++i)
+  {
+    output.push_back(lookupFrameString(source_frame_chain[i]));
+ }
 }
 
 

@@ -400,6 +400,11 @@ private:
   template<typename F>
   int walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string) const;
 
+  /**@brief Traverse the transform tree. If frame_chain is not NULL, store the traversed frame tree in vector frame_chain.
+   * */
+  template<typename F>
+  int walkToTopParent(F& f, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string, std::vector<CompactFrameID> *frame_chain) const;
+
   void testTransformableRequests();
   bool canTransformInternal(CompactFrameID target_id, CompactFrameID source_id,
                     const ros::Time& time, std::string* error_msg) const;
@@ -409,7 +414,6 @@ private:
 
   //Whether it is safe to use canTransform with a timeout. (If another thread is not provided it will always timeout.)
   bool using_dedicated_thread_;
-  
 
 };
 
