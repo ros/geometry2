@@ -790,7 +790,7 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
 
 tf2::TimeCacheInterfacePtr BufferCore::getFrame(CompactFrameID frame_id) const
 {
-  if (frame_id == 0 || frame_id > frames_.size()) /// @todo check larger values too
+  if (frame_id >= frames_.size())
     return TimeCacheInterfacePtr();
   else
   {
