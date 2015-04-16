@@ -242,7 +242,8 @@ public:
   {
     boost::mutex::scoped_lock frames_lock(target_frames_mutex_);
 
-    target_frames_ = target_frames;
+    target_frames_.resize(target_frames.size());
+    std::transform(target_frames.begin(), target_frames.end(), target_frames_.begin(), this->stripSlash);
     expected_success_count_ = target_frames_.size() + (time_tolerance_.isZero() ? 0 : 1);
 
     std::stringstream ss;
@@ -298,7 +299,7 @@ public:
 
     namespace mt = ros::message_traits;
     const MConstPtr& message = evt.getMessage();
-    const std::string frame_id = mt::FrameId<M>::value(*message);
+    std::string frame_id = stripSlash(mt::FrameId<M>::value(*message));
     ros::Time stamp = mt::TimeStamp<M>::value(*message);
 
     if (frame_id.empty())
@@ -485,7 +486,7 @@ private:
 
     bool can_transform = true;
     const MConstPtr& message = info.event.getMessage();
-    const std::string& frame_id = mt::FrameId<M>::value(*message);
+    std::string frame_id = stripSlash(mt::FrameId<M>::value(*message));
     ros::Time stamp = mt::TimeStamp<M>::value(*message);
 
     if (result == tf2::TransformAvailable)
@@ -642,6 +643,18 @@ private:
   {
     boost::mutex::scoped_lock lock(failure_signal_mutex_);
     failure_signal_(evt.getMessage(), reason);
+  }
+
+  static
+  std::string stripSlash(const std::string& in)
+  {
+    if ( !in.empty() && (in[0] == '/'))
+    {
+      std::string out = in;
+      out.erase(0, 1);
+      return out;
+    }
+    return in;
   }
 
   tf2::BufferCore& bc_; ///< The Transformer used to determine if transformation data is available
