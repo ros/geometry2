@@ -335,8 +335,6 @@ private:
   /// How long to cache transform history
   ros::Duration cache_time_;
 
-  mutable std::vector<P_TimeAndFrameID> lct_cache_;
-
   typedef boost::unordered_map<TransformableCallbackHandle, TransformableCallback> M_TransformableCallback;
   M_TransformableCallback transformable_callbacks_;
   uint32_t transformable_callbacks_counter_;
