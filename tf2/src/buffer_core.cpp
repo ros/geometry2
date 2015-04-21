@@ -914,7 +914,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
     return tf2_msgs::TF2Error::NO_ERROR;
   }
 
-  lct_cache_.clear();
+  std::vector<P_TimeAndFrameID> lct_cache;
 
   // Walk the tree to its root from the source frame, accumulating the list of parent/time as well as the latest time
   // in the target is a direct parent
@@ -945,7 +945,7 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
       common_time = std::min(latest.first, common_time);
     }
 
-    lct_cache_.push_back(latest);
+    lct_cache.push_back(latest);
 
     frame = latest.second;
 
@@ -1000,8 +1000,8 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
       common_time = std::min(latest.first, common_time);
     }
 
-    std::vector<P_TimeAndFrameID>::iterator it = std::find_if(lct_cache_.begin(), lct_cache_.end(), TimeAndFrameIDFrameComparator(latest.second));
-    if (it != lct_cache_.end()) // found a common parent
+    std::vector<P_TimeAndFrameID>::iterator it = std::find_if(lct_cache.begin(), lct_cache.end(), TimeAndFrameIDFrameComparator(latest.second));
+    if (it != lct_cache.end()) // found a common parent
     {
       common_parent = it->second;
       break;
@@ -1042,8 +1042,8 @@ int BufferCore::getLatestCommonTime(CompactFrameID target_id, CompactFrameID sou
 
   // Loop through the source -> root list until we hit the common parent
   {
-    std::vector<P_TimeAndFrameID>::iterator it = lct_cache_.begin();
-    std::vector<P_TimeAndFrameID>::iterator end = lct_cache_.end();
+    std::vector<P_TimeAndFrameID>::iterator it = lct_cache.begin();
+    std::vector<P_TimeAndFrameID>::iterator end = lct_cache.end();
     for (; it != end; ++it)
     {
       if (!it->first.isZero())
