@@ -33,6 +33,7 @@
 #include "tf2_ros/buffer.h"
 
 #include <ros/assert.h>
+#include <sstream>
 
 namespace tf2_ros
 {
@@ -100,6 +101,18 @@ void sleep_fallback_to_wall(const ros::Duration& d)
   }
 }
 
+void conditionally_append_timeout_info(std::string * errstr, const ros::Time& start_time,
+                                       const ros::Duration& timeout)
+{
+  if (errstr)
+  {
+    std::stringstream ss;
+    ss << ". canTransform returned after "<< (now_fallback_to_wall() - start_time).toSec() \
+       <<" timeout was " << timeout.toSec() << ".";
+    (*errstr) += ss.str();
+  }
+}
+
 bool
 Buffer::canTransform(const std::string& target_frame, const std::string& source_frame, 
                      const ros::Time& time, const ros::Duration timeout, std::string* errstr) const
@@ -113,8 +126,12 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
          !canTransform(target_frame, source_frame, time) &&
          now_fallback_to_wall() >= start_time &&  //don't wait if time jumped backwards
          ros::ok()) // Make sure we haven't been stopped
-    sleep_fallback_to_wall(ros::Duration(0.01));
-  return canTransform(target_frame, source_frame, time, errstr);
+    {
+      sleep_fallback_to_wall(ros::Duration(0.01));
+    }
+  bool retval = canTransform(target_frame, source_frame, time, errstr);
+  conditionally_append_timeout_info(errstr, start_time, timeout);
+  return retval;
 }
 
     
@@ -132,8 +149,12 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
          !canTransform(target_frame, target_time, source_frame, source_time, fixed_frame) &&
          now_fallback_to_wall() >= start_time &&  //don't wait if time jumped backwards
          ros::ok()) // Make sure we haven't been stopped
-    sleep_fallback_to_wall(ros::Duration(0.01));
-  return canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
+         {  
+           sleep_fallback_to_wall(ros::Duration(0.01));
+         }
+  bool retval = canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
+  conditionally_append_timeout_info(errstr, start_time, timeout);
+  return retval; 
 }
 
 
