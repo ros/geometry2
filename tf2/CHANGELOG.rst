@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.10 (2015-04-21)
+-------------------
 * move lct_cache into function local memoryfor `#92 <https://github.com/ros/geometry_experimental/issues/92>`_
 * Clean up range checking. Re: `#92 <https://github.com/ros/geometry_experimental/issues/92>`_
 * Fixed chainToVector
