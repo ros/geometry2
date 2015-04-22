@@ -75,6 +75,9 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
                 r.sleep()
         core_result = self.can_transform_core(target_frame, source_frame, time)
         if return_debug_tuple:
+            core_result[2] = core_result[2] + " timeout: %s, elapsed: %s" % \
+                                               (timeout.to_secs(),
+                                                (rospy.Time.now() - start_time).to_secs())
             return core_result
         return core_result[0]
     
@@ -90,6 +93,8 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
                 r.sleep()
         core_result = self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
         if return_debug_tuple:
+            core_result[2] = core_result[2] + " timeout: %s, elapsed: %s" % \
+                                               (timeout.to_secs(),
+                                                (rospy.Time.now() - start_time).to_secs())
             return core_result
         return core_result[0]
-
