@@ -2,6 +2,17 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* do not short circuit waitForTransform timeout when running inside pytf. Fixes `#102 <https://github.com/ros/geometry_experimental/issues/102>`_
+  roscpp is not initialized inside pytf which means that ros::ok is not
+  valid. This was causing the timer to abort immediately.
+  This breaks support for pytf with respect to early breaking out of a loop re `#26 <https://github.com/ros/geometry_experimental/issues/26>`_.
+  This is conceptually broken in pytf, and is fixed in tf2_ros python implementation.
+  If you want this behavior I recommend switching to the tf2 python bindings.
+* inject timeout information into error string for canTransform with timeout
+* Contributors: Tully Foote
+
 0.5.10 (2015-04-21)
 -------------------
 * switch to use a shared lock with upgrade instead of only a unique lock. For `#91 <https://github.com/ros/geometry_experimental/issues/91>`_
