@@ -2,6 +2,14 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* move lct_cache into function local memoryfor `#92 <https://github.com/ros/geometry_experimental/issues/92>`_
+* Clean up range checking. Re: `#92 <https://github.com/ros/geometry_experimental/issues/92>`_
+* Fixed chainToVector
+* release lock before possibly invoking user callbacks. Fixes `#91 <https://github.com/ros/geometry_experimental/issues/91>`_
+* Contributors: Jackie Kay, Tully Foote
+
 0.5.9 (2015-03-25)
 ------------------
 * fixing edge case where two no frame id lookups matched in getLatestCommonTime

@@ -2,6 +2,16 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* switch to use a shared lock with upgrade instead of only a unique lock. For `#91 <https://github.com/ros/geometry_experimental/issues/91>`_
+* Update message_filter.h
+* filters: fix unsupported old messages with frame_id starting with '/'
+* Enabled tf2 documentation
+* make sure the messages get processed before testing the effects. Fixes `#88 <https://github.com/ros/geometry_experimental/issues/88>`_
+* allowing to use message filters with PCL types
+* Contributors: Brice Rebsamen, Jackie Kay, Tully Foote, Vincent Rabaud, jmtatsch
+
 0.5.9 (2015-03-25)
 ------------------
 * changed queue_size in Python transform boradcaster to match that in c++
