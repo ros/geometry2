@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.11 (2015-04-22)
+-------------------
 * do not short circuit waitForTransform timeout when running inside pytf. Fixes `#102 <https://github.com/ros/geometry_experimental/issues/102>`_
   roscpp is not initialized inside pytf which means that ros::ok is not
   valid. This was causing the timer to abort immediately.
