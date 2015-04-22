@@ -125,7 +125,7 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
   while (now_fallback_to_wall() < start_time + timeout && 
          !canTransform(target_frame, source_frame, time) &&
          now_fallback_to_wall() >= start_time &&  //don't wait if time jumped backwards
-         ros::ok()) // Make sure we haven't been stopped
+         (ros::ok() || !ros::isInitialized())) // Make sure we haven't been stopped (won't work for pytf)
     {
       sleep_fallback_to_wall(ros::Duration(0.01));
     }
@@ -148,7 +148,7 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
   while (now_fallback_to_wall() < start_time + timeout && 
          !canTransform(target_frame, target_time, source_frame, source_time, fixed_frame) &&
          now_fallback_to_wall() >= start_time &&  //don't wait if time jumped backwards
-         ros::ok()) // Make sure we haven't been stopped
+         (ros::ok() || !ros::isInitialized())) // Make sure we haven't been stopped (won't work for pytf)
          {  
            sleep_fallback_to_wall(ros::Duration(0.01));
          }
