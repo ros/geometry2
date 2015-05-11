@@ -74,7 +74,7 @@ template <>
 inline
   void doTransform(const geometry_msgs::Vector3Stamped& t_in, geometry_msgs::Vector3Stamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    KDL::Vector v_out = gmTransformToKDL(transform) * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z);
+    KDL::Vector v_out = gmTransformToKDL(transform).M * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z);
     t_out.vector.x = v_out[0];
     t_out.vector.y = v_out[1];
     t_out.vector.z = v_out[2];
