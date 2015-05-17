@@ -36,7 +36,7 @@
 #include <tf2/transform_datatypes.h>
 #include <tf2/exceptions.h>
 #include <geometry_msgs/TransformStamped.h>
-
+#include <tf2/impl/convert.h>
 
 namespace tf2 {
 
@@ -82,11 +82,18 @@ template <class P>
     return t.frame_id_;
   }
 
+/** Function that converts any type to any type (messages or not).
+ * Matching toMsg and from Msg conversion functions need to exist.
+ * If they don't exist or do not apply (for example, if your two
+ * classes are messages), just write a specialization of the function.
+ * \param a the object to convert
+ * \param b the object to convert to
+ */
 template <class A, class B>
   void convert(const A& a, B& b)
   {
     //printf("In double type convert\n");
-    fromMsg(toMsg(a), b);
+    impl::Converter<ros::message_traits::IsMessage<A>::value, ros::message_traits::IsMessage<B>::value>::convert(a, b);
   }
 
 template <class A>
