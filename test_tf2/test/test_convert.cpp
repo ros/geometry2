@@ -38,6 +38,7 @@
 #include <tf2/convert.h>
 #include <tf2_kdl/tf2_kdl.h>
 #include <tf2_bullet/tf2_bullet.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <ros/time.h>
 
 TEST(tf2Convert, kdlToBullet)
@@ -65,8 +66,54 @@ TEST(tf2Convert, kdlToBullet)
   EXPECT_NEAR(b1.x(), b2.x(), epsilon);
   EXPECT_NEAR(b1.y(), b2.y(), epsilon);
   EXPECT_NEAR(b1.z(), b2.z(), epsilon);
+}
 
-} 
+TEST(tf2Convert, kdlBulletROSConversions)
+{
+  double epsilon = 1e-9;
+
+  tf2::Stamped<btVector3> b1(btVector3(1,2,3), ros::Time(), "my_frame"), b2, b3, b4;
+  geometry_msgs::PointStamped r1, r2, r3;
+  tf2::Stamped<KDL::Vector> k1, k2, k3;
+
+  // Do bullet -> self -> bullet -> KDL -> self -> KDL -> ROS -> self -> ROS -> KDL -> bullet -> ROS -> bullet
+  tf2::convert(b1, b1);
+  tf2::convert(b1, b2);
+  tf2::convert(b2, k1);
+  tf2::convert(k1, k1);
+  tf2::convert(k1, k2);
+  tf2::convert(k2, r1);
+  tf2::convert(r1, r1);
+  tf2::convert(r1, r2);
+  tf2::convert(r2, k3);
+  tf2::convert(k3, b3);
+  tf2::convert(b3, r3);
+  tf2::convert(r3, b4);
+
+  EXPECT_EQ(b1.frame_id_, b4.frame_id_);
+  EXPECT_NEAR(b1.stamp_.toSec(), b4.stamp_.toSec(), epsilon);
+  EXPECT_NEAR(b1.x(), b4.x(), epsilon);
+  EXPECT_NEAR(b1.y(), b4.y(), epsilon);
+  EXPECT_NEAR(b1.z(), b4.z(), epsilon);
+
+  // The following should simply compile, that's it
+  r2 = tf2::toMsg(r1);
+  tf2::fromMsg(r2, r3);
+
+  EXPECT_NEAR(r1.point.x, r3.point.x, epsilon);
+  EXPECT_NEAR(r1.point.y, r3.point.y, epsilon);
+  EXPECT_NEAR(r1.point.z, r3.point.z, epsilon);
+
+  r1 = tf2::toMsg(r1);
+  EXPECT_NEAR(r1.point.x, r3.point.x, epsilon);
+  EXPECT_NEAR(r1.point.y, r3.point.y, epsilon);
+  EXPECT_NEAR(r1.point.z, r3.point.z, epsilon);
+
+  tf2::fromMsg(r1, r1);
+  EXPECT_NEAR(r1.point.x, r3.point.x, epsilon);
+  EXPECT_NEAR(r1.point.y, r3.point.y, epsilon);
+  EXPECT_NEAR(r1.point.z, r3.point.z, epsilon);
+}
 
 int main(int argc, char** argv)
 {

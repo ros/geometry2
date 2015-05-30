@@ -81,16 +81,6 @@ void doTransform(const sensor_msgs::PointCloud2 &p_in, sensor_msgs::PointCloud2 
     *z_out = point.z();
   }
 }
-inline
-sensor_msgs::PointCloud2 toMsg(const sensor_msgs::PointCloud2 &in)
-{
-  return in;
-}
-inline
-void fromMsg(const sensor_msgs::PointCloud2 &msg, sensor_msgs::PointCloud2 &out)
-{
-  out = msg;
-}
 
 } // namespace
 
