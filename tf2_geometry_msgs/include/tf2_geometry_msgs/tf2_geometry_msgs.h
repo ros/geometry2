@@ -194,6 +194,31 @@ void doTransform(const geometry_msgs::QuaternionStamped& t_in, geometry_msgs::Qu
   t_out.header.frame_id = transform.header.frame_id;
 }
 
+template <>
+inline
+geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in)
+{
+  geometry_msgs::QuaternionStamped out;
+  out.header.stamp = in.stamp_;
+  out.header.frame_id = in.frame_id_;
+  out.quaternion.w = in.getW();
+  out.quaternion.x = in.getX();
+  out.quaternion.y = in.getY();
+  out.quaternion.z = in.getZ();
+  return out;
+}
+
+template <>
+inline
+void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quaternion>& out)
+{
+  out.stamp_ = in.header.stamp;
+  out.frame_id_ = in.header.frame_id;
+  tf2::Quaternion tmp;
+  fromMsg(in.quaternion, tmp);
+  out.setData(tmp);
+}
+
 
 /**********************/
 /** TransformStamped **/
