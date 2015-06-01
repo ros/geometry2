@@ -91,23 +91,6 @@ template <class P>
 template<typename A, typename B>
   B toMsg(const A& a);
 
-/** Function that converts from one type to a ROS message type. This is the
- * specialization of the two argument template. It will not compile for an
- * object that is not a ROS message. Inside the "convert" function, it is
- * optimized out.
- * \param a a ROS message
- * \return a copy of the same ROS message
- */
-template<typename A>
-  A toMsg(const A& a) {
-    // Make sure that we are dealing with a message
-    // If your code does not compile and refers to that line, it's because
-    // you are using toMsg for something that is not a ROS message, e.g toMsg(int)
-    // This is a C++03 version of a static_assert
-    static bool _is_message[ros::message_traits::IsMessage<A>::value ? 1 : -1];
-    return a;
-  }
-
 /** Function that converts from a ROS message type to another type. It has to be
  * implemented by each data type in tf2_* (except ROS messages) as it is used
  * in the "convert" function.
@@ -116,24 +99,6 @@ template<typename A>
  */
 template<typename A, typename B>
   void fromMsg(const A&, B& b);
-
-/** Function that converts from one type to a ROS message type. This is the
- * specialization of the two argument template. It will not compile for an
- * object that is not a ROS message. Inside the "convert" function, it is
- * optimized out.
- * \param a a ROS message to convert from
- * \param b a ROS message of the same type as the first one
- */
-template<typename A>
-  void fromMsg(const A& a, A& b) {
-    // Make sure that we are dealing with a message
-    // If your code does not compile and refers to that line, it's because
-    // you are using fromMsg for something that is not a ROS message
-    // This is a C++03 version of a static_assert
-    static bool _is_message[ros::message_traits::IsMessage<A>::value ? 1 : -1];
-    if(&a != &b)
-        b = a;
-  }
 
 /** Function that converts any type to any type (messages or not).
  * Matching toMsg and from Msg conversion functions need to exist.

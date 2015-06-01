@@ -95,25 +95,7 @@ TEST(tf2Convert, kdlBulletROSConversions)
   EXPECT_NEAR(b1.x(), b4.x(), epsilon);
   EXPECT_NEAR(b1.y(), b4.y(), epsilon);
   EXPECT_NEAR(b1.z(), b4.z(), epsilon);
-
-  // The following should simply compile, that's it
-  r2 = tf2::toMsg(r1);
-  tf2::fromMsg(r2, r3);
-
-  EXPECT_NEAR(r1.point.x, r3.point.x, epsilon);
-  EXPECT_NEAR(r1.point.y, r3.point.y, epsilon);
-  EXPECT_NEAR(r1.point.z, r3.point.z, epsilon);
-
-  r1 = tf2::toMsg(r1);
-  EXPECT_NEAR(r1.point.x, r3.point.x, epsilon);
-  EXPECT_NEAR(r1.point.y, r3.point.y, epsilon);
-  EXPECT_NEAR(r1.point.z, r3.point.z, epsilon);
-
-  tf2::fromMsg(r1, r1);
-  EXPECT_NEAR(r1.point.x, r3.point.x, epsilon);
-  EXPECT_NEAR(r1.point.y, r3.point.y, epsilon);
-  EXPECT_NEAR(r1.point.z, r3.point.z, epsilon);
-}
+} 
 
 int main(int argc, char** argv)
 {

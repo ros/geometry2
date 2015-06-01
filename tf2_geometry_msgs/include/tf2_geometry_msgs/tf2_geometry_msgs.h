@@ -81,6 +81,16 @@ inline
     t_out.header.stamp = transform.header.stamp;
     t_out.header.frame_id = transform.header.frame_id;
   }
+inline
+geometry_msgs::Vector3Stamped toMsg(const geometry_msgs::Vector3Stamped& in)
+{
+  return in;
+}
+inline
+void fromMsg(const geometry_msgs::Vector3Stamped& msg, geometry_msgs::Vector3Stamped& out)
+{
+  out = msg;
+}
 
 
 
@@ -110,6 +120,16 @@ inline
     t_out.header.stamp = transform.header.stamp;
     t_out.header.frame_id = transform.header.frame_id;
   }
+inline
+geometry_msgs::PointStamped toMsg(const geometry_msgs::PointStamped& in)
+{
+  return in;
+}
+inline
+void fromMsg(const geometry_msgs::PointStamped& msg, geometry_msgs::PointStamped& out)
+{
+  out = msg;
+}
 
 
 /*****************/
@@ -142,6 +162,16 @@ inline
     t_out.header.stamp = transform.header.stamp;
     t_out.header.frame_id = transform.header.frame_id;
   }
+inline
+geometry_msgs::PoseStamped toMsg(const geometry_msgs::PoseStamped& in)
+{
+  return in;
+}
+inline
+void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& out)
+{
+  out = msg;
+}
 
 
 /****************/
@@ -193,6 +223,16 @@ void doTransform(const geometry_msgs::QuaternionStamped& t_in, geometry_msgs::Qu
   t_out.header.stamp = transform.header.stamp;
   t_out.header.frame_id = transform.header.frame_id;
 }
+inline
+geometry_msgs::QuaternionStamped toMsg(const geometry_msgs::QuaternionStamped& in)
+{
+  return in;
+}
+inline
+void fromMsg(const geometry_msgs::QuaternionStamped& msg, geometry_msgs::QuaternionStamped& out)
+{
+  out = msg;
+}
 
 
 /**********************/
@@ -228,6 +268,16 @@ void doTransform(const geometry_msgs::TransformStamped& t_in, geometry_msgs::Tra
     t_out.header.stamp = transform.header.stamp;
     t_out.header.frame_id = transform.header.frame_id;
   }
+inline
+geometry_msgs::TransformStamped toMsg(const geometry_msgs::TransformStamped& in)
+{
+  return in;
+}
+inline
+void fromMsg(const geometry_msgs::TransformStamped& msg, geometry_msgs::TransformStamped& out)
+{
+  out = msg;
+}
 
 
 /***************/
