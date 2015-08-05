@@ -50,6 +50,16 @@ KDL::Frame transformToKDL(const geometry_msgs::TransformStamped& t)
 		      KDL::Vector(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z));
   }
 
+inline
+geometry_msgs::TransformStamped kdlToTransform(const KDL::Frame& k)
+{
+  geometry_msgs::TransformStamped t;
+  t.transform.translation.x = k.p.x();
+  t.transform.translation.y = k.p.y();
+  t.transform.translation.z = k.p.z();
+  k.M.GetQuaternion(t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w);
+  return t;
+}
 
 // ---------------------
 // Vector
