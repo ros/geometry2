@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.12 (2015-08-05)
+-------------------
 * add utilities to get yaw, pitch, roll and identity transform
 * provide more conversions between types
   The previous conversion always assumed that it was converting a

@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.12 (2015-08-05)
+-------------------
 * remove annoying gcc warning
   This is because the roslog macro cannot have two arguments that are
   formatting strings: we need to concatenate them first.
