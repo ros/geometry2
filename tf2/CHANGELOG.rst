@@ -2,6 +2,15 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add utilities to get yaw, pitch, roll and identity transform
+* provide more conversions between types
+  The previous conversion always assumed that it was converting a
+  non-message type to a non-message type. Now, one, both or none
+  can be a message or a non-message.
+* Contributors: Vincent Rabaud
+
 0.5.11 (2015-04-22)
 -------------------
 

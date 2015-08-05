@@ -2,6 +2,20 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove annoying gcc warning
+  This is because the roslog macro cannot have two arguments that are
+  formatting strings: we need to concatenate them first.
+* break canTransform loop only for non-tiny negative time deltas
+  (At least) with Python 2 ros.Time.now() is not necessarily monotonic
+  and one can experience negative time deltas (usually well below 1s)
+  on real hardware under full load. This check was originally introduced
+  to allow for backjumps with rosbag replays, and only there it makes sense.
+  So we'll add a small duration threshold to ignore backjumps due to
+  non-monotonic clocks.
+* Contributors: Vincent Rabaud, v4hn
+
 0.5.11 (2015-04-22)
 -------------------
 * do not short circuit waitForTransform timeout when running inside pytf. Fixes `#102 <https://github.com/ros/geometry_experimental/issues/102>`_
