@@ -33,9 +33,9 @@ add_executable(test_tf2_sensor_msgs_cpp EXCLUDE_FROM_ALL test/test_tf2_sensor_ms
 target_link_libraries(test_tf2_sensor_msgs_cpp ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
 
 
-#if(TARGET tests)
-#  add_dependencies(tests test_tf2_sensor_msgs_cpp)
-#endif()
+if(TARGET tests)
+  add_dependencies(tests test_tf2_sensor_msgs_cpp)
+endif()
 add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 
 
