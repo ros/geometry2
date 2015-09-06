@@ -17,10 +17,13 @@
 
   <run_depend>tf2</run_depend>
   <run_depend>tf2_bullet</run_depend>
+  <run_depend>tf2_eigen</run_depend>
   <run_depend>tf2_geometry_msgs</run_depend>
   <run_depend>tf2_kdl</run_depend>
   <run_depend>tf2_msgs</run_depend>
+  <run_depend>tf2_py</run_depend>
   <run_depend>tf2_ros</run_depend>
+  <run_depend>tf2_sensor_msgs</run_depend>
   <run_depend>tf2_tools</run_depend>
 
   <export>
