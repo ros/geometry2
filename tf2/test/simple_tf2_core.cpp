@@ -27,19 +27,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <chrono>
 #include <gtest/gtest.h>
 #include <tf2/buffer_core.h>
-#include <sys/time.h>
-#include <ros/ros.h>
 #include "tf2/LinearMath/Vector3.h"
 #include "tf2/exceptions.h"
+
+typedef std::chrono::system_clock::time_point TimePoint;
 
 void seed_rand()
 {
   //Seed random number generator with current microseond count
-  timeval temp_time_struct;
-  gettimeofday(&temp_time_struct,NULL);
-  srand(temp_time_struct.tv_usec);
+  srand(std::chrono::system_clock::now().time_since_epoch().count());
 };
 
 void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xvalues, std::vector<double>& yvalues, std::vector<double>&zvalues)
@@ -58,7 +57,7 @@ void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xva
 TEST(tf2, setTransformFail)
 {
   tf2::BufferCore tfc;
-  geometry_msgs::TransformStamped st;
+  geometry_msgs::msg::TransformStamped st;
   EXPECT_FALSE(tfc.setTransform(st, "authority1"));
   
 }
@@ -66,10 +65,15 @@ TEST(tf2, setTransformFail)
 TEST(tf2, setTransformValid)
 {
   tf2::BufferCore tfc;
-  geometry_msgs::TransformStamped st;
+  geometry_msgs::msg::TransformStamped st;
   st.header.frame_id = "foo";
-  st.header.stamp = ros::Time(1.0);
+  st.header.stamp = builtin_interfaces::msg::Time();
+  st.header.stamp.sec = 1;
+  st.header.stamp.nanosec = 1;
   st.child_frame_id = "child";
+  st.transform.rotation.x = 0;
+  st.transform.rotation.y = 0;
+  st.transform.rotation.z = 0;
   st.transform.rotation.w = 1;
   EXPECT_TRUE(tfc.setTransform(st, "authority1"));
   
@@ -78,45 +82,54 @@ TEST(tf2, setTransformValid)
 TEST(tf2_lookupTransform, LookupException_Nothing_Exists)
 {
   tf2::BufferCore tfc;
-  EXPECT_THROW(tfc.lookupTransform("a", "b", ros::Time().fromSec(1.0)), tf2::LookupException);
+  EXPECT_THROW(tfc.lookupTransform("a", "b", TimePoint(std::chrono::seconds(1))), tf2::LookupException);
   
 }
 
 TEST(tf2_canTransform, Nothing_Exists)
 {
   tf2::BufferCore tfc;
-  EXPECT_FALSE(tfc.canTransform("a", "b", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("a", "b", TimePoint(std::chrono::seconds(1))));
   
 }
 
 TEST(tf2_lookupTransform, LookupException_One_Exists)
 {
   tf2::BufferCore tfc;
-  geometry_msgs::TransformStamped st;
+  geometry_msgs::msg::TransformStamped st;
   st.header.frame_id = "foo";
-  st.header.stamp = ros::Time(1.0);
+  st.header.stamp = builtin_interfaces::msg::Time();
+  st.header.stamp.sec = 1;
+  st.header.stamp.nanosec = 0;
   st.child_frame_id = "child";
+  st.transform.rotation.x = 0;
+  st.transform.rotation.y = 0;
+  st.transform.rotation.z = 0;
   st.transform.rotation.w = 1;
   EXPECT_TRUE(tfc.setTransform(st, "authority1"));
-  EXPECT_THROW(tfc.lookupTransform("foo", "bar", ros::Time().fromSec(1.0)), tf2::LookupException);
+  EXPECT_THROW(tfc.lookupTransform("foo", "bar", TimePoint(std::chrono::seconds(1))), tf2::LookupException);
   
 }
 
 TEST(tf2_canTransform, One_Exists)
 {
   tf2::BufferCore tfc;
-  geometry_msgs::TransformStamped st;
+  geometry_msgs::msg::TransformStamped st;
   st.header.frame_id = "foo";
-  st.header.stamp = ros::Time(1.0);
+  st.header.stamp = builtin_interfaces::msg::Time();
+  st.header.stamp.sec = 1;
+  st.header.stamp.nanosec = 0;
   st.child_frame_id = "child";
+  st.transform.rotation.x = 0;
+  st.transform.rotation.y = 0;
+  st.transform.rotation.z = 0;
   st.transform.rotation.w = 1;
   EXPECT_TRUE(tfc.setTransform(st, "authority1"));
-  EXPECT_FALSE(tfc.canTransform("foo", "bar", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("foo", "bar", TimePoint(std::chrono::seconds(1))));
 }
 
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::Time::init(); //needed for ros::TIme::now()
   return RUN_ALL_TESTS();
 }

@@ -157,17 +157,6 @@ public:
 			xz - wy, yz + wx, tf2Scalar(1.0) - (xx + yy));
 	}
 
-
-	/** @brief Set the matrix from euler angles using YPR around ZYX respectively
-	*  @param yaw Yaw about Z axis
-	*  @param pitch Pitch about Y axis
-	*  @param roll Roll about X axis 
-	*/
-	void setEulerZYX(const tf2Scalar& yaw, const tf2Scalar& pitch, const tf2Scalar& roll) __attribute__((deprecated))
-	{
-		setEulerYPR(yaw, pitch, roll);
-	}
-
 	/** @brief Set the matrix from euler angles YPR around ZYX axes
 	* @param eulerZ Yaw aboud Z axis
 	* @param eulerY Pitch around Y axis
@@ -273,17 +262,6 @@ public:
 		}
 		q.setValue(temp[0],temp[1],temp[2],temp[3]);
 	}
-
-	/**@brief Get the matrix represented as euler angles around ZYX
-	* @param yaw Yaw around Z axis
-	* @param pitch Pitch around Y axis
-	* @param roll around X axis 
- 	* @param solution_number Which solution of two possible solutions ( 1 or 2) are possible values*/	
-	__attribute__((deprecated)) void getEulerZYX(tf2Scalar& yaw, tf2Scalar& pitch, tf2Scalar& roll, unsigned int solution_number = 1) const
-	{
-		getEulerYPR(yaw, pitch, roll, solution_number);
-	};
-
 
 	/**@brief Get the matrix represented as euler angles around YXZ, roundtrip with setEulerYPR
 	* @param yaw Yaw around Z axis
@@ -691,4 +669,3 @@ TF2SIMD_FORCE_INLINE	void	Matrix3x3::deSerializeDouble(const struct	Matrix3x3Dou
 
 }
 #endif //TF2_MATRIX3x3_H
-

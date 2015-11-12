@@ -82,7 +82,7 @@ Changelog for package tf2_bullet
 
 0.4.0 (2013-06-27)
 ------------------
-* moving convert methods back into tf2 because it does not have any ros dependencies beyond ros::Time which is already a dependency of tf2
+* moving convert methods back into tf2 because it does not have any ros dependencies beyond builtin_interfaces::msg::Time which is already a dependency of tf2
 * Cleaning up unnecessary dependency on roscpp
 * converting contents of tf2_ros to be properly namespaced in the tf2_ros namespace
 * Cleaning up packaging of tf2 including:

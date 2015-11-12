@@ -1,4 +1,4 @@
-<package>
+<package format="2">
   <name>tf2_ros</name>
   <version>0.5.12</version>
   <description>
@@ -11,38 +11,31 @@
 
   <url type="website">http://www.ros.org/wiki/tf2_ros</url>
     
-  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>actionlib</build_depend>
-  <build_depend>actionlib_msgs</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend version_gte="1.11.1">message_filters</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>rosgraph</build_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>tf2</build_depend>
-  <build_depend>tf2_msgs</build_depend>
-  <build_depend>tf2_py</build_depend>
- 
-  <run_depend>actionlib</run_depend>
-  <run_depend>actionlib_msgs</run_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>message_filters</run_depend>
-  <run_depend>roscpp</run_depend>
+  <!-- <depend>actionlib</depend>
+  <depend>actionlib_msgs</depend> -->
+  <!-- <build_depend version_gte="1.11.1">message_filters</build_depend> -->
+  <!-- <build_depend>rosgraph</build_depend> -->
+  <!-- <build_depend>rospy</build_depend> -->
+  <!-- <build_depend>tf2_py</build_depend> -->
+  
+  <depend>geometry_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_msgs</depend>
+
+  <!-- <run_depend>message_filters</run_depend>
   <run_depend>rosgraph</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>tf2</run_depend>
   <run_depend>tf2_msgs</run_depend>
   <run_depend>tf2_py</run_depend>
+  <test_depend>rostest</test_depend> -->
 
-  <test_depend>rostest</test_depend>
-
-
-
-
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>
-
-
-

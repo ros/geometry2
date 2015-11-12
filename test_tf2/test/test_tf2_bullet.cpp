@@ -41,17 +41,17 @@ static const double EPS = 1e-3;
 
 TEST(TfBullet, Transform)
 {
-  tf2::Stamped<btTransform> v1(btTransform(btQuaternion(1,0,0,0), btVector3(1,2,3)), ros::Time(2.0), "A");
+  tf2::Stamped<btTransform> v1(btTransform(btQuaternion(1,0,0,0), btVector3(1,2,3)), builtin_interfaces::msg::Time(2.0), "A");
 
   // simple api
-  btTransform v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
+  btTransform v_simple = tf_buffer->transform(v1, "B", tf2::TempDuration(2.0));
   EXPECT_NEAR(v_simple.getOrigin().getX(), -9, EPS);
   EXPECT_NEAR(v_simple.getOrigin().getY(), 18, EPS);
   EXPECT_NEAR(v_simple.getOrigin().getZ(), 27, EPS);
 
   // advanced api
-  btTransform v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
-					       "B", ros::Duration(3.0));
+  btTransform v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
+					       "B", tf2::TempDuration(3.0));
   EXPECT_NEAR(v_advanced.getOrigin().getX(), -9, EPS);
   EXPECT_NEAR(v_advanced.getOrigin().getY(), 18, EPS);
   EXPECT_NEAR(v_advanced.getOrigin().getZ(), 27, EPS);
@@ -61,17 +61,17 @@ TEST(TfBullet, Transform)
 
 TEST(TfBullet, Vector)
 {
-  tf2::Stamped<btVector3>  v1(btVector3(1,2,3), ros::Time(2.0), "A");
+  tf2::Stamped<btVector3>  v1(btVector3(1,2,3), builtin_interfaces::msg::Time(2.0), "A");
 
   // simple api
-  btVector3 v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
+  btVector3 v_simple = tf_buffer->transform(v1, "B", tf2::TempDuration(2.0));
   EXPECT_NEAR(v_simple.getX(), -9, EPS);
   EXPECT_NEAR(v_simple.getY(), 18, EPS);
   EXPECT_NEAR(v_simple.getZ(), 27, EPS);
 
   // advanced api
-  btVector3 v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
-  					     "B", ros::Duration(3.0));
+  btVector3 v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
+  					     "B", tf2::TempDuration(3.0));
   EXPECT_NEAR(v_advanced.getX(), -9, EPS);
   EXPECT_NEAR(v_advanced.getY(), 18, EPS);
   EXPECT_NEAR(v_advanced.getZ(), 27, EPS);
@@ -93,7 +93,7 @@ int main(int argc, char **argv){
   t.transform.translation.y = 20;
   t.transform.translation.z = 30;
   t.transform.rotation.x = 1;
-  t.header.stamp = ros::Time(2.0);
+  t.header.stamp = builtin_interfaces::msg::Time(2.0);
   t.header.frame_id = "A";
   t.child_frame_id = "B";
   tf_buffer->setTransform(t, "test");

@@ -134,7 +134,7 @@ Changelog for package tf2
 ------------------
 * splitting rospy dependency into tf2_py so tf2 is pure c++ library.
 * switching to console_bridge from rosconsole
-* moving convert methods back into tf2 because it does not have any ros dependencies beyond ros::Time which is already a dependency of tf2
+* moving convert methods back into tf2 because it does not have any ros dependencies beyond builtin_interfaces::msg::Time which is already a dependency of tf2
 * Cleaning up unnecessary dependency on roscpp
 * Cleaning up packaging of tf2 including:
   removing unused nodehandle

@@ -46,7 +46,7 @@ namespace tf2
 // method to extract timestamp from object
 template <>
 inline
-const ros::Time& getTimestamp(const sensor_msgs::PointCloud2& p) {return p.header.stamp;}
+const builtin_interfaces::msg::Time& getTimestamp(const sensor_msgs::PointCloud2& p) {return p.header.stamp;}
 
 // method to extract frame id from object
 template <>
