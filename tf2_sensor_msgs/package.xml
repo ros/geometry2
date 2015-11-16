@@ -23,6 +23,7 @@
   <run_depend>sensor_msgs</run_depend>
   <run_depend>tf2_ros</run_depend>
   <run_depend>tf2</run_depend>
+  <run_depend>python_orocos_kdl</run_depend>
 
   <test_depend>rostest</test_depend>
 
