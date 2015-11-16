@@ -26,10 +26,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from sensor_msgs.msg import PointCloud2
+from sensor_msgs.point_cloud2 import read_points, create_cloud
 import PyKDL
 import rospy
 import tf2_ros
-from sensor_msgs.point_cloud2 import read_cloud
 
 def to_msg_msg(msg):
     return msg
@@ -50,13 +50,11 @@ def transform_to_kdl(t):
 
 # PointStamped
 def do_transform_cloud(cloud, transform):
-    res = cloud.copy()
     t_kdl = transform_to_kdl(transform)
-    for p_in, p_out in [ read_cloud(cloud), read_cloud(res) ]:
-        p = t_kdl * PyKDL.Vector(p_in.x, p_in.y, p_in.z)
-        p_out.x = p[0]
-        p_out.y = p[1]
-        p_out.z = p[2]
-    res.header = transform.header
+    points_out = []
+    for p_in in read_points(cloud):
+        p_out = t_kdl * PyKDL.Vector(p_in[0], p_in[1], p_in[2])
+        points_out.append(p_out)
+    res = create_cloud(transform.header, cloud.fields, points_out)
     return res
 tf2_ros.TransformRegistration().add(PointCloud2, do_transform_cloud)

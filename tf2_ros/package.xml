@@ -37,7 +37,10 @@
   <run_depend>tf2_msgs</run_depend>
   <run_depend>tf2_py</run_depend>
 
-  <test_depend>rostest</test_depend>g
+  <test_depend>rostest</test_depend>
+
+
+
 
 </package>
 

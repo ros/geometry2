@@ -23,6 +23,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 catkin_python_setup()
 
 if(CATKIN_ENABLE_TESTING)
+  catkin_add_nosetests(test/test_tf2_sensor_msgs.py)
 
 find_package(catkin REQUIRED COMPONENTS sensor_msgs rostest tf2_ros tf2)
 
