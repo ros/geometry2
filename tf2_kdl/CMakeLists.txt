@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS cmake_modules tf2 tf2_ros tf2_msgs)
 find_package(Eigen REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS}
+  INCLUDE_DIRS include ${Eigen_INCLUDE_DIRS}
   DEPENDS Eigen orocos_kdl
 )
 
