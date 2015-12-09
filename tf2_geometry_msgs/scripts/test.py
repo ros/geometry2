@@ -44,6 +44,31 @@ def main():
     v.pose.orientation.x = 1
     print b.transform(v, 'b')
 
+    print "\nTranslation shouldn't affect Vector3:\n"
+    t = TransformStamped()
+    t.transform.translation.x = 1
+    t.transform.translation.y = 2
+    t.transform.translation.z = 3
+    t.transform.rotation.w = 1
+
+    v = Vector3Stamped()
+    v.vector.x = 1
+    v.vector.y = 0
+    v.vector.z = 0
+
+    print tf2_geometry_msgs.do_transform_vector3(v, t)
+
+    print "\nRotate Vector3 180 deg about y:\n"
+    t = TransformStamped()
+    t.transform.rotation.y = 1
+
+    v = Vector3Stamped()
+    v.vector.x = 1
+    v.vector.y = 0
+    v.vector.z = 0
+
+    print tf2_geometry_msgs.do_transform_vector3(v, t)
+
 if __name__ == '__main__':
     rospy.init_node('wim')
     main()
