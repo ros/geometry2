@@ -35,6 +35,7 @@ find_package (Threads)
 target_link_libraries(test_kdl ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${orocos_kdl_LIBRARIES} ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
+add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test_python.launch)
 
 if(TARGET tests)
   add_dependencies(tests test_kdl)
