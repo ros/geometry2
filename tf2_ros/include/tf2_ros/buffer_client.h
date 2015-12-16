@@ -53,7 +53,7 @@ namespace tf2_ros
        * \param check_frequency The frequency in Hz to check whether the BufferServer has completed a request
        * \param timeout_paddind The amount of time to allow passed the desired timeout on the client side for communication lag
        */
-      BufferClient(std::string ns, double check_frequency = 10.0, ros::Duration timeout_padding_ = ros::Duration(2.0));
+      BufferClient(std::string ns, double check_frequency = 10.0, tf2::TempDuration timeout_padding_ = tf2::TempDuration(2.0));
 
       /** \brief Get the transform between two frames by frame ID.
        * \param target_frame The frame to which data should be transformed
@@ -67,7 +67,7 @@ namespace tf2_ros
        */
       virtual geometry_msgs::TransformStamped
         lookupTransform(const std::string& target_frame, const std::string& source_frame,
-            const ros::Time& time, const ros::Duration timeout = ros::Duration(0.0)) const;
+            const builtin_interfaces::msg::Time& time, const tf2::TempDuration timeout = tf2::TempDuration(0.0)) const;
 
       /** \brief Get the transform between two frames by frame ID assuming fixed frame.
        * \param target_frame The frame to which data should be transformed
@@ -82,9 +82,9 @@ namespace tf2_ros
        * tf2::ExtrapolationException, tf2::InvalidArgumentException
        */
       virtual geometry_msgs::TransformStamped 
-        lookupTransform(const std::string& target_frame, const ros::Time& target_time,
-            const std::string& source_frame, const ros::Time& source_time,
-            const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0)) const;
+        lookupTransform(const std::string& target_frame, const builtin_interfaces::msg::Time& target_time,
+            const std::string& source_frame, const builtin_interfaces::msg::Time& source_time,
+            const std::string& fixed_frame, const tf2::TempDuration timeout = tf2::TempDuration(0.0)) const;
 
       /** \brief Test if a transform is possible
        * \param target_frame The frame into which to transform
@@ -96,7 +96,7 @@ namespace tf2_ros
        */
       virtual bool
         canTransform(const std::string& target_frame, const std::string& source_frame, 
-            const ros::Time& time, const ros::Duration timeout = ros::Duration(0.0), std::string* errstr = NULL) const;
+            const builtin_interfaces::msg::Time& time, const tf2::TempDuration timeout = tf2::TempDuration(0.0), std::string* errstr = NULL) const;
 
       /** \brief Test if a transform is possible
        * \param target_frame The frame into which to transform
@@ -109,11 +109,11 @@ namespace tf2_ros
        * \return True if the transform is possible, false otherwise 
        */
       virtual bool
-        canTransform(const std::string& target_frame, const ros::Time& target_time,
-            const std::string& source_frame, const ros::Time& source_time,
-            const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0), std::string* errstr = NULL) const;
+        canTransform(const std::string& target_frame, const builtin_interfaces::msg::Time& target_time,
+            const std::string& source_frame, const builtin_interfaces::msg::Time& source_time,
+            const std::string& fixed_frame, const tf2::TempDuration timeout = tf2::TempDuration(0.0), std::string* errstr = NULL) const;
 
-      bool waitForServer(const ros::Duration& timeout = ros::Duration(0))
+      bool waitForServer(const tf2::TempDuration& timeout = tf2::TempDuration(0))
       {
         return client_.waitForServer(timeout);
       }
@@ -123,7 +123,7 @@ namespace tf2_ros
       geometry_msgs::TransformStamped processResult(const tf2_msgs::LookupTransformResult& result) const;
       mutable LookupActionClient client_;
       double check_frequency_;
-      ros::Duration timeout_padding_;
+      tf2::TempDuration timeout_padding_;
   };
 };
 #endif

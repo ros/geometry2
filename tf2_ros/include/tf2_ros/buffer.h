@@ -34,9 +34,9 @@
 
 #include <tf2_ros/buffer_interface.h>
 #include <tf2/buffer_core.h>
-#include <tf2_msgs/FrameGraph.h>
-#include <ros/ros.h>
-#include <tf2/convert.h>
+#include <tf2_msgs/srv/frame_graph.hpp>
+#include <rclcpp/rclcpp.hpp>
+//TODO(tfoote)  review removal #include <tf2/convert.h>
 
 
 namespace tf2_ros
@@ -55,7 +55,7 @@ namespace tf2_ros
      * @param debug Whether to advertise the view_frames service that exposes debugging information from the buffer
      * @return 
      */
-    Buffer(ros::Duration cache_time = ros::Duration(BufferCore::DEFAULT_CACHE_TIME), bool debug = false);
+    Buffer(tf2::TempDuration cache_time = tf2::TempDuration(tf2::BUFFER_CORE_DEFAULT_CACHE_TIME), bool debug = false);
 
     /** \brief Get the transform between two frames by frame ID.
      * \param target_frame The frame to which data should be transformed
@@ -67,9 +67,9 @@ namespace tf2_ros
      * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
      * tf2::ExtrapolationException, tf2::InvalidArgumentException
      */
-    virtual geometry_msgs::TransformStamped 
+    virtual geometry_msgs::msg::TransformStamped 
     lookupTransform(const std::string& target_frame, const std::string& source_frame,
-                    const ros::Time& time, const ros::Duration timeout) const;
+                    const tf2::TimePoint& time, const tf2::TempDuration timeout) const;
 
     /** \brief Get the transform between two frames by frame ID assuming fixed frame.
      * \param target_frame The frame to which data should be transformed
@@ -83,10 +83,10 @@ namespace tf2_ros
      * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
      * tf2::ExtrapolationException, tf2::InvalidArgumentException
      */
-    virtual geometry_msgs::TransformStamped 
-    lookupTransform(const std::string& target_frame, const ros::Time& target_time,
-                    const std::string& source_frame, const ros::Time& source_time,
-                    const std::string& fixed_frame, const ros::Duration timeout) const;
+    virtual geometry_msgs::msg::TransformStamped 
+    lookupTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
+                    const std::string& source_frame, const tf2::TimePoint& source_time,
+                    const std::string& fixed_frame, const tf2::TempDuration timeout) const;
 
 
     /** \brief Test if a transform is possible
@@ -99,7 +99,7 @@ namespace tf2_ros
      */
     virtual bool
     canTransform(const std::string& target_frame, const std::string& source_frame, 
-                 const ros::Time& target_time, const ros::Duration timeout, std::string* errstr = NULL) const;
+                 const tf2::TimePoint& target_time, const tf2::TempDuration timeout, std::string* errstr = NULL) const;
     
     /** \brief Test if a transform is possible
      * \param target_frame The frame into which to transform
@@ -112,21 +112,22 @@ namespace tf2_ros
      * \return True if the transform is possible, false otherwise 
      */
     virtual bool
-      canTransform(const std::string& target_frame, const ros::Time& target_time,
-                   const std::string& source_frame, const ros::Time& source_time,
-                   const std::string& fixed_frame, const ros::Duration timeout, std::string* errstr = NULL) const;
+      canTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
+                   const std::string& source_frame, const tf2::TimePoint& source_time,
+                   const std::string& fixed_frame, const tf2::TempDuration timeout, std::string* errstr = NULL) const;
 
 
     
     
   private:
-    bool getFrames(tf2_msgs::FrameGraph::Request& req, tf2_msgs::FrameGraph::Response& res) ;
+    bool getFrames(tf2_msgs::srv::FrameGraph::Request& req, tf2_msgs::srv::FrameGraph::Response& res) ;
 
 
     // conditionally error if dedicated_thread unset.
     bool checkAndErrorDedicatedThreadPresent(std::string* errstr) const;
 
-    ros::ServiceServer frames_server_;
+//TODO(renable framegraph service)
+//    ros::ServiceServer frames_server_;
 
 
   }; // class 

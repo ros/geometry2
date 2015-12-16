@@ -37,8 +37,7 @@
 
 using namespace tf2;
 
-
-bool StaticCache::getData(ros::Time time, TransformStorage & data_out, std::string* error_str) //returns false if data not available
+bool StaticCache::getData(TimePoint time, TransformStorage & data_out, std::string* error_str) //returns false if data not available
 {
   data_out = storage_;
   data_out.stamp_ = time;
@@ -58,23 +57,22 @@ void StaticCache::clearList() { return; };
 
 unsigned int StaticCache::getListLength() {   return 1; };
 
-CompactFrameID StaticCache::getParent(ros::Time time, std::string* error_str)
+CompactFrameID StaticCache::getParent(TimePoint time, std::string* error_str)
 {
   return storage_.frame_id_;
 }
 
 P_TimeAndFrameID StaticCache::getLatestTimeAndParent()
 {
-  return std::make_pair(ros::Time(), storage_.frame_id_);
+  return std::make_pair(TimePoint(), storage_.frame_id_);
 }
 
-ros::Time StaticCache::getLatestTimestamp() 
+TimePoint StaticCache::getLatestTimestamp()
 {   
-  return ros::Time();
+  return TimePoint();
 };
 
-ros::Time StaticCache::getOldestTimestamp() 
+TimePoint StaticCache::getOldestTimestamp()
 {   
-  return ros::Time();
+  return TimePoint();
 };
-

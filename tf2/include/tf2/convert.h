@@ -32,10 +32,14 @@
 #ifndef TF2_CONVERT_H
 #define TF2_CONVERT_H
 
+#include <builtin_interfaces/msg/time.hpp>
+
+// TODO(tfoote) 
+#error This has not been converted to ROS2 and will not compile
 
 #include <tf2/transform_datatypes.h>
 #include <tf2/exceptions.h>
-#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include <tf2/impl/convert.h>
 
 namespace tf2 {
@@ -50,14 +54,14 @@ namespace tf2 {
  * This method needs to be implemented by client library developers
  */
 template <class T>
-  void doTransform(const T& data_in, T& data_out, const geometry_msgs::TransformStamped& transform);
+  void doTransform(const T& data_in, T& data_out, const geometry_msgs::msg::TransformStamped& transform);
 
 /**\brief Get the timestamp from data 
  * \param t The data input.
  * \return The timestamp associated with the data. 
  */
 template <class T>
-  const ros::Time& getTimestamp(const T& t);
+  const builtin_interfaces::msg::Time& getTimestamp(const T& t);
 
 /**\brief Get the frame_id from data 
  * \param t The data input.
@@ -70,7 +74,7 @@ template <class T>
 
 /* An implementation for Stamped<P> datatypes */
 template <class P>
-  const ros::Time& getTimestamp(const tf2::Stamped<P>& t)
+  const builtin_interfaces::msg::Time& getTimestamp(const tf2::Stamped<P>& t)
   {
     return t.stamp_;
   }

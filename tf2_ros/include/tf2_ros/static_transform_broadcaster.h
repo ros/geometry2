@@ -35,9 +35,9 @@
 
 
 
-#include "ros/ros.h"
-#include "geometry_msgs/TransformStamped.h"
-#include "tf2_msgs/TFMessage.h"
+#include "rclcpp/rclcpp.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
+#include "tf2_msgs/msg/tf_message.hpp"
 
 namespace tf2_ros
 {
@@ -54,17 +54,17 @@ public:
 
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
-  void sendTransform(const geometry_msgs::TransformStamped & transform);
+  void sendTransform(const geometry_msgs::msg::TransformStamped & transform);
 
   /** \brief Send a vector of TransformStamped messages
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
-  void sendTransform(const std::vector<geometry_msgs::TransformStamped> & transforms);
+  void sendTransform(const std::vector<geometry_msgs::msg::TransformStamped> & transforms);
 
 private:
   /// Internal reference to ros::Node
-  ros::NodeHandle node_;
-  ros::Publisher publisher_;
-  tf2_msgs::TFMessage net_message_;
+  rclcpp::node::Node::SharedPtr node_;
+  rclcpp::publisher::Publisher<tf2_msgs::msg::TFMessage>::SharedPtr publisher_;
+  tf2_msgs::msg::TFMessage net_message_;
 
 };
 

@@ -31,36 +31,36 @@
 /** \author Tully Foote */
 
 
-#include "ros/ros.h"
-#include "tf2_msgs/TFMessage.h"
+#include "rclcpp/rclcpp.hpp"
+#include "tf2_msgs/msg/tf_message.hpp"
 #include "tf2_ros/transform_broadcaster.h"
 
 namespace tf2_ros {
 
 TransformBroadcaster::TransformBroadcaster()
 {
-  publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf", 100);
+  rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
+  custom_qos_profile.depth = 100;
+  publisher_ = node_->create_publisher<tf2_msgs::msg::TFMessage>("/tf_static", custom_qos_profile);
 };
 
-void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped & msgtf)
+void TransformBroadcaster::sendTransform(const geometry_msgs::msg::TransformStamped & msgtf)
 {
-  std::vector<geometry_msgs::TransformStamped> v1;
+  std::vector<geometry_msgs::msg::TransformStamped> v1;
   v1.push_back(msgtf);
   sendTransform(v1);
 }
 
 
-void TransformBroadcaster::sendTransform(const std::vector<geometry_msgs::TransformStamped> & msgtf)
+void TransformBroadcaster::sendTransform(const std::vector<geometry_msgs::msg::TransformStamped> & msgtf)
 {
-  tf2_msgs::TFMessage message;
-  for (std::vector<geometry_msgs::TransformStamped>::const_iterator it = msgtf.begin(); it != msgtf.end(); ++it)
+  tf2_msgs::msg::TFMessage message;
+  for (std::vector<geometry_msgs::msg::TransformStamped>::const_iterator it = msgtf.begin(); it != msgtf.end(); ++it)
   {
     message.transforms.push_back(*it);
   }
-  publisher_.publish(message);
+  publisher_->publish(message);
 }
 
 
 }
-
-

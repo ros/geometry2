@@ -33,8 +33,20 @@
 #define TF2_EXCEPTIONS_H
 
 #include <stdexcept>
+#include <cstdint>
 
 namespace tf2{
+
+enum class TF2Error : std::uint8_t{
+  NO_ERROR = 0,
+  LOOKUP_ERROR = 1,
+  CONNECTIVITY_ERROR = 2,
+  EXTRAPOLATION_ERROR = 3,
+  INVALID_ARGUMENT_ERROR = 4,
+  TIMEOUT_ERROR = 5,
+  TRANSFORM_ERROR = 6
+};
+
 
 /** \brief A base class for all tf2 exceptions 
  * This inherits from ros::exception 

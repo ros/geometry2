@@ -31,31 +31,35 @@
 /** \author Tully Foote */
 
 
-#include "ros/ros.h"
-#include "tf2_msgs/TFMessage.h"
+#include "rclcpp/rclcpp.hpp"
+#include "tf2_msgs/msg/tf_message.hpp"
 #include "tf2_ros/static_transform_broadcaster.h"
 
 namespace tf2_ros {
 
 StaticTransformBroadcaster::StaticTransformBroadcaster()
 {
-  publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf_static", 100, true);
+  node_ = rclcpp::node::Node::make_shared("static_transform_publisher");
+  rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
+  custom_qos_profile.depth = 100;
+  // TODO(tfoote) latched equivalent
+  publisher_ = node_->create_publisher<tf2_msgs::msg::TFMessage>("/tf_static", custom_qos_profile);
 };
 
-void StaticTransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped & msgtf)
+void StaticTransformBroadcaster::sendTransform(const geometry_msgs::msg::TransformStamped & msgtf)
 {
-  std::vector<geometry_msgs::TransformStamped> v1;
+  std::vector<geometry_msgs::msg::TransformStamped> v1;
   v1.push_back(msgtf);
   sendTransform(v1);
 }
 
 
-void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::TransformStamped> & msgtf)
+void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::msg::TransformStamped> & msgtf)
 {
-  for (std::vector<geometry_msgs::TransformStamped>::const_iterator it_in = msgtf.begin(); it_in != msgtf.end(); ++it_in)
+  for (std::vector<geometry_msgs::msg::TransformStamped>::const_iterator it_in = msgtf.begin(); it_in != msgtf.end(); ++it_in)
   {
     bool match_found = false;
-    for (std::vector<geometry_msgs::TransformStamped>::iterator it_msg = net_message_.transforms.begin(); it_msg != net_message_.transforms.end(); ++it_msg)
+    for (std::vector<geometry_msgs::msg::TransformStamped>::iterator it_msg = net_message_.transforms.begin(); it_msg != net_message_.transforms.end(); ++it_msg)
     {
       if (it_in->child_frame_id == it_msg->child_frame_id)
       {
@@ -68,10 +72,8 @@ void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::
       net_message_.transforms.push_back(*it_in);
   }
 
-  publisher_.publish(net_message_);
+  publisher_->publish(net_message_);
 }
 
 
 }
-
-

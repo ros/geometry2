@@ -61,7 +61,7 @@ int main(int argc, char** argv)
   nh.param("buffer_size", buffer_size, 120.0);
 
   // WIM: this works fine:
-  tf2_ros::Buffer buffer_core(ros::Duration(buffer_size+0)); // WTF??
+  tf2_ros::Buffer buffer_core(tf2::TempDuration(buffer_size+0)); // WTF??
   tf2_ros::TransformListener listener(buffer_core);
   tf2_ros::BufferServer buffer_server(buffer_core, "tf2_buffer_server", false);
   buffer_server.start();
