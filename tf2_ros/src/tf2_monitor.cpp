@@ -203,7 +203,7 @@ public:
       avg_diff = lowpass * diff + (1-lowpass)*avg_diff;
       if (diff > max_diff) max_diff = diff;
     }
-    std::this_thread::sleep_for(tf2::Duration(0.01e9));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     if (counter > 20){
       counter = 0;
 
