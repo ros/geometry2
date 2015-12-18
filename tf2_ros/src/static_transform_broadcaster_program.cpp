@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
   
   tf2_ros::StaticTransformBroadcaster broadcaster;
 
-  if(argc == 10 or argc == 9)
+  if(argc == 10 || argc == 9)
   {
     geometry_msgs::msg::TransformStamped msg;
 
