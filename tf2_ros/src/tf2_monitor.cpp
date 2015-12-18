@@ -77,7 +77,7 @@ public:
     {
       frame_authority_map[message.transforms[i].child_frame_id] = authority;
 
-      double offset = tf2::TempToSec(tf2::get_now()) - tf2_ros::TempToSec(message.transforms[i].header.stamp);
+      double offset = tf2::timeToSec(tf2::get_now()) - tf2_ros::durationToSec(message.transforms[i].header.stamp);
       average_offset  += offset;
       
       std::map<std::string, std::vector<double> >::iterator it = delay_map.find(message.transforms[i].child_frame_id);
@@ -113,11 +113,11 @@ public:
     std::map<std::string, std::vector<double> >::iterator it3 = authority_frequency_map.find(authority);
     if (it3 == authority_frequency_map.end())
     {
-      authority_frequency_map[authority] = std::vector<double>(1,tf2::TempToSec(tf2::get_now()));
+      authority_frequency_map[authority] = std::vector<double>(1,tf2::timeToSec(tf2::get_now()));
     }
     else
     {
-      it3->second.push_back(tf2::TempToSec(tf2::get_now()));
+      it3->second.push_back(tf2::timeToSec(tf2::get_now()));
       if (it3->second.size() > 1000) 
         it3->second.erase(it3->second.begin());
     }
@@ -134,7 +134,7 @@ public:
     if (using_specific_chain_)
     {
       std::cout << "Waiting for transform chain to become available between "<< framea_ << " and " << frameb_<< " " << std::flush;
-      while (rclcpp::ok() && !buffer_.canTransform(framea_, frameb_, tf2::TimePointZero, tf2::TempDuration(1.0e9)))
+      while (rclcpp::ok() && !buffer_.canTransform(framea_, frameb_, tf2::TimePointZero, tf2::Duration(1.0e9)))
         std::cout << "." << std::flush;
       std::cout << std::endl;
      
@@ -199,11 +199,11 @@ public:
     if (using_specific_chain_)
     {
       auto tmp = buffer_.lookupTransform(framea_, frameb_, tf2::TimePointZero);
-      double diff = tf2::TempToSec(tf2::get_now()) - tf2_ros::TempToSec(tmp.header.stamp);
+      double diff = tf2::timeToSec(tf2::get_now()) - tf2_ros::durationToSec(tmp.header.stamp);
       avg_diff = lowpass * diff + (1-lowpass)*avg_diff;
       if (diff > max_diff) max_diff = diff;
     }
-    std::this_thread::sleep_for(tf2::TempDuration(0.01e9));
+    std::this_thread::sleep_for(tf2::Duration(0.01e9));
     if (counter > 20){
       counter = 0;
 

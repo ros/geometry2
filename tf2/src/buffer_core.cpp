@@ -105,7 +105,7 @@ CompactFrameID BufferCore::validateFrameId(const char* function_name_arg, const 
   return id;
 }
 
-BufferCore::BufferCore(TempDuration cache_time)
+BufferCore::BufferCore(tf2::Duration cache_time)
 : cache_time_(cache_time)
 , transformable_callbacks_counter_(0)
 , transformable_requests_counter_(0)
@@ -649,7 +649,7 @@ void BufferCore::lookupTransformImpl(const std::string& target_frame,
 geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame, 
                                           const std::string& observation_frame, 
                                           const builtin_interfaces::msg::Time& time, 
-                                          const tf2::TempDuration& averaging_interval) const
+                                          const tf2::Duration& averaging_interval) const
 {
   try
   {
@@ -682,7 +682,7 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
                                           const tf2::Point & reference_point, 
                                           const std::string& reference_point_frame, 
                                           const builtin_interfaces::msg::Time& time, 
-                                          const tf2::TempDuration& averaging_interval) const
+                                          const tf2::Duration& averaging_interval) const
 {
   try{
   geometry_msgs::Twist t;
@@ -1107,8 +1107,8 @@ std::string BufferCore::allFramesAsYAML(TimePoint current_time) const
       authority = it->second;
     }
 
-    TempDuration dur1 = cache->getLatestTimestamp() - cache->getOldestTimestamp();
-    TempDuration dur2 = TempDuration(std::chrono::microseconds(100));
+    tf2::Duration dur1 = cache->getLatestTimestamp() - cache->getOldestTimestamp();
+    tf2::Duration dur2 = tf2::Duration(std::chrono::microseconds(100));
 
     double rate;
     if (dur1 > dur2)
@@ -1401,8 +1401,8 @@ std::string BufferCore::_allFramesAsDot(TimePoint current_time) const
     if (it != frame_authority_.end())
       authority = it->second;
 
-    TempDuration dur1 = counter_frame->getLatestTimestamp() - counter_frame->getOldestTimestamp();
-    TempDuration dur2 = std::chrono::microseconds(100);
+    tf2::Duration dur1 = counter_frame->getLatestTimestamp() - counter_frame->getOldestTimestamp();
+    tf2::Duration dur2 = std::chrono::microseconds(100);
 
     double rate;
     if (dur1 > dur2)

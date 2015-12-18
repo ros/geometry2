@@ -67,7 +67,7 @@ enum TransformableResult
 };
 
 
-static constexpr TempDuration BUFFER_CORE_DEFAULT_CACHE_TIME = std::chrono::seconds(10);  //!< The default amount of time to cache data in seconds
+static constexpr Duration BUFFER_CORE_DEFAULT_CACHE_TIME = std::chrono::seconds(10);  //!< The default amount of time to cache data in seconds
 
 /** \brief A Class which provides coordinate transforms between any two frames in a system.
  *
@@ -98,7 +98,7 @@ public:
    * \param cache_time How long to keep a history of transforms in nanoseconds
    *
    */
-  BufferCore(tf2::TempDuration cache_time_ = BUFFER_CORE_DEFAULT_CACHE_TIME);
+  BufferCore(tf2::Duration cache_time_ = BUFFER_CORE_DEFAULT_CACHE_TIME);
   virtual ~BufferCore(void);
 
   /** \brief Clear all data */
@@ -168,7 +168,7 @@ public:
   geometry_msgs::Twist
     lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, const std::string& reference_frame,
 		const tf::Point & reference_point, const std::string& reference_point_frame, 
-		const builtin_interfaces::msg::Time& time, const tf2::TempDuration& averaging_interval) const;
+		const builtin_interfaces::msg::Time& time, const tf2::Duration& averaging_interval) const;
   */
   /** \brief lookup the twist of the tracking frame with respect to the observational frame 
    * 
@@ -185,7 +185,7 @@ public:
   /*
   geometry_msgs::Twist
     lookupTwist(const std::string& tracking_frame, const std::string& observation_frame, 
-		const builtin_interfaces::msg::Time& time, const tf2::TempDuration& averaging_interval) const;
+		const builtin_interfaces::msg::Time& time, const tf2::Duration& averaging_interval) const;
   */
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -282,7 +282,7 @@ public:
   }
 
   /**@brief Get the duration over which this transformer will cache */
-  TempDuration getCacheLength() { return cache_time_;}
+  tf2::Duration getCacheLength() { return cache_time_;}
 
   /** \brief Backwards compatabilityA way to see what frames have been cached
    * Useful for debugging
@@ -323,7 +323,7 @@ private:
 
 
   /// How long to cache transform history
-  TempDuration cache_time_;
+  tf2::Duration cache_time_;
 
   typedef std::unordered_map<TransformableCallbackHandle, TransformableCallback> M_TransformableCallback;
   M_TransformableCallback transformable_callbacks_;

@@ -143,7 +143,7 @@ static int rostime_converter(PyObject *obj, builtin_interfaces::msg::Time *rt)
   }
 }
 
-static int rosduration_converter(PyObject *obj, tf2::TempDuration *rt)
+static int rosduration_converter(PyObject *obj, tf2::Duration *rt)
 {
   PyObject *tsr = PyObject_CallMethod(obj, (char*)"to_sec", NULL);
   if (tsr == NULL) {
@@ -158,7 +158,7 @@ static int rosduration_converter(PyObject *obj, tf2::TempDuration *rt)
 
 static int BufferCore_init(PyObject *self, PyObject *args, PyObject *kw)
 {
-  tf2::TempDuration cache_time;
+  tf2::Duration cache_time;
 
   cache_time.fromSec(tf2::BUFFER_CORE_DEFAULT_CACHE_TIME);
 
@@ -335,7 +335,7 @@ static PyObject *lookupTwistCore(PyObject *self, PyObject *args, PyObject *kw)
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *tracking_frame, *observation_frame;
   builtin_interfaces::msg::Time time;
-  tf2::TempDuration averaging_interval;
+  tf2::Duration averaging_interval;
   static const char *keywords[] = { "tracking_frame", "observation_frame", "time", "averaging_interval", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&O&", (char**)keywords, &tracking_frame, &observation_frame, rostime_converter, &time, rosduration_converter, &averaging_interval))
@@ -353,7 +353,7 @@ static PyObject *lookupTwistFullCore(PyObject *self, PyObject *args)
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *tracking_frame, *observation_frame, *reference_frame, *reference_point_frame;
   builtin_interfaces::msg::Time time;
-  tf2::TempDuration averaging_interval;
+  tf2::Duration averaging_interval;
   double px, py, pz;
 
   if (!PyArg_ParseTuple(args, "sss(ddd)sO&O&",

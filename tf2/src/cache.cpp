@@ -53,7 +53,7 @@ TransformStorage::TransformStorage(const TimePoint& stamp, const Quaternion& q, 
 {
 }
 
-TimeCache::TimeCache(TempDuration max_storage_time)
+TimeCache::TimeCache(tf2::Duration max_storage_time)
 : max_storage_time_(max_storage_time)
 {}
 

@@ -52,7 +52,7 @@ TEST(TfGeometry, Frame)
   v1.header.frame_id = "A";
 
   // simple api
-  geometry_msgs::PoseStamped v_simple = tf_buffer->transform(v1, "B", tf2::TempDuration(2.0));
+  geometry_msgs::PoseStamped v_simple = tf_buffer->transform(v1, "B", tf2::Duration(2.0));
   EXPECT_NEAR(v_simple.pose.position.x, -9, EPS);
   EXPECT_NEAR(v_simple.pose.position.y, 18, EPS);
   EXPECT_NEAR(v_simple.pose.position.z, 27, EPS);
@@ -64,7 +64,7 @@ TEST(TfGeometry, Frame)
 
   // advanced api
   geometry_msgs::PoseStamped v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
-							      "A", tf2::TempDuration(3.0));
+							      "A", tf2::Duration(3.0));
   EXPECT_NEAR(v_advanced.pose.position.x, -9, EPS);
   EXPECT_NEAR(v_advanced.pose.position.y, 18, EPS);
   EXPECT_NEAR(v_advanced.pose.position.z, 27, EPS);
@@ -86,14 +86,14 @@ TEST(TfGeometry, Vector)
   v1.header.frame_id = "A";
 
   // simple api
-  geometry_msgs::Vector3Stamped v_simple = tf_buffer->transform(v1, "B", tf2::TempDuration(2.0));
+  geometry_msgs::Vector3Stamped v_simple = tf_buffer->transform(v1, "B", tf2::Duration(2.0));
   EXPECT_NEAR(v_simple.vector.x, 1, EPS);
   EXPECT_NEAR(v_simple.vector.y, -2, EPS);
   EXPECT_NEAR(v_simple.vector.z, -3, EPS);
 
   // advanced api
   geometry_msgs::Vector3Stamped v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
-								 "A", tf2::TempDuration(3.0));
+								 "A", tf2::Duration(3.0));
   EXPECT_NEAR(v_advanced.vector.x, 1, EPS);
   EXPECT_NEAR(v_advanced.vector.y, -2, EPS);
   EXPECT_NEAR(v_advanced.vector.z, -3, EPS);
@@ -110,14 +110,14 @@ TEST(TfGeometry, Point)
   v1.header.frame_id = "A";
 
   // simple api
-  geometry_msgs::PointStamped v_simple = tf_buffer->transform(v1, "B", tf2::TempDuration(2.0));
+  geometry_msgs::PointStamped v_simple = tf_buffer->transform(v1, "B", tf2::Duration(2.0));
   EXPECT_NEAR(v_simple.point.x, -9, EPS);
   EXPECT_NEAR(v_simple.point.y, 18, EPS);
   EXPECT_NEAR(v_simple.point.z, 27, EPS);
 
   // advanced api
   geometry_msgs::PointStamped v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
-								 "A", tf2::TempDuration(3.0));
+								 "A", tf2::Duration(3.0));
   EXPECT_NEAR(v_advanced.point.x, -9, EPS);
   EXPECT_NEAR(v_advanced.point.y, 18, EPS);
   EXPECT_NEAR(v_advanced.point.z, 27, EPS);

@@ -44,7 +44,7 @@
 namespace tf2_ros
 {
 
-Buffer::Buffer(tf2::TempDuration cache_time, bool debug) :
+Buffer::Buffer(tf2::Duration cache_time, bool debug) :
   BufferCore(cache_time)
 {
   // TODO(tfoote) reenable 
@@ -57,7 +57,7 @@ Buffer::Buffer(tf2::TempDuration cache_time, bool debug) :
 
 geometry_msgs::msg::TransformStamped 
 Buffer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
-                        const tf2::TimePoint& lookup_time, const tf2::TempDuration timeout) const
+                        const tf2::TimePoint& lookup_time, const tf2::Duration timeout) const
 {
   canTransform(target_frame, source_frame, lookup_time, timeout);
   return lookupTransform(target_frame, source_frame, lookup_time);
@@ -67,7 +67,7 @@ Buffer::lookupTransform(const std::string& target_frame, const std::string& sour
 geometry_msgs::msg::TransformStamped 
 Buffer::lookupTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
                         const std::string& source_frame, const tf2::TimePoint& source_time,
-                        const std::string& fixed_frame, const tf2::TempDuration timeout) const
+                        const std::string& fixed_frame, const tf2::Duration timeout) const
 {
   canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout);
   return lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame);
@@ -97,7 +97,7 @@ tf2::TimePoint now_fallback_to_wall()
     This makes the system fall back to Wall time if not initialized.  
     https://github.com/ros/geometry/issues/30
 */
-void sleep_fallback_to_wall(const tf2::TempDuration& d)
+void sleep_fallback_to_wall(const tf2::Duration& d)
 {
   std::this_thread::sleep_for(d);
   //TODO(tfoote) reneable this when there's a new ros::Time equivalent
@@ -113,20 +113,20 @@ void sleep_fallback_to_wall(const tf2::TempDuration& d)
 }
 
 void conditionally_append_timeout_info(std::string * errstr, const tf2::TimePoint& start_time,
-                                       const tf2::TempDuration& timeout)
+                                       const tf2::Duration& timeout)
 {
   if (errstr)
   {
     std::stringstream ss;
-    ss << ". canTransform returned after "<< tf2::TempToSec(now_fallback_to_wall() - start_time) \
-       <<" timeout was " << tf2::TempToSec(timeout) << ".";
+    ss << ". canTransform returned after "<< tf2::durationToSec(now_fallback_to_wall() - start_time) \
+       <<" timeout was " << tf2::durationToSec(timeout) << ".";
     (*errstr) += ss.str();
   }
 }
 
 bool
 Buffer::canTransform(const std::string& target_frame, const std::string& source_frame, 
-                     const tf2::TimePoint& time, const tf2::TempDuration timeout, std::string* errstr) const
+                     const tf2::TimePoint& time, const tf2::Duration timeout, std::string* errstr) const
 {
   if (!checkAndErrorDedicatedThreadPresent(errstr))
     return false;
@@ -135,11 +135,11 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
   tf2::TimePoint start_time = now_fallback_to_wall();
   while (now_fallback_to_wall() < start_time + timeout && 
          !canTransform(target_frame, source_frame, time) &&
-         (now_fallback_to_wall()+tf2::TempDuration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
+         (now_fallback_to_wall()+tf2::Duration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
          (rclcpp::ok()// || !ros::isInitialized() //TODO(tfoote) restore
        )) // Make sure we haven't been stopped (won't work for pytf)
     {
-      sleep_fallback_to_wall(tf2::TempDuration(0.01));
+      sleep_fallback_to_wall(tf2::Duration(0.01));
     }
   bool retval = canTransform(target_frame, source_frame, time, errstr);
   conditionally_append_timeout_info(errstr, start_time, timeout);
@@ -150,7 +150,7 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
 bool
 Buffer::canTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
                      const std::string& source_frame, const tf2::TimePoint& source_time,
-                     const std::string& fixed_frame, const tf2::TempDuration timeout, std::string* errstr) const
+                     const std::string& fixed_frame, const tf2::Duration timeout, std::string* errstr) const
 {
   if (!checkAndErrorDedicatedThreadPresent(errstr))
     return false;
@@ -159,12 +159,12 @@ Buffer::canTransform(const std::string& target_frame, const tf2::TimePoint& targ
   tf2::TimePoint start_time = now_fallback_to_wall();
   while (now_fallback_to_wall() < start_time + timeout && 
          !canTransform(target_frame, target_time, source_frame, source_time, fixed_frame) &&
-         (now_fallback_to_wall()+tf2::TempDuration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
+         (now_fallback_to_wall()+tf2::Duration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
          (rclcpp::ok() //|| !ros::isInitialized() //TODO(tfoote) restore
           )
         ) // Make sure we haven't been stopped (won't work for pytf)
          {  
-           sleep_fallback_to_wall(tf2::TempDuration(0.01));
+           sleep_fallback_to_wall(tf2::Duration(0.01));
          }
   bool retval = canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
   conditionally_append_timeout_info(errstr, start_time, timeout);

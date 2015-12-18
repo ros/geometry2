@@ -38,7 +38,7 @@
 
 namespace tf2_ros
 {
-  BufferServer::BufferServer(const Buffer& buffer, const std::string& ns, bool auto_start, tf2::TempDuration check_period): 
+  BufferServer::BufferServer(const Buffer& buffer, const std::string& ns, bool auto_start, tf2::Duration check_period): 
     buffer_(buffer),
     server_(ros::NodeHandle(),
             ns,

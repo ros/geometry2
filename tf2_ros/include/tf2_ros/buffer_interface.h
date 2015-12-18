@@ -57,7 +57,7 @@ namespace tf2_ros
     return t;
   }
 
-  inline double TempToSec(const builtin_interfaces::msg::Time & time_msg)
+  inline double durationToSec(const builtin_interfaces::msg::Time & time_msg)
   {
     auto ns = std::chrono::nanoseconds(time_msg.nanosec);
     auto s = std::chrono::seconds(time_msg.sec);
@@ -81,7 +81,7 @@ public:
    */
   virtual geometry_msgs::msg::TransformStamped
     lookupTransform(const std::string& target_frame, const std::string& source_frame, 
-		    const tf2::TimePoint& time, const tf2::TempDuration timeout) const = 0;
+		    const tf2::TimePoint& time, const tf2::Duration timeout) const = 0;
 
   /** \brief Get the transform between two frames by frame ID assuming fixed frame.
    * \param target_frame The frame to which data should be transformed
@@ -98,7 +98,7 @@ public:
   virtual geometry_msgs::msg::TransformStamped 
     lookupTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
 		    const std::string& source_frame, const tf2::TimePoint& source_time,
-		    const std::string& fixed_frame, const tf2::TempDuration timeout) const = 0;
+		    const std::string& fixed_frame, const tf2::Duration timeout) const = 0;
 
 
   /** \brief Test if a transform is possible
@@ -111,7 +111,7 @@ public:
    */
   virtual bool
     canTransform(const std::string& target_frame, const std::string& source_frame, 
-		 const tf2::TimePoint& time, const tf2::TempDuration timeout, std::string* errstr = NULL) const = 0;
+		 const tf2::TimePoint& time, const tf2::Duration timeout, std::string* errstr = NULL) const = 0;
 
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -126,14 +126,14 @@ public:
   virtual bool
     canTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
 		 const std::string& source_frame, const tf2::TimePoint& source_time,
-		 const std::string& fixed_frame, const tf2::TempDuration timeout, std::string* errstr = NULL) const = 0;
+		 const std::string& fixed_frame, const tf2::Duration timeout, std::string* errstr = NULL) const = 0;
 
 
 /* TODO(tfoote) restore transform methods
   // Transform, simple api, with pre-allocation
   template <class T>
     T& transform(const T& in, T& out, 
-		 const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+		 const std::string& target_frame, tf2::Duration timeout=tf2::Duration(0.0)) const
   {
     // do the transform
     tf2::doTransform(in, out, lookupTransform(target_frame, tf2::getFrameId(in), tf2::getTimestamp(in), timeout));
@@ -144,7 +144,7 @@ public:
   // transform, simple api, no pre-allocation
   template <class T>
     T transform(const T& in, 
-		const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+		const std::string& target_frame, tf2::Duration timeout=tf2::Duration(0.0)) const
   {
     T out;
     return transform(in, out, target_frame, timeout);
@@ -153,7 +153,7 @@ public:
   //transform, simple api, different types, pre-allocation
   template <class A, class B>
     B& transform(const A& in, B& out,
-        const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+        const std::string& target_frame, tf2::Duration timeout=tf2::Duration(0.0)) const
   {
     A copy = transform(in, target_frame, timeout);
     tf2::convert(copy, out);
@@ -164,7 +164,7 @@ public:
   template <class T>
     T& transform(const T& in, T& out, 
 		 const std::string& target_frame, const tf2::TimePoint& target_time,
-		 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+		 const std::string& fixed_frame, tf2::Duration timeout=tf2::Duration(0.0)) const
   {
     // do the transform
     tf2::doTransform(in, out, lookupTransform(target_frame, target_time, 
@@ -178,7 +178,7 @@ public:
   template <class T>
     T transform(const T& in, 
 		 const std::string& target_frame, const tf2::TimePoint& target_time,
-		 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+		 const std::string& fixed_frame, tf2::Duration timeout=tf2::Duration(0.0)) const
   {
     T out;
     return transform(in, out, target_frame, target_time, fixed_frame, timeout);
@@ -188,7 +188,7 @@ public:
   template <class A, class B>
     B& transform(const A& in, B& out, 
 		 const std::string& target_frame, const tf2::TimePoint& target_time,
-		 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+		 const std::string& fixed_frame, tf2::Duration timeout=tf2::Duration(0.0)) const
   {
     // do the transform
     A copy = transform(in, target_frame, target_time, fixed_frame, timeout);

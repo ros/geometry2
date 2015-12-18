@@ -45,7 +45,7 @@ TEST(TfKDL, Frame)
 
 
   // simple api
-  KDL::Frame v_simple = tf_buffer->transform(v1, "B", tf2::TempDuration(2.0));
+  KDL::Frame v_simple = tf_buffer->transform(v1, "B", tf2::Duration(2.0));
   EXPECT_NEAR(v_simple.p[0], -9, EPS);
   EXPECT_NEAR(v_simple.p[1], 18, EPS);
   EXPECT_NEAR(v_simple.p[2], 27, EPS);
@@ -58,7 +58,7 @@ TEST(TfKDL, Frame)
 
   // advanced api
   KDL::Frame v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
-					       "A", tf2::TempDuration(3.0));
+					       "A", tf2::Duration(3.0));
   EXPECT_NEAR(v_advanced.p[0], -9, EPS);
   EXPECT_NEAR(v_advanced.p[1], 18, EPS);
   EXPECT_NEAR(v_advanced.p[2], 27, EPS);
@@ -77,14 +77,14 @@ TEST(TfKDL, Vector)
 
 
   // simple api
-  KDL::Vector v_simple = tf_buffer->transform(v1, "B", tf2::TempDuration(2.0));
+  KDL::Vector v_simple = tf_buffer->transform(v1, "B", tf2::Duration(2.0));
   EXPECT_NEAR(v_simple[0], -9, EPS);
   EXPECT_NEAR(v_simple[1], 18, EPS);
   EXPECT_NEAR(v_simple[2], 27, EPS);
 
   // advanced api
   KDL::Vector v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
-					       "A", tf2::TempDuration(3.0));
+					       "A", tf2::Duration(3.0));
   EXPECT_NEAR(v_advanced[0], -9, EPS);
   EXPECT_NEAR(v_advanced[1], 18, EPS);
   EXPECT_NEAR(v_advanced[2], 27, EPS);

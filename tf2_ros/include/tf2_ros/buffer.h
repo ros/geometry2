@@ -55,7 +55,7 @@ namespace tf2_ros
      * @param debug Whether to advertise the view_frames service that exposes debugging information from the buffer
      * @return 
      */
-    Buffer(tf2::TempDuration cache_time = tf2::TempDuration(tf2::BUFFER_CORE_DEFAULT_CACHE_TIME), bool debug = false);
+    Buffer(tf2::Duration cache_time = tf2::Duration(tf2::BUFFER_CORE_DEFAULT_CACHE_TIME), bool debug = false);
 
     /** \brief Get the transform between two frames by frame ID.
      * \param target_frame The frame to which data should be transformed
@@ -69,7 +69,7 @@ namespace tf2_ros
      */
     virtual geometry_msgs::msg::TransformStamped 
     lookupTransform(const std::string& target_frame, const std::string& source_frame,
-                    const tf2::TimePoint& time, const tf2::TempDuration timeout) const;
+                    const tf2::TimePoint& time, const tf2::Duration timeout) const;
 
     /** \brief Get the transform between two frames by frame ID assuming fixed frame.
      * \param target_frame The frame to which data should be transformed
@@ -86,7 +86,7 @@ namespace tf2_ros
     virtual geometry_msgs::msg::TransformStamped 
     lookupTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
                     const std::string& source_frame, const tf2::TimePoint& source_time,
-                    const std::string& fixed_frame, const tf2::TempDuration timeout) const;
+                    const std::string& fixed_frame, const tf2::Duration timeout) const;
 
 
     /** \brief Test if a transform is possible
@@ -99,7 +99,7 @@ namespace tf2_ros
      */
     virtual bool
     canTransform(const std::string& target_frame, const std::string& source_frame, 
-                 const tf2::TimePoint& target_time, const tf2::TempDuration timeout, std::string* errstr = NULL) const;
+                 const tf2::TimePoint& target_time, const tf2::Duration timeout, std::string* errstr = NULL) const;
     
     /** \brief Test if a transform is possible
      * \param target_frame The frame into which to transform
@@ -114,7 +114,7 @@ namespace tf2_ros
     virtual bool
       canTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
                    const std::string& source_frame, const tf2::TimePoint& source_time,
-                   const std::string& fixed_frame, const tf2::TempDuration timeout, std::string* errstr = NULL) const;
+                   const std::string& fixed_frame, const tf2::Duration timeout, std::string* errstr = NULL) const;
 
 
     

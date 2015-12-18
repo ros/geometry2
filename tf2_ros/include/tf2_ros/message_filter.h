@@ -81,7 +81,7 @@ public:
   virtual void clear() = 0;
   virtual void setTargetFrame(const std::string& target_frame) = 0;
   virtual void setTargetFrames(const V_string& target_frames) = 0;
-  virtual void setTolerance(const tf2::TempDuration& tolerance) = 0;
+  virtual void setTolerance(const tf2::Duration& tolerance) = 0;
 };
 
 /**
@@ -265,7 +265,7 @@ public:
   /**
    * \brief Set the required tolerance for the notifier to return true
    */
-  void setTolerance(const tf2::TempDuration& tolerance)
+  void setTolerance(const tf2::Duration& tolerance)
   {
     std::unique_lock<std::mutex> lock(target_frames_mutex_);
     time_tolerance_ = tolerance;
@@ -454,7 +454,7 @@ private:
     transform_message_count_ = 0;
     incoming_message_count_ = 0;
     dropped_message_count_ = 0;
-    time_tolerance_ = tf2::TempDuration(0.0);
+    time_tolerance_ = tf2::Duration(0.0);
     warned_about_empty_frame_id_ = false;
     expected_success_count_ = 1;
 
@@ -706,7 +706,7 @@ private:
 
   ros::WallTime next_failure_warning_;
 
-  tf2::TempDuration time_tolerance_; ///< Provide additional tolerance on time for messages which are stamped but can have associated duration
+  tf2::Duration time_tolerance_; ///< Provide additional tolerance on time for messages which are stamped but can have associated duration
 
   message_filters::Connection message_connection_;
 

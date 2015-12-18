@@ -38,7 +38,7 @@
 
 namespace tf2_ros
 {
-  BufferClient::BufferClient(std::string ns, double check_frequency, tf2::TempDuration timeout_padding): 
+  BufferClient::BufferClient(std::string ns, double check_frequency, tf2::Duration timeout_padding): 
     client_(ns), 
     check_frequency_(check_frequency),
     timeout_padding_(timeout_padding)
@@ -46,7 +46,7 @@ namespace tf2_ros
   }
 
   geometry_msgs::TransformStamped BufferClient::lookupTransform(const std::string& target_frame, const std::string& source_frame,
-      const builtin_interfaces::msg::Time& time, const tf2::TempDuration timeout) const
+      const builtin_interfaces::msg::Time& time, const tf2::Duration timeout) const
   {
     //populate the goal message
     tf2_msgs::LookupTransformGoal goal;
@@ -61,7 +61,7 @@ namespace tf2_ros
 
   geometry_msgs::TransformStamped BufferClient::lookupTransform(const std::string& target_frame, const builtin_interfaces::msg::Time& target_time,
       const std::string& source_frame, const builtin_interfaces::msg::Time& source_time,
-      const std::string& fixed_frame, const tf2::TempDuration timeout) const
+      const std::string& fixed_frame, const tf2::Duration timeout) const
   {
     //populate the goal message
     tf2_msgs::LookupTransformGoal goal;
@@ -130,7 +130,7 @@ namespace tf2_ros
   }
 
   bool BufferClient::canTransform(const std::string& target_frame, const std::string& source_frame, 
-        const builtin_interfaces::msg::Time& time, const tf2::TempDuration timeout, std::string* errstr) const
+        const builtin_interfaces::msg::Time& time, const tf2::Duration timeout, std::string* errstr) const
   {
     try
     {
@@ -147,7 +147,7 @@ namespace tf2_ros
 
   bool BufferClient::canTransform(const std::string& target_frame, const builtin_interfaces::msg::Time& target_time,
         const std::string& source_frame, const builtin_interfaces::msg::Time& source_time,
-        const std::string& fixed_frame, const tf2::TempDuration timeout, std::string* errstr) const
+        const std::string& fixed_frame, const tf2::Duration timeout, std::string* errstr) const
   {
     try
     {

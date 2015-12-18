@@ -77,7 +77,7 @@ public:
 
 using TimeCacheInterfacePtr = std::shared_ptr<TimeCacheInterface>;
 
-constexpr TempDuration TIMECACHE_DEFAULT_MAX_STORAGE_TIME = std::chrono::seconds(10); //!< default value of 10 seconds storage
+constexpr tf2::Duration TIMECACHE_DEFAULT_MAX_STORAGE_TIME = std::chrono::seconds(10); //!< default value of 10 seconds storage
 
 /** \brief A class to keep a sorted linked list in time
  * This builds and maintains a list of timestamped
@@ -89,7 +89,7 @@ class TimeCache : public TimeCacheInterface
   static const int MIN_INTERPOLATION_DISTANCE = 5; //!< Number of nano-seconds to not interpolate below.
   static const unsigned int MAX_LENGTH_LINKED_LIST = 1000000; //!< Maximum length of linked list, to make sure not to be able to use unlimited memory.
 
-  TimeCache(TempDuration  max_storage_time = TIMECACHE_DEFAULT_MAX_STORAGE_TIME);
+  TimeCache(tf2::Duration  max_storage_time = TIMECACHE_DEFAULT_MAX_STORAGE_TIME);
 
 
   /// Virtual methods
@@ -110,7 +110,7 @@ private:
   typedef std::list<TransformStorage> L_TransformStorage;
   L_TransformStorage storage_;
 
-  TempDuration max_storage_time_;
+  tf2::Duration max_storage_time_;
 
 
   /// A helper function for getData

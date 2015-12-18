@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Willow Garage, Inc.
+ * Copyright (c) 2015, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,55 +27,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** \author Tully Foote */
-
-#ifndef TF2_TRANSFORM_STORAGE_H
-#define TF2_TRANSFORM_STORAGE_H
-
-#include <tf2/LinearMath/Vector3.h>
-#include <tf2/LinearMath/Quaternion.h>
-
-#include "tf2/time.h"
+#include <chrono>
+#include <iomanip>
+#include <ctime>
+#include <thread>
 
 namespace tf2
 {
+  using Duration = std::chrono::duration<double, std::nano>;
+  using TimePoint = std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>;
 
 
+  using IDuration = std::chrono::duration<int, std::nano>;
+  // This is the zero time in ROS
+  static const TimePoint TimePointZero = TimePoint(IDuration::zero());
 
-typedef uint32_t CompactFrameID;
-
-/** \brief Storage for transforms and their parent */
-class TransformStorage
-{
-public:
-  TransformStorage();
-  TransformStorage(const TimePoint& stamp, const Quaternion& q, const Vector3& t, CompactFrameID frame_id,
-                   CompactFrameID child_frame_id);
-
-  TransformStorage(const TransformStorage& rhs)
+  inline TimePoint get_now()
   {
-    *this = rhs;
+    return std::chrono::system_clock::now();
   }
 
-  TransformStorage& operator=(const TransformStorage& rhs)
+  inline double durationToSec(const tf2::Duration & input){
+    return std::chrono::duration_cast<std::chrono::seconds>(input).count();
+  }
+  
+  inline double timeToSec(const TimePoint& timepoint)
   {
-#if 01
-    rotation_ = rhs.rotation_;
-    translation_ = rhs.translation_;
-    stamp_ = rhs.stamp_;
-    frame_id_ = rhs.frame_id_;
-    child_frame_id_ = rhs.child_frame_id_;
-#endif
-    return *this;
+    return durationToSec(Duration(timepoint.time_since_epoch()));
   }
 
-  tf2::Quaternion rotation_;
-  tf2::Vector3 translation_;
-  TimePoint stamp_;
-  CompactFrameID frame_id_;
-  CompactFrameID child_frame_id_;
-};
+  // Display functions as there is no default display
+  // TODO: find a proper way to handle display
+  inline std::string displayTimePoint(const TimePoint& stamp)
+  {
+    // Below would only work with GCC 5.0 and above
+    //return std::put_time(&stamp, "%c");
+    std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::milliseconds>(stamp));
+    return std::ctime(&time);
+  }
+  inline double displayDuration(const tf2::Duration& duration)
+  {
+    return std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+  }
 
 }
-
-#endif // TF2_TRANSFORM_STORAGE_H

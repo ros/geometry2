@@ -162,7 +162,7 @@ void push_back_1(std::vector<std::string>& children, std::vector<std::string>& p
   dy.push_back(0.0);
 }
 
-void setupTree(tf2::BufferCore& mBC, const std::string& mode, const builtin_interfaces::msg::Time & time, const tf2::TempDuration& interpolation_space = tf2::TempDuration())
+void setupTree(tf2::BufferCore& mBC, const std::string& mode, const builtin_interfaces::msg::Time & time, const tf2::Duration& interpolation_space = tf2::Duration())
 {
   ROS_DEBUG("Clearing Buffer Core for new test setup");
   mBC.clear();
@@ -237,7 +237,7 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const builtin_inte
         else
           ts.child_frame_id = frames[i]; // connect first frame
         EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-        if (interpolation_space > tf2::TempDuration())
+        if (interpolation_space > tf2::Duration())
         {
           ts.header.stamp = time + interpolation_space * .5;
           EXPECT_TRUE(mBC.setTransform(ts, "authority"));
@@ -276,7 +276,7 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const builtin_inte
     ts.header.frame_id = parents[i];
     ts.child_frame_id = children[i];
     EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-    if (interpolation_space > tf2::TempDuration())
+    if (interpolation_space > tf2::Duration())
     {
       ts.header.stamp = time + interpolation_space * .5;
       EXPECT_TRUE(mBC.setTransform(ts, "authority"));
@@ -632,11 +632,11 @@ TEST(BufferCore_lookupTransform, i_configuration)
   builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<tf2::TempDuration> durations;
-  durations.push_back(tf2::TempDuration(1.0));
-  durations.push_back(tf2::TempDuration(0.001));
-  durations.push_back(tf2::TempDuration(0.1));
-  tf2::TempDuration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -970,11 +970,11 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
   builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<tf2::TempDuration> durations;
-  durations.push_back(tf2::TempDuration(1.0));
-  durations.push_back(tf2::TempDuration(0.001));
-  durations.push_back(tf2::TempDuration(0.1));
-  tf2::TempDuration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1014,11 +1014,11 @@ TEST(BufferCore_lookupTransform, v_configuration)
   builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<tf2::TempDuration> durations;
-  durations.push_back(tf2::TempDuration(1.0));
-  durations.push_back(tf2::TempDuration(0.001));
-  durations.push_back(tf2::TempDuration(0.1));
-  tf2::TempDuration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1061,11 +1061,11 @@ TEST(BufferCore_lookupTransform, y_configuration)
   builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<tf2::TempDuration> durations;
-  durations.push_back(tf2::TempDuration(1.0));
-  durations.push_back(tf2::TempDuration(0.001));
-  durations.push_back(tf2::TempDuration(0.1));
-  tf2::TempDuration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1107,11 +1107,11 @@ TEST(BufferCore_lookupTransform, multi_configuration)
   builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<tf2::TempDuration> durations;
-  durations.push_back(tf2::TempDuration(1.0));
-  durations.push_back(tf2::TempDuration(0.001));
-  durations.push_back(tf2::TempDuration(0.1));
-  tf2::TempDuration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1319,10 +1319,10 @@ TEST(BufferCore_lookupTransform, helix_configuration)
 
     tf2::BufferCore mBC;
 
-    builtin_interfaces::msg::Time     t0        = builtin_interfaces::msg::Time() + tf2::TempDuration(10);
-    tf2::TempDuration step      = tf2::TempDuration(0.05);
-    tf2::TempDuration half_step = tf2::TempDuration(0.025);
-    builtin_interfaces::msg::Time     t1        = t0 + tf2::TempDuration(5.0);
+    builtin_interfaces::msg::Time     t0        = builtin_interfaces::msg::Time() + tf2::Duration(10);
+    tf2::Duration step      = tf2::Duration(0.05);
+    tf2::Duration half_step = tf2::Duration(0.025);
+    builtin_interfaces::msg::Time     t1        = t0 + tf2::Duration(5.0);
 
     /*
      * a->b->c
@@ -1435,11 +1435,11 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
   builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<tf2::TempDuration> durations;
-  durations.push_back(tf2::TempDuration(1.0));
-  durations.push_back(tf2::TempDuration(0.001));
-  durations.push_back(tf2::TempDuration(0.1));
-  tf2::TempDuration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -2020,7 +2020,7 @@ TEST(tf, Exceptions)
 
 TEST(tf, NoExtrapolationExceptionFromParent)
 {
-  tf::Transformer mTR(true, tf2::TempDuration().fromNSec(1000000));
+  tf::Transformer mTR(true, tf2::Duration().fromNSec(1000000));
   
 
 
@@ -2056,7 +2056,7 @@ TEST(tf, NoExtrapolationExceptionFromParent)
 
 TEST(tf, ExtrapolationFromOneValue)
 {
-  tf::Transformer mTR(true, tf2::TempDuration().fromNSec(1000000));
+  tf::Transformer mTR(true, tf2::Duration().fromNSec(1000000));
   
 
 
@@ -2189,7 +2189,7 @@ TEST(tf, getLatestCommonTime)
   EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(5000));
 
 
-  mTR.setExtrapolationLimit(tf2::TempDuration().fromNSec(20000));
+  mTR.setExtrapolationLimit(tf2::Duration().fromNSec(20000));
 
   //check timestamps resulting
   tf::Stamped<tf::Point> output, output2;
