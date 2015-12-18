@@ -38,7 +38,7 @@
 
 namespace tf2_ros
 {
-  BufferServer::BufferServer(const Buffer& buffer, const std::string& ns, bool auto_start, ros::Duration check_period): 
+  BufferServer::BufferServer(const Buffer& buffer, const std::string& ns, bool auto_start, tf2::Duration check_period): 
     buffer_(buffer),
     server_(ros::NodeHandle(),
             ns,
@@ -50,16 +50,16 @@ namespace tf2_ros
     check_timer_ = n.createTimer(check_period, boost::bind(&BufferServer::checkTransforms, this, _1));
   }
 
-  void BufferServer::checkTransforms(const ros::TimerEvent& e)
+  void BufferServer::checkTransforms(const builtin_interfaces::msg::TimerEvent& e)
   {
-    boost::mutex::scoped_lock l(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     for(std::list<GoalInfo>::iterator it = active_goals_.begin(); it != active_goals_.end();)
     {
       GoalInfo& info = *it;
 
       //we want to lookup a transform if the time on the goal
       //has expired, or a transform is available
-      if(canTransform(info.handle) || info.end_time < ros::Time::now())
+      if(canTransform(info.handle) || info.end_time < tf2::get_now())
       {
         tf2_msgs::LookupTransformResult result;
 
@@ -112,7 +112,7 @@ namespace tf2_ros
 
   void BufferServer::cancelCB(GoalHandle gh)
   {
-    boost::mutex::scoped_lock l(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     //we need to find the goal in the list and remove it... also setting it as canceled
     //if its not in the list, we won't do anything since it will have already been set
     //as completed
@@ -139,11 +139,11 @@ namespace tf2_ros
     //along with the time that the goal will end
     GoalInfo goal_info;
     goal_info.handle = gh;
-    goal_info.end_time = ros::Time::now() + gh.getGoal()->timeout;
+    goal_info.end_time = tf2::get_now() + gh.getGoal()->timeout;
 
     //we can do a quick check here to see if the transform is valid
     //we'll also do this if the end time has been reached 
-    if(canTransform(gh) || goal_info.end_time <= ros::Time::now())
+    if(canTransform(gh) || goal_info.end_time <= tf2::get_now())
     {
       tf2_msgs::LookupTransformResult result;
       try
@@ -185,7 +185,7 @@ namespace tf2_ros
       return;
     }
 
-    boost::mutex::scoped_lock l(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     active_goals_.push_back(goal_info);
   }
 

@@ -45,7 +45,7 @@ TEST(tf2Convert, kdlToBullet)
 {
   double epsilon = 1e-9;
 
-  tf2::Stamped<btVector3> b(btVector3(1,2,3), ros::Time(), "my_frame");
+  tf2::Stamped<btVector3> b(btVector3(1,2,3), builtin_interfaces::msg::Time(), "my_frame");
 
   tf2::Stamped<btVector3> b1 = b;
   tf2::Stamped<KDL::Vector> k1;
@@ -72,7 +72,7 @@ TEST(tf2Convert, kdlBulletROSConversions)
 {
   double epsilon = 1e-9;
 
-  tf2::Stamped<btVector3> b1(btVector3(1,2,3), ros::Time(), "my_frame"), b2, b3, b4;
+  tf2::Stamped<btVector3> b1(btVector3(1,2,3), builtin_interfaces::msg::Time(), "my_frame"), b2, b3, b4;
   geometry_msgs::PointStamped r1, r2, r3;
   tf2::Stamped<KDL::Vector> k1, k2, k3;
 

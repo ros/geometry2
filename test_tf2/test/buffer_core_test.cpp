@@ -30,7 +30,7 @@
 #include <gtest/gtest.h>
 #include <tf2/buffer_core.h>
 #include "tf2/exceptions.h"
-#include <sys/time.h>
+#include <chrono>
 #include <ros/ros.h>
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btTransform.h"
@@ -38,10 +38,8 @@
 
 void seed_rand()
 {
-  //Seed random number generator with current microseond count
-  timeval temp_time_struct;
-  gettimeofday(&temp_time_struct,NULL);
-  srand(temp_time_struct.tv_usec);
+  //Seed random number generator with current time.
+  srand(std::chrono::system_clock::now().time_since_epoch().count());
 };
 
 void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xvalues, std::vector<double>& yvalues, std::vector<double>&zvalues)
@@ -164,7 +162,7 @@ void push_back_1(std::vector<std::string>& children, std::vector<std::string>& p
   dy.push_back(0.0);
 }
 
-void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & time, const ros::Duration& interpolation_space = ros::Duration())
+void setupTree(tf2::BufferCore& mBC, const std::string& mode, const builtin_interfaces::msg::Time & time, const tf2::Duration& interpolation_space = tf2::Duration())
 {
   ROS_DEBUG("Clearing Buffer Core for new test setup");
   mBC.clear();
@@ -228,10 +226,10 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
         ts.transform.rotation.y = 0;
         ts.transform.rotation.z = sin(direction * M_PI/8);
         ts.transform.rotation.w = cos(direction * M_PI/8);
-        if (time > ros::Time() + (interpolation_space * .5))
+        if (time > builtin_interfaces::msg::Time() + (interpolation_space * .5))
           ts.header.stamp = time - (interpolation_space * .5);
         else
-          ts.header.stamp = ros::Time();
+          ts.header.stamp = builtin_interfaces::msg::Time();
             
         ts.header.frame_id = frame_prefix + frames[i-1];
         if (i > 1)
@@ -239,7 +237,7 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
         else
           ts.child_frame_id = frames[i]; // connect first frame
         EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-        if (interpolation_space > ros::Duration())
+        if (interpolation_space > tf2::Duration())
         {
           ts.header.stamp = time + interpolation_space * .5;
           EXPECT_TRUE(mBC.setTransform(ts, "authority"));
@@ -270,15 +268,15 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
     setIdentity(ts.transform);
     ts.transform.translation.x = dx[i];
     ts.transform.translation.y = dy[i];
-    if (time > ros::Time() + (interpolation_space * .5))
+    if (time > builtin_interfaces::msg::Time() + (interpolation_space * .5))
       ts.header.stamp = time - (interpolation_space * .5);
     else
-      ts.header.stamp = ros::Time();
+      ts.header.stamp = builtin_interfaces::msg::Time();
             
     ts.header.frame_id = parents[i];
     ts.child_frame_id = children[i];
     EXPECT_TRUE(mBC.setTransform(ts, "authority"));
-    if (interpolation_space > ros::Duration())
+    if (interpolation_space > tf2::Duration())
     {
       ts.header.stamp = time + interpolation_space * .5;
       EXPECT_TRUE(mBC.setTransform(ts, "authority"));
@@ -293,7 +291,7 @@ TEST(BufferCore_setTransform, NoInsertOnSelfTransform)
   tf2::BufferCore mBC;
   geometry_msgs::TransformStamped tranStamped;
   setIdentity(tranStamped.transform);
-  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.stamp = builtin_interfaces::msg::Time().fromNSec(10.0);
   tranStamped.header.frame_id = "same_frame";
   tranStamped.child_frame_id = "same_frame";
   EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
@@ -304,7 +302,7 @@ TEST(BufferCore_setTransform, NoInsertWithNan)
   tf2::BufferCore mBC;
   geometry_msgs::TransformStamped tranStamped;
   setIdentity(tranStamped.transform);
-  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.stamp = builtin_interfaces::msg::Time().fromNSec(10.0);
   tranStamped.header.frame_id = "same_frame";
   tranStamped.child_frame_id = "other_frame";
   EXPECT_TRUE(mBC.setTransform(tranStamped, "authority"));
@@ -319,7 +317,7 @@ TEST(BufferCore_setTransform, NoInsertWithNoFrameID)
   tf2::BufferCore mBC;
   geometry_msgs::TransformStamped tranStamped;
   setIdentity(tranStamped.transform);
-  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.stamp = builtin_interfaces::msg::Time().fromNSec(10.0);
   tranStamped.header.frame_id = "same_frame";
   tranStamped.child_frame_id = "";
   EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
@@ -333,7 +331,7 @@ TEST(BufferCore_setTransform, NoInsertWithNoParentID)
   tf2::BufferCore mBC;
   geometry_msgs::TransformStamped tranStamped;
   setIdentity(tranStamped.transform);
-  tranStamped.header.stamp = ros::Time().fromNSec(10.0);
+  tranStamped.header.stamp = builtin_interfaces::msg::Time().fromNSec(10.0);
   tranStamped.header.frame_id = "";
   tranStamped.child_frame_id = "some_frame";
   EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
@@ -357,7 +355,7 @@ TEST(tf, ListOneInverse)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped (btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped (btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
   }
 
@@ -367,7 +365,7 @@ TEST(tf, ListOneInverse)
   for ( uint64_t i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "child");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10 + i), "child");
 
     try{
     Stamped<Pose> outpose;
@@ -401,9 +399,9 @@ TEST(tf, ListTwoInverse)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
-    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "child", "grandchild");
+    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(10 + i),  "child", "grandchild");
     mTR.setTransform(tranStamped2);
   }
 
@@ -413,7 +411,7 @@ TEST(tf, ListTwoInverse)
   for ( unsigned int i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "grandchild");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10 + i), "grandchild");
 
     try{
     Stamped<Pose> outpose;
@@ -448,7 +446,7 @@ TEST(tf, ListOneForward)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
   }
 
@@ -458,7 +456,7 @@ TEST(tf, ListOneForward)
   for ( uint64_t i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "my_parent");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10 + i), "my_parent");
 
     try{
     Stamped<Pose> outpose;
@@ -492,9 +490,9 @@ TEST(tf, ListTwoForward)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parent", "child");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(10 + i),  "my_parent", "child");
     mTR.setTransform(tranStamped);
-    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "child", "grandchild");
+    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(10 + i),  "child", "grandchild");
     mTR.setTransform(tranStamped2);
   }
 
@@ -504,7 +502,7 @@ TEST(tf, ListTwoForward)
   for ( unsigned int i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "my_parent");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10 + i), "my_parent");
 
     try{
     Stamped<Pose> outpose;
@@ -538,9 +536,9 @@ TEST(tf, TransformThrougRoot)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(1000 + i*100),  "my_parent", "childA");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(1000 + i*100),  "my_parent", "childA");
     mTR.setTransform(tranStamped);
-    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(1000 + i*100),  "my_parent", "childB");
+    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(1000 + i*100),  "my_parent", "childB");
     mTR.setTransform(tranStamped2);
   }
 
@@ -550,7 +548,7 @@ TEST(tf, TransformThrougRoot)
   for ( unsigned int i = 0; i < runs ; i++ )
 
   {
-    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000 + i*100), "childA");
+    Stamped<Pose> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000 + i*100), "childA");
 
     try{
     Stamped<Pose> outpose;
@@ -584,9 +582,9 @@ TEST(tf, TransformThroughNO_PARENT)
     yvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
     zvalues[i] = 10.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
 
-    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parentA", "childA");
+    StampedTransform tranStamped(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(10 + i),  "my_parentA", "childA");
     mTR.setTransform(tranStamped);
-    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), ros::Time().fromNSec(10 + i),  "my_parentB", "childB");
+    StampedTransform tranStamped2(btTransform(btQuaternion(0,0,0,1), btVector3(xvalues[i],yvalues[i],zvalues[i])), builtin_interfaces::msg::Time().fromNSec(10 + i),  "my_parentB", "childB");
     mTR.setTransform(tranStamped2);
   }
 
@@ -596,7 +594,7 @@ TEST(tf, TransformThroughNO_PARENT)
   for ( unsigned int i = 0; i < runs ; i++ )
 
   {
-    Stamped<btTransform> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10 + i), "childA");
+    Stamped<btTransform> inpose (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10 + i), "childA");
     bool exception_thrown = false;
 
     try{
@@ -627,18 +625,18 @@ TEST(BufferCore_lookupTransform, i_configuration)
 
   rostest::Permuter permuter;
 
-  std::vector<ros::Time> times;
-  times.push_back(ros::Time(1.0));
-  times.push_back(ros::Time(10.0));
-  times.push_back(ros::Time(0.0));
-  ros::Time eval_time;
+  std::vector<builtin_interfaces::msg::Time> times;
+  times.push_back(builtin_interfaces::msg::Time(1.0));
+  times.push_back(builtin_interfaces::msg::Time(10.0));
+  times.push_back(builtin_interfaces::msg::Time(0.0));
+  builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<ros::Duration> durations;
-  durations.push_back(ros::Duration(1.0));
-  durations.push_back(ros::Duration(0.001));
-  durations.push_back(ros::Duration(0.1));
-  ros::Duration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -702,7 +700,7 @@ TEST(BufferCore_lookupTransform, i_configuration)
 }
 
 /* Check 1 result return false if test parameters unmet */
-bool check_1_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const ros::Time& eval_time, double epsilon)
+bool check_1_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const builtin_interfaces::msg::Time& eval_time, double epsilon)
 {
   //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
   EXPECT_EQ(outpose.header.stamp, eval_time);
@@ -737,7 +735,7 @@ bool check_1_result(const geometry_msgs::TransformStamped& outpose, const std::s
 }
 
 /* Check v result return false if test parameters unmet */
-bool check_v_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const ros::Time& eval_time, double epsilon)
+bool check_v_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const builtin_interfaces::msg::Time& eval_time, double epsilon)
 {
   //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
   EXPECT_EQ(outpose.header.stamp, eval_time);
@@ -847,7 +845,7 @@ bool check_v_result(const geometry_msgs::TransformStamped& outpose, const std::s
 }
 
 /* Check v result return false if test parameters unmet */
-bool check_y_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const ros::Time& eval_time, double epsilon)
+bool check_y_result(const geometry_msgs::TransformStamped& outpose, const std::string& source_frame, const std::string& target_frame, const builtin_interfaces::msg::Time& eval_time, double epsilon)
 {
   //printf("source_frame %s target_frame %s time %f\n", source_frame.c_str(), target_frame.c_str(), eval_time.toSec());  
   EXPECT_EQ(outpose.header.stamp, eval_time);
@@ -965,18 +963,18 @@ TEST(BufferCore_lookupTransform, one_link_configuration)
 
   rostest::Permuter permuter;
 
-  std::vector<ros::Time> times;
-  times.push_back(ros::Time(1.0));
-  times.push_back(ros::Time(10.0));
-  times.push_back(ros::Time(0.0));
-  ros::Time eval_time;
+  std::vector<builtin_interfaces::msg::Time> times;
+  times.push_back(builtin_interfaces::msg::Time(1.0));
+  times.push_back(builtin_interfaces::msg::Time(10.0));
+  times.push_back(builtin_interfaces::msg::Time(0.0));
+  builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<ros::Duration> durations;
-  durations.push_back(ros::Duration(1.0));
-  durations.push_back(ros::Duration(0.001));
-  durations.push_back(ros::Duration(0.1));
-  ros::Duration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1009,18 +1007,18 @@ TEST(BufferCore_lookupTransform, v_configuration)
 
   rostest::Permuter permuter;
 
-  std::vector<ros::Time> times;
-  times.push_back(ros::Time(1.0));
-  times.push_back(ros::Time(10.0));
-  times.push_back(ros::Time(0.0));
-  ros::Time eval_time;
+  std::vector<builtin_interfaces::msg::Time> times;
+  times.push_back(builtin_interfaces::msg::Time(1.0));
+  times.push_back(builtin_interfaces::msg::Time(10.0));
+  times.push_back(builtin_interfaces::msg::Time(0.0));
+  builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<ros::Duration> durations;
-  durations.push_back(ros::Duration(1.0));
-  durations.push_back(ros::Duration(0.001));
-  durations.push_back(ros::Duration(0.1));
-  ros::Duration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1056,18 +1054,18 @@ TEST(BufferCore_lookupTransform, y_configuration)
 
   rostest::Permuter permuter;
 
-  std::vector<ros::Time> times;
-  times.push_back(ros::Time(1.0));
-  times.push_back(ros::Time(10.0));
-  times.push_back(ros::Time(0.0));
-  ros::Time eval_time;
+  std::vector<builtin_interfaces::msg::Time> times;
+  times.push_back(builtin_interfaces::msg::Time(1.0));
+  times.push_back(builtin_interfaces::msg::Time(10.0));
+  times.push_back(builtin_interfaces::msg::Time(0.0));
+  builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<ros::Duration> durations;
-  durations.push_back(ros::Duration(1.0));
-  durations.push_back(ros::Duration(0.001));
-  durations.push_back(ros::Duration(0.1));
-  ros::Duration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1102,18 +1100,18 @@ TEST(BufferCore_lookupTransform, multi_configuration)
 
   rostest::Permuter permuter;
 
-  std::vector<ros::Time> times;
-  times.push_back(ros::Time(1.0));
-  times.push_back(ros::Time(10.0));
-  times.push_back(ros::Time(0.0));
-  ros::Time eval_time;
+  std::vector<builtin_interfaces::msg::Time> times;
+  times.push_back(builtin_interfaces::msg::Time(1.0));
+  times.push_back(builtin_interfaces::msg::Time(10.0));
+  times.push_back(builtin_interfaces::msg::Time(0.0));
+  builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<ros::Duration> durations;
-  durations.push_back(ros::Duration(1.0));
-  durations.push_back(ros::Duration(0.001));
-  durations.push_back(ros::Duration(0.1));
-  ros::Duration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1271,46 +1269,46 @@ TEST(BufferCore_lookupTransform, compound_xfm_configuration)
     expected_rootc = tb * tc;
 
     // root -> b -> c
-    geometry_msgs::TransformStamped out_rootc = mBC.lookupTransform("root", "c", ros::Time());
+    geometry_msgs::TransformStamped out_rootc = mBC.lookupTransform("root", "c", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_rootc, expected_rootc, epsilon);
 
     // root -> b -> c -> d
-    geometry_msgs::TransformStamped out_rootd = mBC.lookupTransform("root", "d", ros::Time());
+    geometry_msgs::TransformStamped out_rootd = mBC.lookupTransform("root", "d", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_rootd, expected_rootd, epsilon);
 
     // a <- root -> b
-    geometry_msgs::TransformStamped out_ab = mBC.lookupTransform("a", "b", ros::Time());
+    geometry_msgs::TransformStamped out_ab = mBC.lookupTransform("a", "b", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_ab, expected_ab, epsilon);
 
-    geometry_msgs::TransformStamped out_ba = mBC.lookupTransform("b", "a", ros::Time());
+    geometry_msgs::TransformStamped out_ba = mBC.lookupTransform("b", "a", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_ba, expected_ba, epsilon);
 
     // a <- root -> b -> c
-    geometry_msgs::TransformStamped out_ac = mBC.lookupTransform("a", "c", ros::Time());
+    geometry_msgs::TransformStamped out_ac = mBC.lookupTransform("a", "c", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_ac, expected_ac, epsilon);
 
-    geometry_msgs::TransformStamped out_ca = mBC.lookupTransform("c", "a", ros::Time());
+    geometry_msgs::TransformStamped out_ca = mBC.lookupTransform("c", "a", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_ca, expected_ca, epsilon);
 
     // a <- root -> b -> c -> d
-    geometry_msgs::TransformStamped out_ad = mBC.lookupTransform("a", "d", ros::Time());
+    geometry_msgs::TransformStamped out_ad = mBC.lookupTransform("a", "d", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_ad, expected_ad, epsilon);
 
-    geometry_msgs::TransformStamped out_da = mBC.lookupTransform("d", "a", ros::Time());
+    geometry_msgs::TransformStamped out_da = mBC.lookupTransform("d", "a", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_da, expected_da, epsilon);
 
     // b -> c
-    geometry_msgs::TransformStamped out_cb = mBC.lookupTransform("c", "b", ros::Time());
+    geometry_msgs::TransformStamped out_cb = mBC.lookupTransform("c", "b", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_cb, expected_cb, epsilon);
 
-    geometry_msgs::TransformStamped out_bc = mBC.lookupTransform("b", "c", ros::Time());
+    geometry_msgs::TransformStamped out_bc = mBC.lookupTransform("b", "c", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_bc, expected_bc, epsilon);
 
     // b -> c -> d
-    geometry_msgs::TransformStamped out_bd = mBC.lookupTransform("b", "d", ros::Time());
+    geometry_msgs::TransformStamped out_bd = mBC.lookupTransform("b", "d", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_bd, expected_bd, epsilon);
 
-    geometry_msgs::TransformStamped out_db = mBC.lookupTransform("d", "b", ros::Time());
+    geometry_msgs::TransformStamped out_db = mBC.lookupTransform("d", "b", builtin_interfaces::msg::Time());
     CHECK_TRANSFORMS_NEAR(out_db, expected_db, epsilon);
 }
 
@@ -1321,10 +1319,10 @@ TEST(BufferCore_lookupTransform, helix_configuration)
 
     tf2::BufferCore mBC;
 
-    ros::Time     t0        = ros::Time() + ros::Duration(10);
-    ros::Duration step      = ros::Duration(0.05);
-    ros::Duration half_step = ros::Duration(0.025);
-    ros::Time     t1        = t0 + ros::Duration(5.0);
+    builtin_interfaces::msg::Time     t0        = builtin_interfaces::msg::Time() + tf2::Duration(10);
+    tf2::Duration step      = tf2::Duration(0.05);
+    tf2::Duration half_step = tf2::Duration(0.025);
+    builtin_interfaces::msg::Time     t1        = t0 + tf2::Duration(5.0);
 
     /*
      * a->b->c
@@ -1342,9 +1340,9 @@ TEST(BufferCore_lookupTransform, helix_configuration)
     double theta = 0.25;
     double vel   = 1.0;
 
-    for (ros::Time t = t0; t <= t1; t += step)
+    for (builtin_interfaces::msg::Time t = t0; t <= t1; t += step)
     {
-    	ros::Time t2 = t + half_step;
+    	builtin_interfaces::msg::Time t2 = t + half_step;
     	double dt  = (t - t0).toSec();
     	double dt2 = (t2 - t0).toSec();
 
@@ -1378,9 +1376,9 @@ TEST(BufferCore_lookupTransform, helix_configuration)
     }
 
 
-    for (ros::Time t = t0 + half_step; t < t1; t += step)
+    for (builtin_interfaces::msg::Time t = t0 + half_step; t < t1; t += step)
     {
-    	ros::Time t2 = t + half_step;
+    	builtin_interfaces::msg::Time t2 = t + half_step;
     	double dt  = (t - t0).toSec();
     	double dt2 = (t2 - t0).toSec();
 
@@ -1408,9 +1406,9 @@ TEST(BufferCore_lookupTransform, helix_configuration)
     }
 
     // Advanced API
-    for (ros::Time t = t0 + half_step; t < t1; t += (step + step))
+    for (builtin_interfaces::msg::Time t = t0 + half_step; t < t1; t += (step + step))
     {
-    	ros::Time t2 = t + step;
+    	builtin_interfaces::msg::Time t2 = t + step;
     	double dt  = (t - t0).toSec();
     	double dt2 = (t2 - t0).toSec();
 
@@ -1430,18 +1428,18 @@ TEST(BufferCore_lookupTransform, ring_45_configuration)
   double epsilon = 1e-6;
   rostest::Permuter permuter;
 
-  std::vector<ros::Time> times;
-  times.push_back(ros::Time(1.0));
-  times.push_back(ros::Time(10.0));
-  times.push_back(ros::Time(0.0));
-  ros::Time eval_time;
+  std::vector<builtin_interfaces::msg::Time> times;
+  times.push_back(builtin_interfaces::msg::Time(1.0));
+  times.push_back(builtin_interfaces::msg::Time(10.0));
+  times.push_back(builtin_interfaces::msg::Time(0.0));
+  builtin_interfaces::msg::Time eval_time;
   permuter.addOptionSet(times, &eval_time);
 
-  std::vector<ros::Duration> durations;
-  durations.push_back(ros::Duration(1.0));
-  durations.push_back(ros::Duration(0.001));
-  durations.push_back(ros::Duration(0.1));
-  ros::Duration interpolation_space;
+  std::vector<tf2::Duration> durations;
+  durations.push_back(tf2::Duration(1.0));
+  durations.push_back(tf2::Duration(0.001));
+  durations.push_back(tf2::Duration(0.1));
+  tf2::Duration interpolation_space;
   //  permuter.addOptionSet(durations, &interpolation_space);
 
   std::vector<std::string> frames;
@@ -1737,17 +1735,17 @@ TEST(BufferCore_lookupTransform, invalid_arguments)
 {
   tf2::BufferCore mBC;
   
-  setupTree(mBC, "i", ros::Time(1.0));
+  setupTree(mBC, "i", builtin_interfaces::msg::Time(1.0));
   
-  EXPECT_NO_THROW(mBC.lookupTransform("b", "a", ros::Time()));
+  EXPECT_NO_THROW(mBC.lookupTransform("b", "a", builtin_interfaces::msg::Time()));
 
   //Empty frame_id
-  EXPECT_THROW(mBC.lookupTransform("", "a", ros::Time()), tf2::InvalidArgumentException);
-  EXPECT_THROW(mBC.lookupTransform("b", "", ros::Time()), tf2::InvalidArgumentException);
+  EXPECT_THROW(mBC.lookupTransform("", "a", builtin_interfaces::msg::Time()), tf2::InvalidArgumentException);
+  EXPECT_THROW(mBC.lookupTransform("b", "", builtin_interfaces::msg::Time()), tf2::InvalidArgumentException);
 
   //frame_id with /
-  EXPECT_THROW(mBC.lookupTransform("/b", "a", ros::Time()), tf2::InvalidArgumentException);
-  EXPECT_THROW(mBC.lookupTransform("b", "/a", ros::Time()), tf2::InvalidArgumentException);
+  EXPECT_THROW(mBC.lookupTransform("/b", "a", builtin_interfaces::msg::Time()), tf2::InvalidArgumentException);
+  EXPECT_THROW(mBC.lookupTransform("b", "/a", builtin_interfaces::msg::Time()), tf2::InvalidArgumentException);
 
 };
 
@@ -1755,18 +1753,18 @@ TEST(BufferCore_canTransform, invalid_arguments)
 {
   tf2::BufferCore mBC;
 
-  setupTree(mBC, "i", ros::Time(1.0));
+  setupTree(mBC, "i", builtin_interfaces::msg::Time(1.0));
   
-  EXPECT_TRUE(mBC.canTransform("b", "a", ros::Time()));
+  EXPECT_TRUE(mBC.canTransform("b", "a", builtin_interfaces::msg::Time()));
   
   
   //Empty frame_id
-  EXPECT_FALSE(mBC.canTransform("", "a", ros::Time()));
-  EXPECT_FALSE(mBC.canTransform("b", "", ros::Time()));
+  EXPECT_FALSE(mBC.canTransform("", "a", builtin_interfaces::msg::Time()));
+  EXPECT_FALSE(mBC.canTransform("b", "", builtin_interfaces::msg::Time()));
 
   //frame_id with /
-  EXPECT_FALSE(mBC.canTransform("/b", "a", ros::Time()));
-  EXPECT_FALSE(mBC.canTransform("b", "/a", ros::Time()));
+  EXPECT_FALSE(mBC.canTransform("/b", "a", builtin_interfaces::msg::Time()));
+  EXPECT_FALSE(mBC.canTransform("b", "/a", builtin_interfaces::msg::Time()));
 
 };
 
@@ -1777,7 +1775,7 @@ struct TransformableHelper
   {}
 
   void callback(tf2::TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
-          ros::Time time, tf2::TransformableResult result)
+          builtin_interfaces::msg::Time time, tf2::TransformableResult result)
   {
     called = true;
   }
@@ -1791,14 +1789,14 @@ TEST(BufferCore_transformableCallbacks, alreadyTransformable)
   TransformableHelper h;
 
   geometry_msgs::TransformStamped t;
-  t.header.stamp = ros::Time(1);
+  t.header.stamp = builtin_interfaces::msg::Time(1);
   t.header.frame_id = "a";
   t.child_frame_id = "b";
   t.transform.rotation.w = 1.0;
   b.setTransform(t, "me");
 
   tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
-  EXPECT_EQ(b.addTransformableRequest(cb_handle, "a", "b", ros::Time(1)), 0U);
+  EXPECT_EQ(b.addTransformableRequest(cb_handle, "a", "b", builtin_interfaces::msg::Time(1)), 0U);
 }
 
 TEST(BufferCore_transformableCallbacks, waitForNewTransform)
@@ -1806,12 +1804,12 @@ TEST(BufferCore_transformableCallbacks, waitForNewTransform)
   tf2::BufferCore b;
   TransformableHelper h;
   tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
-  EXPECT_GT(b.addTransformableRequest(cb_handle, "a", "b", ros::Time(10)), 0U);
+  EXPECT_GT(b.addTransformableRequest(cb_handle, "a", "b", builtin_interfaces::msg::Time(10)), 0U);
 
   geometry_msgs::TransformStamped t;
   for (uint32_t i = 1; i <= 10; ++i)
   {
-    t.header.stamp = ros::Time(i);
+    t.header.stamp = builtin_interfaces::msg::Time(i);
     t.header.frame_id = "a";
     t.child_frame_id = "b";
     t.transform.rotation.w = 1.0;
@@ -1833,12 +1831,12 @@ TEST(BufferCore_transformableCallbacks, waitForOldTransform)
   tf2::BufferCore b;
   TransformableHelper h;
   tf2::TransformableCallbackHandle cb_handle = b.addTransformableCallback(boost::bind(&TransformableHelper::callback, &h, _1, _2, _3, _4, _5));
-  EXPECT_GT(b.addTransformableRequest(cb_handle, "a", "b", ros::Time(1)), 0U);
+  EXPECT_GT(b.addTransformableRequest(cb_handle, "a", "b", builtin_interfaces::msg::Time(1)), 0U);
 
   geometry_msgs::TransformStamped t;
   for (uint32_t i = 10; i > 0; --i)
   {
-    t.header.stamp = ros::Time(i);
+    t.header.stamp = builtin_interfaces::msg::Time(i);
     t.header.frame_id = "a";
     t.child_frame_id = "b";
     t.transform.rotation.w = 1.0;
@@ -1865,10 +1863,10 @@ TEST(tf, Exceptions)
  Stamped<btTransform> outpose;
 
  //connectivity when no data
- EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(10000000)));
+ EXPECT_FALSE(mTR.canTransform("parent", "me", builtin_interfaces::msg::Time().fromNSec(10000000)));
  try 
  {
-   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000000) , "me"), outpose);
+   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10000000) , "me"), outpose);
    EXPECT_FALSE("ConnectivityException Not Thrown");   
  }
  catch ( tf::LookupException &ex)
@@ -1881,13 +1879,13 @@ TEST(tf, Exceptions)
    EXPECT_FALSE("Other Exception Caught");
  }
  
- mTR.setTransform( StampedTransform(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(100000), "parent", "me"));
+ mTR.setTransform( StampedTransform(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(100000), "parent", "me"));
 
  //Extrapolation not valid with one value
- EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(200000)));
+ EXPECT_FALSE(mTR.canTransform("parent", "me", builtin_interfaces::msg::Time().fromNSec(200000)));
  try 
  {
-   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "me"), outpose);
+   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(200000) , "me"), outpose);
    EXPECT_TRUE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -1901,14 +1899,14 @@ TEST(tf, Exceptions)
  }
  
 
- mTR.setTransform( StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(300000), "parent", "me"));
+ mTR.setTransform( StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(300000), "parent", "me"));
 
  //NO Extration when Interpolating
  //inverse list
- EXPECT_TRUE(mTR.canTransform("parent", "me", ros::Time().fromNSec(200000)));
+ EXPECT_TRUE(mTR.canTransform("parent", "me", builtin_interfaces::msg::Time().fromNSec(200000)));
  try 
  {
-   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "me"), outpose);
+   mTR.transformPose("parent",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(200000) , "me"), outpose);
    EXPECT_TRUE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -1924,10 +1922,10 @@ TEST(tf, Exceptions)
 
 
  //forward list
- EXPECT_TRUE(mTR.canTransform("me", "parent", ros::Time().fromNSec(200000)));
+ EXPECT_TRUE(mTR.canTransform("me", "parent", builtin_interfaces::msg::Time().fromNSec(200000)));
  try 
  {
-   mTR.transformPose("me",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(200000) , "parent"), outpose);
+   mTR.transformPose("me",Stamped<Pose>(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(200000) , "parent"), outpose);
    EXPECT_TRUE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -1943,10 +1941,10 @@ TEST(tf, Exceptions)
 
  //Extrapolating backwards
  //inverse list
- EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(1000)));
+ EXPECT_FALSE(mTR.canTransform("parent", "me", builtin_interfaces::msg::Time().fromNSec(1000)));
  try 
  {
-   mTR.transformPose("parent",Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000) , "me"), outpose);
+   mTR.transformPose("parent",Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000) , "me"), outpose);
    EXPECT_FALSE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -1959,10 +1957,10 @@ TEST(tf, Exceptions)
    EXPECT_FALSE("Other Exception Caught");
  }
  //forwards list
- EXPECT_FALSE(mTR.canTransform("me", "parent", ros::Time().fromNSec(1000)));
+ EXPECT_FALSE(mTR.canTransform("me", "parent", builtin_interfaces::msg::Time().fromNSec(1000)));
  try 
  {
-   mTR.transformPose("me",Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000) , "parent"), outpose);
+   mTR.transformPose("me",Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000) , "parent"), outpose);
    EXPECT_FALSE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -1980,10 +1978,10 @@ TEST(tf, Exceptions)
  // Test extrapolation inverse and forward linkages FORWARD
 
  //inverse list
- EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(350000)));
+ EXPECT_FALSE(mTR.canTransform("parent", "me", builtin_interfaces::msg::Time().fromNSec(350000)));
  try 
  {
-   mTR.transformPose("parent", Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(350000) , "me"), outpose);
+   mTR.transformPose("parent", Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(350000) , "me"), outpose);
    EXPECT_FALSE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -1997,10 +1995,10 @@ TEST(tf, Exceptions)
  }
 
  //forward list
- EXPECT_FALSE(mTR.canTransform("parent", "me", ros::Time().fromNSec(350000)));
+ EXPECT_FALSE(mTR.canTransform("parent", "me", builtin_interfaces::msg::Time().fromNSec(350000)));
  try 
  {
-   mTR.transformPose("me", Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(350000) , "parent"), outpose);
+   mTR.transformPose("me", Stamped<Pose> (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(350000) , "parent"), outpose);
    EXPECT_FALSE("ExtrapolationException Not Thrown");
  }
  catch ( tf::ExtrapolationException &ex)
@@ -2022,28 +2020,28 @@ TEST(tf, Exceptions)
 
 TEST(tf, NoExtrapolationExceptionFromParent)
 {
-  tf::Transformer mTR(true, ros::Duration().fromNSec(1000000));
+  tf::Transformer mTR(true, tf2::Duration().fromNSec(1000000));
   
 
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000), "parent", "a"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000), "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10000),  "parent", "a"));
   
   
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "b"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent", "b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000),  "parent", "b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10000),  "parent", "b"));
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent", "parent"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent's parent", "parent's parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000),  "parent's parent", "parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000),  "parent's parent's parent", "parent's parent"));
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent's parent", "parent"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(10000),  "parent's parent's parent", "parent's parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10000),  "parent's parent", "parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(10000),  "parent's parent's parent", "parent's parent"));
 
   Stamped<Point> output;
 
   try
   {
-    mTR.transformPoint( "b", Stamped<Point>(Point(1,1,1), ros::Time().fromNSec(2000), "a"), output);
+    mTR.transformPoint( "b", Stamped<Point>(Point(1,1,1), builtin_interfaces::msg::Time().fromNSec(2000), "a"), output);
   }
   catch (ExtrapolationException &ex)
   {
@@ -2058,13 +2056,13 @@ TEST(tf, NoExtrapolationExceptionFromParent)
 
 TEST(tf, ExtrapolationFromOneValue)
 {
-  tf::Transformer mTR(true, ros::Duration().fromNSec(1000000));
+  tf::Transformer mTR(true, tf2::Duration().fromNSec(1000000));
   
 
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000),  "parent", "a"));
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent's parent", "parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000),  "parent's parent", "parent"));
 
 
   Stamped<Point> output;
@@ -2073,7 +2071,7 @@ TEST(tf, ExtrapolationFromOneValue)
   //Past time
   try
   {
-    mTR.transformPoint( "parent", Stamped<Point>(Point(1,1,1), ros::Time().fromNSec(10), "a"), output);
+    mTR.transformPoint( "parent", Stamped<Point>(Point(1,1,1), builtin_interfaces::msg::Time().fromNSec(10), "a"), output);
   }
   catch (ExtrapolationException &ex)
   {
@@ -2086,7 +2084,7 @@ TEST(tf, ExtrapolationFromOneValue)
   //Future one element
   try
   {
-    mTR.transformPoint( "parent", Stamped<Point>(Point(1,1,1), ros::Time().fromNSec(100000), "a"), output);
+    mTR.transformPoint( "parent", Stamped<Point>(Point(1,1,1), builtin_interfaces::msg::Time().fromNSec(100000), "a"), output);
   }
   catch (ExtrapolationException &ex)
   {
@@ -2099,7 +2097,7 @@ TEST(tf, ExtrapolationFromOneValue)
   excepted = false;
   try
   {
-    mTR.transformPoint( "parent's parent", Stamped<Point>(Point(1,1,1), ros::Time().fromNSec(1), "a"), output);
+    mTR.transformPoint( "parent's parent", Stamped<Point>(Point(1,1,1), builtin_interfaces::msg::Time().fromNSec(1), "a"), output);
   }
   catch (ExtrapolationException &ex)
   {
@@ -2112,7 +2110,7 @@ TEST(tf, ExtrapolationFromOneValue)
   excepted = false;
   try
   {
-    mTR.transformPoint( "parent's parent", Stamped<Point>(Point(1,1,1), ros::Time().fromNSec(10000), "a"), output);
+    mTR.transformPoint( "parent's parent", Stamped<Point>(Point(1,1,1), builtin_interfaces::msg::Time().fromNSec(10000), "a"), output);
   }
   catch (ExtrapolationException &ex)
   {
@@ -2121,12 +2119,12 @@ TEST(tf, ExtrapolationFromOneValue)
   
   EXPECT_TRUE(excepted);
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(20000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(20000),  "parent", "a"));
 
   excepted = false;
   try
   {
-    mTR.transformPoint( "parent", Stamped<Point>(Point(1,1,1), ros::Time().fromNSec(10000), "a"), output);
+    mTR.transformPoint( "parent", Stamped<Point>(Point(1,1,1), builtin_interfaces::msg::Time().fromNSec(10000), "a"), output);
   }
   catch (ExtrapolationException &ex)
   {
@@ -2142,63 +2140,63 @@ TEST(tf, ExtrapolationFromOneValue)
 TEST(tf, getLatestCommonTime)
 {
   tf::Transformer mTR(true);
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(1000),  "parent", "a"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(2000),  "parent's parent", "parent"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(1000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(2000),  "parent's parent", "parent"));
   
   //simple case
-  ros::Time t;
+  builtin_interfaces::msg::Time t;
   mTR.getLatestCommonTime("a", "parent's parent", t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(1000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(1000));
 
   //no connection
   EXPECT_EQ(tf::LOOKUP_ERROR, mTR.getLatestCommonTime("a", "not valid", t, NULL));
-  EXPECT_EQ(t, ros::Time());
+  EXPECT_EQ(t, builtin_interfaces::msg::Time());
 
   //testing with update
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(3000),  "parent", "a"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(3000),  "parent", "a"));
   mTR.getLatestCommonTime("a", "parent's parent",t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(2000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(2000));
 
   //longer chain
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "parent", "b"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(3000),  "b", "c"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(9000),  "c", "d"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(5000),  "f", "e"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(4000),  "parent", "b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(3000),  "b", "c"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(9000),  "c", "d"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(5000),  "f", "e"));
 
   //shared parent
   mTR.getLatestCommonTime("a", "b",t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(3000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(3000));
 
   //two degrees
   mTR.getLatestCommonTime("a", "c", t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(3000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(3000));
   //reversed
   mTR.getLatestCommonTime("c", "a", t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(3000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(3000));
 
   //three degrees
   mTR.getLatestCommonTime("a", "d", t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(3000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(3000));
   //reversed
   mTR.getLatestCommonTime("d", "a", t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(3000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(3000));
 
   //disconnected tree
   mTR.getLatestCommonTime("e", "f", t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(5000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(5000));
   //reversed order
   mTR.getLatestCommonTime("f", "e", t, NULL);
-  EXPECT_EQ(t, ros::Time().fromNSec(5000));
+  EXPECT_EQ(t, builtin_interfaces::msg::Time().fromNSec(5000));
 
 
-  mTR.setExtrapolationLimit(ros::Duration().fromNSec(20000));
+  mTR.setExtrapolationLimit(tf2::Duration().fromNSec(20000));
 
   //check timestamps resulting
   tf::Stamped<tf::Point> output, output2;
   try
   {
-    mTR.transformPoint( "parent", Stamped<Point>(Point(1,1,1), ros::Time(), "b"), output);
-    mTR.transformPoint( "a", ros::Time(),Stamped<Point>(Point(1,1,1), ros::Time(), "b"), "c",  output2);
+    mTR.transformPoint( "parent", Stamped<Point>(Point(1,1,1), builtin_interfaces::msg::Time(), "b"), output);
+    mTR.transformPoint( "a", builtin_interfaces::msg::Time(),Stamped<Point>(Point(1,1,1), builtin_interfaces::msg::Time(), "b"), "c",  output2);
   }
   catch (tf::TransformException &ex)
   {
@@ -2206,16 +2204,16 @@ TEST(tf, getLatestCommonTime)
     EXPECT_FALSE("Shouldn't get this Exception");
   }
 
-  EXPECT_EQ(output.stamp_, ros::Time().fromNSec(4000));
-  EXPECT_EQ(output2.stamp_, ros::Time().fromNSec(3000));
+  EXPECT_EQ(output.stamp_, builtin_interfaces::msg::Time().fromNSec(4000));
+  EXPECT_EQ(output2.stamp_, builtin_interfaces::msg::Time().fromNSec(3000));
 
 
   //zero length lookup zero time
-  ros::Time now1 = ros::Time::now();
-  ros::Time time_output;
+  builtin_interfaces::msg::Time now1 = builtin_interfaces::msg::Time::now();
+  builtin_interfaces::msg::Time time_output;
   mTR.getLatestCommonTime("a", "a", time_output, NULL);
   EXPECT_LE(now1.toSec(), time_output.toSec());
-  EXPECT_LE(time_output.toSec(), ros::Time::now().toSec());
+  EXPECT_LE(time_output.toSec(), builtin_interfaces::msg::Time::now().toSec());
 
 
 }
@@ -2223,12 +2221,12 @@ TEST(tf, getLatestCommonTime)
 TEST(tf, RepeatedTimes)
 {
   Transformer mTR;
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "parent", "b"));
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,1,0), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "parent", "b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(4000),  "parent", "b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,1,0), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(4000),  "parent", "b"));
 
   tf::StampedTransform  output;
   try{
-    mTR.lookupTransform("parent", "b" , ros::Time().fromNSec(4000), output);
+    mTR.lookupTransform("parent", "b" , builtin_interfaces::msg::Time().fromNSec(4000), output);
     EXPECT_TRUE(!std::isnan(output.getOrigin().x()));
     EXPECT_TRUE(!std::isnan(output.getOrigin().y()));
     EXPECT_TRUE(!std::isnan(output.getOrigin().z()));
@@ -2261,7 +2259,7 @@ TEST(tf, frameExists)
   EXPECT_FALSE(mTR.frameExists("other"));
   EXPECT_FALSE(mTR.frameExists("frame"));
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "/parent", "/b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(4000),  "/parent", "/b"));
 
   // test with fully qualified name
   EXPECT_TRUE(mTR.frameExists("/b"));
@@ -2275,7 +2273,7 @@ TEST(tf, frameExists)
   EXPECT_FALSE(mTR.frameExists("other"));
   EXPECT_FALSE(mTR.frameExists("frame"));
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,1,0), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "/frame", "/other"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,1,0), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(4000),  "/frame", "/other"));
 
   // test with fully qualified name
   EXPECT_TRUE(mTR.frameExists("/b"));
@@ -2311,21 +2309,21 @@ TEST(tf, canTransform)
   Transformer mTR;
 
   //confirm zero length list disconnected will return true
-  EXPECT_TRUE(mTR.canTransform("some_frame","some_frame", ros::Time()));
-  EXPECT_TRUE(mTR.canTransform("some_frame","some_frame", ros::Time::now()));
+  EXPECT_TRUE(mTR.canTransform("some_frame","some_frame", builtin_interfaces::msg::Time()));
+  EXPECT_TRUE(mTR.canTransform("some_frame","some_frame", builtin_interfaces::msg::Time::now()));
 
   //Create a two link tree between times 10 and 20
   for (int i = 10; i < 20; i++)
   {
-    mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), ros::Time().fromSec(i),  "parent", "child"));
-    mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), ros::Time().fromSec(i),  "parent", "other_child"));
+    mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromSec(i),  "parent", "child"));
+    mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromSec(i),  "parent", "other_child"));
   }
 
   // four different timestamps related to tf state
-  ros::Time zero_time = ros::Time().fromSec(0);
-  ros::Time old_time = ros::Time().fromSec(5);
-  ros::Time valid_time = ros::Time().fromSec(15);
-  ros::Time future_time = ros::Time().fromSec(25);
+  builtin_interfaces::msg::Time zero_time = builtin_interfaces::msg::Time().fromSec(0);
+  builtin_interfaces::msg::Time old_time = builtin_interfaces::msg::Time().fromSec(5);
+  builtin_interfaces::msg::Time valid_time = builtin_interfaces::msg::Time().fromSec(15);
+  builtin_interfaces::msg::Time future_time = builtin_interfaces::msg::Time().fromSec(25);
 
 
   //confirm zero length list disconnected will return true
@@ -2408,15 +2406,15 @@ TEST(tf, lookupTransform)
   //Create a two link tree between times 10 and 20
   for (int i = 10; i < 20; i++)
   {
-    mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), ros::Time().fromSec(i),  "parent", "child"));
-    mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), ros::Time().fromSec(i),  "parent", "other_child"));
+    mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromSec(i),  "parent", "child"));
+    mTR.setTransform(  StampedTransform (btTransform(btQuaternion(1,0,0), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromSec(i),  "parent", "other_child"));
   }
 
   // four different timestamps related to tf state
-  ros::Time zero_time = ros::Time().fromSec(0);
-  ros::Time old_time = ros::Time().fromSec(5);
-  ros::Time valid_time = ros::Time().fromSec(15);
-  ros::Time future_time = ros::Time().fromSec(25);
+  builtin_interfaces::msg::Time zero_time = builtin_interfaces::msg::Time().fromSec(0);
+  builtin_interfaces::msg::Time old_time = builtin_interfaces::msg::Time().fromSec(5);
+  builtin_interfaces::msg::Time valid_time = builtin_interfaces::msg::Time().fromSec(15);
+  builtin_interfaces::msg::Time future_time = builtin_interfaces::msg::Time().fromSec(25);
 
   //output
   tf::StampedTransform output;
@@ -2567,11 +2565,11 @@ TEST(tf, lookupTransform)
   //make sure zero goes to now for zero length
   try
   {
-    ros::Time now1 = ros::Time::now();
+    builtin_interfaces::msg::Time now1 = builtin_interfaces::msg::Time::now();
 
-    mTR.lookupTransform("a", "a", ros::Time(),output);
+    mTR.lookupTransform("a", "a", builtin_interfaces::msg::Time(),output);
     EXPECT_LE(now1.toSec(), output.stamp_.toSec());
-    EXPECT_LE(output.stamp_.toSec(), ros::Time::now().toSec());
+    EXPECT_LE(output.stamp_.toSec(), builtin_interfaces::msg::Time::now().toSec());
   }
   catch (tf::TransformException &ex)
   {
@@ -2587,7 +2585,7 @@ TEST(tf, getFrameStrings)
   Transformer mTR;
 
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "/parent", "/b"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(4000),  "/parent", "/b"));
   std::vector <std::string> frames_string;
   mTR.getFrameStrings(frames_string);
   ASSERT_EQ(frames_string.size(), (unsigned)2);
@@ -2595,7 +2593,7 @@ TEST(tf, getFrameStrings)
   EXPECT_STREQ(frames_string[1].c_str(), std::string("/parent").c_str());
 
 
-  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), ros::Time().fromNSec(4000),  "/frame", "/other"));
+  mTR.setTransform(  StampedTransform (btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0)), builtin_interfaces::msg::Time().fromNSec(4000),  "/frame", "/other"));
   
   mTR.getFrameStrings(frames_string);
   ASSERT_EQ(frames_string.size(), (unsigned)4);
@@ -2756,41 +2754,41 @@ TEST(tf2_stamped, OperatorEqualEqual)
   transform0a.setIdentity();
   transform1.setIdentity();
   transform1.setOrigin(btVector3(1, 0, 0));
-  tf2::StampedTransform stamped_transform_reference(transform0a, ros::Time(), "frame_id", "child_frame_id");
-  tf2::StampedTransform stamped_transform0A(transform0, ros::Time(), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform_reference(transform0a, builtin_interfaces::msg::Time(), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform0A(transform0, builtin_interfaces::msg::Time(), "frame_id", "child_frame_id");
   EXPECT_TRUE(stamped_transform0A == stamped_transform_reference); // Equal
-  tf2::StampedTransform stamped_transform0B(transform0, ros::Time(), "frame_id_not_equal", "child_frame_id");
+  tf2::StampedTransform stamped_transform0B(transform0, builtin_interfaces::msg::Time(), "frame_id_not_equal", "child_frame_id");
   EXPECT_FALSE(stamped_transform0B == stamped_transform_reference); // Different Frame id
-  tf2::StampedTransform stamped_transform0C(transform0, ros::Time(1.0), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform0C(transform0, builtin_interfaces::msg::Time(1.0), "frame_id", "child_frame_id");
   EXPECT_FALSE(stamped_transform0C == stamped_transform_reference); // Different Time
-  tf2::StampedTransform stamped_transform0D(transform0, ros::Time(1.0), "frame_id_not_equal", "child_frame_id");
+  tf2::StampedTransform stamped_transform0D(transform0, builtin_interfaces::msg::Time(1.0), "frame_id_not_equal", "child_frame_id");
   EXPECT_FALSE(stamped_transform0D == stamped_transform_reference); // Different frame id and time
-  tf2::StampedTransform stamped_transform0E(transform1, ros::Time(), "frame_id_not_equal", "child_frame_id");
+  tf2::StampedTransform stamped_transform0E(transform1, builtin_interfaces::msg::Time(), "frame_id_not_equal", "child_frame_id");
   EXPECT_FALSE(stamped_transform0E == stamped_transform_reference); // Different transform, frame id
-  tf2::StampedTransform stamped_transform0F(transform1, ros::Time(1.0), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform0F(transform1, builtin_interfaces::msg::Time(1.0), "frame_id", "child_frame_id");
   EXPECT_FALSE(stamped_transform0F == stamped_transform_reference); // Different transform, time
-  tf2::StampedTransform stamped_transform0G(transform1, ros::Time(1.0), "frame_id_not_equal", "child_frame_id");
+  tf2::StampedTransform stamped_transform0G(transform1, builtin_interfaces::msg::Time(1.0), "frame_id_not_equal", "child_frame_id");
   EXPECT_FALSE(stamped_transform0G == stamped_transform_reference); // Different transform, frame id and time
-  tf2::StampedTransform stamped_transform0H(transform1, ros::Time(), "frame_id", "child_frame_id");
+  tf2::StampedTransform stamped_transform0H(transform1, builtin_interfaces::msg::Time(), "frame_id", "child_frame_id");
   EXPECT_FALSE(stamped_transform0H == stamped_transform_reference); // Different transform
 
 
   //Different child_frame_id
-  tf2::StampedTransform stamped_transform1A(transform0, ros::Time(), "frame_id", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1A(transform0, builtin_interfaces::msg::Time(), "frame_id", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1A == stamped_transform_reference); // Equal
-  tf2::StampedTransform stamped_transform1B(transform0, ros::Time(), "frame_id_not_equal", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1B(transform0, builtin_interfaces::msg::Time(), "frame_id_not_equal", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1B == stamped_transform_reference); // Different Frame id
-  tf2::StampedTransform stamped_transform1C(transform0, ros::Time(1.0), "frame_id", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1C(transform0, builtin_interfaces::msg::Time(1.0), "frame_id", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1C == stamped_transform_reference); // Different Time
-  tf2::StampedTransform stamped_transform1D(transform0, ros::Time(1.0), "frame_id_not_equal", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1D(transform0, builtin_interfaces::msg::Time(1.0), "frame_id_not_equal", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1D == stamped_transform_reference); // Different frame id and time
-  tf2::StampedTransform stamped_transform1E(transform1, ros::Time(), "frame_id_not_equal", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1E(transform1, builtin_interfaces::msg::Time(), "frame_id_not_equal", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1E == stamped_transform_reference); // Different transform, frame id
-  tf2::StampedTransform stamped_transform1F(transform1, ros::Time(1.0), "frame_id", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1F(transform1, builtin_interfaces::msg::Time(1.0), "frame_id", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1F == stamped_transform_reference); // Different transform, time
-  tf2::StampedTransform stamped_transform1G(transform1, ros::Time(1.0), "frame_id_not_equal", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1G(transform1, builtin_interfaces::msg::Time(1.0), "frame_id_not_equal", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1G == stamped_transform_reference); // Different transform, frame id and time
-  tf2::StampedTransform stamped_transform1H(transform1, ros::Time(), "frame_id", "child_frame_id2");
+  tf2::StampedTransform stamped_transform1H(transform1, builtin_interfaces::msg::Time(), "frame_id", "child_frame_id2");
   EXPECT_FALSE(stamped_transform1H == stamped_transform_reference); // Different transform
 
 }
@@ -2801,8 +2799,8 @@ TEST(tf2_stamped, OperatorEqual)
   pose0.setIdentity();
   pose1.setIdentity();
   pose1.setOrigin(btVector3(1, 0, 0));
-  tf2::Stamped<btTransform> stamped_pose0(pose0, ros::Time(), "frame_id");
-  tf2::Stamped<btTransform> stamped_pose1(pose1, ros::Time(1.0), "frame_id_not_equal");
+  tf2::Stamped<btTransform> stamped_pose0(pose0, builtin_interfaces::msg::Time(), "frame_id");
+  tf2::Stamped<btTransform> stamped_pose1(pose1, builtin_interfaces::msg::Time(1.0), "frame_id_not_equal");
   EXPECT_FALSE(stamped_pose1 == stamped_pose0);
   stamped_pose1 = stamped_pose0;
   EXPECT_TRUE(stamped_pose1 == stamped_pose0);
@@ -2811,7 +2809,7 @@ TEST(tf2_stamped, OperatorEqual)
   */
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::Time::init(); //needed for ros::TIme::now()
+  builtin_interfaces::msg::Time::init(); //needed for builtin_interfaces::msg::Time::now()
   ros::init(argc, argv, "tf_unittest");
   return RUN_ALL_TESTS();
 }

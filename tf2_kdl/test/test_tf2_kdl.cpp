@@ -41,11 +41,11 @@ static const double EPS = 1e-3;
 
 TEST(TfKDL, Frame)
 {
-  tf2::Stamped<KDL::Frame> v1(KDL::Frame(KDL::Rotation::RPY(M_PI, 0, 0), KDL::Vector(1,2,3)), ros::Time(2.0), "A");
+  tf2::Stamped<KDL::Frame> v1(KDL::Frame(KDL::Rotation::RPY(M_PI, 0, 0), KDL::Vector(1,2,3)), builtin_interfaces::msg::Time(2.0), "A");
 
 
   // simple api
-  KDL::Frame v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
+  KDL::Frame v_simple = tf_buffer->transform(v1, "B", tf2::Duration(2.0));
   EXPECT_NEAR(v_simple.p[0], -9, EPS);
   EXPECT_NEAR(v_simple.p[1], 18, EPS);
   EXPECT_NEAR(v_simple.p[2], 27, EPS);
@@ -57,8 +57,8 @@ TEST(TfKDL, Frame)
   
 
   // advanced api
-  KDL::Frame v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
-					       "A", ros::Duration(3.0));
+  KDL::Frame v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
+					       "A", tf2::Duration(3.0));
   EXPECT_NEAR(v_advanced.p[0], -9, EPS);
   EXPECT_NEAR(v_advanced.p[1], 18, EPS);
   EXPECT_NEAR(v_advanced.p[2], 27, EPS);
@@ -73,18 +73,18 @@ TEST(TfKDL, Frame)
 
 TEST(TfKDL, Vector)
 {
-  tf2::Stamped<KDL::Vector> v1(KDL::Vector(1,2,3), ros::Time(2.0), "A");
+  tf2::Stamped<KDL::Vector> v1(KDL::Vector(1,2,3), builtin_interfaces::msg::Time(2.0), "A");
 
 
   // simple api
-  KDL::Vector v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
+  KDL::Vector v_simple = tf_buffer->transform(v1, "B", tf2::Duration(2.0));
   EXPECT_NEAR(v_simple[0], -9, EPS);
   EXPECT_NEAR(v_simple[1], 18, EPS);
   EXPECT_NEAR(v_simple[2], 27, EPS);
 
   // advanced api
-  KDL::Vector v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
-					       "A", ros::Duration(3.0));
+  KDL::Vector v_advanced = tf_buffer->transform(v1, "B", builtin_interfaces::msg::Time(2.0),
+					       "A", tf2::Duration(3.0));
   EXPECT_NEAR(v_advanced[0], -9, EPS);
   EXPECT_NEAR(v_advanced[1], 18, EPS);
   EXPECT_NEAR(v_advanced[2], 27, EPS);
@@ -92,14 +92,14 @@ TEST(TfKDL, Vector)
 
 TEST(TfKDL, ConvertVector)
 {
-  tf2::Stamped<KDL::Vector> v(KDL::Vector(1,2,3), ros::Time(), "my_frame");
+  tf2::Stamped<KDL::Vector> v(KDL::Vector(1,2,3), builtin_interfaces::msg::Time(), "my_frame");
 
   tf2::Stamped<KDL::Vector> v1 = v;
   tf2::convert(v1, v1);
 
   EXPECT_EQ(v, v1);
 
-  tf2::Stamped<KDL::Vector> v2(KDL::Vector(3,4,5), ros::Time(), "my_frame2");
+  tf2::Stamped<KDL::Vector> v2(KDL::Vector(3,4,5), builtin_interfaces::msg::Time(), "my_frame2");
   tf2::convert(v1, v2);
 
   EXPECT_EQ(v, v2);
@@ -120,7 +120,7 @@ int main(int argc, char **argv){
   t.transform.translation.y = 20;
   t.transform.translation.z = 30;
   t.transform.rotation.x = 1;
-  t.header.stamp = ros::Time(2.0);
+  t.header.stamp = builtin_interfaces::msg::Time(2.0);
   t.header.frame_id = "A";
   t.child_frame_id = "B";
   tf_buffer->setTransform(t, "test");

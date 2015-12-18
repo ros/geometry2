@@ -39,7 +39,7 @@
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/thread.hpp>
 
 #include <message_filters/connection.h>
@@ -81,7 +81,7 @@ public:
   virtual void clear() = 0;
   virtual void setTargetFrame(const std::string& target_frame) = 0;
   virtual void setTargetFrames(const V_string& target_frames) = 0;
-  virtual void setTolerance(const ros::Duration& tolerance) = 0;
+  virtual void setTolerance(const tf2::Duration& tolerance) = 0;
 };
 
 /**
@@ -104,7 +104,7 @@ template<class M>
 class MessageFilter : public MessageFilterBase, public message_filters::SimpleFilter<M>
 {
 public:
-  typedef boost::shared_ptr<M const> MConstPtr;
+  using MConstPtr = std::shared_ptr<M const>;
   typedef ros::MessageEvent<M const> MEvent;
   typedef boost::function<void(const MConstPtr&, FilterFailureReason)> FailureCallback;
   typedef boost::signals2::signal<void(const MConstPtr&, FilterFailureReason)> FailureSignal;
@@ -240,7 +240,7 @@ public:
    */
   void setTargetFrames(const V_string& target_frames)
   {
-    boost::mutex::scoped_lock frames_lock(target_frames_mutex_);
+    std::unique_lock<std::mutex> frames_lock(target_frames_mutex_);
 
     target_frames_.resize(target_frames.size());
     std::transform(target_frames.begin(), target_frames.end(), target_frames_.begin(), this->stripSlash);
@@ -258,16 +258,16 @@ public:
    */
   std::string getTargetFramesString()
   {
-    boost::mutex::scoped_lock lock(target_frames_mutex_);
+    std::unique_lock<std::mutex> lock(target_frames_mutex_);
     return target_frames_string_;
   };
 
   /**
    * \brief Set the required tolerance for the notifier to return true
    */
-  void setTolerance(const ros::Duration& tolerance)
+  void setTolerance(const tf2::Duration& tolerance)
   {
-    boost::mutex::scoped_lock lock(target_frames_mutex_);
+    std::unique_lock<std::mutex> lock(target_frames_mutex_);
     time_tolerance_ = tolerance;
     expected_success_count_ = target_frames_.size() + (time_tolerance_.isZero() ? 0 : 1);
   }
@@ -300,7 +300,7 @@ public:
     namespace mt = ros::message_traits;
     const MConstPtr& message = evt.getMessage();
     std::string frame_id = stripSlash(mt::FrameId<M>::value(*message));
-    ros::Time stamp = mt::TimeStamp<M>::value(*message);
+    builtin_interfaces::msg::Time stamp = mt::TimeStamp<M>::value(*message);
 
     if (frame_id.empty())
     {
@@ -315,7 +315,7 @@ public:
       V_string target_frames_copy;
       // Copy target_frames_ to avoid deadlock from #79
       {
-        boost::mutex::scoped_lock frames_lock(target_frames_mutex_);
+        std::unique_lock<std::mutex> frames_lock(target_frames_mutex_);
         target_frames_copy = target_frames_;
       }
 
@@ -419,7 +419,7 @@ public:
     boost::shared_ptr<std::map<std::string, std::string> > header(new std::map<std::string, std::string>);
     (*header)["callerid"] = "unknown";
     ros::WallTime n = ros::WallTime::now();
-    ros::Time t(n.sec, n.nsec);
+    builtin_interfaces::msg::Time t(n.sec, n.nsec);
     add(MEvent(message, header, t));
   }
 
@@ -429,7 +429,7 @@ public:
    */
   message_filters::Connection registerFailureCallback(const FailureCallback& callback)
   {
-    boost::mutex::scoped_lock lock(failure_signal_mutex_);
+    std::unique_lock<std::mutex> lock(failure_signal_mutex_);
     return message_filters::Connection(boost::bind(&MessageFilter::disconnectFailure, this, _1), failure_signal_.connect(callback));
   }
 
@@ -454,7 +454,7 @@ private:
     transform_message_count_ = 0;
     incoming_message_count_ = 0;
     dropped_message_count_ = 0;
-    time_tolerance_ = ros::Duration(0.0);
+    time_tolerance_ = tf2::Duration(0.0);
     warned_about_empty_frame_id_ = false;
     expected_success_count_ = 1;
 
@@ -462,7 +462,7 @@ private:
   }
 
   void transformable(tf2::TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
-                     ros::Time time, tf2::TransformableResult result)
+                     builtin_interfaces::msg::Time time, tf2::TransformableResult result)
   {
     namespace mt = ros::message_traits;
 
@@ -497,11 +497,11 @@ private:
     bool can_transform = true;
     const MConstPtr& message = info.event.getMessage();
     std::string frame_id = stripSlash(mt::FrameId<M>::value(*message));
-    ros::Time stamp = mt::TimeStamp<M>::value(*message);
+    builtin_interfaces::msg::Time stamp = mt::TimeStamp<M>::value(*message);
 
     if (result == tf2::TransformAvailable)
     {
-      boost::mutex::scoped_lock frames_lock(target_frames_mutex_);
+      std::unique_lock<std::mutex> frames_lock(target_frames_mutex_);
       // make sure we can still perform all the necessary transforms
       typename V_string::iterator it = target_frames_.begin();
       typename V_string::iterator end = target_frames_.end();
@@ -647,13 +647,13 @@ private:
 
   void disconnectFailure(const message_filters::Connection& c)
   {
-    boost::mutex::scoped_lock lock(failure_signal_mutex_);
+    std::unique_lock<std::mutex> lock(failure_signal_mutex_);
     c.getBoostConnection().disconnect();
   }
 
   void signalFailure(const MEvent& evt, FilterFailureReason reason)
   {
-    boost::mutex::scoped_lock lock(failure_signal_mutex_);
+    std::unique_lock<std::mutex> lock(failure_signal_mutex_);
     failure_signal_(evt.getMessage(), reason);
   }
 
@@ -672,7 +672,7 @@ private:
   tf2::BufferCore& bc_; ///< The Transformer used to determine if transformation data is available
   V_string target_frames_; ///< The frames we need to be able to transform to before a message is ready
   std::string target_frames_string_;
-  boost::mutex target_frames_mutex_; ///< A mutex to protect access to the target_frames_ list and target_frames_string.
+  std::mutex target_frames_mutex_; ///< A mutex to protect access to the target_frames_ list and target_frames_string.
   uint32_t queue_size_; ///< The maximum number of messages we queue up
   tf2::TransformableCallbackHandle callback_handle_;
 
@@ -701,17 +701,17 @@ private:
   uint64_t incoming_message_count_;
   uint64_t dropped_message_count_;
 
-  ros::Time last_out_the_back_stamp_;
+  tf2::TimePoint last_out_the_back_stamp_;
   std::string last_out_the_back_frame_;
 
   ros::WallTime next_failure_warning_;
 
-  ros::Duration time_tolerance_; ///< Provide additional tolerance on time for messages which are stamped but can have associated duration
+  tf2::Duration time_tolerance_; ///< Provide additional tolerance on time for messages which are stamped but can have associated duration
 
   message_filters::Connection message_connection_;
 
   FailureSignal failure_signal_;
-  boost::mutex failure_signal_mutex_;
+  std::mutex failure_signal_mutex_;
 
   ros::CallbackQueueInterface* callback_queue_;
 };

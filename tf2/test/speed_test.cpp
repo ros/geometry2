@@ -27,30 +27,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <console_bridge/console.h>
+#include <string>
+
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include <tf2/buffer_core.h>
 
-#include <ros/time.h>
-#include <console_bridge/console.h>
-
-#include <boost/lexical_cast.hpp>
 
 int main(int argc, char** argv)
 {
   uint32_t num_levels = 10;
   if (argc > 1)
   {
-    num_levels = boost::lexical_cast<uint32_t>(argv[1]);
+    num_levels = std::stoi(argv[1]);
   }
 
   tf2::BufferCore bc;
-  geometry_msgs::TransformStamped t;
-  t.header.stamp = ros::Time(1);
+  geometry_msgs::msg::TransformStamped t;
+  t.header.stamp = builtin_interfaces::msg::Time(1);
   t.header.frame_id = "root";
   t.child_frame_id = "0";
   t.transform.translation.x = 1;
   t.transform.rotation.w = 1.0;
   bc.setTransform(t, "me");
-  t.header.stamp = ros::Time(2);
+  t.header.stamp = builtin_interfaces::msg::Time(2);
   bc.setTransform(t, "me");
 
   for (uint32_t i = 1; i < num_levels/2; ++i)
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
       std::stringstream child_ss;
       child_ss << i;
 
-      t.header.stamp = ros::Time(j);
+      t.header.stamp = builtin_interfaces::msg::Time(j);
       t.header.frame_id = parent_ss.str();
       t.child_frame_id = child_ss.str();
       bc.setTransform(t, "me");
@@ -72,10 +72,10 @@ int main(int argc, char** argv)
   t.header.frame_id = "root";
   std::stringstream ss;
   ss << num_levels/2;
-  t.header.stamp = ros::Time(1);
+  t.header.stamp = builtin_interfaces::msg::Time(1);
   t.child_frame_id = ss.str();
   bc.setTransform(t, "me");
-  t.header.stamp = ros::Time(2);
+  t.header.stamp = builtin_interfaces::msg::Time(2);
   bc.setTransform(t, "me");
 
   for (uint32_t i = num_levels/2 + 1; i < num_levels; ++i)
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
       std::stringstream child_ss;
       child_ss << i;
 
-      t.header.stamp = ros::Time(j);
+      t.header.stamp = builtin_interfaces::msg::Time(j);
       t.header.frame_id = parent_ss.str();
       t.child_frame_id = child_ss.str();
       bc.setTransform(t, "me");
@@ -96,10 +96,10 @@ int main(int argc, char** argv)
 
   //logInfo_STREAM(bc.allFramesAsYAML());
 
-  std::string v_frame0 = boost::lexical_cast<std::string>(num_levels - 1);
-  std::string v_frame1 = boost::lexical_cast<std::string>(num_levels/2 - 1);
+  std::string v_frame0 = std::to_string(num_levels - 1);
+  std::string v_frame1 = std::to_string(num_levels/2 - 1);
   logInform("%s to %s", v_frame0.c_str(), v_frame1.c_str());
-  geometry_msgs::TransformStamped out_t;
+  geometry_msgs::msg::TransformStamped out_t;
 
   const uint32_t count = 1000000;
   logInform("Doing %d %d-level tests", count, num_levels);
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(0));
+      out_t = bc.lookupTransform(v_frame1, v_frame0, tf2::TimePoint());
     }
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(1));
+      out_t = bc.lookupTransform(v_frame1, v_frame0, tf2::TimePoint(std::chrono::seconds(1)));
     }
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
@@ -137,7 +137,7 @@ int main(int argc, char** argv)
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(1.5));
+      out_t = bc.lookupTransform(v_frame1, v_frame0, tf2::TimePoint(std::chrono::milliseconds(1500)));
     }
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
@@ -151,7 +151,7 @@ int main(int argc, char** argv)
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(2));
+      out_t = bc.lookupTransform(v_frame1, v_frame0, tf2::TimePoint(std::chrono::seconds(2)));
     }
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
@@ -165,7 +165,7 @@ int main(int argc, char** argv)
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      bc.canTransform(v_frame1, v_frame0, ros::Time(0));
+      bc.canTransform(v_frame1, v_frame0, tf2::TimePoint());
     }
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      bc.canTransform(v_frame1, v_frame0, ros::Time(1));
+      bc.canTransform(v_frame1, v_frame0, tf2::TimePoint(std::chrono::seconds(1)));
     }
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      bc.canTransform(v_frame1, v_frame0, ros::Time(1.5));
+      bc.canTransform(v_frame1, v_frame0, tf2::TimePoint(std::chrono::milliseconds(1500)));
     }
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
     ros::WallTime start = ros::WallTime::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      bc.canTransform(v_frame1, v_frame0, ros::Time(2));
+      bc.canTransform(v_frame1, v_frame0, tf2::TimePoint(std::chrono::seconds(2)));
     }
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;

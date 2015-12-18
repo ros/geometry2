@@ -35,17 +35,12 @@
 #include <tf2/LinearMath/Vector3.h>
 #include <tf2/LinearMath/Quaternion.h>
 
-#include <ros/message_forward.h>
-#include <ros/time.h>
-#include <ros/types.h>
-
-namespace geometry_msgs
-{
-ROS_DECLARE_MESSAGE(TransformStamped);
-}
+#include "tf2/time.h"
 
 namespace tf2
 {
+
+
 
 typedef uint32_t CompactFrameID;
 
@@ -54,7 +49,8 @@ class TransformStorage
 {
 public:
   TransformStorage();
-  TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID frame_id, CompactFrameID child_frame_id);
+  TransformStorage(const TimePoint& stamp, const Quaternion& q, const Vector3& t, CompactFrameID frame_id,
+                   CompactFrameID child_frame_id);
 
   TransformStorage(const TransformStorage& rhs)
   {
@@ -75,7 +71,7 @@ public:
 
   tf2::Quaternion rotation_;
   tf2::Vector3 translation_;
-  ros::Time stamp_;
+  TimePoint stamp_;
   CompactFrameID frame_id_;
   CompactFrameID child_frame_id_;
 };
@@ -83,4 +79,3 @@ public:
 }
 
 #endif // TF2_TRANSFORM_STORAGE_H
-

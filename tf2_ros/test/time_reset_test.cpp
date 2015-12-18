@@ -30,7 +30,6 @@
 #include <gtest/gtest.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
-#include <sys/time.h>
 #include <rosgraph_msgs/Clock.h>
 
 using namespace tf2;
@@ -47,20 +46,20 @@ TEST(tf2_ros_transform_listener, time_backwards)
   ros::Publisher clock = nh.advertise<rosgraph_msgs::Clock>("/clock", 5);
 
   rosgraph_msgs::Clock c;
-  c.clock = ros::Time(100);
+  c.clock = builtin_interfaces::msg::Time(100);
   clock.publish(c);
 
   // basic test
-  ASSERT_FALSE(buffer.canTransform("foo", "bar", ros::Time(101, 0)));
+  ASSERT_FALSE(buffer.canTransform("foo", "bar", builtin_interfaces::msg::Time(101, 0)));
 
   // set the transform
   geometry_msgs::TransformStamped msg;
-  msg.header.stamp = ros::Time(100, 0);
+  msg.header.stamp = builtin_interfaces::msg::Time(100, 0);
   msg.header.frame_id = "foo";
   msg.child_frame_id = "bar";
   msg.transform.rotation.x = 1.0;
   tfb.sendTransform(msg);
-  msg.header.stamp = ros::Time(102, 0);
+  msg.header.stamp = builtin_interfaces::msg::Time(102, 0);
   tfb.sendTransform(msg);
 
 
@@ -69,9 +68,9 @@ TEST(tf2_ros_transform_listener, time_backwards)
   sleep(1);
 
   // verify it's been set
-  ASSERT_TRUE(buffer.canTransform("foo", "bar", ros::Time(101, 0)));
+  ASSERT_TRUE(buffer.canTransform("foo", "bar", builtin_interfaces::msg::Time(101, 0)));
 
-  c.clock = ros::Time(90);
+  c.clock = builtin_interfaces::msg::Time(90);
   clock.publish(c);
 
   // make sure it arrives
@@ -79,7 +78,7 @@ TEST(tf2_ros_transform_listener, time_backwards)
   sleep(1);
 
   //Send anoterh message to trigger clock test on an unrelated frame
-  msg.header.stamp = ros::Time(110, 0);
+  msg.header.stamp = builtin_interfaces::msg::Time(110, 0);
   msg.header.frame_id = "foo2";
   msg.child_frame_id = "bar2";
   tfb.sendTransform(msg);
@@ -89,7 +88,7 @@ TEST(tf2_ros_transform_listener, time_backwards)
   sleep(1);
 
   //verify the data's been cleared
-  ASSERT_FALSE(buffer.canTransform("foo", "bar", ros::Time(101, 0)));
+  ASSERT_FALSE(buffer.canTransform("foo", "bar", builtin_interfaces::msg::Time(101, 0)));
 
 }
 

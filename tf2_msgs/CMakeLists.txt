@@ -1,20 +1,25 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2_msgs)
 
-find_package(catkin REQUIRED COMPONENTS message_generation geometry_msgs actionlib_msgs)
-find_package(Boost COMPONENTS thread REQUIRED)
+if(NOT WIN32)
+  add_definitions(-std=c++11)
+endif()
 
-add_message_files(DIRECTORY msg FILES TF2Error.msg TFMessage.msg)
-add_service_files(DIRECTORY srv FILES FrameGraph.srv)
+find_package(ament_cmake)
+find_package(rosidl_default_generators REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+#find_package(actionlib_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
-add_action_files(DIRECTORY action FILES LookupTransform.action)
-generate_messages(
-  DEPENDENCIES actionlib_msgs std_msgs geometry_msgs
+## TODO(tfoote) add actions back
+#add_action_files(DIRECTORY action FILES LookupTransform.action)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/TF2Error.msg"
+  "msg/TFMessage.msg"
+  "srv/FrameGraph.srv"
+  DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
 )
 
-catkin_package(
-   INCLUDE_DIRS include
-   CATKIN_DEPENDS message_generation geometry_msgs actionlib_msgs)
-
-
-
+ament_package()

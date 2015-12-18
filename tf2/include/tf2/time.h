@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
+ * Copyright (c) 2015, Open Source Robotics Foundation, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,47 +27,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <chrono>
+#include <iomanip>
+#include <ctime>
+#include <thread>
 
-/** \author Tully Foote */
-
-#ifndef TF2_ROS_STATICTRANSFORMBROADCASTER_H
-#define TF2_ROS_STATICTRANSFORMBROADCASTER_H
-
-
-
-#include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/transform_stamped.hpp"
-#include "tf2_msgs/msg/tf_message.hpp"
-
-namespace tf2_ros
+namespace tf2
 {
+  using Duration = std::chrono::duration<double, std::nano>;
+  using TimePoint = std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>;
 
 
-/** \brief This class provides an easy way to publish coordinate frame transform information.  
- * It will handle all the messaging and stuffing of messages.  And the function prototypes lay out all the 
- * necessary data needed for each message.  */
+  using IDuration = std::chrono::duration<int, std::nano>;
+  // This is the zero time in ROS
+  static const TimePoint TimePointZero = TimePoint(IDuration::zero());
 
-class StaticTransformBroadcaster{
-public:
-  /** \brief Constructor (needs a ros::Node reference) */
-  StaticTransformBroadcaster();
+  inline TimePoint get_now()
+  {
+    return std::chrono::system_clock::now();
+  }
 
-  /** \brief Send a TransformStamped message
-   * The stamped data structure includes frame_id, and time, and parent_id already.  */
-  void sendTransform(const geometry_msgs::msg::TransformStamped & transform);
+  inline double durationToSec(const tf2::Duration & input){
+    return (double)std::chrono::duration_cast<std::chrono::seconds>(input).count();
+  }
+  
+  inline double timeToSec(const TimePoint& timepoint)
+  {
+    return durationToSec(Duration(timepoint.time_since_epoch()));
+  }
 
-  /** \brief Send a vector of TransformStamped messages
-   * The stamped data structure includes frame_id, and time, and parent_id already.  */
-  void sendTransform(const std::vector<geometry_msgs::msg::TransformStamped> & transforms);
+  // Display functions as there is no default display
+  // TODO: find a proper way to handle display
+  inline std::string displayTimePoint(const TimePoint& stamp)
+  {
+    // Below would only work with GCC 5.0 and above
+    //return std::put_time(&stamp, "%c");
+    std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::milliseconds>(stamp));
+    return std::ctime(&time);
+  }
 
-private:
-  /// Internal reference to ros::Node
-  rclcpp::node::Node::SharedPtr node_;
-  rclcpp::publisher::Publisher<tf2_msgs::msg::TFMessage>::SharedPtr publisher_;
-  tf2_msgs::msg::TFMessage net_message_;
-
-};
 
 }
-
-#endif //TF_STATICTRANSFORMBROADCASTER_H

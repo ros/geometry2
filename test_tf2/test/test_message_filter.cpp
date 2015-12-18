@@ -34,7 +34,6 @@
 #include <tf2/buffer_core.h>
 #include <geometry_msgs/PointStamped.h>
 #include <boost/bind.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
@@ -75,7 +74,7 @@ TEST(MessageFilter, noTransforms)
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
-  msg->header.stamp = ros::Time(1);
+  msg->header.stamp = builtin_interfaces::msg::Time(1);
   msg->header.frame_id = "frame2";
   filter.add(msg);
 
@@ -90,14 +89,14 @@ TEST(MessageFilter, noTransformsSameFrame)
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
-  msg->header.stamp = ros::Time(1);
+  msg->header.stamp = builtin_interfaces::msg::Time(1);
   msg->header.frame_id = "frame1";
   filter.add(msg);
 
   EXPECT_EQ(1, n.count_);
 }
 
-geometry_msgs::TransformStamped createTransform(Quaternion q, Vector3 v, ros::Time stamp, const std::string& frame1, const std::string& frame2)
+geometry_msgs::TransformStamped createTransform(Quaternion q, Vector3 v, builtin_interfaces::msg::Time stamp, const std::string& frame1, const std::string& frame2)
 {
   geometry_msgs::TransformStamped t;
   t.header.frame_id = frame1;
@@ -120,7 +119,7 @@ TEST(MessageFilter, preexistingTransforms)
   MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
-  ros::Time stamp(1);
+  builtin_interfaces::msg::Time stamp(1);
   bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -139,7 +138,7 @@ TEST(MessageFilter, postTransforms)
   MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
-  ros::Time stamp(1);
+  builtin_interfaces::msg::Time stamp(1);
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
@@ -162,7 +161,7 @@ TEST(MessageFilter, queueSize)
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
   filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
-  ros::Time stamp(1);
+  builtin_interfaces::msg::Time stamp(1);
 
   for (int i = 0; i < 20; ++i)
   {
@@ -189,7 +188,7 @@ TEST(MessageFilter, setTargetFrame)
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
   filter.setTargetFrame("frame1000");
 
-  ros::Time stamp(1);
+  builtin_interfaces::msg::Time stamp(1);
   bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1000", "frame2"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -214,7 +213,7 @@ TEST(MessageFilter, multipleTargetFrames)
   target_frames.push_back("frame2");
   filter.setTargetFrames(target_frames);
 
-  ros::Time stamp(1);
+  builtin_interfaces::msg::Time stamp(1);
   bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame3"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -224,7 +223,7 @@ TEST(MessageFilter, multipleTargetFrames)
 
   EXPECT_EQ(0, n.count_); // frame1->frame3 exists, frame2->frame3 does not (yet)
 
-  //ros::Time::setNow(ros::Time::now() + ros::Duration(1.0));
+  //builtin_interfaces::msg::Time::setNow(builtin_interfaces::msg::Time::now() + tf2::Duration(1.0));
 
   bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
 
@@ -233,14 +232,14 @@ TEST(MessageFilter, multipleTargetFrames)
 
 TEST(MessageFilter, tolerance)
 {
-  ros::Duration offset(0.2);
+  tf2::Duration offset(0.2);
   BufferCore bc;
   Notification n(1);
   MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
   filter.setTolerance(offset);
 
-  ros::Time stamp(1);
+  builtin_interfaces::msg::Time stamp(1);
   bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
@@ -267,9 +266,9 @@ TEST(MessageFilter, outTheBackFailure)
   MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
-  ros::Time stamp(1);
+  builtin_interfaces::msg::Time stamp(1);
   bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp, "frame1", "frame2"), "me");
-  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp + ros::Duration(10000), "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp + tf2::Duration(10000), "frame1", "frame2"), "me");
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
@@ -286,7 +285,7 @@ TEST(MessageFilter, outTheBackFailure2)
   MessageFilter<geometry_msgs::PointStamped> filter(bc, "frame1", 1, 0);
   filter.registerFailureCallback(boost::bind(&Notification::failure, &n, _1, _2));
 
-  ros::Time stamp(1);
+  builtin_interfaces::msg::Time stamp(1);
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
   msg->header.stamp = stamp;
@@ -296,7 +295,7 @@ TEST(MessageFilter, outTheBackFailure2)
   EXPECT_EQ(0, n.count_);
   EXPECT_EQ(0, n.failure_count_);
 
-  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp + ros::Duration(10000), "frame1", "frame2"), "me");
+  bc.setTransform(createTransform(Quaternion(0,0,0,1), Vector3(1,2,3), stamp + tf2::Duration(10000), "frame1", "frame2"), "me");
 
   EXPECT_EQ(1, n.failure_count_);
 }
@@ -324,7 +323,7 @@ TEST(MessageFilter, callbackQueue)
   filter.registerCallback(boost::bind(&Notification::notify, &n, _1));
 
   geometry_msgs::PointStampedPtr msg(new geometry_msgs::PointStamped);
-  msg->header.stamp = ros::Time(1);
+  msg->header.stamp = builtin_interfaces::msg::Time(1);
   msg->header.frame_id = "frame1";
   filter.add(msg);
 

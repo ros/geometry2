@@ -31,7 +31,6 @@
 #include <tf2/buffer_core.h>
 #include "tf2/exceptions.h"
 #include <tf2_ros/static_transform_broadcaster.h>
-#include <sys/time.h>
 #include <ros/ros.h>
 #include "rostest/permuter.h"
 
@@ -42,18 +41,18 @@ TEST(StaticTranformPublsher, a_b_different_times)
 {
   tf2_ros::Buffer mB;
   tf2_ros::TransformListener tfl(mB);
-  EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(100), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(1000), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "b", builtin_interfaces::msg::Time(), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "b", builtin_interfaces::msg::Time(100), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "b", builtin_interfaces::msg::Time(1000), tf2::Duration(1.0)));
 };
 
 TEST(StaticTranformPublsher, a_c_different_times)
 {
   tf2_ros::Buffer mB;
   tf2_ros::TransformListener tfl(mB);
-  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(100), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(1000), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", builtin_interfaces::msg::Time(), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", builtin_interfaces::msg::Time(100), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", builtin_interfaces::msg::Time(1000), tf2::Duration(1.0)));
 };
 
 TEST(StaticTranformPublsher, a_d_different_times)
@@ -63,23 +62,23 @@ TEST(StaticTranformPublsher, a_d_different_times)
   geometry_msgs::TransformStamped ts;
   ts.transform.rotation.w = 1;
   ts.header.frame_id = "c";
-  ts.header.stamp = ros::Time(10.0);
+  ts.header.stamp = builtin_interfaces::msg::Time(10.0);
   ts.child_frame_id = "d";
   
   // make sure listener has populated
-  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(100), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(1000), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", builtin_interfaces::msg::Time(), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", builtin_interfaces::msg::Time(100), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "c", builtin_interfaces::msg::Time(1000), tf2::Duration(1.0)));
 
 
   mB.setTransform(ts, "authority");
   //printf("%s\n", mB.allFramesAsString().c_str());
-  EXPECT_TRUE(mB.canTransform("c", "d", ros::Time(10), ros::Duration(0)));
+  EXPECT_TRUE(mB.canTransform("c", "d", builtin_interfaces::msg::Time(10), tf2::Duration(0)));
 
-  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(), ros::Duration(0)));
-  EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(1), ros::Duration(0)));
-  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(10), ros::Duration(0)));
-  EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(100), ros::Duration(0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", builtin_interfaces::msg::Time(), tf2::Duration(0)));
+  EXPECT_FALSE(mB.canTransform("a", "d", builtin_interfaces::msg::Time(1), tf2::Duration(0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", builtin_interfaces::msg::Time(10), tf2::Duration(0)));
+  EXPECT_FALSE(mB.canTransform("a", "d", builtin_interfaces::msg::Time(100), tf2::Duration(0)));
 
 };
 
@@ -91,15 +90,15 @@ TEST(StaticTranformPublsher, multiple_parent_test)
   geometry_msgs::TransformStamped ts;
   ts.transform.rotation.w = 1;
   ts.header.frame_id = "c";
-  ts.header.stamp = ros::Time(10.0);
+  ts.header.stamp = builtin_interfaces::msg::Time(10.0);
   ts.child_frame_id = "d";
 
   stb.sendTransform(ts);
   
   // make sure listener has populated
-  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(100), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("a", "d", ros::Time(1000), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", builtin_interfaces::msg::Time(), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", builtin_interfaces::msg::Time(100), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("a", "d", builtin_interfaces::msg::Time(1000), tf2::Duration(1.0)));
 
 
   // Publish new transform with child 'd', should replace old one in static tf
@@ -110,10 +109,10 @@ TEST(StaticTranformPublsher, multiple_parent_test)
   ts.child_frame_id = "other_child2";
   stb.sendTransform(ts);
 
-  EXPECT_TRUE(mB.canTransform("new_parent", "d", ros::Time(), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("new_parent", "other_child", ros::Time(), ros::Duration(1.0)));
-  EXPECT_TRUE(mB.canTransform("new_parent", "other_child2", ros::Time(), ros::Duration(1.0)));
-  EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("new_parent", "d", builtin_interfaces::msg::Time(), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("new_parent", "other_child", builtin_interfaces::msg::Time(), tf2::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("new_parent", "other_child2", builtin_interfaces::msg::Time(), tf2::Duration(1.0)));
+  EXPECT_FALSE(mB.canTransform("a", "d", builtin_interfaces::msg::Time(), tf2::Duration(1.0)));
 };
 
 int main(int argc, char **argv){

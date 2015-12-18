@@ -32,102 +32,115 @@
 
 #include "tf2_ros/buffer.h"
 
-#include <ros/assert.h>
 #include <sstream>
+#include <thread>
+
+//TODO(tfoote replace these terrible macros)
+#define ROS_ERROR printf
+#define ROS_FATAL printf
+#define ROS_INFO printf
+
 
 namespace tf2_ros
 {
 
-Buffer::Buffer(ros::Duration cache_time, bool debug) :
+Buffer::Buffer(tf2::Duration cache_time, bool debug) :
   BufferCore(cache_time)
 {
-  if(debug && !ros::service::exists("~tf2_frames", false))
-  {
-    ros::NodeHandle n("~");
-    frames_server_ = n.advertiseService("tf2_frames", &Buffer::getFrames, this);
-  }
+  // TODO(tfoote) reenable 
+  // if(debug && !ros::service::exists("~tf2_frames", false))
+  // {
+  //   ros::NodeHandle n("~");
+  //   frames_server_ = n.advertiseService("tf2_frames", &Buffer::getFrames, this);
+  // }
 }
 
-geometry_msgs::TransformStamped 
+geometry_msgs::msg::TransformStamped 
 Buffer::lookupTransform(const std::string& target_frame, const std::string& source_frame,
-                        const ros::Time& time, const ros::Duration timeout) const
+                        const tf2::TimePoint& lookup_time, const tf2::Duration timeout) const
 {
-  canTransform(target_frame, source_frame, time, timeout);
-  return lookupTransform(target_frame, source_frame, time);
+  canTransform(target_frame, source_frame, lookup_time, timeout);
+  return lookupTransform(target_frame, source_frame, lookup_time);
 }
 
 
-geometry_msgs::TransformStamped 
-Buffer::lookupTransform(const std::string& target_frame, const ros::Time& target_time,
-                        const std::string& source_frame, const ros::Time& source_time,
-                        const std::string& fixed_frame, const ros::Duration timeout) const
+geometry_msgs::msg::TransformStamped 
+Buffer::lookupTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
+                        const std::string& source_frame, const tf2::TimePoint& source_time,
+                        const std::string& fixed_frame, const tf2::Duration timeout) const
 {
   canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, timeout);
   return lookupTransform(target_frame, target_time, source_frame, source_time, fixed_frame);
 }
 
 /** This is a workaround for the case that we're running inside of
-    rospy and ros::Time is not initialized inside the c++ instance. 
+    rospy and tf2::TimePoint is not initialized inside the c++ instance. 
     This makes the system fall back to Wall time if not initialized.  
 */
-ros::Time now_fallback_to_wall()
+tf2::TimePoint now_fallback_to_wall()
 {
-  try
-  {
-    return ros::Time::now();
-  }
-  catch (ros::TimeNotInitializedException ex)
-  {
-    ros::WallTime wt = ros::WallTime::now(); 
-    return ros::Time(wt.sec, wt.nsec); 
-  }
+  //TODO(tfoote) commented pending replacement for ros::time
+  // try
+  // {
+    return tf2::get_now();
+  //}
+  // catch (ros::TimeNotInitializedException ex)
+  // {
+  //   //TODO(tfoote) should be walltime 
+  //   ros::WallTime wt = get_now_msg(); // ros::WallTime::now(); 
+  //   return ros::Time(wt.sec, wt.nsec); 
+  // }
 }
 
 /** This is a workaround for the case that we're running inside of
-    rospy and ros::Time is not initialized inside the c++ instance. 
+    rospy and tf2::TimePoint is not initialized inside the c++ instance. 
     This makes the system fall back to Wall time if not initialized.  
     https://github.com/ros/geometry/issues/30
 */
-void sleep_fallback_to_wall(const ros::Duration& d)
+void sleep_fallback_to_wall(const tf2::Duration& d)
 {
-  try
-  {
-      d.sleep();
-  }
-  catch (ros::TimeNotInitializedException ex)
-  {
-    ros::WallDuration wd = ros::WallDuration(d.sec, d.nsec); 
-    wd.sleep();
-  }
+  auto micro_d = std::chrono::duration_cast<std::chrono::microseconds>(d);
+  std::this_thread::sleep_for(micro_d);
+  //TODO(tfoote) reneable this when there's a new ros::Time equivalent
+  // try
+  // {
+  //     d.sleep();
+  // }
+  // catch (ros::TimeNotInitializedException ex)
+  // {
+  //   ros::WallDuration wd = ros::WallDuration(d.sec, d.nsec); 
+  //   wd.sleep();
+  // }
 }
 
-void conditionally_append_timeout_info(std::string * errstr, const ros::Time& start_time,
-                                       const ros::Duration& timeout)
+void conditionally_append_timeout_info(std::string * errstr, const tf2::TimePoint& start_time,
+                                       const tf2::Duration& timeout)
 {
   if (errstr)
   {
     std::stringstream ss;
-    ss << ". canTransform returned after "<< (now_fallback_to_wall() - start_time).toSec() \
-       <<" timeout was " << timeout.toSec() << ".";
+    ss << ". canTransform returned after "<< tf2::durationToSec(now_fallback_to_wall() - start_time) \
+       <<" timeout was " << tf2::durationToSec(timeout) << ".";
     (*errstr) += ss.str();
   }
 }
 
 bool
 Buffer::canTransform(const std::string& target_frame, const std::string& source_frame, 
-                     const ros::Time& time, const ros::Duration timeout, std::string* errstr) const
+                     const tf2::TimePoint& time, const tf2::Duration timeout, std::string* errstr) const
 {
   if (!checkAndErrorDedicatedThreadPresent(errstr))
     return false;
 
   // poll for transform if timeout is set
-  ros::Time start_time = now_fallback_to_wall();
+  tf2::TimePoint start_time = now_fallback_to_wall();
   while (now_fallback_to_wall() < start_time + timeout && 
          !canTransform(target_frame, source_frame, time) &&
-         (now_fallback_to_wall()+ros::Duration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
-         (ros::ok() || !ros::isInitialized())) // Make sure we haven't been stopped (won't work for pytf)
+         (now_fallback_to_wall()+tf2::Duration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
+         (rclcpp::ok()// || !ros::isInitialized() //TODO(tfoote) restore
+       )) // Make sure we haven't been stopped (won't work for pytf)
     {
-      sleep_fallback_to_wall(ros::Duration(0.01));
+      sleep_fallback_to_wall(tf2::Duration(0.01));
     }
   bool retval = canTransform(target_frame, source_frame, time, errstr);
   conditionally_append_timeout_info(errstr, start_time, timeout);
@@ -136,21 +149,23 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
 
     
 bool
-Buffer::canTransform(const std::string& target_frame, const ros::Time& target_time,
-                     const std::string& source_frame, const ros::Time& source_time,
-                     const std::string& fixed_frame, const ros::Duration timeout, std::string* errstr) const
+Buffer::canTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
+                     const std::string& source_frame, const tf2::TimePoint& source_time,
+                     const std::string& fixed_frame, const tf2::Duration timeout, std::string* errstr) const
 {
   if (!checkAndErrorDedicatedThreadPresent(errstr))
     return false;
 
   // poll for transform if timeout is set
-  ros::Time start_time = now_fallback_to_wall();
+  tf2::TimePoint start_time = now_fallback_to_wall();
   while (now_fallback_to_wall() < start_time + timeout && 
          !canTransform(target_frame, target_time, source_frame, source_time, fixed_frame) &&
-         (now_fallback_to_wall()+ros::Duration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
-         (ros::ok() || !ros::isInitialized())) // Make sure we haven't been stopped (won't work for pytf)
+         (now_fallback_to_wall()+tf2::Duration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
+         (rclcpp::ok() //|| !ros::isInitialized() //TODO(tfoote) restore
+          )
+        ) // Make sure we haven't been stopped (won't work for pytf)
          {  
-           sleep_fallback_to_wall(ros::Duration(0.01));
+           sleep_fallback_to_wall(tf2::Duration(0.01));
          }
   bool retval = canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
   conditionally_append_timeout_info(errstr, start_time, timeout);
@@ -158,7 +173,7 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
 }
 
 
-bool Buffer::getFrames(tf2_msgs::FrameGraph::Request& req, tf2_msgs::FrameGraph::Response& res) 
+bool Buffer::getFrames(tf2_msgs::srv::FrameGraph::Request& req, tf2_msgs::srv::FrameGraph::Response& res) 
 {
   res.frame_yaml = allFramesAsYAML();
   return true;
