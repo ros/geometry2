@@ -71,6 +71,9 @@ TEST(tf2, setTransformValid)
   st.header.stamp.sec = 1;
   st.header.stamp.nanosec = 1;
   st.child_frame_id = "child";
+  st.transform.translation.x = 0;
+  st.transform.translation.y = 0;
+  st.transform.translation.z = 0;
   st.transform.rotation.x = 0;
   st.transform.rotation.y = 0;
   st.transform.rotation.z = 0;
@@ -102,6 +105,9 @@ TEST(tf2_lookupTransform, LookupException_One_Exists)
   st.header.stamp.sec = 1;
   st.header.stamp.nanosec = 0;
   st.child_frame_id = "child";
+  st.transform.translation.x = 0;
+  st.transform.translation.y = 0;
+  st.transform.translation.z = 0;
   st.transform.rotation.x = 0;
   st.transform.rotation.y = 0;
   st.transform.rotation.z = 0;
@@ -120,6 +126,9 @@ TEST(tf2_canTransform, One_Exists)
   st.header.stamp.sec = 1;
   st.header.stamp.nanosec = 0;
   st.child_frame_id = "child";
+  st.transform.translation.x = 0;
+  st.transform.translation.y = 0;
+  st.transform.translation.z = 0;
   st.transform.rotation.x = 0;
   st.transform.rotation.y = 0;
   st.transform.rotation.z = 0;
