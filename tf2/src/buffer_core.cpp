@@ -1125,9 +1125,9 @@ std::string BufferCore::allFramesAsYAML(TimePoint current_time) const
     mstream << "  most_recent_transform: " << displayTimePoint(cache->getLatestTimestamp()) << std::endl;
     mstream << "  oldest_transform: " << displayTimePoint(cache->getOldestTimestamp()) << std::endl;
     if ( current_time !=TimePointZero ) {
-      mstream << "  transform_delay: " << displayDuration(current_time - cache->getLatestTimestamp()) << std::endl;
+      mstream << "  transform_delay: " << durationToSec(current_time - cache->getLatestTimestamp()) << std::endl;
     }
-    mstream << "  buffer_length: " << displayDuration(cache->getLatestTimestamp() - cache->getOldestTimestamp()) << std::endl;
+    mstream << "  buffer_length: " << durationToSec(cache->getLatestTimestamp() - cache->getOldestTimestamp()) << std::endl;
   }
 
   return mstream.str();
@@ -1419,12 +1419,12 @@ std::string BufferCore::_allFramesAsDot(TimePoint current_time) const
             << "Average rate: " << rate << " Hz\\n"
             << "Most recent transform: " << displayTimePoint(counter_frame->getLatestTimestamp()) <<" ";
     if (current_time != TimePointZero)
-      mstream << "( "<<  displayDuration(current_time - counter_frame->getLatestTimestamp()) << " sec old)";
+      mstream << "( "<<  durationToSec(current_time - counter_frame->getLatestTimestamp()) << " sec old)";
     mstream << "\\n"
       //    << "(time: " << getFrame(counter)->getLatestTimestamp().toSec() << ")\\n"
       //    << "Oldest transform: " << (current_time - getFrame(counter)->getOldestTimestamp()).toSec() << " sec old \\n"
       //    << "(time: " << (getFrame(counter)->getOldestTimestamp()).toSec() << ")\\n"
-            << "Buffer length: " << displayDuration(counter_frame->getLatestTimestamp()-counter_frame->getOldestTimestamp()) << " sec\\n"
+            << "Buffer length: " << durationToSec(counter_frame->getLatestTimestamp()-counter_frame->getOldestTimestamp()) << " sec\\n"
             <<"\"];" <<std::endl;
   }
 

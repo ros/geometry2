@@ -48,7 +48,7 @@ namespace tf2
   }
 
   inline double durationToSec(const tf2::Duration & input){
-    return std::chrono::duration_cast<std::chrono::seconds>(input).count();
+    return (double)std::chrono::duration_cast<std::chrono::seconds>(input).count();
   }
   
   inline double timeToSec(const TimePoint& timepoint)
@@ -65,9 +65,6 @@ namespace tf2
     std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::milliseconds>(stamp));
     return std::ctime(&time);
   }
-  inline double displayDuration(const tf2::Duration& duration)
-  {
-    return std::chrono::duration_cast<std::chrono::seconds>(duration).count();
-  }
+
 
 }

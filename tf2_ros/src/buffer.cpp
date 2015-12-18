@@ -99,7 +99,8 @@ tf2::TimePoint now_fallback_to_wall()
 */
 void sleep_fallback_to_wall(const tf2::Duration& d)
 {
-  std::this_thread::sleep_for(d);
+  auto micro_d = std::chrono::duration_cast<std::chrono::microseconds>(d);
+  std::this_thread::sleep_for(micro_d);
   //TODO(tfoote) reneable this when there's a new ros::Time equivalent
   // try
   // {
