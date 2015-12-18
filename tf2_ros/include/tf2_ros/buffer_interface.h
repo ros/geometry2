@@ -59,8 +59,8 @@ namespace tf2_ros
 
   inline double timeToSec(const builtin_interfaces::msg::Time & time_msg)
   {
-    auto ns = std::chrono::nanoseconds(time_msg.nanosec);
-    auto s = std::chrono::seconds(time_msg.sec);
+    auto ns = std::chrono::duration<double, std::nano>(time_msg.nanosec);
+    auto s = std::chrono::duration<double>(time_msg.sec);
     return (s + std::chrono::duration_cast<std::chrono::seconds>(ns)).count();
   }
 
