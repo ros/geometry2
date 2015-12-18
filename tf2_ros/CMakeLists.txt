@@ -10,6 +10,7 @@ set(TF2_PY tf2_py)
 endif()
 
 find_package(ament_cmake REQUIRED)
+# TODO(tfoote) uncomment when reenabling server client interfaces
 # find_package(actionlib REQUIRED)
 # find_package(actionlib_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
@@ -18,38 +19,6 @@ find_package(tf2 REQUIRED)
 find_package(tf2_msgs REQUIRED)
 
 find_package(rmw)
-find_package(rmw_implementation) # not needed after rmw typesupport refactor
-
-# 
-# find_package(catkin REQUIRED COMPONENTS
-#   actionlib
-#   actionlib_msgs
-#   geometry_msgs
-#   message_filters
-#   roscpp
-#   rosgraph
-#   rospy
-#   tf2
-#   tf2_msgs
-#   ${TF2_PY}
-# )
-
-# catkin_python_setup()
-
-# catkin_package(
-#   INCLUDE_DIRS include
-#   LIBRARIES ${PROJECT_NAME}
-#   CATKIN_DEPENDS
-#   actionlib
-#   actionlib_msgs
-#   geometry_msgs
-#   message_filters
-#   roscpp
-#   rosgraph
-#   tf2
-#   tf2_msgs
-#   ${TF2_PY}
-# )
 
 include_directories(include
   ${geometry_msgs_INCLUDE_DIRS}
@@ -59,7 +28,6 @@ include_directories(include
   ${tf2_INCLUDE_DIRS}
   ${tf2_msgs_INCLUDE_DIRS}
   )
-message(fatal_error "tf2_msgs_INCLUDE_DIRS ${tf2_msgs_INCLUDE_DIRS}")
 
 # tf2_ros library
 add_library(${PROJECT_NAME}
@@ -79,6 +47,8 @@ target_link_libraries(${PROJECT_NAME}
   ${tf2_LIBRARIES}
   ${tf2_msgs_LIBRARIES}
   )
+  
+# TODO(tfoote) port server client interfaces
 # # buffer_server executable
 # add_executable(buffer_server src/buffer_server_main.cpp)
 # add_dependencies(${PROJECT_NAME}_buffer_server tf2_msgs_gencpp)
@@ -139,7 +109,7 @@ install(TARGETS
   static_transform_publisher
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib/${PROJECT_NAME}
+  RUNTIME DESTINATION bin/${PROJECT_NAME}
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -149,8 +119,9 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 # Tests
 # if(AMENT_ENABLE_TESTING)
+# TODO(tfoote) port tests to use ROS2 instead of ROS1 api.
 if (false)
-  
+
 # new requirements for testing
 find_package(catkin REQUIRED COMPONENTS
   actionlib
@@ -192,7 +163,6 @@ add_rostest(test/transform_listener_unittest.launch)
 add_rostest(test/transform_listener_time_reset_test.launch)
 
 endif()
-# TODO(tfoote) Need amend_export_dependenceies?
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_package()

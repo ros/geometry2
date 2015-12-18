@@ -126,7 +126,7 @@ namespace tf2_ros
     // conditionally error if dedicated_thread unset.
     bool checkAndErrorDedicatedThreadPresent(std::string* errstr) const;
 
-//TODO(renable framegraph service)
+//TODO(tfoote)renable framegraph service
 //    ros::ServiceServer frames_server_;
 
 

@@ -37,7 +37,7 @@
 
 namespace tf2{
 
-enum class TF2Error : std::uint8_t{
+enum class TF2Error : std::uint8_t {
   NO_ERROR = 0,
   LOOKUP_ERROR = 1,
   CONNECTIVITY_ERROR = 2,

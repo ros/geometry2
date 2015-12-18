@@ -52,8 +52,8 @@ namespace tf2_ros
     std::chrono::seconds s = \
       std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
     builtin_interfaces::msg::Time t;
-    t.sec = s.count();
-    t.nanosec = ns.count() % 1000000000ull;
+    t.sec = (int32_t)s.count();
+    t.nanosec = (uint32_t)(ns.count() % 1000000000ull);
     return t;
   }
 
@@ -129,73 +129,73 @@ public:
 		 const std::string& fixed_frame, const tf2::TempDuration timeout, std::string* errstr = NULL) const = 0;
 
 
-// TODO(tfoote) restore transform methods
-  // // Transform, simple api, with pre-allocation
-  // template <class T>
-  //   T& transform(const T& in, T& out, 
-	// 	 const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
-  // {
-  //   // do the transform
-  //   tf2::doTransform(in, out, lookupTransform(target_frame, tf2::getFrameId(in), tf2::getTimestamp(in), timeout));
-  //   return out;
-  // }
-  // 
-  // 
-  // // transform, simple api, no pre-allocation
-  // template <class T>
-  //   T transform(const T& in, 
-	// 	const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
-  // {
-  //   T out;
-  //   return transform(in, out, target_frame, timeout);
-  // }
-  // 
-  // //transform, simple api, different types, pre-allocation
-  // template <class A, class B>
-  //   B& transform(const A& in, B& out,
-  //       const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
-  // {
-  //   A copy = transform(in, target_frame, timeout);
-  //   tf2::convert(copy, out);
-  //   return out;
-  // }
-  // 
-  // // Transform, advanced api, with pre-allocation
-  // template <class T>
-  //   T& transform(const T& in, T& out, 
-	// 	 const std::string& target_frame, const tf2::TimePoint& target_time,
-	// 	 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
-  // {
-  //   // do the transform
-  //   tf2::doTransform(in, out, lookupTransform(target_frame, target_time, 
-  //                                             tf2::getFrameId(in), tf2::getTimestamp(in), 
-  //                                             fixed_frame, timeout));
-  //   return out;
-  // }
-  // 
-  // 
-  // // transform, advanced api, no pre-allocation
-  // template <class T>
-  //   T transform(const T& in, 
-	// 	 const std::string& target_frame, const tf2::TimePoint& target_time,
-	// 	 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
-  // {
-  //   T out;
-  //   return transform(in, out, target_frame, target_time, fixed_frame, timeout);
-  // }
-  // 
-  // // Transform, advanced api, different types, with pre-allocation
-  // template <class A, class B>
-  //   B& transform(const A& in, B& out, 
-	// 	 const std::string& target_frame, const tf2::TimePoint& target_time,
-	// 	 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
-  // {
-  //   // do the transform
-  //   A copy = transform(in, target_frame, target_time, fixed_frame, timeout);
-  //   tf2::convert(copy, out);
-  //   return out;
-  // }
+/* TODO(tfoote) restore transform methods
+  // Transform, simple api, with pre-allocation
+  template <class T>
+    T& transform(const T& in, T& out, 
+		 const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+  {
+    // do the transform
+    tf2::doTransform(in, out, lookupTransform(target_frame, tf2::getFrameId(in), tf2::getTimestamp(in), timeout));
+    return out;
+  }
+  
+  
+  // transform, simple api, no pre-allocation
+  template <class T>
+    T transform(const T& in, 
+		const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+  {
+    T out;
+    return transform(in, out, target_frame, timeout);
+  }
+  
+  //transform, simple api, different types, pre-allocation
+  template <class A, class B>
+    B& transform(const A& in, B& out,
+        const std::string& target_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+  {
+    A copy = transform(in, target_frame, timeout);
+    tf2::convert(copy, out);
+    return out;
+  }
+  
+  // Transform, advanced api, with pre-allocation
+  template <class T>
+    T& transform(const T& in, T& out, 
+		 const std::string& target_frame, const tf2::TimePoint& target_time,
+		 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+  {
+    // do the transform
+    tf2::doTransform(in, out, lookupTransform(target_frame, target_time, 
+                                              tf2::getFrameId(in), tf2::getTimestamp(in), 
+                                              fixed_frame, timeout));
+    return out;
+  }
 
+
+  // transform, advanced api, no pre-allocation
+  template <class T>
+    T transform(const T& in, 
+		 const std::string& target_frame, const tf2::TimePoint& target_time,
+		 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+  {
+    T out;
+    return transform(in, out, target_frame, target_time, fixed_frame, timeout);
+  }
+  
+  // Transform, advanced api, different types, with pre-allocation
+  template <class A, class B>
+    B& transform(const A& in, B& out, 
+		 const std::string& target_frame, const tf2::TimePoint& target_time,
+		 const std::string& fixed_frame, tf2::TempDuration timeout=tf2::TempDuration(0.0)) const
+  {
+    // do the transform
+    A copy = transform(in, target_frame, target_time, fixed_frame, timeout);
+    tf2::convert(copy, out);
+    return out;
+  }
+*/
 
  }; // class
 

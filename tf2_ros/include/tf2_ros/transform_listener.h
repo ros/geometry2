@@ -35,7 +35,6 @@
 #include <thread>
 #include "tf2_msgs/msg/tf_message.hpp"
 #include "rclcpp/rclcpp.hpp"
-// #include "ros/callback_queue.h"
 
 #include "tf2_ros/buffer.h"
 

@@ -110,20 +110,7 @@ public:
    * \param is_static Record this transform as a static transform.  It will be good across all time.  (This cannot be changed after the first call.)
    * \return True unless an error occured
    */
-  bool setTransform(const geometry_msgs::msg::TransformStamped& transform, const std::string & authority, bool is_static = false)
-  {
-    tf2::Transform tf2_transform(tf2::Quaternion(transform.transform.rotation.w,
-                                                 transform.transform.rotation.x,
-                                                 transform.transform.rotation.y,
-                                                 transform.transform.rotation.z),
-                                 tf2::Vector3(transform.transform.translation.x,
-                                              transform.transform.translation.y,
-                                              transform.transform.translation.z));
-    TimePoint time_point(std::chrono::nanoseconds(transform.header.stamp.nanosec) +
-        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::seconds(transform.header.stamp.sec)));
-    return setTransformImpl(tf2_transform, transform.header.frame_id, transform.child_frame_id,
-                            time_point, authority, is_static);
-  }
+  bool setTransform(const geometry_msgs::msg::TransformStamped& transform, const std::string & authority, bool is_static = false);
 
   /*********** Accessors *************/
 
@@ -138,27 +125,7 @@ public:
    */
   geometry_msgs::msg::TransformStamped 
     lookupTransform(const std::string& target_frame, const std::string& source_frame,
-		    const TimePoint& time) const
-  {
-    tf2::Transform transform;
-    TimePoint time_out;
-    lookupTransformImpl(target_frame, source_frame, time, transform, time_out);
-    geometry_msgs::msg::TransformStamped msg;
-    msg.transform.translation.x = transform.getOrigin().x();
-    msg.transform.translation.y = transform.getOrigin().y();
-    msg.transform.translation.z = transform.getOrigin().z();
-    msg.transform.rotation.x = transform.getRotation().x();
-    msg.transform.rotation.y = transform.getRotation().y();
-    msg.transform.rotation.z = transform.getRotation().z();
-    msg.transform.rotation.w = transform.getRotation().w();
-    std::chrono::time_point_cast<std::chrono::seconds>(time_out);
-    msg.header.stamp.sec = std::chrono::time_point_cast<std::chrono::seconds>(time_out).time_since_epoch().count();
-    msg.header.stamp.nanosec = std::chrono::time_point_cast<std::chrono::nanoseconds>(time_out).time_since_epoch().count() - msg.header.stamp.sec;
-    msg.header.frame_id = target_frame;
-    msg.child_frame_id = source_frame;
-
-    return msg;
-  }
+		    const TimePoint& time) const;
 
   /** \brief Get the transform between two frames by frame ID assuming fixed frame.
    * \param target_frame The frame to which data should be transformed
@@ -175,27 +142,7 @@ public:
   geometry_msgs::msg::TransformStamped
     lookupTransform(const std::string& target_frame, const TimePoint& target_time,
 		    const std::string& source_frame, const TimePoint& source_time,
-		    const std::string& fixed_frame) const
-  {
-    tf2::Transform transform;
-    TimePoint time_out;
-    lookupTransformImpl(target_frame, target_time, source_frame, source_time,
-                        fixed_frame, transform, time_out);
-    geometry_msgs::msg::TransformStamped msg;
-    msg.transform.translation.x = transform.getOrigin().x();
-    msg.transform.translation.y = transform.getOrigin().y();
-    msg.transform.translation.z = transform.getOrigin().z();
-    msg.transform.rotation.x = transform.getRotation().x();
-    msg.transform.rotation.y = transform.getRotation().y();
-    msg.transform.rotation.z = transform.getRotation().z();
-    msg.transform.rotation.w = transform.getRotation().w();
-    msg.header.stamp.sec = std::chrono::time_point_cast<std::chrono::seconds>(time_out).time_since_epoch().count();
-    msg.header.stamp.nanosec = std::chrono::time_point_cast<std::chrono::nanoseconds>(time_out).time_since_epoch().count() - msg.header.stamp.sec;
-    msg.header.frame_id = target_frame;
-    msg.child_frame_id = source_frame;
-
-    return msg;
-  }
+		    const std::string& fixed_frame) const;
 
   /** \brief Lookup the twist of the tracking_frame with respect to the observation frame in the reference_frame using the reference point
    * \param tracking_frame The frame to track

@@ -38,7 +38,7 @@
 
 void seed_rand()
 {
-  //Seed random number generator with current microseond count
+  //Seed random number generator with current time.
   srand(std::chrono::system_clock::now().time_since_epoch().count());
 };
 

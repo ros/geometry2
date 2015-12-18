@@ -21,8 +21,5 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/FrameGraph.srv"
   DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
 )
-#  actionlib_msgs
 
-# TODO(tfoote) Need amend_export_dependenceies?
-ament_export_dependencies(rosidl_generator_cpp)
 ament_package()
