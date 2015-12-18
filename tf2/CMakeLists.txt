@@ -29,8 +29,10 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 # Tests
 if(AMENT_ENABLE_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+  # TODO(tfoote) enable linters
+  # find_package(ament_lint_auto REQUIRED)
+  # ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_gtest)
      
   ament_add_gtest(test_cache_unittest test/cache_unittest.cpp)
   if(TARGET test_cache_unittest)
