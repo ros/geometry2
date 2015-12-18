@@ -701,7 +701,7 @@ private:
   uint64_t incoming_message_count_;
   uint64_t dropped_message_count_;
 
-  builtin_interfaces::msg::Time last_out_the_back_stamp_;
+  tf2::TimePoint last_out_the_back_stamp_;
   std::string last_out_the_back_frame_;
 
   ros::WallTime next_failure_warning_;

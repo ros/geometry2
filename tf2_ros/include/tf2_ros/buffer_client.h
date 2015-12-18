@@ -67,7 +67,7 @@ namespace tf2_ros
        */
       virtual geometry_msgs::TransformStamped
         lookupTransform(const std::string& target_frame, const std::string& source_frame,
-            const builtin_interfaces::msg::Time& time, const tf2::Duration timeout = tf2::Duration(0.0)) const;
+            const tf2::TimePoint& time, const tf2::Duration timeout = tf2::Duration(0.0)) const;
 
       /** \brief Get the transform between two frames by frame ID assuming fixed frame.
        * \param target_frame The frame to which data should be transformed
@@ -82,8 +82,8 @@ namespace tf2_ros
        * tf2::ExtrapolationException, tf2::InvalidArgumentException
        */
       virtual geometry_msgs::TransformStamped 
-        lookupTransform(const std::string& target_frame, const builtin_interfaces::msg::Time& target_time,
-            const std::string& source_frame, const builtin_interfaces::msg::Time& source_time,
+        lookupTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
+            const std::string& source_frame, const tf2::TimePoint& source_time,
             const std::string& fixed_frame, const tf2::Duration timeout = tf2::Duration(0.0)) const;
 
       /** \brief Test if a transform is possible
@@ -96,7 +96,7 @@ namespace tf2_ros
        */
       virtual bool
         canTransform(const std::string& target_frame, const std::string& source_frame, 
-            const builtin_interfaces::msg::Time& time, const tf2::Duration timeout = tf2::Duration(0.0), std::string* errstr = NULL) const;
+            const tf2::TimePoint& time, const tf2::Duration timeout = tf2::Duration(0.0), std::string* errstr = NULL) const;
 
       /** \brief Test if a transform is possible
        * \param target_frame The frame into which to transform
@@ -109,8 +109,8 @@ namespace tf2_ros
        * \return True if the transform is possible, false otherwise 
        */
       virtual bool
-        canTransform(const std::string& target_frame, const builtin_interfaces::msg::Time& target_time,
-            const std::string& source_frame, const builtin_interfaces::msg::Time& source_time,
+        canTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
+            const std::string& source_frame, const tf2::TimePoint& source_time,
             const std::string& fixed_frame, const tf2::Duration timeout = tf2::Duration(0.0), std::string* errstr = NULL) const;
 
       bool waitForServer(const tf2::Duration& timeout = tf2::Duration(0))

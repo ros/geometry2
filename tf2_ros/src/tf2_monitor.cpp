@@ -77,7 +77,7 @@ public:
     {
       frame_authority_map[message.transforms[i].child_frame_id] = authority;
 
-      double offset = tf2::timeToSec(tf2::get_now()) - tf2_ros::durationToSec(message.transforms[i].header.stamp);
+      double offset = tf2::timeToSec(tf2::get_now()) - tf2_ros::timeToSec(message.transforms[i].header.stamp);
       average_offset  += offset;
       
       std::map<std::string, std::vector<double> >::iterator it = delay_map.find(message.transforms[i].child_frame_id);
@@ -199,7 +199,7 @@ public:
     if (using_specific_chain_)
     {
       auto tmp = buffer_.lookupTransform(framea_, frameb_, tf2::TimePointZero);
-      double diff = tf2::timeToSec(tf2::get_now()) - tf2_ros::durationToSec(tmp.header.stamp);
+      double diff = tf2::timeToSec(tf2::get_now()) - tf2_ros::timeToSec(tmp.header.stamp);
       avg_diff = lowpass * diff + (1-lowpass)*avg_diff;
       if (diff > max_diff) max_diff = diff;
     }

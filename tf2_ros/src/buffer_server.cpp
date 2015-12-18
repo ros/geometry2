@@ -59,7 +59,7 @@ namespace tf2_ros
 
       //we want to lookup a transform if the time on the goal
       //has expired, or a transform is available
-      if(canTransform(info.handle) || info.end_time < builtin_interfaces::msg::Time::now())
+      if(canTransform(info.handle) || info.end_time < tf2::get_now())
       {
         tf2_msgs::LookupTransformResult result;
 
@@ -139,11 +139,11 @@ namespace tf2_ros
     //along with the time that the goal will end
     GoalInfo goal_info;
     goal_info.handle = gh;
-    goal_info.end_time = builtin_interfaces::msg::Time::now() + gh.getGoal()->timeout;
+    goal_info.end_time = tf2::get_now() + gh.getGoal()->timeout;
 
     //we can do a quick check here to see if the transform is valid
     //we'll also do this if the end time has been reached 
-    if(canTransform(gh) || goal_info.end_time <= builtin_interfaces::msg::Time::now())
+    if(canTransform(gh) || goal_info.end_time <= tf2::get_now())
     {
       tf2_msgs::LookupTransformResult result;
       try
