@@ -648,7 +648,7 @@ void BufferCore::lookupTransformImpl(const std::string& target_frame,
 /*
 geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame, 
                                           const std::string& observation_frame, 
-                                          const builtin_interfaces::msg::Time& time, 
+                                          const tf2::TimePoint& time, 
                                           const tf2::Duration& averaging_interval) const
 {
   try
@@ -681,7 +681,7 @@ geometry_msgs::Twist BufferCore::lookupTwist(const std::string& tracking_frame,
                                           const std::string& reference_frame,
                                           const tf2::Point & reference_point, 
                                           const std::string& reference_point_frame, 
-                                          const builtin_interfaces::msg::Time& time, 
+                                          const tf2::TimePoint& time, 
                                           const tf2::Duration& averaging_interval) const
 {
   try{

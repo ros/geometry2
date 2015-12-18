@@ -61,7 +61,7 @@ template <class T>
  * \return The timestamp associated with the data. 
  */
 template <class T>
-  const builtin_interfaces::msg::Time& getTimestamp(const T& t);
+  const tf2::TimePoint& getTimestamp(const T& t);
 
 /**\brief Get the frame_id from data 
  * \param t The data input.
@@ -74,7 +74,7 @@ template <class T>
 
 /* An implementation for Stamped<P> datatypes */
 template <class P>
-  const builtin_interfaces::msg::Time& getTimestamp(const tf2::Stamped<P>& t)
+  const tf2::TimePoint& getTimestamp(const tf2::Stamped<P>& t)
   {
     return t.stamp_;
   }
