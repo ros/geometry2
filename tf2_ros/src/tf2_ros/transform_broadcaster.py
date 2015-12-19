@@ -37,11 +37,11 @@ from geometry_msgs.msg import TransformStamped
 
 class TransformBroadcaster:
     """
-    :class:`TransformBroadcaster` is a convenient way to send transformation updates on the ``"/tf"`` message topic.
+    :class:`TransformBroadcaster` is a convenient way to send transformation updates on the ``"tf"`` message topic.
     """
 
     def __init__(self):
-        self.pub_tf = rospy.Publisher("/tf", TFMessage, queue_size=100)
+        self.pub_tf = rospy.Publisher("tf", TFMessage, queue_size=100)
 
     def sendTransform(self, transform):
         if not isinstance(transform, list):

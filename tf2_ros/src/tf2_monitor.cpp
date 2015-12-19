@@ -158,9 +158,9 @@ public:
     custom_qos_profile.depth = 100;
     
     std::function<void(const tf2_msgs::msg::TFMessage::SharedPtr)> standard_callback = std::bind(&TFMonitor::callback, this, std::placeholders::_1);
-    subscriber_tf_ = node_->create_subscription<tf2_msgs::msg::TFMessage>("/tf", standard_callback, custom_qos_profile);
+    subscriber_tf_ = node_->create_subscription<tf2_msgs::msg::TFMessage>("tf", standard_callback, custom_qos_profile);
     std::function<void(const tf2_msgs::msg::TFMessage::SharedPtr)> static_callback = std::bind(&TFMonitor::callback, this, std::placeholders::_1);
-    subscriber_tf_message_ = node_->create_subscription<tf2_msgs::msg::TFMessage>("/tf_static", static_callback, custom_qos_profile);
+    subscriber_tf_message_ = node_->create_subscription<tf2_msgs::msg::TFMessage>("tf_static", static_callback, custom_qos_profile);
 
     // subscriber_tf_ = node_->create_subscriber.subscribe<tf::tfMessage>("tf", 100, boost::bind(&TFMonitor::callback, this, _1));
     // subscriber_tf_message_ = node_.subscribe<tf::tfMessage>("tf_message", 100, boost::bind(&TFMonitor::callback, this, _1));
