@@ -1264,7 +1264,7 @@ void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
 bool BufferCore::_frameExists(const std::string& frame_id_str) const
 {
   std::unique_lock<std::mutex> lock(frame_mutex_);
-  return frameIDs_.count(frame_id_str);
+  return (frameIDs_.count(frame_id_str) > 0);
 }
 
 bool BufferCore::_getParent(const std::string& frame_id, TimePoint time, std::string& parent) const
