@@ -61,6 +61,17 @@ template <class A>
     return a;
   }
 
+/** Takes anything that can be converted to a tf2::Quaternion in input and checks if it is unitary
+ * \returns true if the quaternion in input is unitary, false otherwise
+ */
+template <class A>
+  bool isUnitaryQuaternion(const A& a)
+  {
+    tf2::Quaternion q = impl::toQuaternion(a);
+    return q.length2() == 1.0;
+  }
+
+
 }
 
 #endif //TF2_UTILS_H
