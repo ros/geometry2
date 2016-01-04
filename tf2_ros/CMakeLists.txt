@@ -85,6 +85,7 @@ target_link_libraries(tf2_echo
   ${rmw_implementation_LIBRARIES}
   ${tf2_LIBRARIES}
   ${tf2_msgs_LIBRARIES}
+  -pthread
   )
 
   add_executable(tf2_monitor
@@ -98,6 +99,7 @@ target_link_libraries(tf2_echo
     ${rmw_implementation_LIBRARIES}
     ${tf2_LIBRARIES}
     ${tf2_msgs_LIBRARIES}
+    -pthread
     )
 
 # Install rules
