@@ -6,7 +6,7 @@ if(NOT WIN32)
 endif()
 
 if(NOT ANDROID)
-set(TF2_PY tf2_py)
+  set(TF2_PY tf2_py)
 endif()
 
 find_package(ament_cmake REQUIRED)
@@ -39,13 +39,20 @@ add_library(${PROJECT_NAME}
   src/static_transform_broadcaster.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
+set(LINKLIST 
   ${geometry_msgs_LIBRARIES}
   ${rclcpp_LIBRARIES}
   ${rmw_LIBRARIES}
   ${rmw_implementation_LIBRARIES}
   ${tf2_LIBRARIES}
   ${tf2_msgs_LIBRARIES}
+)
+if(NOT WIN32)
+  list(APPEND LINKLIST -pthread)
+endif()
+
+target_link_libraries(${PROJECT_NAME}
+   ${LINKLIST}
   )
   
 # TODO(tfoote) port server client interfaces
@@ -85,7 +92,6 @@ target_link_libraries(tf2_echo
   ${rmw_implementation_LIBRARIES}
   ${tf2_LIBRARIES}
   ${tf2_msgs_LIBRARIES}
-  -pthread
   )
 
   add_executable(tf2_monitor
@@ -99,7 +105,6 @@ target_link_libraries(tf2_echo
     ${rmw_implementation_LIBRARIES}
     ${tf2_LIBRARIES}
     ${tf2_msgs_LIBRARIES}
-    -pthread
     )
 
 # Install rules
