@@ -44,6 +44,23 @@ Eigen::Affine3d transformToEigen(const geometry_msgs::TransformStamped& t) {
 					      t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z));
 }
 
+inline
+geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
+{
+  geometry_msgs::TransformStamped t;
+  t.transform.translation.x = T.translation().x();
+  t.transform.translation.y = T.translation().y();
+  t.transform.translation.z = T.translation().z();
+
+  Eigen::Quaterniond q(T.rotation());
+  t.transform.rotation.x = q.x();
+  t.transform.rotation.y = q.y();
+  t.transform.rotation.z = q.z();
+  t.transform.rotation.w = q.w();
+  
+  return t;
+}
+
 
 // this method needs to be implemented by client library developers
 template <>
