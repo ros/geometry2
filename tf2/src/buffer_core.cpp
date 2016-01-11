@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <console_bridge/console.h>
 #include "tf2/LinearMath/Transform.h"
+#include <boost/foreach.hpp>
 
 namespace tf2
 {
@@ -1312,6 +1313,11 @@ void BufferCore::testTransformableRequests()
 {
   boost::mutex::scoped_lock lock(transformable_requests_mutex_);
   V_TransformableRequest::iterator it = transformable_requests_.begin();
+
+  typedef boost::tuple<TransformableCallback&, TransformableRequestHandle, std::string,
+                       std::string, ros::Time&, TransformableResult&> TransformableTuple;
+  std::vector<TransformableTuple> transformables;
+
   for (; it != transformable_requests_.end();)
   {
     TransformableRequest& req = *it;
@@ -1351,8 +1357,12 @@ void BufferCore::testTransformableRequests()
         M_TransformableCallback::iterator it = transformable_callbacks_.find(req.cb_handle);
         if (it != transformable_callbacks_.end())
         {
-          const TransformableCallback& cb = it->second;
-          cb(req.request_handle, lookupFrameString(req.target_id), lookupFrameString(req.source_id), req.time, result);
+          transformables.push_back(boost::make_tuple(boost::ref(it->second),
+                                                     req.request_handle,
+                                                     lookupFrameString(req.target_id),
+                                                     lookupFrameString(req.source_id),
+                                                     boost::ref(req.time),
+                                                     boost::ref(result)));
         }
       }
 
@@ -1369,8 +1379,13 @@ void BufferCore::testTransformableRequests()
     }
   }
 
-  // unlock before allowing possible user callbacks to avoid potential detadlock (#91)
+  // unlock before allowing possible user callbacks to avoid potential deadlock (#91)
   lock.unlock();
+
+  BOOST_FOREACH (TransformableTuple tt, transformables)
+  {
+    tt.get<0>()(tt.get<1>(), tt.get<2>(), tt.get<3>(), tt.get<4>(), tt.get<5>());
+  }
 
   // Backwards compatability callback for tf
   _transforms_changed_();
