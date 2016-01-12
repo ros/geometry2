@@ -37,7 +37,8 @@
 
 namespace tf2
 {
-    
+
+inline    
 Eigen::Affine3d transformToEigen(const geometry_msgs::TransformStamped& t) {
   return Eigen::Affine3d(Eigen::Translation3d(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z)
 			 * Eigen::Quaterniond(t.transform.rotation.w, 
@@ -64,6 +65,7 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
 
 // this method needs to be implemented by client library developers
 template <>
+inline
 void doTransform(const tf2::Stamped<Eigen::Vector3d>& t_in, 
 		 tf2::Stamped<Eigen::Vector3d>& t_out,
 		 const geometry_msgs::TransformStamped& transform) {
@@ -73,6 +75,7 @@ void doTransform(const tf2::Stamped<Eigen::Vector3d>& t_in,
 }
 
 //convert to vector message
+inline
 geometry_msgs::PointStamped toMsg(const tf2::Stamped<Eigen::Vector3d>& in)
 {
   geometry_msgs::PointStamped msg;
@@ -84,6 +87,7 @@ geometry_msgs::PointStamped toMsg(const tf2::Stamped<Eigen::Vector3d>& in)
   return msg;
 }
 
+inline
 void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3d>& out) {
   out.stamp_ = msg.header.stamp;
   out.frame_id_ = msg.header.frame_id;
@@ -95,6 +99,7 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3
 
 // this method needs to be implemented by client library developers
 template <>
+inline
 void doTransform(const tf2::Stamped<Eigen::Affine3d>& t_in,
 		 tf2::Stamped<Eigen::Affine3d>& t_out,
 		 const geometry_msgs::TransformStamped& transform) {
@@ -102,6 +107,7 @@ void doTransform(const tf2::Stamped<Eigen::Affine3d>& t_in,
 }
 
 //convert to pose message
+inline
 geometry_msgs::PoseStamped toMsg(const tf2::Stamped<Eigen::Affine3d>& in)
 {
   geometry_msgs::PoseStamped msg;
@@ -117,6 +123,7 @@ geometry_msgs::PoseStamped toMsg(const tf2::Stamped<Eigen::Affine3d>& in)
   return msg;
 }
 
+inline
 void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<Eigen::Affine3d>& out)
 {
   out.stamp_ = msg.header.stamp;
