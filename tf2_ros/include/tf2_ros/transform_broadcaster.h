@@ -36,7 +36,7 @@
 
 
 #include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/transform_stamped.h"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 namespace tf2_ros
 {
 
