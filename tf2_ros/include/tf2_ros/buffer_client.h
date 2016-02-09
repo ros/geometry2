@@ -51,9 +51,9 @@ namespace tf2_ros
       /** \brief BufferClient constructor
        * \param ns The namespace in which to look for a BufferServer
        * \param check_frequency The frequency in Hz to check whether the BufferServer has completed a request
-       * \param timeout_paddind The amount of time to allow passed the desired timeout on the client side for communication lag
+       * \param timeout_padding The amount of time to allow passed the desired timeout on the client side for communication lag
        */
-      BufferClient(std::string ns, double check_frequency = 10.0, ros::Duration timeout_padding_ = ros::Duration(2.0));
+      BufferClient(std::string ns, double check_frequency = 10.0, ros::Duration timeout_padding = ros::Duration(2.0));
 
       /** \brief Get the transform between two frames by frame ID.
        * \param target_frame The frame to which data should be transformed
