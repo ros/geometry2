@@ -92,7 +92,7 @@ namespace tf2_ros
     /** \brief Test if a transform is possible
      * \param target_frame The frame into which to transform
      * \param source_frame The frame from which to transform
-     * \param time The time at which to transform
+     * \param target_time The time at which to transform
      * \param timeout How long to block before failing
      * \param errstr A pointer to a string which will be filled with why the transform failed, if not NULL
      * \return True if the transform is possible, false otherwise 
