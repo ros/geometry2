@@ -417,8 +417,8 @@ tf2::TF2Error BufferCore::walkToTopParent(F& f, TimePoint time, CompactFrameID t
   if (frame_chain)
   {
     // Pruning: Compare the chains starting at the parent (end) until they differ
-    int m = reverse_frame_chain.size()-1;
-    int n = frame_chain->size()-1;
+    std::size_t m = reverse_frame_chain.size()-1;
+    std::size_t n = frame_chain->size()-1;
     for (; m >= 0 && n >= 0; --m, --n)
     {
       if ((*frame_chain)[n] != reverse_frame_chain[m])
@@ -430,7 +430,7 @@ tf2::TF2Error BufferCore::walkToTopParent(F& f, TimePoint time, CompactFrameID t
 
     if (m < reverse_frame_chain.size())
     {
-      for (int i = m; i >= 0; --i)
+      for (std::size_t i = m; i >= 0; --i)
       {
         frame_chain->push_back(reverse_frame_chain[i]);
       }
@@ -1264,7 +1264,7 @@ void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
 bool BufferCore::_frameExists(const std::string& frame_id_str) const
 {
   std::unique_lock<std::mutex> lock(frame_mutex_);
-  return frameIDs_.count(frame_id_str);
+  return (frameIDs_.count(frame_id_str) > 0);
 }
 
 bool BufferCore::_getParent(const std::string& frame_id, TimePoint time, std::string& parent) const
@@ -1519,8 +1519,8 @@ void BufferCore::_chainAsVector(const std::string & target_frame, TimePoint targ
         assert(0);
       }
     }
-    int m = target_frame_chain.size()-1;
-    int n = source_frame_chain.size()-1;
+    std::size_t m = target_frame_chain.size()-1;
+    std::size_t n = source_frame_chain.size()-1;
     for (; m >= 0 && n >= 0; --m, --n)
     {
       if (source_frame_chain[n] != target_frame_chain[m])
@@ -1532,7 +1532,7 @@ void BufferCore::_chainAsVector(const std::string & target_frame, TimePoint targ
 
     if (m < target_frame_chain.size())
     {
-      for (unsigned int i = 0; i <= m; ++i)
+      for (std::size_t i = 0; i <= m; ++i)
       {
         source_frame_chain.push_back(target_frame_chain[i]);
       }

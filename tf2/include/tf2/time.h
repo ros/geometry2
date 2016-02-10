@@ -63,7 +63,16 @@ namespace tf2
     // Below would only work with GCC 5.0 and above
     //return std::put_time(&stamp, "%c");
     std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::milliseconds>(stamp));
+#ifdef __STDC_LIB_EXT1__
+    // Result string will not be longer than "Www Mmm dd hh:mm:ss yyyy\n"
+    char time_point_s[26];
+    std::memset(time_point_s, 0, sizeof time_point_s);
+    // TODO(esteve): check errno_t
+    std::ctime_s(time_point_s, sizeof time_point_s, &time);
+    return std::string(time_point_s);
+#else
     return std::ctime(&time);
+#endif
   }
 
 
