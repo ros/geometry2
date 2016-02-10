@@ -38,7 +38,7 @@ typedef std::chrono::system_clock::time_point TimePoint;
 void seed_rand()
 {
   //Seed random number generator with current microseond count
-  srand(std::chrono::system_clock::now().time_since_epoch().count());
+  srand((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
 };
 
 void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xvalues, std::vector<double>& yvalues, std::vector<double>&zvalues)

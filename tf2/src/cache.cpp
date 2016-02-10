@@ -264,7 +264,7 @@ void TimeCache::clearList()
 
 unsigned int TimeCache::getListLength()
 {
-  return storage_.size();
+  return (unsigned int)storage_.size();
 }
 
 P_TimeAndFrameID TimeCache::getLatestTimeAndParent()
