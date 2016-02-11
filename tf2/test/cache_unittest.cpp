@@ -42,7 +42,7 @@ void seed_rand()
   values.clear();
   for (unsigned int i = 0; i < 2000; i++)
   {
-    int pseudo_rand = std::floor(i * 3.141592653589793);
+    int pseudo_rand = (int)std::floor((double)i * 3.141592653589793);
     values.push_back(( pseudo_rand % 100)/50.0 - 1.0);
     //printf("Seeding with %f\n", values.back());
   }
@@ -79,7 +79,7 @@ TEST(TimeCache, Repeatability)
   
   for ( uint64_t i = 1; i < runs ; i++ )
   {
-    stor.frame_id_ = i;
+    stor.frame_id_ = tf2::CompactFrameID(i);
     stor.stamp_ = TimePoint(std::chrono::nanoseconds(i));
     
     cache.insertData(stor);
@@ -132,13 +132,13 @@ TEST(TimeCache, ZeroAtFront)
   
   for ( uint64_t i = 1; i < runs ; i++ )
   {
-    stor.frame_id_ = i;
+    stor.frame_id_ = tf2::CompactFrameID(i);
     stor.stamp_ = TimePoint(std::chrono::nanoseconds(i));
     
     cache.insertData(stor);
   }
 
-  stor.frame_id_ = runs;
+  stor.frame_id_ = tf2::CompactFrameID(runs);
   stor.stamp_ = TimePoint(std::chrono::nanoseconds(runs));
   cache.insertData(stor);
 
@@ -154,7 +154,7 @@ TEST(TimeCache, ZeroAtFront)
   EXPECT_EQ(stor.frame_id_, runs);
   EXPECT_EQ(stor.stamp_, TimePoint(std::chrono::nanoseconds(runs)));
 
-  stor.frame_id_ = runs;
+  stor.frame_id_ = tf2::CompactFrameID(runs);
   stor.stamp_ = TimePoint(std::chrono::nanoseconds(runs+1));
   cache.insertData(stor);
 
@@ -242,7 +242,7 @@ TEST(TimeCache, ReparentingInterpolationProtection)
     zvalues[step] = 10.0 * get_rand();
 
     stor.translation_.setValue(xvalues[step], yvalues[step], zvalues[step]);
-    stor.frame_id_ = step + 4;
+    stor.frame_id_ = tf2::CompactFrameID(step + 4);
     stor.stamp_ = TimePoint(std::chrono::nanoseconds(step * 100 + offset));
     cache.insertData(stor);
   }

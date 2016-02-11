@@ -417,8 +417,8 @@ tf2::TF2Error BufferCore::walkToTopParent(F& f, TimePoint time, CompactFrameID t
   if (frame_chain)
   {
     // Pruning: Compare the chains starting at the parent (end) until they differ
-    int m = reverse_frame_chain.size()-1;
-    int n = frame_chain->size()-1;
+    int m = (int)reverse_frame_chain.size()-1;
+    int n = (int)frame_chain->size()-1;
     for (; m >= 0 && n >= 0; --m, --n)
     {
       if ((*frame_chain)[n] != reverse_frame_chain[m])
@@ -538,8 +538,8 @@ geometry_msgs::msg::TransformStamped
   msg.transform.rotation.z = transform.getRotation().z();
   msg.transform.rotation.w = transform.getRotation().w();
   std::chrono::time_point_cast<std::chrono::seconds>(time_out);
-  msg.header.stamp.sec = std::chrono::time_point_cast<std::chrono::seconds>(time_out).time_since_epoch().count();
-  msg.header.stamp.nanosec = std::chrono::time_point_cast<std::chrono::nanoseconds>(time_out).time_since_epoch().count() - msg.header.stamp.sec;
+  msg.header.stamp.sec = (uint32_t)std::chrono::time_point_cast<std::chrono::seconds>(time_out).time_since_epoch().count();
+  msg.header.stamp.nanosec = (uint32_t)std::chrono::time_point_cast<std::chrono::nanoseconds>(time_out).time_since_epoch().count() - msg.header.stamp.sec;
   msg.header.frame_id = target_frame;
   msg.child_frame_id = source_frame;
 
@@ -563,8 +563,8 @@ geometry_msgs::msg::TransformStamped
   msg.transform.rotation.y = transform.getRotation().y();
   msg.transform.rotation.z = transform.getRotation().z();
   msg.transform.rotation.w = transform.getRotation().w();
-  msg.header.stamp.sec = std::chrono::time_point_cast<std::chrono::seconds>(time_out).time_since_epoch().count();
-  msg.header.stamp.nanosec = std::chrono::time_point_cast<std::chrono::nanoseconds>(time_out).time_since_epoch().count() - msg.header.stamp.sec;
+  msg.header.stamp.sec = (uint32_t)std::chrono::time_point_cast<std::chrono::seconds>(time_out).time_since_epoch().count();
+  msg.header.stamp.nanosec = (uint32_t)std::chrono::time_point_cast<std::chrono::nanoseconds>(time_out).time_since_epoch().count() - msg.header.stamp.sec;
   msg.header.frame_id = target_frame;
   msg.child_frame_id = source_frame;
 
@@ -1236,7 +1236,7 @@ TransformableRequestHandle BufferCore::addTransformableRequest(TransformableCall
 struct BufferCore::RemoveRequestByID
 {
   RemoveRequestByID(TransformableRequestHandle handle)
-  : handle_(handle)
+  : handle_((TransformableCallbackHandle)handle)
   {}
 
   bool operator()(const TransformableRequest& req)
@@ -1264,7 +1264,7 @@ void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
 bool BufferCore::_frameExists(const std::string& frame_id_str) const
 {
   std::unique_lock<std::mutex> lock(frame_mutex_);
-  return frameIDs_.count(frame_id_str);
+  return frameIDs_.count(frame_id_str) != 0;
 }
 
 bool BufferCore::_getParent(const std::string& frame_id, TimePoint time, std::string& parent) const
@@ -1519,8 +1519,8 @@ void BufferCore::_chainAsVector(const std::string & target_frame, TimePoint targ
         assert(0);
       }
     }
-    int m = target_frame_chain.size()-1;
-    int n = source_frame_chain.size()-1;
+    int m = (int)target_frame_chain.size()-1;
+    int n = (int)source_frame_chain.size()-1;
     for (; m >= 0 && n >= 0; --m, --n)
     {
       if (source_frame_chain[n] != target_frame_chain[m])
@@ -1532,7 +1532,7 @@ void BufferCore::_chainAsVector(const std::string & target_frame, TimePoint targ
 
     if (m < target_frame_chain.size())
     {
-      for (unsigned int i = 0; i <= m; ++i)
+      for (int i = 0; i <= m; ++i)
       {
         source_frame_chain.push_back(target_frame_chain[i]);
       }

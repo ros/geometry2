@@ -56,14 +56,12 @@ namespace tf2
     return durationToSec(Duration(timepoint.time_since_epoch()));
   }
 
-  // Display functions as there is no default display
-  // TODO: find a proper way to handle display
   inline std::string displayTimePoint(const TimePoint& stamp)
   {
-    // Below would only work with GCC 5.0 and above
-    //return std::put_time(&stamp, "%c");
     std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::milliseconds>(stamp));
-    return std::ctime(&time);
+    char str[100];
+    std::strftime(str, sizeof(str), "%c", std::localtime(&time));
+    return std::string(str);
   }
 
 
