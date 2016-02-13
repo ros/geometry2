@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2015, 2016, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+ #ifndef TF2_TIME_H
+ #define TF2_TIME_H
+
 #include <chrono>
-#include <iomanip>
-#include <ctime>
+#include <stdio.h>
+#include <string>
 #include <thread>
 
 namespace tf2
@@ -50,7 +53,7 @@ namespace tf2
   inline double durationToSec(const tf2::Duration & input){
     return (double)std::chrono::duration_cast<std::chrono::seconds>(input).count();
   }
-  
+
   inline double timeToSec(const TimePoint& timepoint)
   {
     return durationToSec(Duration(timepoint.time_since_epoch()));
@@ -58,11 +61,15 @@ namespace tf2
 
   inline std::string displayTimePoint(const TimePoint& stamp)
   {
-    std::time_t time = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::milliseconds>(stamp));
-    char str[100];
-    std::strftime(str, sizeof(str), "%c", std::localtime(&time));
-    return std::string(str);
+    const char * format_str = "%.6f";
+    double current_time = timeToSec(stamp);
+    int buff_size = snprintf(NULL, 0, format_str, current_time);
+    char * buffer = new char[buff_size];
+    snprintf(buffer, buff_size, format_str, current_time);
+    std::string result = std::string(buffer);
+    delete[] buffer;
+    return result;
   }
-
-
 }
+
+#endif // TF2_TIME_CACHE_H

@@ -32,6 +32,7 @@
 #include <tf2/buffer_core.h>
 #include "tf2/LinearMath/Vector3.h"
 #include "tf2/exceptions.h"
+#include "tf2/time.h"
 
 typedef std::chrono::system_clock::time_point TimePoint;
 
@@ -135,6 +136,13 @@ TEST(tf2_canTransform, One_Exists)
   st.transform.rotation.w = 1;
   EXPECT_TRUE(tfc.setTransform(st, "authority1"));
   EXPECT_FALSE(tfc.canTransform("foo", "bar", TimePoint(std::chrono::seconds(1))));
+}
+
+TEST(tf2_time, Display_Time_Point)
+{
+  tf2::TimePoint t = tf2::get_now();
+  // Check ability to stringify
+  std::string s = tf2::displayTimePoint(t);
 }
 
 
