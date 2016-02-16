@@ -46,33 +46,30 @@ std::string tf2::displayTimePoint(const TimePoint& stamp)
 {
   const char * format_str = "%.6f";
   double current_time = timeToSec(stamp);
-#ifdef _WIN32
   int buff_size = snprintf(NULL, 0, format_str, current_time);
   if (buff_size < 0) {
+#ifdef __STDC_LIB_EXT1__
     size_t errmsglen = strerrorlen_s(errno) + 1;
     char errmsg[errmsglen];
     strerror_s(errmsg, errmsglen, errno);
     throw std::runtime_error(errmsg);
-  }
+#else
+    throw std::runtime_error(strerror(errno));
+#endif // __STDC_LIB_EXT1__
+}
+
   char buffer[buff_size];
   int bytes_written = snprintf(buffer, buff_size, format_str, current_time);
   if (bytes_written < 0) {
+#ifdef __STDC_LIB_EXT1__
     size_t errmsglen = strerrorlen_s(errno) + 1;
     char errmsg[errmsglen];
     strerror_s(errmsg, errmsglen, errno);
     throw std::runtime_error(errmsg);
-  }
 #else
-  int buff_size = snprintf(NULL, 0, format_str, current_time);
-  if (buff_size < 0) {
     throw std::runtime_error(strerror(errno));
+#endif // __STDC_LIB_EXT1__
   }
-  char buffer[buff_size];
-  int bytes_written = snprintf(buffer, buff_size, format_str, current_time);
-  if (buff_size < 0) {
-    throw std::runtime_error(strerror(errno));
-  }
-#endif // _WIN32
   std::string result = std::string(buffer);
   return result;
 }
