@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2016, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2015-2016, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,10 @@
  #define TF2_TIME_H
 
 #include <chrono>
+#include <new>
 #include <stdio.h>
 #include <string>
+#include <string.h>
 #include <thread>
 
 namespace tf2
@@ -64,12 +66,18 @@ namespace tf2
     const char * format_str = "%.6f";
     double current_time = timeToSec(stamp);
     int buff_size = snprintf(NULL, 0, format_str, current_time);
+    if (buff_size < 0) {
+      throw std::runtime_error(strerror(errno));
+    }
     char * buffer = new char[buff_size];
-    snprintf(buffer, buff_size, format_str, current_time);
+    int bytes_written = snprintf(buffer, buff_size, format_str, current_time);
+    if (bytes_written < 0) {
+      throw std::runtime_error(strerror(errno));
+    }
     std::string result = std::string(buffer);
     delete[] buffer;
     return result;
   }
 }
 
-#endif // TF2_TIME_CACHE_H
+#endif // TF2_TIME_H
