@@ -49,9 +49,9 @@ std::string tf2::displayTimePoint(const TimePoint& stamp)
 #ifdef _WIN32
   int buff_size = snprintf(NULL, 0, format_str, current_time);
   if (buff_size < 0) {
-    size_t errmsglen = strerrorlen_r(errno) + 1;
+    size_t errmsglen = strerrorlen_s(errno) + 1;
     char errmsg[errmsglen];
-    strerror_r(errmsg, errmsglen, errno);
+    strerror_s(errmsg, errmsglen, errno);
     throw std::runtime_error(errmsg);
   }
   char buffer[buff_size];
