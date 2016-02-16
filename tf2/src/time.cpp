@@ -29,14 +29,10 @@
 
 /** \author Tully Foote */
 
-// #define __STDC_WANT_LIB_EXT1__ 1
-// // Needs to be first with above define
-#include <time.h>
-
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <time.h>
 
 #include "tf2/time.h"
 
