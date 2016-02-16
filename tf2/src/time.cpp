@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2016, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,40 +27,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
- #ifndef TF2_TIME_H
- #define TF2_TIME_H
+/** \author Tully Foote */
 
-#include <chrono>
-#include <stdio.h>
-#include <string>
-#include <thread>
+#define __STDC_WANT_LIB_EXT1__ 1
+// Needs to be first with above define
+#include <time.h>
 
-namespace tf2
+#include <errno.h>
+#include <string.h>
+
+
+#include "tf2/time.h"
+
+using namespace tf2;
+
+std::string tf2::displayTimePoint(const TimePoint& stamp)
 {
-  using Duration = std::chrono::duration<double, std::nano>;
-  using TimePoint = std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>;
-
-
-  using IDuration = std::chrono::duration<int, std::nano>;
-  // This is the zero time in ROS
-  static const TimePoint TimePointZero = TimePoint(IDuration::zero());
-
-  inline TimePoint get_now()
-  {
-    return std::chrono::system_clock::now();
+  const char * format_str = "%.6f";
+  double current_time = timeToSec(stamp);
+#ifdef __STDC_LIB_EXT1__
+  int buff_size = snprintf(NULL, 0, format_str, current_time);
+  if (buff_size < 0) {
+    size_t errmsglen = strerrorlen_s(errno) + 1;
+    char errmsg[errmsglen];
+    strerror_rq(errmsg, errmsglen, errno);
+    throw std::runtime_error(errmsg);
   }
-
-  inline double durationToSec(const tf2::Duration & input){
-    return (double)std::chrono::duration_cast<std::chrono::seconds>(input).count();
+  char buffer[buff_size];
+  int bytes_written = snprintf(buffer, buff_size, format_str, current_time);
+  if (bytes_written < 0) {
+    size_t errmsglen = strerrorlen_s(errno) + 1;
+    char errmsg[errmsglen];
+    strerror_s(errmsg, errmsglen, errno);
+    throw std::runtime_error(errmsg);
   }
-
-  inline double timeToSec(const TimePoint& timepoint)
-  {
-    return durationToSec(Duration(timepoint.time_since_epoch()));
+#else
+  int buff_size = snprintf(NULL, 0, format_str, current_time);
+  if (buff_size < 0) {
+    throw std::runtime_error(strerror(errno));
   }
-
-  std::string displayTimePoint(const TimePoint& stamp);
-
+  char buffer[buff_size];
+  int bytes_written = snprintf(buffer, buff_size, format_str, current_time);
+  if (buff_size < 0) {
+    throw std::runtime_error(strerror(errno));
+  }
+#endif //__STDC_LIB_EXT1__
+  std::string result = std::string(buffer);
+  return result;
 }
-
-#endif // TF2_TIME_H
