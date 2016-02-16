@@ -29,8 +29,8 @@
 
 /** \author Tully Foote */
 
-#define __STDC_WANT_LIB_EXT1__ 1
-// Needs to be first with above define
+// #define __STDC_WANT_LIB_EXT1__ 1
+// // Needs to be first with above define
 #include <time.h>
 
 #include <errno.h>
@@ -48,28 +48,29 @@ std::string tf2::displayTimePoint(const TimePoint& stamp)
   double current_time = timeToSec(stamp);
   int buff_size = snprintf(NULL, 0, format_str, current_time);
   if (buff_size < 0) {
-#ifdef __STDC_LIB_EXT1__
+#ifdef _WIN32
     size_t errmsglen = strerrorlen_s(errno) + 1;
     char errmsg[errmsglen];
     strerror_s(errmsg, errmsglen, errno);
     throw std::runtime_error(errmsg);
 #else
     throw std::runtime_error(strerror(errno));
-#endif // __STDC_LIB_EXT1__
+#endif // _WIN32
 }
 
-  char buffer[buff_size];
+  char * buffer = new char[buff_size];
   int bytes_written = snprintf(buffer, buff_size, format_str, current_time);
   if (bytes_written < 0) {
-#ifdef __STDC_LIB_EXT1__
+#ifdef _WIN32
     size_t errmsglen = strerrorlen_s(errno) + 1;
     char errmsg[errmsglen];
     strerror_s(errmsg, errmsglen, errno);
     throw std::runtime_error(errmsg);
 #else
     throw std::runtime_error(strerror(errno));
-#endif // __STDC_LIB_EXT1__
+#endif // _WIN32
   }
   std::string result = std::string(buffer);
+  delete[] buffer;
   return result;
 }
