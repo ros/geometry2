@@ -14,7 +14,7 @@ include_directories(include src/bt ${geometry_msgs_INCLUDE_DIRS} ${console_bridg
 # export user definitions
 
 #CPP Libraries
-add_library(tf2 src/cache.cpp src/buffer_core.cpp src/static_cache.cpp)
+add_library(tf2 src/cache.cpp src/buffer_core.cpp src/static_cache.cpp src/time.cpp)
 target_link_libraries(tf2 ${geometry_msgs_LIBRARIES} ${console_bridge_LIBRARIES})
 
 install(TARGETS tf2
@@ -33,17 +33,17 @@ if(AMENT_ENABLE_TESTING)
   # find_package(ament_lint_auto REQUIRED)
   # ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest)
-     
+
   ament_add_gtest(test_cache_unittest test/cache_unittest.cpp)
   if(TARGET test_cache_unittest)
     target_link_libraries(test_cache_unittest tf2 ${geometry_msgs_LIBRARIES} ${console_bridge_LIBRARIES})
   endif()
-  
+
   ament_add_gtest(test_static_cache_unittest test/static_cache_test.cpp)
   if(TARGET test_static_cache_unittest)
     target_link_libraries(test_static_cache_unittest tf2 ${geometry_msgs_LIBRARIES} ${console_bridge_LIBRARIES})
   endif()
-  
+
   ament_add_gtest(test_simple test/simple_tf2_core.cpp)
   if(TARGET test_simple)
     target_link_libraries(test_simple tf2  ${geometry_msgs_LIBRARIES} ${console_bridge_LIBRARIES})

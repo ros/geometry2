@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Open Source Robotics Foundation, Inc.
+ * Copyright (c) 2016, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,40 +27,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
- #ifndef TF2_TIME_H
- #define TF2_TIME_H
+/** \author Tully Foote */
 
-#include <chrono>
+#include <errno.h>
+#include <string.h>
 #include <stdio.h>
-#include <string>
-#include <thread>
+#include <time.h>
 
-namespace tf2
+#include "tf2/time.h"
+
+using namespace tf2;
+
+std::string tf2::displayTimePoint(const TimePoint& stamp)
 {
-  using Duration = std::chrono::duration<double, std::nano>;
-  using TimePoint = std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>;
-
-
-  using IDuration = std::chrono::duration<int, std::nano>;
-  // This is the zero time in ROS
-  static const TimePoint TimePointZero = TimePoint(IDuration::zero());
-
-  inline TimePoint get_now()
-  {
-    return std::chrono::system_clock::now();
-  }
-
-  inline double durationToSec(const tf2::Duration & input){
-    return (double)std::chrono::duration_cast<std::chrono::seconds>(input).count();
-  }
-
-  inline double timeToSec(const TimePoint& timepoint)
-  {
-    return durationToSec(Duration(timepoint.time_since_epoch()));
-  }
-
-  std::string displayTimePoint(const TimePoint& stamp);
-
+  const char * format_str = "%.6f";
+  double current_time = timeToSec(stamp);
+  int buff_size = snprintf(NULL, 0, format_str, current_time);
+  if (buff_size < 0) {
+#ifdef _WIN32
+    // Using fixed buffer size since, strerrorlen_s not yet available
+    const int errormsglen = 200;
+    char errmsg[errormsglen];
+    strerror_s(errmsg, errormsglen, errno);
+    throw std::runtime_error(errmsg);
+#else
+    throw std::runtime_error(strerror(errno));
+#endif // _WIN32
 }
 
-#endif // TF2_TIME_H
+  char * buffer = new char[buff_size];
+  int bytes_written = snprintf(buffer, buff_size, format_str, current_time);
+  if (bytes_written < 0) {
+#ifdef _WIN32
+    // Using fixed buffer size since, strerrorlen_s not yet available
+    const int errormsglen = 200;
+    char errmsg[errormsglen];
+    strerror_s(errmsg, errormsglen, errno);
+    throw std::runtime_error(errmsg);
+#else
+    throw std::runtime_error(strerror(errno));
+#endif // _WIN32
+  }
+  std::string result = std::string(buffer);
+  delete[] buffer;
+  return result;
+}
