@@ -47,7 +47,7 @@ target_link_libraries(${PROJECT_NAME}
   ${tf2_LIBRARIES}
   ${tf2_msgs_LIBRARIES}
   )
-  
+
 # TODO(tfoote) port server client interfaces
 # # buffer_server executable
 # add_executable(buffer_server src/buffer_server_main.cpp)
@@ -109,7 +109,7 @@ install(TARGETS
   static_transform_publisher
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin/${PROJECT_NAME}
+  RUNTIME DESTINATION bin
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/
