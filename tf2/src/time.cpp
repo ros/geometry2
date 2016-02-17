@@ -45,9 +45,10 @@ std::string tf2::displayTimePoint(const TimePoint& stamp)
   int buff_size = snprintf(NULL, 0, format_str, current_time);
   if (buff_size < 0) {
 #ifdef _WIN32
-    size_t errmsglen = strerrorlen_s(errno) + 1;
-    char errmsg[errmsglen];
-    strerror_s(errmsg, errmsglen, errno);
+    // Using fixed buffer size since, strerrorlen_s not yet available
+    const int errormsglen = 200;
+    char errmsg[errormsglen];
+    strerror_s(errmsg, errormsglen, errno);
     throw std::runtime_error(errmsg);
 #else
     throw std::runtime_error(strerror(errno));
@@ -58,9 +59,10 @@ std::string tf2::displayTimePoint(const TimePoint& stamp)
   int bytes_written = snprintf(buffer, buff_size, format_str, current_time);
   if (bytes_written < 0) {
 #ifdef _WIN32
-    size_t errmsglen = strerrorlen_s(errno) + 1;
-    char errmsg[errmsglen];
-    strerror_s(errmsg, errmsglen, errno);
+    // Using fixed buffer size since, strerrorlen_s not yet available
+    const int errormsglen = 200;
+    char errmsg[errormsglen];
+    strerror_s(errmsg, errormsglen, errno);
     throw std::runtime_error(errmsg);
 #else
     throw std::runtime_error(strerror(errno));
