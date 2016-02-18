@@ -20,6 +20,12 @@ find_package(tf2_msgs REQUIRED)
 
 find_package(rmw)
 
+# This is necessary due to console bridge installing to a non-standard location
+# https://github.com/ros2/ros2/issues/195
+if(UNIX AND NOT APPLE)
+  ament_environment_hooks(env_hook/console_bridge_libs.sh)
+endif()
+
 include_directories(include
   ${geometry_msgs_INCLUDE_DIRS}
   ${rclcpp_INCLUDE_DIRS}
