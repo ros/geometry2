@@ -2,8 +2,8 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.13 (2016-03-04)
+-------------------
 * converting python test script into unit test
 * Don't export catkin includes
 * Contributors: Jochen Sprickerhof, Tully Foote

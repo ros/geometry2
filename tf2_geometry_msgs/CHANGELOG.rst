@@ -2,8 +2,8 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.13 (2016-03-04)
+-------------------
 * Add missing python_orocos_kdl dependency
 * make example into unit test
 * vector3 not affected by translation

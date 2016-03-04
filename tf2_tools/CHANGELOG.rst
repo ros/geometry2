@@ -2,8 +2,8 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.13 (2016-03-04)
+-------------------
 * casted el to string in view_frames
 * Contributors: g_gemignani
 

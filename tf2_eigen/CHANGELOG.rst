@@ -2,8 +2,8 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.13 (2016-03-04)
+-------------------
 * Added missing inline
 * Added unit test
   - Testing conversion to msg forward/backward

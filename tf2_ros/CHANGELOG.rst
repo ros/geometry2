@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.13 (2016-03-04)
+-------------------
 * fix documentation warnings
 * Adding tests to package
 * Contributors: Laurent GEORGE, Vincent Rabaud

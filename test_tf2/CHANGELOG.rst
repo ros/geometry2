@@ -2,8 +2,8 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.13 (2016-03-04)
+-------------------
 * Remove LGPL from license tags
   LGPL was erroneously included in 2a38724. As there are no files with it
   in the package.
