@@ -2,6 +2,12 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Don't export catkin includes
+  They only point to the temporary include in the build directory.
+* Contributors: Jochen Sprickerhof
+
 0.5.12 (2015-08-05)
 -------------------
 

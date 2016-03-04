@@ -2,6 +2,9 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.12 (2015-08-05)
 -------------------
 * add utilities to get yaw, pitch, roll and identity transform

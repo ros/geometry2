@@ -2,6 +2,13 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove LGPL from license tags
+  LGPL was erroneously included in 2a38724. As there are no files with it
+  in the package.
+* Contributors: Jochen Sprickerhof
+
 0.5.12 (2015-08-05)
 -------------------
 * add utilities to get yaw, pitch, roll and identity transform
