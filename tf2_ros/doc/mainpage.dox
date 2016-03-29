@@ -21,4 +21,6 @@ To listen for transforms using ROS:
   - Optionally, specify if the TransformListener runs in its own thread or not.
 - Check if a transform is available with tf2_ros::Buffer::canTransform().
 - Call tf2_ros::Buffer::lookupTransform() to get the transform between two frames.
+
+For more information, see the tf2 tutorials: http://wiki.ros.org/tf2/Tutorials
 */
