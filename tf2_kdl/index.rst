@@ -1,12 +1,11 @@
-tf2_kdl
-=====
+tf2_kdl documentation
+=====================
 
 This is the Python API reference of the tf2_kdl package.
 
-.. toctree::
-    :maxdepth: 2
-
-    tf2
+.. automodule:: tf2_kdl.tf2_kdl
+    :members:
+    :undoc-members:
 
 Indices and tables
 ==================
