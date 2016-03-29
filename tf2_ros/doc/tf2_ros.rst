@@ -1,4 +1,5 @@
-.. .. currentmodule:: tf2_ros
+tf_ros2 Python API
+==================
 
 Exceptions
 ----------
@@ -59,6 +60,7 @@ BufferClient
 ------------
 .. autoclass:: tf2_ros.buffer_client.BufferClient
     :members:
+
 
 TransformBroadcaster
 --------------------

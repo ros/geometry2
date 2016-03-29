@@ -159,6 +159,7 @@ public:
    * \tparam A The type of the object to transform.
    * \tparam B The type of the transformed output.
    * \param in The object to transform
+   * \param out The transformed output, converted to the specified type.
    * \param target_frame The string identifer for the frame to transform into.
    * \param timeout How long to wait for the target frame. Default value is zero (no blocking).
    * \return The transformed output, converted to the specified type.

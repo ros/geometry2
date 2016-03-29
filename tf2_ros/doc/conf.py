@@ -202,3 +202,5 @@ intersphinx_mapping = {
     'http://docs.opencv.org/3.0-last-rst/': None,
     'http://docs.scipy.org/doc/numpy' : None
     }
+
+autoclass_content = "both"

@@ -35,7 +35,20 @@ import threading
 from tf2_msgs.msg import TFMessage
 
 class TransformListener():
+    """
+    :class:`TransformListener` is a convenient way to listen for coordinate frame transformation info.
+
+    This class takes an object that instantiates the :class:`BufferInterface` interface, to which
+    it propagates changes to the tf frame graph.
+    """
     def __init__(self, buffer):
+        """
+        .. function:: __init__(buffer)
+
+            Constructor.
+
+            :param buffer: The buffer to propagate changes to when tf info updates.
+        """
         self.listenerthread = TransformListenerThread(buffer)
         self.listenerthread.setDaemon(True)
         self.listenerthread.start()

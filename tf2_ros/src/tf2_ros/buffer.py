@@ -43,12 +43,17 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
     Stores known frames and offers a ROS service, "tf_frames", which responds to client requests
     with a response containing a :class:`tf2_msgs.FrameGraph` representing the relationship of
     known frames. 
-
-    :param cache_time: (Optional) How long to retain past information in BufferCore.
-    :param debug: (Optional) If true, check if another tf2_frames service has been advertised.
     """
 
     def __init__(self, cache_time = None, debug = True):
+        """
+        .. function:: __init__(cache_time = None, debug = True)
+
+            Constructor.
+
+            :param cache_time: (Optional) How long to retain past information in BufferCore.
+            :param debug: (Optional) If true, check if another tf2_frames service has been advertised.
+        """
         if cache_time != None:
             tf2.BufferCore.__init__(self, cache_time)
         else:
@@ -94,7 +99,6 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
         :return: The transform between the frames.
         :rtype: :class:`geometry_msgs.msg.TransformStamped`
         """
-
         self.can_transform_full(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
         return self.lookup_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
 
@@ -111,7 +115,6 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
         :return: True if the transform is possible, false otherwise.
         :rtype: bool
         """
-
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
             r= rospy.Rate(20)

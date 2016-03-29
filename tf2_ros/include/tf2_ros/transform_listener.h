@@ -43,7 +43,9 @@
 
 namespace tf2_ros{
 
-class TransformListener 
+/** \brief This class provides an easy way to request and receive coordinate frame transform information.
+ */
+class TransformListener
 {
 
 public:
