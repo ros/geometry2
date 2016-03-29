@@ -2,25 +2,23 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b tf2_cpp is ... 
-
-<!-- 
-Provide an overview of your package.
--->
-
+\b tf2_ros2 is the C++ ROS wrapper around the tf2 transform library.
 
 \section codeapi Code API
 
-<!--
-Provide links to specific auto-generated API documentation within your
-package that is of particular interest to a reader. Doxygen will
-document pretty much every part of your code, so do your best here to
-point the reader to the actual API.
+To broadcast transforms using ROS:
+- Call ros::init() to initialize a node.
+- Construct a tf2_ros::TransformBroadcaster.
+- Pass a geometry_msgs::TransformStamped message to tf2_ros::TransformBroadcaster::sendTransform().
+  - Alternatively, pass a vector of geometry_msgs::TransformStamped messages.
 
-If your codebase is fairly large or has different sets of APIs, you
-should use the doxygen 'group' tag to keep these APIs together. For
-example, the roscpp documentation has 'libros' group.
--->
+Use StaticTransformBroadcaster for "latching" behavior for transforms that are not expected to change.
 
-
+To listen for transforms using ROS:
+- Construct a tf2_ros::Buffer.
+- Pass the tf2_ros::Buffer to the constructor of tf2_ros::TransformListener.
+  - Optionally, pass a ros::NodeHandle (otherwise TransformListener will connect to the node for the process).
+  - Optionally, specify if the TransformListener runs in its own thread or not.
+- Check if a transform is available with tf2_ros::Buffer::canTransform().
+- Call tf2_ros::Buffer::lookupTransform() to get the transform between two frames.
 */
