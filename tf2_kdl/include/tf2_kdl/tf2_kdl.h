@@ -74,8 +74,8 @@ geometry_msgs::TransformStamped kdlToTransform(const KDL::Frame& k)
 // ---------------------
 /** \brief Apply a geometry_msgs TransformStamped to an KDL-specific Vector type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
- * \param t_in The vector to transform, as timestamped KDL Vector data type.
- * \param t_out The transformed vector, as timestamped KDL Vector data type.
+ * \param t_in The vector to transform, as a timestamped KDL Vector data type.
+ * \param t_out The transformed vector, as a timestamped KDL Vector data type.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>
@@ -122,8 +122,8 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<KDL::Vector>& 
 // ---------------------
 /** \brief Apply a geometry_msgs TransformStamped to an KDL-specific Twist type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
- * \param t_in The twist to transform, as timestamped KDL Twist data type.
- * \param t_out The transformed Twist, as timestamped KDL Frame data type.
+ * \param t_in The twist to transform, as a timestamped KDL Twist data type.
+ * \param t_out The transformed Twist, as a timestamped KDL Frame data type.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>
@@ -177,8 +177,8 @@ void fromMsg(const geometry_msgs::TwistStamped& msg, tf2::Stamped<KDL::Twist>& o
 // ---------------------
 /** \brief Apply a geometry_msgs TransformStamped to an KDL-specific Wrench type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
- * \param t_in The wrench to transform, as timestamped KDL Wrench data type.
- * \param t_out The transformed Wrench, as timestamped KDL Frame data type.
+ * \param t_in The wrench to transform, as a timestamped KDL Wrench data type.
+ * \param t_out The transformed Wrench, as a timestamped KDL Frame data type.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>
@@ -234,8 +234,8 @@ void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped<KDL::Wrench>&
 // ---------------------
 /** \brief Apply a geometry_msgs TransformStamped to a KDL-specific Frame data type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
- * \param t_in The frame to transform, as timestamped KDL Frame.
- * \param t_out The transformed frame, as timestamped KDL Frame.
+ * \param t_in The frame to transform, as a timestamped KDL Frame.
+ * \param t_out The transformed frame, as a timestamped KDL Frame.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>

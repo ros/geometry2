@@ -73,8 +73,8 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
 
 /** \brief Apply a geometry_msgs TransformStamped to an Eigen-specific Vector3d type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
- * \param t_in The vector to transform, as timestamped Eigen Vector3d data type.
- * \param t_out The transformed vector, as timestamped Eigen Vector3d data type.
+ * \param t_in The vector to transform, as a timestamped Eigen Vector3d data type.
+ * \param t_out The transformed vector, as a timestamped Eigen Vector3d data type.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>
@@ -121,8 +121,8 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3
 
 /** \brief Apply a geometry_msgs TransformStamped to a Eigen-specific affine transform data type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
- * \param t_in The frame to transform, as timestamped Eigen Affine3d transform.
- * \param t_out The transformed frame, as timestamped Eigen Affine3d transform.
+ * \param t_in The frame to transform, as a timestamped Eigen Affine3d transform.
+ * \param t_out The transformed frame, as a timestamped Eigen Affine3d transform.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>

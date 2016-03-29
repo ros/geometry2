@@ -2,25 +2,18 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b tf2_geometry_msgs is ... 
+\b tf2_geometry_msgs contains functions for converting between various geometry_msgs data types.
 
-<!-- 
-Provide an overview of your package.
--->
+This library is an implementation of the templated conversion interface specified in tf/convert.h.
+It offers conversion and transform convenience functions between various geometry_msgs data types,
+such as Vector, Point, Pose, Transform, Quaternion, etc.
 
+See the <A HREF="http://wiki.ros.org/tf2/Tutorials/Migration/DataConversions">Conversions overview</A>
+wiki page for more information about datatype conversion in tf2.
 
-\section codeapi Code API
+\section codeapi Code API 
 
-<!--
-Provide links to specific auto-generated API documentation within your
-package that is of particular interest to a reader. Doxygen will
-document pretty much every part of your code, so do your best here to
-point the reader to the actual API.
-
-If your codebase is fairly large or has different sets of APIs, you
-should use the doxygen 'group' tag to keep these APIs together. For
-example, the roscpp documentation has 'libros' group.
--->
-
+This library consists of one header only, tf2_geometry_msgs/tf2_geometry_msgs.h, which consists mostly of
+specializations of template functions defined in tf2/convert.h.
 
 */
