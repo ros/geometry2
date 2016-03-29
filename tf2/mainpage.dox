@@ -21,7 +21,7 @@ tf2 offers a templated conversion interface for external libraries to specify co
 tf2-specific data types and user-defined data types. Various templated functions in tf2_ros use the
 conversion interface to apply transformations from the tf server to these custom datatypes.
 
-The conversion interface is defined in convert.h.
+The conversion interface is defined in tf2/convert.h.
 
 Some packages that implement this interface:
 
