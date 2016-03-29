@@ -1,8 +1,8 @@
-tf2_ros
-----------------
+.. .. currentmodule:: tf2_ros
 
-.. currentmodule:: tf2_ros
-
+Exceptions
+----------
+.. TODO move to code and autoexception instead. include from tf2_py
 
 .. exception:: TransformException
 
@@ -41,6 +41,9 @@ tf2_ros
    subclass of :exc:`TransformException`.
    Raised when the arguments to the method are called improperly formed.  An example of why this might be raised is if an argument is nan. 
 
+.. autoexception:: tf2_ros.buffer_interface.TypeException
+
+.. autoexception:: tf2_ros.buffer_interface.NotImplementedException
 
 BufferCore
 -----------
@@ -164,3 +167,37 @@ BufferCore
         :raises: :exc:`tf2.ConnectivityException`, :exc:`tf2.LookupException`, or :exc:`tf2.ExtrapolationException`, or :exc:`tf2.InvalidArgumentException`
 
         Extended version of :meth:`lookupTransform`.
+
+BufferInterface
+---------------
+.. autoclass:: tf2_ros.buffer_interface.BufferInterface
+    :members:
+    :undoc-members:
+
+
+Buffer
+---------------
+.. autoclass:: tf2_ros.buffer.Buffer
+    :members:
+    :undoc-members:
+
+
+BufferClient
+---------------
+.. autoclass:: tf2_ros.buffer_client.BufferClient
+    :members:
+    :undoc-members:
+
+TransformBroadcaster
+--------------------
+.. autoclass:: tf2_ros.transform_broadcaster.TransformBroadcaster
+    :members:
+    :undoc-members:
+
+TransformListener
+-----------------
+.. autoclass:: tf2_ros.transform_listener.TransformListener
+    :members:
+    :undoc-members:
+
+

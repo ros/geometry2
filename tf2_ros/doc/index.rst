@@ -32,8 +32,8 @@ See http://wiki.ros.org/tf2/Tutorials for more detailed usage.
 
 .. _overview: http://wiki.ros.org/tf2/Tutorials/Migration/DataConversions
 
-Table of Contents
-=================
+Available Classes and Namespaces
+================================
 
 .. toctree::
     :maxdepth: 2

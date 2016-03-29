@@ -35,6 +35,12 @@ from copy import deepcopy
 from std_msgs.msg import Header
 
 class BufferInterface:
+    """
+    Abstract interface for wrapping the Python bindings for the tf2 library in
+    a ROS-based convenience API.
+    Implementations include :class:tf2_ros.buffer.Buffer and
+    :class:tf2_ros.buffer_client.BufferClient.
+    """
     def __init__(self):
         self.registration = tf2_ros.TransformRegistration()
 
@@ -83,10 +89,18 @@ def Stamped(obj, stamp, frame_id):
 
 
 class TypeException(Exception):
+    """
+    Raised when an unexpected type is received while registering a transform
+    in :class:`tf2_ros.buffer_interface.BufferInterface`.
+    """
     def __init__(self, errstr):
         self.errstr = errstr
 
 class NotImplementedException(Exception):
+    """
+    Raised when can_transform or lookup_transform is not implemented in a
+    subclass of :class:`tf2_ros.buffer_interface.BufferInterface`.
+    """
     def __init__(self):
         self.errstr = 'CanTransform or LookupTransform not implemented'
 
