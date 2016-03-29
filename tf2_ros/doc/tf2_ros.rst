@@ -1,7 +1,7 @@
-tf2
+tf2_ros
 ----------------
 
-.. currentmodule:: tf2
+.. currentmodule:: tf2_ros
 
 
 .. exception:: TransformException

@@ -14,7 +14,7 @@ To broadcast transforms using ROS:
 - Use tf2_ros::StaticTransformBroadcaster for "latching" behavior when transforms that are not expected to change.
 
 To listen for transforms using ROS:
-- Construct a tf2_ros::BufferInterface.
+- Construct an instance of a class that implements tf2_ros::BufferInterface.
   - tf2_ros::Buffer is the standard implementation which offers a tf2_frames service that can respond to requests with a tf2_msgs::FrameGraph.
   - tf2_ros::BufferClient uses an actionlib::SimpleActionClient to wait for the requested transform to become available.
 - Pass the tf2_ros::Buffer to the constructor of tf2_ros::TransformListener.
