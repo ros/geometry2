@@ -44,6 +44,11 @@ class TransformBroadcaster:
         self.pub_tf = rospy.Publisher("/tf", TFMessage, queue_size=100)
 
     def sendTransform(self, transform):
+        """
+        Send a transform, or a list of transforms, to the Buffer associated with this TransformBroadcaster.
+
+        :param transform: A transform or list of transforms to send.
+        """
         if not isinstance(transform, list):
             transform = [transform]
         self.pub_tf.publish(TFMessage(transform))

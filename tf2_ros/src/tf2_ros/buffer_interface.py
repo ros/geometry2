@@ -35,11 +35,31 @@ from copy import deepcopy
 from std_msgs.msg import Header
 
 class BufferInterface:
+    """
+    Abstract interface for wrapping the Python bindings for the tf2 library in
+    a ROS-based convenience API.
+    Implementations include :class:tf2_ros.buffer.Buffer and
+    :class:tf2_ros.buffer_client.BufferClient.
+    """
     def __init__(self):
         self.registration = tf2_ros.TransformRegistration()
 
     # transform, simple api
     def transform(self, object_stamped, target_frame, timeout=rospy.Duration(0.0), new_type = None):
+        """
+        Transform an input into the target frame.
+
+        The input must be a known transformable type (by way of the tf2 data type conversion interface).
+
+        If new_type is not None, the type specified must have a valid conversion from the input type,
+        else the function will raise an exception.
+
+        :param object_stamped: The timestamped object the transform.
+        :param target_frame: Name of the frame to transform the input into.
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :param new_type: (Optional) Type to convert the object to.
+        :return: The transformed, timestamped output, possibly converted to a new type.
+        """
         do_transform = self.registration.get(type(object_stamped))
         res = do_transform(object_stamped, self.lookup_transform(target_frame, object_stamped.header.frame_id,
                                                                  object_stamped.header.stamp, timeout))
@@ -47,9 +67,28 @@ class BufferInterface:
             return res
 
         return convert(res, new_type)
-    
+
     # transform, advanced api
     def transform_full(self, object_stamped, target_frame, target_time, fixed_frame, timeout=rospy.Duration(0.0), new_type = None):
+        """
+        Transform an input into the target frame (advanced API).
+
+        The input must be a known transformable type (by way of the tf2 data type conversion interface).
+
+        If new_type is not None, the type specified must have a valid conversion from the input type,
+        else the function will raise an exception.
+
+        This function follows the advanced API, which allows tranforming between different time points,
+        as well as specifying a frame to be considered fixed in time.
+
+        :param object_stamped: The timestamped object the transform.
+        :param target_frame: Name of the frame to transform the input into.
+        :param target_time: Time to transform the input into.
+        :param fixed_frame: Name of the frame to consider constant in time.
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :param new_type: (Optional) Type to convert the object to.
+        :return: The transformed, timestamped output, possibly converted to a new type.
+        """
         do_transform = self.registration.get(type(object_stamped))
         res = do_transform(object_stamped, self.lookup_transform_full(target_frame, target_time,
                                                                      object_stamped.header.frame_id, object_stamped.header.stamp, 
@@ -59,20 +98,70 @@ class BufferInterface:
 
         return convert(res, new_type)
 
-    # lookup, simple api 
     def lookup_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
-        raise NotImplementedException()        
+        """
+        Get the transform from the source frame to the target frame.
 
-    # lookup, advanced api 
+        Must be implemented by a subclass of BufferInterface.
+
+        :param target_frame: Name of the frame to transform into.
+        :param source_frame: Name of the input frame.
+        :param time: The time at which to get the transform. (0 will get the latest) 
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :return: The transform between the frames.
+        :rtype: :class:`geometry_msgs.msg.TransformStamped`
+        """
+        raise NotImplementedException()
+
     def lookup_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+        """
+        Get the transform from the source frame to the target frame using the advanced API.
+
+        Must be implemented by a subclass of BufferInterface.
+
+        :param target_frame: Name of the frame to transform into.
+        :param target_time: The time to transform to. (0 will get the latest) 
+        :param source_frame: Name of the input frame.
+        :param source_time: The time at which source_frame will be evaluated. (0 will get the latest) 
+        :param fixed_frame: Name of the frame to consider constant in time.
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :return: The transform between the frames.
+        :rtype: :class:`geometry_msgs.msg.TransformStamped`
+        """
         raise NotImplementedException()        
 
     # can, simple api
     def can_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+        """
+        Check if a transform from the source frame to the target frame is possible.
+
+        Must be implemented by a subclass of BufferInterface.
+
+        :param target_frame: Name of the frame to transform into.
+        :param source_frame: Name of the input frame.
+        :param time: The time at which to get the transform. (0 will get the latest) 
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :return: True if the transform is possible, false otherwise.
+        :rtype: bool
+        """
         raise NotImplementedException()        
     
     # can, advanced api
     def can_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+        """
+        Check if a transform from the source frame to the target frame is possible (advanced API).
+
+        Must be implemented by a subclass of BufferInterface.
+
+        :param target_frame: Name of the frame to transform into.
+        :param target_time: The time to transform to. (0 will get the latest) 
+        :param source_frame: Name of the input frame.
+        :param source_time: The time at which source_frame will be evaluated. (0 will get the latest) 
+        :param fixed_frame: Name of the frame to consider constant in time.
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :return: True if the transform is possible, false otherwise.
+        :rtype: bool
+        """
         raise NotImplementedException()        
 
 
@@ -83,10 +172,18 @@ def Stamped(obj, stamp, frame_id):
 
 
 class TypeException(Exception):
+    """
+    Raised when an unexpected type is received while registering a transform
+    in :class:`tf2_ros.buffer_interface.BufferInterface`.
+    """
     def __init__(self, errstr):
         self.errstr = errstr
 
 class NotImplementedException(Exception):
+    """
+    Raised when can_transform or lookup_transform is not implemented in a
+    subclass of :class:`tf2_ros.buffer_interface.BufferInterface`.
+    """
     def __init__(self):
         self.errstr = 'CanTransform or LookupTransform not implemented'
 

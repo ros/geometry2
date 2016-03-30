@@ -44,6 +44,11 @@
 
 namespace tf2_ros
 {
+  /** \brief Action server for the actionlib-based implementation of tf2_ros::BufferInterface.
+   * 
+   * Use this class with a tf2_ros::TransformListener in the same process.
+   * You can use this class with a tf2_ros::BufferClient in a different process.
+   */
   class BufferServer
   {
     private:
@@ -57,9 +62,17 @@ namespace tf2_ros
       };
 
     public:
+      /** \brief Constructor
+       * \param buffer The Buffer that this BufferServer will wrap.
+       * \param ns The namespace in which to look for action clients.
+       * \param auto_start Pass argument to the constructor of the ActionServer.
+       * \param check_period How often to check for changes to known transforms (via a timer event).
+       */
       BufferServer(const Buffer& buffer, const std::string& ns,
           bool auto_start = true, ros::Duration check_period = ros::Duration(0.01));
 
+      /** \brief Start the action server.
+       */
       void start();
 
     private:

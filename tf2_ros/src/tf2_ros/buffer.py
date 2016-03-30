@@ -35,7 +35,25 @@ from tf2_msgs.srv import FrameGraph, FrameGraphResponse
 import rosgraph.masterapi
 
 class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
+    """
+    Standard implementation of the :class:`tf2_ros.BufferInterface` abstract data type.
+
+    Inherits from :class:`tf2_ros.buffer_interface.BufferInterface` and :class:`tf2.BufferCore`.
+
+    Stores known frames and offers a ROS service, "tf_frames", which responds to client requests
+    with a response containing a :class:`tf2_msgs.FrameGraph` representing the relationship of
+    known frames. 
+    """
+
     def __init__(self, cache_time = None, debug = True):
+        """
+        .. function:: __init__(cache_time = None, debug = True)
+
+            Constructor.
+
+            :param cache_time: (Optional) How long to retain past information in BufferCore.
+            :param debug: (Optional) If true, check if another tf2_frames service has been advertised.
+        """
         if cache_time != None:
             tf2.BufferCore.__init__(self, cache_time)
         else:
@@ -52,20 +70,51 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
 
     def __get_frames(self, req):
        return FrameGraphResponse(self.all_frames_as_yaml()) 
-        
-    # lookup, simple api 
+
     def lookup_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0)):
+        """
+        Get the transform from the source frame to the target frame.
+
+        :param target_frame: Name of the frame to transform into.
+        :param source_frame: Name of the input frame.
+        :param time: The time at which to get the transform. (0 will get the latest) 
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :return: The transform between the frames.
+        :rtype: :class:`geometry_msgs.msg.TransformStamped`
+        """
+
         self.can_transform(target_frame, source_frame, time, timeout)
         return self.lookup_transform_core(target_frame, source_frame, time)
 
-    # lookup, advanced api 
     def lookup_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0)):
+        """
+        Get the transform from the source frame to the target frame using the advanced API.
+
+        :param target_frame: Name of the frame to transform into.
+        :param target_time: The time to transform to. (0 will get the latest) 
+        :param source_frame: Name of the input frame.
+        :param source_time: The time at which source_frame will be evaluated. (0 will get the latest) 
+        :param fixed_frame: Name of the frame to consider constant in time.
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :return: The transform between the frames.
+        :rtype: :class:`geometry_msgs.msg.TransformStamped`
+        """
         self.can_transform_full(target_frame, target_time, source_frame, source_time, fixed_frame, timeout)
         return self.lookup_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
 
 
-    # can, simple api
     def can_transform(self, target_frame, source_frame, time, timeout=rospy.Duration(0.0), return_debug_tuple=False):
+        """
+        Check if a transform from the source frame to the target frame is possible.
+
+        :param target_frame: Name of the frame to transform into.
+        :param source_frame: Name of the input frame.
+        :param time: The time at which to get the transform. (0 will get the latest) 
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :param return_debug_type: (Optional) If true, return a tuple representing debug information.
+        :return: True if the transform is possible, false otherwise.
+        :rtype: bool
+        """
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
             r= rospy.Rate(20)
@@ -77,10 +126,25 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
         if return_debug_tuple:
             return core_result
         return core_result[0]
-    
-    # can, advanced api
+
     def can_transform_full(self, target_frame, target_time, source_frame, source_time, fixed_frame, timeout=rospy.Duration(0.0),
+
                            return_debug_tuple=False):
+        """
+        Check if a transform from the source frame to the target frame is possible (advanced API).
+
+        Must be implemented by a subclass of BufferInterface.
+
+        :param target_frame: Name of the frame to transform into.
+        :param target_time: The time to transform to. (0 will get the latest) 
+        :param source_frame: Name of the input frame.
+        :param source_time: The time at which source_frame will be evaluated. (0 will get the latest) 
+        :param fixed_frame: Name of the frame to consider constant in time.
+        :param timeout: (Optional) Time to wait for the target frame to become available.
+        :param return_debug_type: (Optional) If true, return a tuple representing debug information.
+        :return: True if the transform is possible, false otherwise.
+        :rtype: bool
+        """
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
             r= rospy.Rate(20)

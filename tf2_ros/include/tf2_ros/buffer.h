@@ -42,7 +42,12 @@
 namespace tf2_ros
 {
 
-  // extend the BufferInterface class and BufferCore class
+  /** \brief Standard implementation of the tf2_ros::BufferInterface abstract data type.
+   *
+   * Inherits tf2_ros::BufferInterface and tf2::BufferCore.
+   * Stores known frames and offers a ROS service, "tf_frames", which responds to client requests
+   * with a response containing a tf2_msgs::FrameGraph representing the relationship of known frames.
+   */
   class Buffer: public BufferInterface, public tf2::BufferCore
   {
   public:

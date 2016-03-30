@@ -43,6 +43,12 @@
 
 namespace tf2_ros
 {
+  /** \brief Action client-based implementation of the tf2_ros::BufferInterface abstract data type.
+   *
+   * BufferClient uses actionlib to coordinate waiting for available transforms.
+   *
+   * You can use this class with a tf2_ros::BufferServer and tf2_ros::TransformListener in a separate process.
+   */
   class BufferClient : public BufferInterface
   {
     public:
@@ -113,6 +119,10 @@ namespace tf2_ros
             const std::string& source_frame, const ros::Time& source_time,
             const std::string& fixed_frame, const ros::Duration timeout = ros::Duration(0.0), std::string* errstr = NULL) const;
 
+      /** \brief Block until the action server is ready to respond to requests.
+       * \param timeout Time to wait for the server.
+       * \return True if the server is ready, false otherwise.
+       */
       bool waitForServer(const ros::Duration& timeout = ros::Duration(0))
       {
         return client_.waitForServer(timeout);
