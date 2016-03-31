@@ -40,3 +40,4 @@ from buffer import *
 from buffer_client import *
 from transform_listener import *
 from transform_broadcaster import *
+from static_transform_broadcaster import *
