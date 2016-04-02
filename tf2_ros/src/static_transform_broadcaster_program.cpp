@@ -70,7 +70,7 @@ int main(int argc, char ** argv)
   {
     if (strcmp(argv[7], argv[8]) == 0)
     {
-      ROS_FATAL("target_frame and source frame are the same (%s, %s) this cannot work", argv[8], argv[9]);
+      ROS_FATAL("target_frame and source frame are the same (%s, %s) this cannot work", argv[7], argv[8]);
       return 1;
     }
     
