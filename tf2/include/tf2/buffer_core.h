@@ -214,6 +214,11 @@ public:
    * Useful for debugging tools
    */
   std::string allFramesAsYAML(TimePoint current_time) const;
+  std::string allFramesAsYAML(double current_time) const {
+    return this->allFramesAsYAML(
+      TimePoint(std::chrono::duration_cast<std::chrono::system_clock::duration>(
+        std::chrono::duration<double, std::nano>(current_time))));
+  }
 
   /** Backwards compatibility for #84
   */
@@ -288,6 +293,12 @@ public:
    * Useful for debugging
    */
   std::string _allFramesAsDot(TimePoint current_time) const;
+  std::string _allFramesAsDot(double current_time) const
+  {
+    return this->allFramesAsYAML(
+      TimePoint(std::chrono::duration_cast<std::chrono::system_clock::duration>(
+        std::chrono::duration<double, std::nano>(current_time))));
+  }
   std::string _allFramesAsDot() const;
 
   /** \brief Backwards compatabilityA way to see what frames are in a chain
