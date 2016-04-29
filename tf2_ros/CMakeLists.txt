@@ -124,7 +124,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 
 # Tests
-# if(AMENT_ENABLE_TESTING)
+# if(BUILD_TESTING)
 # TODO(tfoote) port tests to use ROS2 instead of ROS1 api.
 if (false)
 
