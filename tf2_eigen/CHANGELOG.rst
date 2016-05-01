@@ -2,6 +2,14 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.13 (2016-03-04)
+-------------------
+* Added missing inline
+* Added unit test
+  - Testing conversion to msg forward/backward
+* Added eigenTotransform function
+* Contributors: Davide Tateo, boris-il-forte
+
 0.5.12 (2015-08-05)
 -------------------
 

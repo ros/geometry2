@@ -35,20 +35,15 @@ from tf2_msgs.msg import TFMessage
 from geometry_msgs.msg import TransformStamped
 
 
-class TransformBroadcaster:
+class StaticTransformBroadcaster:
     """
-    :class:`TransformBroadcaster` is a convenient way to send transformation updates on the ``"tf"`` message topic.
+    :class:`StaticTransformBroadcaster` is a convenient way to send static transformation on the ``"/tf_static"`` message topic.
     """
 
     def __init__(self):
-        self.pub_tf = rospy.Publisher("tf", TFMessage, queue_size=100)
+        self.pub_tf = rospy.Publisher("/tf_static", TFMessage, queue_size=100, latch=True)
 
     def sendTransform(self, transform):
-        """
-        Send a transform, or a list of transforms, to the Buffer associated with this TransformBroadcaster.
-
-        :param transform: A transform or list of transforms to send.
-        """
         if not isinstance(transform, list):
             transform = [transform]
         self.pub_tf.publish(TFMessage(transform))

@@ -1,6 +1,6 @@
 <package>
   <name>test_tf2</name>
-  <version>0.5.12</version>
+  <version>0.5.13</version>
   <description>
     tf2 unit tests
   </description>
@@ -8,7 +8,6 @@
   <author>Eitan Marder-Eppstein</author>
   <maintainer email="tfoote@osrfoundation.org">Tully Foote</maintainer>
   <license>BSD</license>
-  <license>LGPL</license>
 
   <url type="website">http://www.ros.org/wiki/geometry_experimental</url>
     

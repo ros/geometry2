@@ -2,6 +2,15 @@
 Changelog for package geometry_experimental
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.13 (2016-03-04)
+-------------------
+* Remove LGPL from license tags
+  LGPL was erroneously included in 2a38724. As there are no files with it
+  in the package.
+* add missing dependencies in the meta-package geometry_experimental
+  This partly fixes the doc jobs in `#120 <https://github.com/ros/geometry_experimental/issues/120>`_
+* Contributors: Jochen Sprickerhof, Vincent Rabaud
+
 0.5.12 (2015-08-05)
 -------------------
 

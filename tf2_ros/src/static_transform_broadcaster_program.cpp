@@ -104,11 +104,9 @@ int main(int argc, char ** argv)
     rclcpp::WallRate loop_rate(0.2);
     while (rclcpp::ok())
     {
-      //TODO(tfoote) reimplement latching
-      ROS_INFO("LOOPING due to no latching at the moment\n");
-      broadcaster.sendTransform(msg);
-      rclcpp::spin_some(node);
-      loop_rate.sleep();  
+      // MQ: git-merge didn't seem to work here... need to rebase somehow
+      ROS_FATAL("target_frame and source frame are the same (%s, %s) this cannot work", argv[7], argv[8]);
+      return 1;
     }
 
     // broadcaster.sendTransform(msg);

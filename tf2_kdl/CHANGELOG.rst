@@ -2,6 +2,12 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.13 (2016-03-04)
+-------------------
+* converting python test script into unit test
+* Don't export catkin includes
+* Contributors: Jochen Sprickerhof, Tully Foote
+
 0.5.12 (2015-08-05)
 -------------------
 * Add kdl::Frame to TransformStamped conversion

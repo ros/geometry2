@@ -2,6 +2,12 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.13 (2016-03-04)
+-------------------
+* fix documentation warnings
+* Adding tests to package
+* Contributors: Laurent GEORGE, Vincent Rabaud
+
 0.5.12 (2015-08-05)
 -------------------
 * remove annoying gcc warning

@@ -2,6 +2,19 @@
 Changelog for package tf2_sensor_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.13 (2016-03-04)
+-------------------
+* add missing Python runtime dependency
+* fix wrong comment
+* Adding tests to package
+* Fixing do_transform_cloud for python
+  The previous code was not used at all (it was a mistake in the __init_\_.py so
+  the do_transform_cloud was not available to the python users).
+  The python code need some little correction (e.g there is no method named
+  read_cloud but it's read_points for instance, and as we are in python we can't
+  use the same trick as in c++ when we got an immutable)
+* Contributors: Laurent GEORGE, Vincent Rabaud
+
 0.5.12 (2015-08-05)
 -------------------
 

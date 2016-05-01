@@ -2,7 +2,7 @@
 <package format="2">
 
   <name>tf2_msgs</name>
-  <version>0.5.12</version>
+  <version>0.5.13</version>
   <description>
     tf2_msgs
   </description>

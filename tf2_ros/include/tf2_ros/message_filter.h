@@ -118,7 +118,7 @@ public:
   /**
    * \brief Constructor
    *
-   * \param tf The tf::Transformer this filter should use
+   * \param bc The tf2::BufferCore this filter should use
    * \param target_frame The frame this filter should attempt to transform to.  To use multiple frames, pass an empty string here and use the setTargetFrames() function.
    * \param queue_size The number of messages to queue up before throwing away old ones.  0 means infinite (dangerous).
    * \param nh The NodeHandle whose callback queue we should add callbacks to
@@ -137,7 +137,7 @@ public:
    * \brief Constructor
    *
    * \param f The filter to connect this filter's input to.  Often will be a message_filters::Subscriber.
-   * \param tf The tf::Transformer this filter should use
+   * \param bc The tf2::BufferCore this filter should use
    * \param target_frame The frame this filter should attempt to transform to.  To use multiple frames, pass an empty string here and use the setTargetFrames() function.
    * \param queue_size The number of messages to queue up before throwing away old ones.  0 means infinite (dangerous).
    * \param nh The NodeHandle whose callback queue we should add callbacks to
@@ -158,7 +158,7 @@ public:
   /**
    * \brief Constructor
    *
-   * \param tf The tf::Transformer this filter should use
+   * \param bc The tf2::BufferCore this filter should use
    * \param target_frame The frame this filter should attempt to transform to.  To use multiple frames, pass an empty string here and use the setTargetFrames() function.
    * \param queue_size The number of messages to queue up before throwing away old ones.  0 means infinite (dangerous).
    * \param cbqueue The callback queue to add callbacks to.  If NULL, callbacks will happen from whatever thread either
@@ -179,7 +179,7 @@ public:
    * \brief Constructor
    *
    * \param f The filter to connect this filter's input to.  Often will be a message_filters::Subscriber.
-   * \param tf The tf::Transformer this filter should use
+   * \param bc The tf2::BufferCore this filter should use
    * \param target_frame The frame this filter should attempt to transform to.  To use multiple frames, pass an empty string here and use the setTargetFrames() function.
    * \param queue_size The number of messages to queue up before throwing away old ones.  0 means infinite (dangerous).
    * \param cbqueue The callback queue to add callbacks to.  If NULL, callbacks will happen from whatever thread either
@@ -689,7 +689,7 @@ private:
   };
   typedef std::list<MessageInfo> L_MessageInfo;
   L_MessageInfo messages_;
-  uint32_t message_count_; ///< The number of messages in the list.  Used because <container>.size() may have linear cost
+  uint32_t message_count_; ///< The number of messages in the list.  Used because \<container\>.size() may have linear cost
   boost::shared_mutex messages_mutex_; ///< The mutex used for locking message list operations
   uint32_t expected_success_count_;
 
