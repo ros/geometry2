@@ -28,7 +28,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 # Tests
-if(AMENT_ENABLE_TESTING)
+if(BUILD_TESTING)
   # TODO(tfoote) enable linters
   # find_package(ament_lint_auto REQUIRED)
   # ament_lint_auto_find_test_dependencies()
