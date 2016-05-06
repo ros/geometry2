@@ -67,8 +67,7 @@ static PyTypeObject buffer_core_Type = {
 static PyObject *PyObject_BorrowAttrString(PyObject* o, const char *name)
 {
     PyObject *r = PyObject_GetAttrString(o, name);
-    if (r != NULL)
-      Py_DECREF(r);
+    Py_XDECREF(r);
     return r;
 }
 
@@ -492,10 +491,7 @@ static PyMethodDef module_methods[] = {
   {0, 0, 0},
 };
 
-extern "C" void init_tf2()
-{
-  PyObject *item, *m, *d;
-
+bool staticInit() {
 #if PYTHON_API_VERSION >= 1007
   tf2_exception = PyErr_NewException((char*)"tf2.TransformException", NULL, NULL);
   tf2_connectivityexception = PyErr_NewException((char*)"tf2.ConnectivityException", tf2_exception, NULL);
@@ -512,13 +508,13 @@ extern "C" void init_tf2()
   tf2_timeoutexception = stringToPython("tf2.TimeoutException");
 #endif
 
-  pModulerospy = PyImport_Import(item = nativeToPythonText("rospy")); Py_DECREF(item);
-  pModulegeometrymsgs = PyImport_ImportModule("geometry_msgs.msg");
+  pModulerospy        = pythonImport("rospy");
+  pModulegeometrymsgs = pythonImport("geometry_msgs.msg");
 
   if(pModulegeometrymsgs == NULL)
   {
     printf("Cannot load geometry_msgs module");
-    return;
+    return false;
   }
 
   buffer_core_Type.tp_alloc = PyType_GenericAlloc;
@@ -527,15 +523,43 @@ extern "C" void init_tf2()
   buffer_core_Type.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
   buffer_core_Type.tp_methods = buffer_core_methods;
   if (PyType_Ready(&buffer_core_Type) != 0)
-    return;
+    return false;
+  return true;
+}
 
-  m = Py_InitModule("_tf2", module_methods);
+PyObject *moduleInit(PyObject *m) {
   PyModule_AddObject(m, "BufferCore", (PyObject *)&buffer_core_Type);
-  d = PyModule_GetDict(m);
+  PyObject *d = PyModule_GetDict(m);
   PyDict_SetItemString(d, "TransformException", tf2_exception);
   PyDict_SetItemString(d, "ConnectivityException", tf2_connectivityexception);
   PyDict_SetItemString(d, "LookupException", tf2_lookupexception);
   PyDict_SetItemString(d, "ExtrapolationException", tf2_extrapolationexception);
   PyDict_SetItemString(d, "InvalidArgumentException", tf2_invalidargumentexception);
   PyDict_SetItemString(d, "TimeoutException", tf2_timeoutexception);
+  return m;
 }
+
+#if PY_MAJOR_VERSION < 3
+extern "C" void init_tf2()
+{
+  if (!staticInit())
+    return;
+  moduleInit(Py_InitModule("_tf2", module_methods));
+}
+
+#else
+struct PyModuleDef tf_module = {
+  PyModuleDef_HEAD_INIT, // base
+  "_tf2",                // name
+  NULL,                  // docstring
+  -1,                    // state size (but we're using globals)
+  module_methods         // methods
+};
+
+PyMODINIT_FUNC PyInit_tf2()
+{
+  if (!staticInit())
+    return NULL;
+  return moduleInit(PyModule_Create(&tf_module));
+}
+#endif
