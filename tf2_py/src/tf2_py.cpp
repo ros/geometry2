@@ -3,6 +3,8 @@
 #include <tf2/buffer_core.h>
 #include <tf2/exceptions.h>
 
+#include "python_compat.h"
+
 // Run x (a tf method, catching TF's exceptions and reraising them as Python exceptions)
 //
 #define WRAP(x) \
@@ -53,6 +55,7 @@ struct buffer_core_t {
   PyObject_HEAD
   tf2::BufferCore *bc;
 };
+
 
 static PyTypeObject buffer_core_Type = {
   PyObject_HEAD_INIT(&PyType_Type)
@@ -106,7 +109,7 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
   PyObject_SetAttrString(pheader, "stamp", time_obj);
   Py_DECREF(time_obj);
 
-  PyObject_SetAttrString(pheader, "frame_id", PyString_FromString((transform->header.frame_id).c_str()));
+  PyObject_SetAttrString(pheader, "frame_id", stringToPython(transform->header.frame_id));
   Py_DECREF(pheader);
 
   PyObject *ptransform = PyObject_GetAttrString(pinst, "transform");
@@ -114,7 +117,7 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
   PyObject *protation = PyObject_GetAttrString(ptransform, "rotation");
   Py_DECREF(ptransform);
 
-  PyObject_SetAttrString(pinst, "child_frame_id", PyString_FromString((transform->child_frame_id).c_str()));
+  PyObject_SetAttrString(pinst, "child_frame_id", stringToPython(transform->child_frame_id));
 
   PyObject_SetAttrString(ptranslation, "x", PyFloat_FromDouble(transform->transform.translation.x));
   PyObject_SetAttrString(ptranslation, "y", PyFloat_FromDouble(transform->transform.translation.y));
@@ -176,20 +179,20 @@ static PyObject *getTFPrefix(PyObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, ""))
     return NULL;
   tf::Transformer *t = ((transformer_t*)self)->t;
-  return PyString_FromString(t->getTFPrefix().c_str());
+  return stringToPython(t->getTFPrefix());
 }
 */
 
 static PyObject *allFramesAsYAML(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
-  return PyString_FromString(bc->allFramesAsYAML().c_str());
+  return stringToPython(bc->allFramesAsYAML());
 }
 
 static PyObject *allFramesAsString(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
-  return PyString_FromString(bc->allFramesAsString().c_str());
+  return stringToPython(bc->allFramesAsString());
 }
 
 static PyObject *canTransformCore(PyObject *self, PyObject *args, PyObject *kw)
@@ -235,7 +238,7 @@ static PyObject *asListOfStrings(std::vector< std::string > los)
   PyObject *r = PyList_New(los.size());
   size_t i;
   for (i = 0; i < los.size(); i++) {
-    PyList_SetItem(r, i, PyString_FromString(los[i].c_str()));
+    PyList_SetItem(r, i, toPythonString(los[i]));
   }
   return r;
 }
@@ -385,8 +388,8 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
 
   geometry_msgs::TransformStamped transform;
   PyObject *header = PyObject_BorrowAttrString(py_transform, "header");
-  transform.child_frame_id = PyString_AsString(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
-  transform.header.frame_id = PyString_AsString(PyObject_BorrowAttrString(header, "frame_id"));
+  transform.child_frame_id = stringFromPython(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
+  transform.header.frame_id = stringFromPython(PyObject_BorrowAttrString(header, "frame_id"));
   if (rostime_converter(PyObject_BorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
     return NULL;
 
@@ -416,8 +419,8 @@ static PyObject *setTransformStatic(PyObject *self, PyObject *args)
 
   geometry_msgs::TransformStamped transform;
   PyObject *header = PyObject_BorrowAttrString(py_transform, "header");
-  transform.child_frame_id = PyString_AsString(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
-  transform.header.frame_id = PyString_AsString(PyObject_BorrowAttrString(header, "frame_id"));
+  transform.child_frame_id = stringFromPython(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
+  transform.header.frame_id = stringFromPython(PyObject_BorrowAttrString(header, "frame_id"));
   if (rostime_converter(PyObject_BorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
     return NULL;
 
@@ -501,15 +504,15 @@ extern "C" void init_tf2()
   tf2_invalidargumentexception = PyErr_NewException((char*)"tf2.InvalidArgumentException", tf2_exception, NULL);
   tf2_timeoutexception = PyErr_NewException((char*)"tf2.TimeoutException", tf2_exception, NULL);
 #else
-  tf2_exception = PyString_FromString("tf2.error");
-  tf2_connectivityexception = PyString_FromString("tf2.ConnectivityException");
-  tf2_lookupexception = PyString_FromString("tf2.LookupException");
-  tf2_extrapolationexception = PyString_FromString("tf2.ExtrapolationException");
-  tf2_invalidargumentexception = PyString_FromString("tf2.InvalidArgumentException");
-  tf2_timeoutexception = PyString_FromString("tf2.TimeoutException");
+  tf2_exception = stringToPython("tf2.error");
+  tf2_connectivityexception = stringToPython("tf2.ConnectivityException");
+  tf2_lookupexception = stringToPython("tf2.LookupException");
+  tf2_extrapolationexception = stringToPython("tf2.ExtrapolationException");
+  tf2_invalidargumentexception = stringToPython("tf2.InvalidArgumentException");
+  tf2_timeoutexception = stringToPython("tf2.TimeoutException");
 #endif
 
-  pModulerospy = PyImport_Import(item= PyString_FromString("rospy")); Py_DECREF(item);
+  pModulerospy = PyImport_Import(item = nativeToPythonText("rospy")); Py_DECREF(item);
   pModulegeometrymsgs = PyImport_ImportModule("geometry_msgs.msg");
 
   if(pModulegeometrymsgs == NULL)
