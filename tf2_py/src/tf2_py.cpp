@@ -58,9 +58,13 @@ struct buffer_core_t {
 
 
 static PyTypeObject buffer_core_Type = {
-  PyObject_HEAD_INIT(&PyType_Type)
+#if PY_MAJOR_VERSION < 3
+  PyObject_HEAD_INIT(NULL)
   0,                               /*size*/
-  "_tf2.BufferCore",                /*name*/
+# else
+  PyVarObject_HEAD_INIT(NULL, 0)
+#endif
+  "_tf2.BufferCore",               /*name*/
   sizeof(buffer_core_t),           /*basicsize*/
 };
 
