@@ -38,7 +38,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <assert.h>
 
-using namespace tf2;
+namespace tf2 {
 
 TransformStorage::TransformStorage()
 {
@@ -60,6 +60,7 @@ TimeCache::TimeCache(ros::Duration max_storage_time)
 : max_storage_time_(max_storage_time)
 {}
 
+namespace cache { // Avoid ODR collisions https://github.com/ros/geometry2/issues/175 
 // hoisting these into separate functions causes an ~8% speedup.  Removing calling them altogether adds another ~10%
 void createExtrapolationException1(ros::Time t0, ros::Time t1, std::string* error_str)
 {
@@ -90,7 +91,7 @@ void createExtrapolationException3(ros::Time t0, ros::Time t1, std::string* erro
     *error_str = ss.str();
   }
 }
-
+} // namespace cache
 
 uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str)
 {
@@ -118,7 +119,7 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
     }
     else
     {
-      createExtrapolationException1(target_time, ts.stamp_, error_str);
+      cache::createExtrapolationException1(target_time, ts.stamp_, error_str);
       return 0;
     }
   }
@@ -139,12 +140,12 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
   // Catch cases that would require extrapolation
   else if (target_time > latest_time)
   {
-    createExtrapolationException2(target_time, latest_time, error_str);
+    cache::createExtrapolationException2(target_time, latest_time, error_str);
     return 0;
   }
   else if (target_time < earliest_time)
   {
-    createExtrapolationException3(target_time, earliest_time, error_str);
+    cache::createExtrapolationException3(target_time, earliest_time, error_str);
     return 0;
   }
 
@@ -302,4 +303,5 @@ void TimeCache::pruneList()
     storage_.pop_back();
   }
   
+} // namespace tf2
 }
