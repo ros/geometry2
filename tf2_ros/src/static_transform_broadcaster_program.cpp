@@ -29,6 +29,7 @@
 
 #include <cstdio>
 #include <tf2/LinearMath/Quaternion.h>
+#include <tf2/utils.h>
 #include "tf2_ros/static_transform_broadcaster.h"
 
 int main(int argc, char ** argv)
@@ -57,8 +58,12 @@ int main(int argc, char ** argv)
     msg.header.stamp = ros::Time::now();
     msg.header.frame_id = argv[8];
     msg.child_frame_id = argv[9];
-  
 
+    if (!tf2::isUnitaryQuaternion(msg.transform.rotation))
+    {
+      ROS_FATAL("not unitary input quaternion of input transformation");
+      return 1;
+    }
 
   broadcaster.sendTransform(msg);
   ROS_INFO("Spinning until killed publishing %s to %s", msg.header.frame_id.c_str(), msg.child_frame_id.c_str());
