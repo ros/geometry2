@@ -37,7 +37,7 @@
 
 #include "tf2_ros/transform_listener.h"
 
-TEST(StaticTranformPublsher, a_b_different_times)
+TEST(StaticTransformPublisher, a_b_different_times)
 {
   tf2_ros::Buffer mB;
   tf2_ros::TransformListener tfl(mB);
@@ -46,7 +46,7 @@ TEST(StaticTranformPublsher, a_b_different_times)
   EXPECT_TRUE(mB.canTransform("a", "b", ros::Time(1000), ros::Duration(1.0)));
 };
 
-TEST(StaticTranformPublsher, a_c_different_times)
+TEST(StaticTransformPublisher, a_c_different_times)
 {
   tf2_ros::Buffer mB;
   tf2_ros::TransformListener tfl(mB);
@@ -55,7 +55,7 @@ TEST(StaticTranformPublsher, a_c_different_times)
   EXPECT_TRUE(mB.canTransform("a", "c", ros::Time(1000), ros::Duration(1.0)));
 };
 
-TEST(StaticTranformPublsher, a_d_different_times)
+TEST(StaticTransformPublisher, a_d_different_times)
 {
   tf2_ros::Buffer mB;
   tf2_ros::TransformListener tfl(mB);
@@ -80,7 +80,7 @@ TEST(StaticTranformPublsher, a_d_different_times)
   EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(100), ros::Duration(0)));
 };
 
-TEST(StaticTranformPublsher, multiple_parent_test)
+TEST(StaticTransformPublisher, multiple_parent_test)
 {
   tf2_ros::Buffer mB;
   tf2_ros::TransformListener tfl(mB);
@@ -112,7 +112,7 @@ TEST(StaticTranformPublsher, multiple_parent_test)
   EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(), ros::Duration(1.0)));
 };
 
-TEST(StaticTranformPublsher, tf_from_param_server_valid)
+TEST(StaticTransformPublisher, tf_from_param_server_valid)
 {
   // This TF is loaded from the parameter server; ensure it is valid.
   tf2_ros::Buffer mB;
