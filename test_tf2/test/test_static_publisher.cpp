@@ -37,7 +37,6 @@
 
 #include "tf2_ros/transform_listener.h"
 
-
 TEST(StaticTranformPublsher, a_b_different_times)
 {
   tf2_ros::Buffer mB;
@@ -112,6 +111,16 @@ TEST(StaticTranformPublsher, multiple_parent_test)
   EXPECT_TRUE(mB.canTransform("new_parent", "other_child2", ros::Time(), ros::Duration(1.0)));
   EXPECT_FALSE(mB.canTransform("a", "d", ros::Time(), ros::Duration(1.0)));
 };
+
+TEST(StaticTranformPublsher, tf_from_param_server_valid)
+{
+  // This TF is loaded from the parameter server; ensure it is valid.
+  tf2_ros::Buffer mB;
+  tf2_ros::TransformListener tfl(mB);
+  EXPECT_TRUE(mB.canTransform("robot_calibration", "world", ros::Time(), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("robot_calibration", "world", ros::Time(100), ros::Duration(1.0)));
+  EXPECT_TRUE(mB.canTransform("robot_calibration", "world", ros::Time(1000), ros::Duration(1.0)));
+}
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
