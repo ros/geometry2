@@ -68,13 +68,6 @@ static PyTypeObject buffer_core_Type = {
   sizeof(buffer_core_t),           /*basicsize*/
 };
 
-static PyObject *PyObject_BorrowAttrString(PyObject* o, const char *name)
-{
-    PyObject *r = PyObject_GetAttrString(o, name);
-    Py_XDECREF(r);
-    return r;
-}
-
 static PyObject *transform_converter(const geometry_msgs::TransformStamped* transform)
 {
   PyObject *pclass, *pargs, *pinst = NULL;
@@ -390,22 +383,22 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
     return NULL;
 
   geometry_msgs::TransformStamped transform;
-  PyObject *header = PyObject_BorrowAttrString(py_transform, "header");
-  transform.child_frame_id = stringFromPython(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
-  transform.header.frame_id = stringFromPython(PyObject_BorrowAttrString(header, "frame_id"));
-  if (rostime_converter(PyObject_BorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
+  PyObject *header = pythonBorrowAttrString(py_transform, "header");
+  transform.child_frame_id = stringFromPython(pythonBorrowAttrString(py_transform, "child_frame_id"));
+  transform.header.frame_id = stringFromPython(pythonBorrowAttrString(header, "frame_id"));
+  if (rostime_converter(pythonBorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
     return NULL;
 
-  PyObject *mtransform = PyObject_BorrowAttrString(py_transform, "transform");
-  PyObject *translation = PyObject_BorrowAttrString(mtransform, "translation");
-  transform.transform.translation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "x"));
-  transform.transform.translation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "y"));
-  transform.transform.translation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "z"));
-  PyObject *rotation = PyObject_BorrowAttrString(mtransform, "rotation");
-  transform.transform.rotation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "x"));
-  transform.transform.rotation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "y"));
-  transform.transform.rotation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "z"));
-  transform.transform.rotation.w = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "w"));
+  PyObject *mtransform = pythonBorrowAttrString(py_transform, "transform");
+  PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
+  transform.transform.translation.x = PyFloat_AsDouble(pythonBorrowAttrString(translation, "x"));
+  transform.transform.translation.y = PyFloat_AsDouble(pythonBorrowAttrString(translation, "y"));
+  transform.transform.translation.z = PyFloat_AsDouble(pythonBorrowAttrString(translation, "z"));
+  PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
+  transform.transform.rotation.x = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "x"));
+  transform.transform.rotation.y = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "y"));
+  transform.transform.rotation.z = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "z"));
+  transform.transform.rotation.w = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "w"));
 
   bc->setTransform(transform, authority);
   Py_RETURN_NONE;
@@ -421,22 +414,22 @@ static PyObject *setTransformStatic(PyObject *self, PyObject *args)
     return NULL;
 
   geometry_msgs::TransformStamped transform;
-  PyObject *header = PyObject_BorrowAttrString(py_transform, "header");
-  transform.child_frame_id = stringFromPython(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
-  transform.header.frame_id = stringFromPython(PyObject_BorrowAttrString(header, "frame_id"));
-  if (rostime_converter(PyObject_BorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
+  PyObject *header = pythonBorrowAttrString(py_transform, "header");
+  transform.child_frame_id = stringFromPython(pythonBorrowAttrString(py_transform, "child_frame_id"));
+  transform.header.frame_id = stringFromPython(pythonBorrowAttrString(header, "frame_id"));
+  if (rostime_converter(pythonBorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
     return NULL;
 
-  PyObject *mtransform = PyObject_BorrowAttrString(py_transform, "transform");
-  PyObject *translation = PyObject_BorrowAttrString(mtransform, "translation");
-  transform.transform.translation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "x"));
-  transform.transform.translation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "y"));
-  transform.transform.translation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "z"));
-  PyObject *rotation = PyObject_BorrowAttrString(mtransform, "rotation");
-  transform.transform.rotation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "x"));
-  transform.transform.rotation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "y"));
-  transform.transform.rotation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "z"));
-  transform.transform.rotation.w = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "w"));
+  PyObject *mtransform = pythonBorrowAttrString(py_transform, "transform");
+  PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
+  transform.transform.translation.x = PyFloat_AsDouble(pythonBorrowAttrString(translation, "x"));
+  transform.transform.translation.y = PyFloat_AsDouble(pythonBorrowAttrString(translation, "y"));
+  transform.transform.translation.z = PyFloat_AsDouble(pythonBorrowAttrString(translation, "z"));
+  PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
+  transform.transform.rotation.x = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "x"));
+  transform.transform.rotation.y = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "y"));
+  transform.transform.rotation.z = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "z"));
+  transform.transform.rotation.w = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "w"));
 
   // only difference to above is is_static == True
   bc->setTransform(transform, authority, true);

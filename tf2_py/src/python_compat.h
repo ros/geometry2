@@ -43,4 +43,11 @@ inline PyObject *pythonImport(const std::string & name)
   return module;
 }
 
+inline PyObject *pythonBorrowAttrString(PyObject* o, const char *name)
+{
+    PyObject *r = PyObject_GetAttrString(o, name);
+    Py_XDECREF(r);
+    return r;
+}
+
 #endif
