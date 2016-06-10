@@ -36,6 +36,7 @@
   <run_depend>tf2_msgs</run_depend>
 
   <test_depend>rosunit</test_depend>
+  <test_depend>rosbash</test_depend>
 
 </package>
 
