@@ -3,6 +3,8 @@
 #include <tf2/buffer_core.h>
 #include <tf2/exceptions.h>
 
+#include "python_compat.h"
+
 // Run x (a tf method, catching TF's exceptions and reraising them as Python exceptions)
 //
 #define WRAP(x) \
@@ -54,20 +56,17 @@ struct buffer_core_t {
   tf2::BufferCore *bc;
 };
 
+
 static PyTypeObject buffer_core_Type = {
-  PyObject_HEAD_INIT(&PyType_Type)
+#if PY_MAJOR_VERSION < 3
+  PyObject_HEAD_INIT(NULL)
   0,                               /*size*/
-  "_tf2.BufferCore",                /*name*/
+# else
+  PyVarObject_HEAD_INIT(NULL, 0)
+#endif
+  "_tf2.BufferCore",               /*name*/
   sizeof(buffer_core_t),           /*basicsize*/
 };
-
-static PyObject *PyObject_BorrowAttrString(PyObject* o, const char *name)
-{
-    PyObject *r = PyObject_GetAttrString(o, name);
-    if (r != NULL)
-      Py_DECREF(r);
-    return r;
-}
 
 static PyObject *transform_converter(const geometry_msgs::TransformStamped* transform)
 {
@@ -106,7 +105,7 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
   PyObject_SetAttrString(pheader, "stamp", time_obj);
   Py_DECREF(time_obj);
 
-  PyObject_SetAttrString(pheader, "frame_id", PyString_FromString((transform->header.frame_id).c_str()));
+  PyObject_SetAttrString(pheader, "frame_id", stringToPython(transform->header.frame_id));
   Py_DECREF(pheader);
 
   PyObject *ptransform = PyObject_GetAttrString(pinst, "transform");
@@ -114,7 +113,7 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
   PyObject *protation = PyObject_GetAttrString(ptransform, "rotation");
   Py_DECREF(ptransform);
 
-  PyObject_SetAttrString(pinst, "child_frame_id", PyString_FromString((transform->child_frame_id).c_str()));
+  PyObject_SetAttrString(pinst, "child_frame_id", stringToPython(transform->child_frame_id));
 
   PyObject_SetAttrString(ptranslation, "x", PyFloat_FromDouble(transform->transform.translation.x));
   PyObject_SetAttrString(ptranslation, "y", PyFloat_FromDouble(transform->transform.translation.y));
@@ -176,20 +175,20 @@ static PyObject *getTFPrefix(PyObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, ""))
     return NULL;
   tf::Transformer *t = ((transformer_t*)self)->t;
-  return PyString_FromString(t->getTFPrefix().c_str());
+  return stringToPython(t->getTFPrefix());
 }
 */
 
 static PyObject *allFramesAsYAML(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
-  return PyString_FromString(bc->allFramesAsYAML().c_str());
+  return stringToPython(bc->allFramesAsYAML());
 }
 
 static PyObject *allFramesAsString(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
-  return PyString_FromString(bc->allFramesAsString().c_str());
+  return stringToPython(bc->allFramesAsString());
 }
 
 static PyObject *canTransformCore(PyObject *self, PyObject *args, PyObject *kw)
@@ -235,7 +234,7 @@ static PyObject *asListOfStrings(std::vector< std::string > los)
   PyObject *r = PyList_New(los.size());
   size_t i;
   for (i = 0; i < los.size(); i++) {
-    PyList_SetItem(r, i, PyString_FromString(los[i].c_str()));
+    PyList_SetItem(r, i, toPythonString(los[i]));
   }
   return r;
 }
@@ -384,22 +383,22 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
     return NULL;
 
   geometry_msgs::TransformStamped transform;
-  PyObject *header = PyObject_BorrowAttrString(py_transform, "header");
-  transform.child_frame_id = PyString_AsString(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
-  transform.header.frame_id = PyString_AsString(PyObject_BorrowAttrString(header, "frame_id"));
-  if (rostime_converter(PyObject_BorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
+  PyObject *header = pythonBorrowAttrString(py_transform, "header");
+  transform.child_frame_id = stringFromPython(pythonBorrowAttrString(py_transform, "child_frame_id"));
+  transform.header.frame_id = stringFromPython(pythonBorrowAttrString(header, "frame_id"));
+  if (rostime_converter(pythonBorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
     return NULL;
 
-  PyObject *mtransform = PyObject_BorrowAttrString(py_transform, "transform");
-  PyObject *translation = PyObject_BorrowAttrString(mtransform, "translation");
-  transform.transform.translation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "x"));
-  transform.transform.translation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "y"));
-  transform.transform.translation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "z"));
-  PyObject *rotation = PyObject_BorrowAttrString(mtransform, "rotation");
-  transform.transform.rotation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "x"));
-  transform.transform.rotation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "y"));
-  transform.transform.rotation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "z"));
-  transform.transform.rotation.w = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "w"));
+  PyObject *mtransform = pythonBorrowAttrString(py_transform, "transform");
+  PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
+  transform.transform.translation.x = PyFloat_AsDouble(pythonBorrowAttrString(translation, "x"));
+  transform.transform.translation.y = PyFloat_AsDouble(pythonBorrowAttrString(translation, "y"));
+  transform.transform.translation.z = PyFloat_AsDouble(pythonBorrowAttrString(translation, "z"));
+  PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
+  transform.transform.rotation.x = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "x"));
+  transform.transform.rotation.y = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "y"));
+  transform.transform.rotation.z = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "z"));
+  transform.transform.rotation.w = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "w"));
 
   bc->setTransform(transform, authority);
   Py_RETURN_NONE;
@@ -415,22 +414,22 @@ static PyObject *setTransformStatic(PyObject *self, PyObject *args)
     return NULL;
 
   geometry_msgs::TransformStamped transform;
-  PyObject *header = PyObject_BorrowAttrString(py_transform, "header");
-  transform.child_frame_id = PyString_AsString(PyObject_BorrowAttrString(py_transform, "child_frame_id"));
-  transform.header.frame_id = PyString_AsString(PyObject_BorrowAttrString(header, "frame_id"));
-  if (rostime_converter(PyObject_BorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
+  PyObject *header = pythonBorrowAttrString(py_transform, "header");
+  transform.child_frame_id = stringFromPython(pythonBorrowAttrString(py_transform, "child_frame_id"));
+  transform.header.frame_id = stringFromPython(pythonBorrowAttrString(header, "frame_id"));
+  if (rostime_converter(pythonBorrowAttrString(header, "stamp"), &transform.header.stamp) != 1)
     return NULL;
 
-  PyObject *mtransform = PyObject_BorrowAttrString(py_transform, "transform");
-  PyObject *translation = PyObject_BorrowAttrString(mtransform, "translation");
-  transform.transform.translation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "x"));
-  transform.transform.translation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "y"));
-  transform.transform.translation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(translation, "z"));
-  PyObject *rotation = PyObject_BorrowAttrString(mtransform, "rotation");
-  transform.transform.rotation.x = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "x"));
-  transform.transform.rotation.y = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "y"));
-  transform.transform.rotation.z = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "z"));
-  transform.transform.rotation.w = PyFloat_AsDouble(PyObject_BorrowAttrString(rotation, "w"));
+  PyObject *mtransform = pythonBorrowAttrString(py_transform, "transform");
+  PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
+  transform.transform.translation.x = PyFloat_AsDouble(pythonBorrowAttrString(translation, "x"));
+  transform.transform.translation.y = PyFloat_AsDouble(pythonBorrowAttrString(translation, "y"));
+  transform.transform.translation.z = PyFloat_AsDouble(pythonBorrowAttrString(translation, "z"));
+  PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
+  transform.transform.rotation.x = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "x"));
+  transform.transform.rotation.y = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "y"));
+  transform.transform.rotation.z = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "z"));
+  transform.transform.rotation.w = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "w"));
 
   // only difference to above is is_static == True
   bc->setTransform(transform, authority, true);
@@ -489,10 +488,7 @@ static PyMethodDef module_methods[] = {
   {0, 0, 0},
 };
 
-extern "C" void init_tf2()
-{
-  PyObject *item, *m, *d;
-
+bool staticInit() {
 #if PYTHON_API_VERSION >= 1007
   tf2_exception = PyErr_NewException((char*)"tf2.TransformException", NULL, NULL);
   tf2_connectivityexception = PyErr_NewException((char*)"tf2.ConnectivityException", tf2_exception, NULL);
@@ -501,21 +497,21 @@ extern "C" void init_tf2()
   tf2_invalidargumentexception = PyErr_NewException((char*)"tf2.InvalidArgumentException", tf2_exception, NULL);
   tf2_timeoutexception = PyErr_NewException((char*)"tf2.TimeoutException", tf2_exception, NULL);
 #else
-  tf2_exception = PyString_FromString("tf2.error");
-  tf2_connectivityexception = PyString_FromString("tf2.ConnectivityException");
-  tf2_lookupexception = PyString_FromString("tf2.LookupException");
-  tf2_extrapolationexception = PyString_FromString("tf2.ExtrapolationException");
-  tf2_invalidargumentexception = PyString_FromString("tf2.InvalidArgumentException");
-  tf2_timeoutexception = PyString_FromString("tf2.TimeoutException");
+  tf2_exception = stringToPython("tf2.error");
+  tf2_connectivityexception = stringToPython("tf2.ConnectivityException");
+  tf2_lookupexception = stringToPython("tf2.LookupException");
+  tf2_extrapolationexception = stringToPython("tf2.ExtrapolationException");
+  tf2_invalidargumentexception = stringToPython("tf2.InvalidArgumentException");
+  tf2_timeoutexception = stringToPython("tf2.TimeoutException");
 #endif
 
-  pModulerospy = PyImport_Import(item= PyString_FromString("rospy")); Py_DECREF(item);
-  pModulegeometrymsgs = PyImport_ImportModule("geometry_msgs.msg");
+  pModulerospy        = pythonImport("rospy");
+  pModulegeometrymsgs = pythonImport("geometry_msgs.msg");
 
   if(pModulegeometrymsgs == NULL)
   {
     printf("Cannot load geometry_msgs module");
-    return;
+    return false;
   }
 
   buffer_core_Type.tp_alloc = PyType_GenericAlloc;
@@ -524,15 +520,43 @@ extern "C" void init_tf2()
   buffer_core_Type.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
   buffer_core_Type.tp_methods = buffer_core_methods;
   if (PyType_Ready(&buffer_core_Type) != 0)
-    return;
+    return false;
+  return true;
+}
 
-  m = Py_InitModule("_tf2", module_methods);
+PyObject *moduleInit(PyObject *m) {
   PyModule_AddObject(m, "BufferCore", (PyObject *)&buffer_core_Type);
-  d = PyModule_GetDict(m);
+  PyObject *d = PyModule_GetDict(m);
   PyDict_SetItemString(d, "TransformException", tf2_exception);
   PyDict_SetItemString(d, "ConnectivityException", tf2_connectivityexception);
   PyDict_SetItemString(d, "LookupException", tf2_lookupexception);
   PyDict_SetItemString(d, "ExtrapolationException", tf2_extrapolationexception);
   PyDict_SetItemString(d, "InvalidArgumentException", tf2_invalidargumentexception);
   PyDict_SetItemString(d, "TimeoutException", tf2_timeoutexception);
+  return m;
 }
+
+#if PY_MAJOR_VERSION < 3
+extern "C" void init_tf2()
+{
+  if (!staticInit())
+    return;
+  moduleInit(Py_InitModule("_tf2", module_methods));
+}
+
+#else
+struct PyModuleDef tf_module = {
+  PyModuleDef_HEAD_INIT, // base
+  "_tf2",                // name
+  NULL,                  // docstring
+  -1,                    // state size (but we're using globals)
+  module_methods         // methods
+};
+
+PyMODINIT_FUNC PyInit_tf2()
+{
+  if (!staticInit())
+    return NULL;
+  return moduleInit(PyModule_Create(&tf_module));
+}
+#endif
