@@ -206,6 +206,51 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<Eigen::Affine3d
 						    msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z)));
 }
 
+/** \brief Apply a geometry_msgs Transform to a Eigen-specific affine transform data type.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h.
+ * \param t_in The frame to transform, as a Eigen Affine3d transform.
+ * \param t_out The transformed frame, as a Eigen Affine3d transform.
+ * \param transform The timestamped transform to apply, as a TransformStamped message.
+ */
+template <>
+void doTransform(const Eigen::Affine3d& t_in,
+                 Eigen::Affine3d& t_out,
+                 const geometry_msgs::TransformStamped& transform) {
+  t_out = Eigen::Affine3d(transformToEigen(transform) * t_in);
+}
+
+
+/** \brief Convert a Eigen Affine3d transform type to a Pose message.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in The Eigen Affine3d to convert.
+ * \return The Eigen transform converted to a Pose message.
+ */
+geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+  geometry_msgs::Pose msg;
+  msg.position.x = in.translation().x();
+  msg.position.y = in.translation().y();
+  msg.position.z = in.translation().z();
+  msg.orientation.x = Eigen::Quaterniond(in.rotation()).x();
+  msg.orientation.y = Eigen::Quaterniond(in.rotation()).y();
+  msg.orientation.z = Eigen::Quaterniond(in.rotation()).z();
+  msg.orientation.w = Eigen::Quaterniond(in.rotation()).w();
+  return msg;
+}
+
+/** \brief Convert a Pose message transform type to a Eigen Affine3d.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param msg The Pose message to convert.
+ * \param out The pose converted to a Eigen Affine3d.
+ */
+void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+  out = Eigen::Affine3d(
+      Eigen::Translation3d(msg.position.x, msg.position.y, msg.position.z) *
+      Eigen::Quaterniond(msg.orientation.w,
+                         msg.orientation.x,
+                         msg.orientation.y,
+                         msg.orientation.z));
+}
+
 } // namespace
 
 #endif // TF2_EIGEN_H
