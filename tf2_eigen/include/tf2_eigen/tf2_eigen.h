@@ -70,6 +70,43 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
   return t;
 }
 
+/** \brief Apply a geometry_msgs TransformStamped to an Eigen-specific Vector3d type.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h.
+ * \param t_in The vector to transform, as a Eigen Vector3d data type.
+ * \param t_out The transformed vector, as a Eigen Vector3d data type.
+ * \param transform The timestamped transform to apply, as a TransformStamped message.
+ */
+template <>
+void doTransform(const Eigen::Vector3d& t_in, Eigen::Vector3d& t_out, const geometry_msgs::TransformStamped& transform)
+{
+  t_out = Eigen::Vector3d(transformToEigen(transform) * t_in);
+}
+
+/** \brief Convert a Eigen Vector3d type to a Point message.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in The timestamped Eigen Vector3d to convert.
+ * \return The vector converted to a Point message.
+ */
+geometry_msgs::Point toMsg(const Eigen::Vector3d& in)
+{
+  geometry_msgs::Point msg;
+  msg.x = in.x();
+  msg.y = in.y();
+  msg.z = in.z();
+  return msg;
+}
+
+/** \brief Convert a Point message type to a Eigen-specific Vector3d type.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h
+ * \param msg The Point message to convert.
+ * \param out The point converted to a Eigen Vector3d.
+ */
+void fromMsg(const geometry_msgs::Point& msg, Eigen::Vector3d& out)
+{
+  out.x() = msg.x;
+  out.y() = msg.y;
+  out.z() = msg.z;
+}
 
 /** \brief Apply a geometry_msgs TransformStamped to an Eigen-specific Vector3d type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
