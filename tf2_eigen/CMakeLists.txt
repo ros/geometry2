@@ -14,7 +14,7 @@ add_definitions(${EIGEN_DEFINITIONS})
 include_directories(include)
 
 catkin_package(
-  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+  INCLUDE_DIRS include
   DEPENDS eigen)
 
 install(DIRECTORY include/${PROJECT_NAME}/
