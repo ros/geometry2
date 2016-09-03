@@ -71,7 +71,10 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
 }
 
 /** \brief Apply a geometry_msgs TransformStamped to an Eigen-specific Vector3d type.
- * This function is a specialization of the doTransform template defined in tf2/convert.h.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h,
+ * although it can not be used in tf2_ros::BufferInterface::transform because this
+ * functions rely on the existenz of a time stamp and a frame id in the type which should
+ * get transformed.
  * \param t_in The vector to transform, as a Eigen Vector3d data type.
  * \param t_out The transformed vector, as a Eigen Vector3d data type.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
@@ -154,7 +157,10 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3
 }
 
 /** \brief Apply a geometry_msgs Transform to a Eigen-specific affine transform data type.
- * This function is a specialization of the doTransform template defined in tf2/convert.h.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h,
+ * although it can not be used in tf2_ros::BufferInterface::transform because this
+ * functions rely on the existenz of a time stamp and a frame id in the type which should
+ * get transformed.
  * \param t_in The frame to transform, as a Eigen Affine3d transform.
  * \param t_out The transformed frame, as a Eigen Affine3d transform.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
@@ -201,7 +207,10 @@ void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
 }
 
 /** \brief Apply a geometry_msgs TransformStamped to a Eigen-specific affine transform data type.
- * This function is a specialization of the doTransform template defined in tf2/convert.h.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h,
+ * although it can not be used in tf2_ros::BufferInterface::transform because this
+ * functions rely on the existenz of a time stamp and a frame id in the type which should
+ * get transformed.
  * \param t_in The frame to transform, as a timestamped Eigen Affine3d transform.
  * \param t_out The transformed frame, as a timestamped Eigen Affine3d transform.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
