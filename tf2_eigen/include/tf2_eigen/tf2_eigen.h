@@ -257,4 +257,36 @@ void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
 
 } // namespace
 
+
+namespace Eigen {
+// This is needed to make the usage of the following covnersion functions usable in tf2::convert().
+// According to clangs error note 'fromMsg'/'toMsg' should be declared prior to the call site or
+// in an associated namespace of one of its arguments. The stamped vorsions of this conversion
+// functions work because they have tf2::Stamped as an argument which is the same namespace as
+// which 'fromMsg'/'toMsg' is defined in. The non-stamped versions have no argument which is
+// defined in tf2, so it take the following definitions in Eigen namespace to make them usable in
+// tf2::convert().
+
+inline
+geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Point& msg, Eigen::Vector3d& out) {
+  tf2::fromMsg(msg, out);
+}
+
+inline
+geometry_msgs::Point toMsg(const Eigen::Vector3d& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+  tf2::fromMsg(msg, out);
+}
+
+} // namespace
+
 #endif // TF2_EIGEN_H
