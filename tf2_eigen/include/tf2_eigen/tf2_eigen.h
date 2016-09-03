@@ -87,6 +87,7 @@ void doTransform(const Eigen::Vector3d& t_in, Eigen::Vector3d& t_out, const geom
  * \param in The timestamped Eigen Vector3d to convert.
  * \return The vector converted to a Point message.
  */
+inline
 geometry_msgs::Point toMsg(const Eigen::Vector3d& in)
 {
   geometry_msgs::Point msg;
@@ -101,6 +102,7 @@ geometry_msgs::Point toMsg(const Eigen::Vector3d& in)
  * \param msg The Point message to convert.
  * \param out The point converted to a Eigen Vector3d.
  */
+inline
 void fromMsg(const geometry_msgs::Point& msg, Eigen::Vector3d& out)
 {
   out.x() = msg.x;
@@ -225,6 +227,7 @@ void doTransform(const Eigen::Affine3d& t_in,
  * \param in The Eigen Affine3d to convert.
  * \return The Eigen transform converted to a Pose message.
  */
+inline
 geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
   geometry_msgs::Pose msg;
   msg.position.x = in.translation().x();
@@ -242,6 +245,7 @@ geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
  * \param msg The Pose message to convert.
  * \param out The pose converted to a Eigen Affine3d.
  */
+inline
 void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
   out = Eigen::Affine3d(
       Eigen::Translation3d(msg.position.x, msg.position.y, msg.position.z) *
