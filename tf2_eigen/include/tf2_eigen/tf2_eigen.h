@@ -70,6 +70,48 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
   return t;
 }
 
+/** \brief Apply a geometry_msgs TransformStamped to an Eigen-specific Vector3d type.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h,
+ * although it can not be used in tf2_ros::BufferInterface::transform because this
+ * functions rely on the existence of a time stamp and a frame id in the type which should
+ * get transformed.
+ * \param t_in The vector to transform, as a Eigen Vector3d data type.
+ * \param t_out The transformed vector, as a Eigen Vector3d data type.
+ * \param transform The timestamped transform to apply, as a TransformStamped message.
+ */
+template <>
+void doTransform(const Eigen::Vector3d& t_in, Eigen::Vector3d& t_out, const geometry_msgs::TransformStamped& transform)
+{
+  t_out = Eigen::Vector3d(transformToEigen(transform) * t_in);
+}
+
+/** \brief Convert a Eigen Vector3d type to a Point message.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in The timestamped Eigen Vector3d to convert.
+ * \return The vector converted to a Point message.
+ */
+inline
+geometry_msgs::Point toMsg(const Eigen::Vector3d& in)
+{
+  geometry_msgs::Point msg;
+  msg.x = in.x();
+  msg.y = in.y();
+  msg.z = in.z();
+  return msg;
+}
+
+/** \brief Convert a Point message type to a Eigen-specific Vector3d type.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h
+ * \param msg The Point message to convert.
+ * \param out The point converted to a Eigen Vector3d.
+ */
+inline
+void fromMsg(const geometry_msgs::Point& msg, Eigen::Vector3d& out)
+{
+  out.x() = msg.x;
+  out.y() = msg.y;
+  out.z() = msg.z;
+}
 
 /** \brief Apply a geometry_msgs TransformStamped to an Eigen-specific Vector3d type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
@@ -98,9 +140,7 @@ geometry_msgs::PointStamped toMsg(const tf2::Stamped<Eigen::Vector3d>& in)
   geometry_msgs::PointStamped msg;
   msg.header.stamp = in.stamp_;
   msg.header.frame_id = in.frame_id_;
-  msg.point.x = in.x();
-  msg.point.y = in.y();
-  msg.point.z = in.z();
+  msg.point = toMsg(static_cast<const Eigen::Vector3d&>(in));
   return msg;
 }
 
@@ -113,14 +153,64 @@ inline
 void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3d>& out) {
   out.stamp_ = msg.header.stamp;
   out.frame_id_ = msg.header.frame_id;
-  out.x() = msg.point.x;
-  out.y() = msg.point.y;
-  out.z() = msg.point.z;
+  fromMsg(msg.point, static_cast<Eigen::Vector3d&>(out));
+}
+
+/** \brief Apply a geometry_msgs Transform to a Eigen-specific affine transform data type.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h,
+ * although it can not be used in tf2_ros::BufferInterface::transform because this
+ * functions rely on the existence of a time stamp and a frame id in the type which should
+ * get transformed.
+ * \param t_in The frame to transform, as a Eigen Affine3d transform.
+ * \param t_out The transformed frame, as a Eigen Affine3d transform.
+ * \param transform The timestamped transform to apply, as a TransformStamped message.
+ */
+template <>
+void doTransform(const Eigen::Affine3d& t_in,
+                 Eigen::Affine3d& t_out,
+                 const geometry_msgs::TransformStamped& transform) {
+  t_out = Eigen::Affine3d(transformToEigen(transform) * t_in);
 }
 
 
+/** \brief Convert a Eigen Affine3d transform type to a Pose message.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in The Eigen Affine3d to convert.
+ * \return The Eigen transform converted to a Pose message.
+ */
+inline
+geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+  geometry_msgs::Pose msg;
+  msg.position.x = in.translation().x();
+  msg.position.y = in.translation().y();
+  msg.position.z = in.translation().z();
+  msg.orientation.x = Eigen::Quaterniond(in.rotation()).x();
+  msg.orientation.y = Eigen::Quaterniond(in.rotation()).y();
+  msg.orientation.z = Eigen::Quaterniond(in.rotation()).z();
+  msg.orientation.w = Eigen::Quaterniond(in.rotation()).w();
+  return msg;
+}
+
+/** \brief Convert a Pose message transform type to a Eigen Affine3d.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param msg The Pose message to convert.
+ * \param out The pose converted to a Eigen Affine3d.
+ */
+inline
+void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+  out = Eigen::Affine3d(
+      Eigen::Translation3d(msg.position.x, msg.position.y, msg.position.z) *
+      Eigen::Quaterniond(msg.orientation.w,
+                         msg.orientation.x,
+                         msg.orientation.y,
+                         msg.orientation.z));
+}
+
 /** \brief Apply a geometry_msgs TransformStamped to a Eigen-specific affine transform data type.
- * This function is a specialization of the doTransform template defined in tf2/convert.h.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h,
+ * although it can not be used in tf2_ros::BufferInterface::transform because this
+ * functions rely on the existence of a time stamp and a frame id in the type which should
+ * get transformed.
  * \param t_in The frame to transform, as a timestamped Eigen Affine3d transform.
  * \param t_out The transformed frame, as a timestamped Eigen Affine3d transform.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
@@ -144,13 +234,7 @@ geometry_msgs::PoseStamped toMsg(const tf2::Stamped<Eigen::Affine3d>& in)
   geometry_msgs::PoseStamped msg;
   msg.header.stamp = in.stamp_;
   msg.header.frame_id = in.frame_id_;
-  msg.pose.position.x = in.translation().x();
-  msg.pose.position.y = in.translation().y();
-  msg.pose.position.z = in.translation().z();
-  msg.pose.orientation.x = Eigen::Quaterniond(in.rotation()).x();
-  msg.pose.orientation.y = Eigen::Quaterniond(in.rotation()).y();
-  msg.pose.orientation.z = Eigen::Quaterniond(in.rotation()).z();
-  msg.pose.orientation.w = Eigen::Quaterniond(in.rotation()).w();
+  msg.pose = toMsg(static_cast<const Eigen::Affine3d&>(in));
   return msg;
 }
 
@@ -164,9 +248,39 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<Eigen::Affine3d
 {
   out.stamp_ = msg.header.stamp;
   out.frame_id_ = msg.header.frame_id;
-  out.setData(Eigen::Affine3d(Eigen::Translation3d(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z)
-			       * Eigen::Quaterniond(msg.pose.orientation.w,
-						    msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z)));
+  fromMsg(msg.pose, static_cast<Eigen::Affine3d&>(out));
+}
+
+} // namespace
+
+
+namespace Eigen {
+// This is needed to make the usage of the following conversion functions usable in tf2::convert().
+// According to clangs error note 'fromMsg'/'toMsg' should be declared prior to the call site or
+// in an associated namespace of one of its arguments. The stamped versions of this conversion
+// functions work because they have tf2::Stamped as an argument which is the same namespace as
+// which 'fromMsg'/'toMsg' is defined in. The non-stamped versions have no argument which is
+// defined in tf2, so it take the following definitions in Eigen namespace to make them usable in
+// tf2::convert().
+
+inline
+geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Point& msg, Eigen::Vector3d& out) {
+  tf2::fromMsg(msg, out);
+}
+
+inline
+geometry_msgs::Point toMsg(const Eigen::Vector3d& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+  tf2::fromMsg(msg, out);
 }
 
 } // namespace
