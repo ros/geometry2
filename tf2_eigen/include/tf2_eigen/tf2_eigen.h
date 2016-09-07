@@ -73,7 +73,7 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
 /** \brief Apply a geometry_msgs TransformStamped to an Eigen-specific Vector3d type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h,
  * although it can not be used in tf2_ros::BufferInterface::transform because this
- * functions rely on the existenz of a time stamp and a frame id in the type which should
+ * functions rely on the existence of a time stamp and a frame id in the type which should
  * get transformed.
  * \param t_in The vector to transform, as a Eigen Vector3d data type.
  * \param t_out The transformed vector, as a Eigen Vector3d data type.
@@ -159,7 +159,7 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3
 /** \brief Apply a geometry_msgs Transform to a Eigen-specific affine transform data type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h,
  * although it can not be used in tf2_ros::BufferInterface::transform because this
- * functions rely on the existenz of a time stamp and a frame id in the type which should
+ * functions rely on the existence of a time stamp and a frame id in the type which should
  * get transformed.
  * \param t_in The frame to transform, as a Eigen Affine3d transform.
  * \param t_out The transformed frame, as a Eigen Affine3d transform.
@@ -209,7 +209,7 @@ void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
 /** \brief Apply a geometry_msgs TransformStamped to a Eigen-specific affine transform data type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h,
  * although it can not be used in tf2_ros::BufferInterface::transform because this
- * functions rely on the existenz of a time stamp and a frame id in the type which should
+ * functions rely on the existence of a time stamp and a frame id in the type which should
  * get transformed.
  * \param t_in The frame to transform, as a timestamped Eigen Affine3d transform.
  * \param t_out The transformed frame, as a timestamped Eigen Affine3d transform.
@@ -255,9 +255,9 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<Eigen::Affine3d
 
 
 namespace Eigen {
-// This is needed to make the usage of the following covnersion functions usable in tf2::convert().
+// This is needed to make the usage of the following conversion functions usable in tf2::convert().
 // According to clangs error note 'fromMsg'/'toMsg' should be declared prior to the call site or
-// in an associated namespace of one of its arguments. The stamped vorsions of this conversion
+// in an associated namespace of one of its arguments. The stamped versions of this conversion
 // functions work because they have tf2::Stamped as an argument which is the same namespace as
 // which 'fromMsg'/'toMsg' is defined in. The non-stamped versions have no argument which is
 // defined in tf2, so it take the following definitions in Eigen namespace to make them usable in
