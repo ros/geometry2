@@ -102,15 +102,36 @@ TEST(TfEigen, ConvertTransform)
   
   Eigen::Affine3d T(tm);
   
-  geometry_msgs::TransformStamped msg = tf2::eigenToTransform(T);
+  geometry_msgs::Transform msg = tf2::eigenToTransform(T);
   Eigen::Affine3d Tback = tf2::transformToEigen(msg);
   
   EXPECT_TRUE(T.isApprox(Tback));
   EXPECT_TRUE(tm.isApprox(Tback.matrix()));
-    
 }
 
+TEST(TfEigen, ConvertTransformStamped)
+{
+  Eigen::Matrix4d tm;
 
+  double alpha = M_PI/4.0;
+  double theta = M_PI/6.0;
+  double gamma = M_PI/12.0;
+
+  tm << cos(theta)*cos(gamma),-cos(theta)*sin(gamma),sin(theta), 1, //
+  cos(alpha)*sin(gamma)+sin(alpha)*sin(theta)*cos(gamma),cos(alpha)*cos(gamma)-sin(alpha)*sin(theta)*sin(gamma),-sin(alpha)*cos(theta), 2, //
+  sin(alpha)*sin(gamma)-cos(alpha)*sin(theta)*cos(gamma),cos(alpha)*sin(theta)*sin(gamma)+sin(alpha)*cos(gamma),cos(alpha)*cos(theta), 3, //
+  0, 0, 0, 1;
+
+  tf2::Stamped<Eigen::Affine3d> T(Eigen::Affine3d(tm), ros::Time(42), "test_frame");
+
+  geometry_msgs::TransformStamped msg = tf2::eigenToTransform(T);
+  tf2::Stamped<Eigen::Affine3d> Tback = tf2::transformToEigen(msg);
+
+  EXPECT_TRUE(T.isApprox(Tback));
+  EXPECT_TRUE(tm.isApprox(Tback.matrix()));
+  EXPECT_EQ(Tback.stamp_, T.stamp_);
+  EXPECT_EQ(Tback.frame_id_, T.frame_id_);
+}
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);

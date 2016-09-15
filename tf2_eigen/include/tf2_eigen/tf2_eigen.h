@@ -38,35 +38,57 @@
 namespace tf2
 {
 
-/** \brief Convert a timestamped transform to the equivalent Eigen data type.
- * \param t The transform to convert, as a geometry_msgs TransformedStamped message.
+/** \brief Convert a transform to the equivalent Eigen data type.
+ * \param t The transform to convert, as a geometry_msgs Transform message.
  * \return The transform message converted to an Eigen Affine3d transform.
  */
 inline
-Eigen::Affine3d transformToEigen(const geometry_msgs::TransformStamped& t) {
-  return Eigen::Affine3d(Eigen::Translation3d(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z)
-			 * Eigen::Quaterniond(t.transform.rotation.w,
-					      t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z));
+Eigen::Affine3d transformToEigen(const geometry_msgs::Transform& t) {
+  return Eigen::Affine3d(Eigen::Translation3d(t.translation.x, t.translation.y, t.translation.z)
+       * Eigen::Quaterniond(t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z));
+}
+
+/** \brief Convert a timestamped transform to the equivalent Eigen data type.
+ * \param t The transform to convert, as a geometry_msgs TransformedStamped message.
+ * \return The transform message converted to an stamped Eigen Affine3d transform.
+ */
+inline
+tf2::Stamped<Eigen::Affine3d> transformToEigen(const geometry_msgs::TransformStamped& t) {
+  return tf2::Stamped<Eigen::Affine3d>(transformToEigen(t.transform), t.header.stamp, t.header.frame_id);
 }
 
 /** \brief Convert an Eigen Affine3d transform to the equivalent geometry_msgs message type.
  * \param T The transform to convert, as an Eigen Affine3d transform.
+ * \return The transform converted to a Transform message.
+ */
+inline
+geometry_msgs::Transform eigenToTransform(const Eigen::Affine3d& T)
+{
+  geometry_msgs::Transform t;
+  t.translation.x = T.translation().x();
+  t.translation.y = T.translation().y();
+  t.translation.z = T.translation().z();
+
+  Eigen::Quaterniond q(T.rotation());
+  t.rotation.x = q.x();
+  t.rotation.y = q.y();
+  t.rotation.z = q.z();
+  t.rotation.w = q.w();
+
+  return t;
+}
+
+/** \brief Convert a stamped Eigen Affine3d transform to the equivalent geometry_msgs message type.
+ * \param T The transform to convert, as an stamped Eigen Affine3d transform.
  * \return The transform converted to a TransformStamped message.
  */
 inline
-geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
+geometry_msgs::TransformStamped eigenToTransform(const tf2::Stamped<Eigen::Affine3d>& T)
 {
   geometry_msgs::TransformStamped t;
-  t.transform.translation.x = T.translation().x();
-  t.transform.translation.y = T.translation().y();
-  t.transform.translation.z = T.translation().z();
-
-  Eigen::Quaterniond q(T.rotation());
-  t.transform.rotation.x = q.x();
-  t.transform.rotation.y = q.y();
-  t.transform.rotation.z = q.z();
-  t.transform.rotation.w = q.w();
-
+  t.header.frame_id = T.frame_id_;
+  t.header.stamp = T.stamp_;
+  t.transform = eigenToTransform(static_cast<const Eigen::Affine3d&>(T));
   return t;
 }
 
@@ -82,7 +104,7 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
 template <>
 void doTransform(const Eigen::Vector3d& t_in, Eigen::Vector3d& t_out, const geometry_msgs::TransformStamped& transform)
 {
-  t_out = Eigen::Vector3d(transformToEigen(transform) * t_in);
+  t_out = Eigen::Vector3d(transformToEigen(transform.transform) * t_in);
 }
 
 /** \brief Convert a Eigen Vector3d type to a Point message.
@@ -124,7 +146,7 @@ inline
 void doTransform(const tf2::Stamped<Eigen::Vector3d>& t_in,
 		 tf2::Stamped<Eigen::Vector3d>& t_out,
 		 const geometry_msgs::TransformStamped& transform) {
-  t_out = tf2::Stamped<Eigen::Vector3d>(transformToEigen(transform) * t_in,
+  t_out = tf2::Stamped<Eigen::Vector3d>(transformToEigen(transform.transform) * t_in,
 					transform.header.stamp,
 					transform.header.frame_id);
 }
@@ -169,7 +191,7 @@ template <>
 void doTransform(const Eigen::Affine3d& t_in,
                  Eigen::Affine3d& t_out,
                  const geometry_msgs::TransformStamped& transform) {
-  t_out = Eigen::Affine3d(transformToEigen(transform) * t_in);
+  t_out = Eigen::Affine3d(transformToEigen(transform.transform) * t_in);
 }
 
 
@@ -220,7 +242,7 @@ inline
 void doTransform(const tf2::Stamped<Eigen::Affine3d>& t_in,
 		 tf2::Stamped<Eigen::Affine3d>& t_out,
 		 const geometry_msgs::TransformStamped& transform) {
-  t_out = tf2::Stamped<Eigen::Affine3d>(transformToEigen(transform) * t_in, transform.header.stamp, transform.header.frame_id);
+  t_out = tf2::Stamped<Eigen::Affine3d>(transformToEigen(transform.transform) * t_in, transform.header.stamp, transform.header.frame_id);
 }
 
 /** \brief Convert a stamped Eigen Affine3d transform type to a Pose message.
