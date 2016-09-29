@@ -42,8 +42,23 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
 
+#include <kdl/frames.hpp>
+
 namespace tf2
 {
+
+ /** \brief Convert a TransformStamped message to a KDL frame.
+  * \param t TransformStamped message to convert.
+  * \return The converted KDL Frame.
+  * \deprecated This function is deprecated: KDL-dependecies of this package will be removed in the future.
+  */
+ inline
+ KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
+   {
+     return KDL::Frame(KDL::Rotation::Quaternion(t.transform.rotation.x, t.transform.rotation.y,
+             t.transform.rotation.z, t.transform.rotation.w),
+           KDL::Vector(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z));
+ }
 
 /** \brief Convert a TransformStamped message to a tf2 Transform.
  * \param t TransformStamped message to convert.
