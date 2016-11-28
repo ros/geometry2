@@ -260,17 +260,21 @@ static PyObject *chain(PyObject *self, PyObject *args, PyObject *kw)
   WRAP(t->chainAsVector(target_frame, target_time, source_frame, source_time, fixed_frame, output));
   return asListOfStrings(output);
 }
+*/
 
-static PyObject *getLatestCommonTime(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *getLatestCommonTime(PyObject *self, PyObject *args)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
-  char *source, *dest;
-  std::string error_string;
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  char *target_frame, *source_frame;
+  tf2::CompactFrameID target_id, source_id;
   ros::Time time;
+  std::string error_string;
 
-  if (!PyArg_ParseTuple(args, "ss", &source, &dest))
+  if (!PyArg_ParseTuple(args, "ss", &target_frame, &source_frame))
     return NULL;
-  int r = t->getLatestCommonTime(source, dest, time, &error_string);
+  WRAP(target_id = bc->_validateFrameId("get_latest_common_time", target_frame));
+  WRAP(source_id = bc->_validateFrameId("get_latest_common_time", source_frame));
+  int r = bc->_getLatestCommonTime(target_id, source_id, time, &error_string);
   if (r == 0) {
     PyObject *rospy_time = PyObject_GetAttrString(pModulerospy, "Time");
     PyObject *args = Py_BuildValue("ii", time.sec, time.nsec);
@@ -279,11 +283,10 @@ static PyObject *getLatestCommonTime(PyObject *self, PyObject *args, PyObject *k
     Py_DECREF(rospy_time);
     return ob;
   } else {
-    PyErr_SetString(tf_exception, error_string.c_str());
+    PyErr_SetString(tf2_exception, error_string.c_str());
     return NULL;
   }
 }
-*/
 
 static PyObject *lookupTransformCore(PyObject *self, PyObject *args, PyObject *kw)
 {
@@ -474,7 +477,7 @@ static struct PyMethodDef buffer_core_methods[] =
   {"clear", (PyCFunction)clear, METH_KEYWORDS},
   //{"frameExists", (PyCFunction)frameExists, METH_VARARGS},
   //{"getFrameStrings", (PyCFunction)getFrameStrings, METH_VARARGS},
-  //{"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
+  {"get_latest_common_time", (PyCFunction)getLatestCommonTime, METH_VARARGS},
   {"lookup_transform_core", (PyCFunction)lookupTransformCore, METH_KEYWORDS},
   {"lookup_transform_full_core", (PyCFunction)lookupTransformFullCore, METH_KEYWORDS},
   //{"lookupTwistCore", (PyCFunction)lookupTwistCore, METH_KEYWORDS},
