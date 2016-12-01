@@ -89,7 +89,14 @@ void TransformListener::init()
 void TransformListener::initThread()
 {
   using_dedicated_thread_ = true;
-  dedicated_listener_thread_ = new std::thread(std::bind( &rclcpp::spin, node_ ));
+  // This lambda is required because `std::thread` cannot infer the correct
+  // rclcpp::spin, since there are more than one versions of it (overloaded).
+  // see: http://stackoverflow.com/a/27389714/671658
+  // I (wjwwood) chose to use the lamda rather than the static cast solution.
+  auto run_func = [](rclcpp::node::Node::SharedPtr node) {
+    return rclcpp::spin(node);
+  };
+  dedicated_listener_thread_ = new std::thread(run_func, node_);
   //Tell the buffer we have a dedicated thread to enable timeouts
   buffer_.setUsingDedicatedThread(true);
 }
