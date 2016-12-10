@@ -300,7 +300,14 @@ int main(int argc, char ** argv)
   //   ros::WallDuration(0.1).sleep();
   // }
 
-  std::thread spinner( std::bind( &rclcpp::spin, nh ));
+  // This lambda is required because `std::thread` cannot infer the correct
+  // rclcpp::spin, since there are more than one versions of it (overloaded).
+  // see: http://stackoverflow.com/a/27389714/671658
+  // I (wjwwood) chose to use the lamda rather than the static cast solution.
+  auto run_func = [](rclcpp::node::Node::SharedPtr node) {
+    return rclcpp::spin(node);
+  };
+  std::thread spinner(run_func, nh);
   TFMonitor monitor(using_specific_chain, framea, frameb);
   monitor.spin();
   spinner.join();
