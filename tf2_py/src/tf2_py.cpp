@@ -373,6 +373,18 @@ static PyObject *lookupTwistFullCore(PyObject *self, PyObject *args)
       twist.angular.x, twist.angular.y, twist.angular.z);
 }
 */
+static inline int checkTranslationType(PyObject* o)
+{
+  PyTypeObject *translation_type = (PyTypeObject*) PyObject_GetAttrString(pModulegeometrymsgs, "Vector3");
+  return PyObject_TypeCheck(o, translation_type);
+}
+
+static inline int checkRotationType(PyObject* o)
+{
+  PyTypeObject *rotation_type = (PyTypeObject*) PyObject_GetAttrString(pModulegeometrymsgs, "Quaternion");
+  return PyObject_TypeCheck(o, rotation_type);
+}
+
 static PyObject *setTransform(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
@@ -390,11 +402,23 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
     return NULL;
 
   PyObject *mtransform = pythonBorrowAttrString(py_transform, "transform");
+
   PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
+  if (!checkTranslationType(translation)) {
+    PyErr_SetString(PyExc_TypeError, "transform.translation must be of type Vector3");
+    return NULL;
+  }
+
   transform.transform.translation.x = PyFloat_AsDouble(pythonBorrowAttrString(translation, "x"));
   transform.transform.translation.y = PyFloat_AsDouble(pythonBorrowAttrString(translation, "y"));
   transform.transform.translation.z = PyFloat_AsDouble(pythonBorrowAttrString(translation, "z"));
+
   PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
+  if (!checkRotationType(rotation)) {
+    PyErr_SetString(PyExc_TypeError, "transform.rotation must be of type Quaternion");
+    return NULL;
+  }
+
   transform.transform.rotation.x = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "x"));
   transform.transform.rotation.y = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "y"));
   transform.transform.rotation.z = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "z"));
@@ -422,10 +446,21 @@ static PyObject *setTransformStatic(PyObject *self, PyObject *args)
 
   PyObject *mtransform = pythonBorrowAttrString(py_transform, "transform");
   PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
+  if (!checkTranslationType(translation)) {
+    PyErr_SetString(PyExc_TypeError, "transform.translation must be of type Vector3");
+    return NULL;
+  }
+
   transform.transform.translation.x = PyFloat_AsDouble(pythonBorrowAttrString(translation, "x"));
   transform.transform.translation.y = PyFloat_AsDouble(pythonBorrowAttrString(translation, "y"));
   transform.transform.translation.z = PyFloat_AsDouble(pythonBorrowAttrString(translation, "z"));
+
   PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
+  if (!checkRotationType(rotation)) {
+    PyErr_SetString(PyExc_TypeError, "transform.rotation must be of type Quaternion");
+    return NULL;
+  }
+
   transform.transform.rotation.x = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "x"));
   transform.transform.rotation.y = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "y"));
   transform.transform.rotation.z = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "z"));
