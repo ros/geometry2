@@ -241,6 +241,19 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
     error_exists = true;
   }
 
+  bool valid = std::abs((stripped.transform.rotation.w * stripped.transform.rotation.w
+                        + stripped.transform.rotation.x * stripped.transform.rotation.x
+                        + stripped.transform.rotation.y * stripped.transform.rotation.y
+                        + stripped.transform.rotation.z * stripped.transform.rotation.z) - 1.0f) < 10e-6;
+
+  if (!valid) 
+  {
+    logError("TF_DENORMALIZED_QUATERNION: Ignoring transform for child_frame_id \"%s\" from authority \"%s\" because of an invalid quaternion in the transform (%f %f %f %f)",
+             stripped.child_frame_id.c_str(), authority.c_str(),
+             stripped.transform.rotation.x, stripped.transform.rotation.y, stripped.transform.rotation.z, stripped.transform.rotation.w);
+    error_exists = true;
+  }
+
   if (error_exists)
     return false;
   
