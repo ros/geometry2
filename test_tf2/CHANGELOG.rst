@@ -2,6 +2,22 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Typos.
+* Adds unit tests for TF loaded from parameter server.
+  This tests both success (loading a valid TF into the param server) and
+  failures (parameter does not exist, parameter contents are invalid).
+* Code linting & reorganization
+  - whitespace
+  - indentation
+  - re-organized code to remove duplications.
+  whitespace & indentation changes only.
+  simplified (de-duplicated) duplicate code.
+  missing a duplicate variable.
+  whitespace changes only.
+* Contributors: Felix Duvallet
+
 0.5.13 (2016-03-04)
 -------------------
 * Remove LGPL from license tags

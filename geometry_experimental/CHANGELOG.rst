@@ -2,6 +2,11 @@
 Changelog for package geometry_experimental
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* create geometry2 metapackage and make geometry_experimental depend on it for clarity of reverse dependency walking.
+* Contributors: Tully Foote
+
 0.5.13 (2016-03-04)
 -------------------
 * Remove LGPL from license tags

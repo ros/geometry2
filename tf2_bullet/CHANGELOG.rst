@@ -2,6 +2,11 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Improve documentation
+* Contributors: Jackie Kay
+
 0.5.13 (2016-03-04)
 -------------------
 * Don't export catkin includes

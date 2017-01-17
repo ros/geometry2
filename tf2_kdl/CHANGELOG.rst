@@ -2,6 +2,12 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add Python documentation for tf2_kdl
+* Document kdl
+* Contributors: Jackie Kay
+
 0.5.13 (2016-03-04)
 -------------------
 * converting python test script into unit test

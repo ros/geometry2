@@ -2,6 +2,18 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Drop roslib.load_manifest (`#191 <https://github.com/ros/geometry2/issues/191>`_)
+* Adds ability to load TF from the ROS parameter server.
+* Code linting & reorganization
+* Fix indexing beyond end of array
+* added a static transform broadcaster in python
+* lots more documentation
+* remove BufferCore doc, add BufferClient/BufferServer doc for C++, add Buffer/BufferInterface Python documentation
+* Better overview for Python
+* Contributors: Eric Wieser, Felix Duvallet, Jackie Kay, Mikael Arguedas, Mike Purvis
+
 0.5.13 (2016-03-04)
 -------------------
 * fix documentation warnings

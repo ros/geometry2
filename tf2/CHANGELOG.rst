@@ -2,6 +2,19 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fixes `#194 <https://github.com/ros/geometry2/issues/194>`_ check for quaternion normalization before inserting into storage (`#196 <https://github.com/ros/geometry2/issues/196>`_)
+  * check for quaternion normalization before inserting into storage
+  * Add test to check for transform failure on invalid quaternion input
+* updating getAngleShortestPath() (`#187 <https://github.com/ros/geometry2/issues/187>`_)
+* Move internal cache functions into a namespace
+  Fixes https://github.com/ros/geometry2/issues/175
+* Link properly to convert.h
+* Landing page for tf2 describing the conversion interface
+* Fix comment on BufferCore::MAX_GRAPH_DEPTH.
+* Contributors: Jackie Kay, Phil Osteen, Tully Foote, alex, gavanderhoorn
+
 0.5.13 (2016-03-04)
 -------------------
 
