@@ -2,8 +2,8 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.14 (2017-01-16)
+-------------------
 * Add tf2_eigen conversions for Pose and Point (not stamped) (`#186 <https://github.com/ros/geometry2/issues/186>`_)
   * tf2_eigen: added conversions for Point msg type (not timestamped) to Eigen::Vector3d
   * tf2_eigen: added conversions for Pose msg type (not timestamped) to Eigen::Affine3d

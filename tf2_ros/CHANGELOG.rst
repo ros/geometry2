@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.14 (2017-01-16)
+-------------------
 * Drop roslib.load_manifest (`#191 <https://github.com/ros/geometry2/issues/191>`_)
 * Adds ability to load TF from the ROS parameter server.
 * Code linting & reorganization

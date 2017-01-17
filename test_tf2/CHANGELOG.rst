@@ -2,8 +2,8 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.14 (2017-01-16)
+-------------------
 * Typos.
 * Adds unit tests for TF loaded from parameter server.
   This tests both success (loading a valid TF into the param server) and

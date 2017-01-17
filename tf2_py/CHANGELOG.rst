@@ -2,8 +2,8 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.14 (2017-01-16)
+-------------------
 * Improve tf compatibility (`#192 <https://github.com/ros/geometry2/issues/192>`_)
   getLatestCommonTime() is needed to implement the TF API.
   See `ros/geometry#134 <https://github.com/ros/geometry/issues/134>`_
