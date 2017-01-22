@@ -26,6 +26,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # author: Wim Meeussen
+# quaterion implementation has been taken from the transforms3d package (author: Matthew Brett)
+# link: https://pypi.python.org/pypi/transforms3d
 
 from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped
 import numpy as np
