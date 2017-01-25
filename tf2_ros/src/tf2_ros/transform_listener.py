@@ -29,15 +29,12 @@
 
 import roslib; roslib.load_manifest('tf2_ros')
 import rospy
-import rospy
 import tf2_ros
-import threading
 from tf2_msgs.msg import TFMessage
 
 class TransformListener():
     """
     :class:`TransformListener` is a convenient way to listen for coordinate frame transformation info.
-
     This class takes an object that instantiates the :class:`BufferInterface` interface, to which
     it propagates changes to the tf frame graph.
     """
@@ -49,22 +46,19 @@ class TransformListener():
 
             :param buffer: The buffer to propagate changes to when tf info updates.
         """
-        self.listenerthread = TransformListenerThread(buffer)
-        self.listenerthread.setDaemon(True)
-        self.listenerthread.start()
-
-
-class TransformListenerThread(threading.Thread):
-    def __init__(self, buffer):
         self.buffer = buffer
-        threading.Thread.__init__(self)
+        self.tf_sub = rospy.Subscriber("/tf", TFMessage, self.callback)
+        self.tf_static_sub = rospy.Subscriber("/tf_static", TFMessage, self.static_callback)
+    
+    def __del__(self):
+        self.unregister()
 
-
-
-    def run(self):
-        rospy.Subscriber("/tf", TFMessage, self.callback)
-        rospy.Subscriber("/tf_static", TFMessage, self.static_callback)
-        rospy.spin()
+    def unregister(self):
+        """
+        Unregisters all tf subscribers.
+        """
+        self.tf_sub.unregister()
+        self.tf_static_sub.unregister()
 
     def callback(self, data):
         who = data._connection_header.get('callerid', "default_authority")
