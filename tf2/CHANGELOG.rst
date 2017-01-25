@@ -2,6 +2,9 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.14 (2017-01-16)
 -------------------
 * fixes `#194 <https://github.com/ros/geometry2/issues/194>`_ check for quaternion normalization before inserting into storage (`#196 <https://github.com/ros/geometry2/issues/196>`_)

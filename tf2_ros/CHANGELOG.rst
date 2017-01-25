@@ -2,6 +2,11 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* tf2_ros: add option to unregister TransformListener (`#201 <https://github.com/ros/geometry2/issues/201>`_)
+* Contributors: Hans-Joachim Krauch
+
 0.5.14 (2017-01-16)
 -------------------
 * Drop roslib.load_manifest (`#191 <https://github.com/ros/geometry2/issues/191>`_)
