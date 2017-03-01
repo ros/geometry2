@@ -52,8 +52,6 @@ public:
 
   StaticTransformBroadcaster(rclcpp::node::Node::SharedPtr node);
 
-  StaticTransformBroadcaster(rclcpp::node::Node::SharedPtr node);
-
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
   void sendTransform(const geometry_msgs::msg::TransformStamped & transform);
