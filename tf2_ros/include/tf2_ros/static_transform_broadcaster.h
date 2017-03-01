@@ -49,8 +49,6 @@ namespace tf2_ros
 
 class StaticTransformBroadcaster{
 public:
-  /** \brief Constructor (needs a ros::Node reference) */
-  StaticTransformBroadcaster();
 
   StaticTransformBroadcaster(rclcpp::node::Node::SharedPtr node);
 
