@@ -37,10 +37,6 @@
 
 #include "tf2_ros/buffer_interface.h"//TODO(tfoote) Remove for temporary get_now_msg
 
-
-
-
-
 //TODO(tfoote replace these terrible macros)
 #define ROS_ERROR printf
 #define ROS_FATAL printf
@@ -50,10 +46,10 @@ int main(int argc, char ** argv)
 {
   //Initialize ROS
   rclcpp::init(argc, argv);
-  auto node = rclcpp::node::Node::make_shared("static_transform_publisher_program");
+  auto node = rclcpp::node::Node::make_shared("static_transform_publisher");
   // ros::init(argc, argv,"static_transform_publisher", ros::init_options::AnonymousName);
-  
-  tf2_ros::StaticTransformBroadcaster broadcaster;
+
+  tf2_ros::StaticTransformBroadcaster broadcaster(node);
 
   if(argc == 10 || argc == 9)
   {
@@ -85,7 +81,7 @@ int main(int argc, char ** argv)
         ROS_FATAL("target_frame and source frame are the same (%s, %s) this cannot work", argv[8], argv[9]);
         return 1;
       }
-      
+
       msg.transform.translation.x = atof(argv[1]);
       msg.transform.translation.y = atof(argv[2]);
       msg.transform.translation.z = atof(argv[3]);
@@ -128,6 +124,5 @@ int main(int argc, char ** argv)
     ROS_ERROR("static_transform_publisher exited due to not having the right number of arguments");
     return -1;
   }
-
 
 };
