@@ -37,7 +37,8 @@
 
 namespace tf2_ros {
 
-TransformBroadcaster::TransformBroadcaster()
+TransformBroadcaster::TransformBroadcaster(rclcpp::node::Node::SharedPtr node) :
+  node_(node)
 {
   rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
   custom_qos_profile.depth = 100;
