@@ -49,7 +49,7 @@ namespace tf2_ros
 class TransformBroadcaster{
 public:
   /** \brief Constructor (needs a ros::Node reference) */
-  TransformBroadcaster();
+  TransformBroadcaster(rclcpp::node::Node::SharedPtr node);
 
   /** \brief Send a StampedTransform 
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
