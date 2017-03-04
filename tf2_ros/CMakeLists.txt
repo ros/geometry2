@@ -79,7 +79,6 @@ target_link_libraries(static_transform_publisher
   ${tf2_msgs_LIBRARIES}
   )
 
-
 add_executable(tf2_echo
   src/tf2_echo.cpp
 )
@@ -171,4 +170,5 @@ add_rostest(test/transform_listener_time_reset_test.launch)
 endif()
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(tf2_msgs)
 ament_package()

@@ -33,14 +33,12 @@
 #ifndef TF2_ROS_TRANSFORMBROADCASTER_H
 #define TF2_ROS_TRANSFORMBROADCASTER_H
 
-
-
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
+
 namespace tf2_ros
 {
-
 
 /** \brief This class provides an easy way to publish coordinate frame transform information.  
  * It will handle all the messaging and stuffing of messages.  And the function prototypes lay out all the 
