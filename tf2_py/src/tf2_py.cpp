@@ -228,20 +228,19 @@ static PyObject *canTransformFullCore(PyObject *self, PyObject *args, PyObject *
   return Py_BuildValue("bs", can_transform, error_msg.c_str());
 }
 
-/* Debugging stuff that may need to be implemented later
 static PyObject *asListOfStrings(std::vector< std::string > los)
 {
   PyObject *r = PyList_New(los.size());
   size_t i;
   for (i = 0; i < los.size(); i++) {
-    PyList_SetItem(r, i, toPythonString(los[i]));
+    PyList_SetItem(r, i, stringToPython(los[i]));
   }
   return r;
 }
 
-static PyObject *chain(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *_chain(PyObject *self, PyObject *args, PyObject *kw)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *target_frame, *source_frame, *fixed_frame;
   ros::Time target_time, source_time;
   std::vector< std::string > output;
@@ -257,10 +256,9 @@ static PyObject *chain(PyObject *self, PyObject *args, PyObject *kw)
                         &fixed_frame))
     return NULL;
 
-  WRAP(t->chainAsVector(target_frame, target_time, source_frame, source_time, fixed_frame, output));
+  WRAP(bc->_chainAsVector(target_frame, target_time, source_frame, source_time, fixed_frame, output));
   return asListOfStrings(output);
 }
-*/
 
 static PyObject *getLatestCommonTime(PyObject *self, PyObject *args)
 {
@@ -481,24 +479,33 @@ static PyObject *clear(PyObject *self, PyObject *args)
   Py_RETURN_NONE;
 }
 
-/* May come back eventually, but not in public api right now
-static PyObject *frameExists(PyObject *self, PyObject *args)
+static PyObject *_frameExists(PyObject *self, PyObject *args)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *frame_id_str;
   if (!PyArg_ParseTuple(args, "s", &frame_id_str))
     return NULL;
-  return PyBool_FromLong(t->frameExists(frame_id_str));
+  return PyBool_FromLong(bc->_frameExists(frame_id_str));
 }
 
-static PyObject *getFrameStrings(PyObject *self, PyObject *args)
+static PyObject *_getFrameStrings(PyObject *self, PyObject *args)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   std::vector< std::string > ids;
-  t->getFrameStrings(ids);
+  bc->_getFrameStrings(ids);
   return asListOfStrings(ids);
 }
-*/
+
+static PyObject *_allFramesAsDot(PyObject *self, PyObject *args, PyObject *kw)
+{
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  static const char *keywords[] = { "time", NULL };
+  ros::Time time;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "|O&", (char**)keywords, rostime_converter, &time))
+    return NULL;
+  return PyString_FromString(bc->_allFramesAsDot(time.toSec()).c_str());
+}
+
 
 static struct PyMethodDef buffer_core_methods[] =
 {
@@ -508,10 +515,11 @@ static struct PyMethodDef buffer_core_methods[] =
   {"set_transform_static", setTransformStatic, METH_VARARGS},
   {"can_transform_core", (PyCFunction)canTransformCore, METH_KEYWORDS},
   {"can_transform_full_core", (PyCFunction)canTransformFullCore, METH_KEYWORDS},
-  //{"chain", (PyCFunction)chain, METH_KEYWORDS},
+  {"_chain", (PyCFunction)_chain, METH_KEYWORDS},
   {"clear", (PyCFunction)clear, METH_KEYWORDS},
-  //{"frameExists", (PyCFunction)frameExists, METH_VARARGS},
-  //{"getFrameStrings", (PyCFunction)getFrameStrings, METH_VARARGS},
+  {"_frameExists", (PyCFunction)_frameExists, METH_VARARGS},
+  {"_getFrameStrings", (PyCFunction)_getFrameStrings, METH_VARARGS},
+  {"_allFramesAsDot", (PyCFunction)_allFramesAsDot, METH_KEYWORDS},
   {"get_latest_common_time", (PyCFunction)getLatestCommonTime, METH_VARARGS},
   {"lookup_transform_core", (PyCFunction)lookupTransformCore, METH_KEYWORDS},
   {"lookup_transform_full_core", (PyCFunction)lookupTransformFullCore, METH_KEYWORDS},
