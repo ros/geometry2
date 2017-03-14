@@ -35,6 +35,8 @@
 #include <string>
 #include <thread>
 
+#include <tf2/visibility_control.h>
+
 namespace tf2
 {
   using Duration = std::chrono::duration<double, std::nano>;
@@ -45,21 +47,21 @@ namespace tf2
   // This is the zero time in ROS
   static const TimePoint TimePointZero = TimePoint(IDuration::zero());
 
-  inline TimePoint get_now()
+  inline TF2_PUBLIC TimePoint get_now()
   {
     return std::chrono::system_clock::now();
   }
 
-  inline double durationToSec(const tf2::Duration & input){
+  inline TF2_PUBLIC double durationToSec(const tf2::Duration & input){
     return (double)std::chrono::duration_cast<std::chrono::seconds>(input).count();
   }
 
-  inline double timeToSec(const TimePoint& timepoint)
+  inline TF2_PUBLIC double timeToSec(const TimePoint& timepoint)
   {
     return durationToSec(Duration(timepoint.time_since_epoch()));
   }
 
-  std::string displayTimePoint(const TimePoint& stamp);
+  TF2_PUBLIC std::string displayTimePoint(const TimePoint& stamp);
 
 }
 

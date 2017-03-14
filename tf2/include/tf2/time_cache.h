@@ -38,12 +38,14 @@
 #include <list>
 #include <sstream>
 
+#include <tf2/visibility_control.h>
+
 namespace tf2
 {
 
 typedef std::pair<TimePoint, CompactFrameID> P_TimeAndFrameID;
 
-class TimeCacheInterface
+class TF2_PUBLIC TimeCacheInterface
 {
 public:
   /** \brief Access data from the cache */
@@ -83,7 +85,7 @@ constexpr tf2::Duration TIMECACHE_DEFAULT_MAX_STORAGE_TIME = std::chrono::second
  * This builds and maintains a list of timestamped
  * data.  And provides lookup functions to get
  * data out as a function of time. */
-class TimeCache : public TimeCacheInterface
+class TF2_PUBLIC TimeCache : public TimeCacheInterface
 {
  public:
   static const int MIN_INTERPOLATION_DISTANCE = 5; //!< Number of nano-seconds to not interpolate below.
@@ -126,7 +128,7 @@ private:
 
 };
 
-class StaticCache : public TimeCacheInterface
+class TF2_PUBLIC StaticCache : public TimeCacheInterface
 {
  public:
   /// Virtual methods

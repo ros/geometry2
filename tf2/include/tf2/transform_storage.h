@@ -36,6 +36,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 
 #include "tf2/time.h"
+#include <tf2/visibility_control.h>
 
 namespace tf2
 {
@@ -45,7 +46,7 @@ namespace tf2
 typedef uint32_t CompactFrameID;
 
 /** \brief Storage for transforms and their parent */
-class TransformStorage
+class TF2_PUBLIC TransformStorage
 {
 public:
   TransformStorage();
