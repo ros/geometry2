@@ -41,6 +41,7 @@
 #include <tf2/exceptions.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <tf2/impl/convert.h>
+#include <tf2/visibility_control.h>
 
 namespace tf2 {
 
@@ -53,6 +54,7 @@ namespace tf2 {
  * 
  * This method needs to be implemented by client library developers
  */
+TF2_PUBLIC
 template <class T>
   void doTransform(const T& data_in, T& data_out, const geometry_msgs::msg::TransformStamped& transform);
 
@@ -60,6 +62,7 @@ template <class T>
  * \param t The data input.
  * \return The timestamp associated with the data. 
  */
+TF2_PUBLIC
 template <class T>
   const tf2::TimePoint& getTimestamp(const T& t);
 
@@ -67,12 +70,14 @@ template <class T>
  * \param t The data input.
  * \return The frame_id associated with the data. 
  */
+TF2_PUBLIC
 template <class T>
   const std::string& getFrameId(const T& t);
 
 
 
 /* An implementation for Stamped<P> datatypes */
+TF2_PUBLIC
 template <class P>
   const tf2::TimePoint& getTimestamp(const tf2::Stamped<P>& t)
   {
@@ -80,6 +85,7 @@ template <class P>
   }
 
 /* An implementation for Stamped<P> datatypes */
+TF2_PUBLIC
 template <class P>
   const std::string& getFrameId(const tf2::Stamped<P>& t)
   {
@@ -92,6 +98,7 @@ template <class P>
  * \param a an object of whatever type
  * \return the conversion as a ROS message
  */
+TF2_PUBLIC
 template<typename A, typename B>
   B toMsg(const A& a);
 
@@ -101,6 +108,7 @@ template<typename A, typename B>
  * \param a a ROS message to convert from
  * \param b the object to convert to
  */
+TF2_PUBLIC
 template<typename A, typename B>
   void fromMsg(const A&, B& b);
 
@@ -111,6 +119,7 @@ template<typename A, typename B>
  * \param a an object to convert from
  * \param b the object to convert to
  */
+TF2_PUBLIC
 template <class A, class B>
   void convert(const A& a, B& b)
   {
@@ -118,6 +127,7 @@ template <class A, class B>
     impl::Converter<ros::message_traits::IsMessage<A>::value, ros::message_traits::IsMessage<B>::value>::convert(a, b);
   }
 
+TF2_PUBLIC
 template <class A>
   void convert(const A& a1, A& a2)
   {
