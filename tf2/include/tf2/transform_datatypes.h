@@ -35,13 +35,15 @@
 #include <chrono>
 #include <string>
 
+#include <tf2/visibility_control.h>
+
 namespace tf2
 {
 
 /** \brief The data type which will be cross compatable with geometry_msgs
  * This is the tf2 datatype equivilant of a MessageStamped */
 template <typename T>
-class Stamped : public T{
+class TF2_PUBLIC Stamped : public T{
  public:
   typedef std::chrono::system_clock::time_point TimePoint;
   TimePoint stamp_; ///< The timestamp associated with this data
@@ -65,6 +67,7 @@ class Stamped : public T{
 };
 
 /** \brief Comparison Operator for Stamped datatypes */
+TF2_PUBLIC
 template <typename T> 
 bool operator==(const Stamped<T> &a, const Stamped<T> &b) {
   return a.frame_id_ == b.frame_id_ && a.stamp_ == b.stamp_ && static_cast<const T&>(a) == static_cast<const T&>(b);

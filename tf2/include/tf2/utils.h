@@ -18,6 +18,7 @@
 #include <tf2/LinearMath/Transform.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/impl/utils.h>
+#include <tf2/visibility_control.h>
 
 namespace tf2 {
 /** Return the yaw, pitch, roll of anything that can be converted to a tf2::Quaternion
@@ -27,6 +28,7 @@ namespace tf2 {
  * \param pitch pitch
  * \param roll roll
  */
+TF2_PUBLIC
 template <class A>
   void getEulerYPR(const A& a, double& yaw, double& pitch, double& roll)
   {
@@ -41,6 +43,7 @@ template <class A>
  * \param a the object to get data from (it represents a rotation/quaternion)
  * \param yaw yaw
  */
+TF2_PUBLIC
 template <class A>
   double getYaw(const A& a)
   {
@@ -51,6 +54,7 @@ template <class A>
 /** Return the identity for any type that can be converted to a tf2::Transform
  * \return an object of class A that is an identity transform
  */
+TF2_PUBLIC
 template <class A>
   A getTransformIdentity()
   {

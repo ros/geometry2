@@ -49,6 +49,7 @@
 #include <memory>
 
 #include <tf2/exceptions.h>
+#include <tf2/visibility_control.h>
 
 namespace tf2
 {
@@ -57,7 +58,7 @@ typedef std::pair<TimePoint, CompactFrameID> P_TimeAndFrameID;
 typedef uint32_t TransformableCallbackHandle;
 typedef uint64_t TransformableRequestHandle;
 
-class TimeCacheInterface;
+class TF2_PUBLIC TimeCacheInterface;
 using TimeCacheInterfacePtr = std::shared_ptr<TimeCacheInterface>;
 
 enum TransformableResult
@@ -87,7 +88,7 @@ static constexpr Duration BUFFER_CORE_DEFAULT_CACHE_TIME = std::chrono::seconds(
  *
  * All function calls which pass frame ids can potentially throw the exception tf::LookupException
  */
-class BufferCore
+class TF2_PUBLIC BufferCore
 {
 public:
   /************* Constants ***********************/
