@@ -54,6 +54,7 @@ target_link_libraries(${PROJECT_NAME}
   ${tf2_msgs_LIBRARIES}
   )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE "TF2_ROS_BUILDING_DLL")
 # TODO(tfoote) port server client interfaces
 # # buffer_server executable
 # add_executable(buffer_server src/buffer_server_main.cpp)
@@ -78,7 +79,6 @@ target_link_libraries(static_transform_publisher
   ${tf2_LIBRARIES}
   ${tf2_msgs_LIBRARIES}
   )
-
 
 add_executable(tf2_echo
   src/tf2_echo.cpp
@@ -171,4 +171,5 @@ add_rostest(test/transform_listener_time_reset_test.launch)
 endif()
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(tf2_msgs)
 ament_package()

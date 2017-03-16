@@ -37,7 +37,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include "tf2_ros/buffer.h"
-
+#include "tf2_ros/visibility_control.h"
 
 namespace tf2_ros{
 
@@ -46,9 +46,13 @@ class TransformListener
 
 public:
   /**@brief Constructor for transform listener */
+  TF2_ROS_PUBLIC
   TransformListener(tf2::BufferCore& buffer, bool spin_thread = true);
+  
+  TF2_ROS_PUBLIC
   TransformListener(tf2::BufferCore& buffer, rclcpp::node::Node::SharedPtr nh, bool spin_thread = true);
 
+  TF2_ROS_PUBLIC
   ~TransformListener();
 
 private:
