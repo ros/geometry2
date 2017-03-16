@@ -20,6 +20,7 @@ subject to the following restrictions:
 
 #include "Scalar.h"
 #include "MinMax.h"
+#include "tf2/visibility_control.h"
 
 namespace tf2
 {

@@ -18,6 +18,7 @@ subject to the following restrictions:
 
 #include "Scalar.h"
 #include "MinMax.h"
+#include "tf2/visibility_control.h"
 
 
 #if defined (__CELLOS_LV2) && defined (__SPU__)

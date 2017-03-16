@@ -19,6 +19,7 @@ subject to the following restrictions:
 
 
 #include "Matrix3x3.h"
+#include "tf2/visibility_control.h"
 
 
 namespace tf2
