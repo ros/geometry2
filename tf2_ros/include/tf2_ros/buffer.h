@@ -33,6 +33,7 @@
 #define TF2_ROS_BUFFER_H
 
 #include <tf2_ros/buffer_interface.h>
+#include <tf2_ros/visibility_control.h>
 #include <tf2/buffer_core.h>
 #include <tf2_msgs/srv/frame_graph.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -55,7 +56,7 @@ namespace tf2_ros
      * @param debug Whether to advertise the view_frames service that exposes debugging information from the buffer
      * @return 
      */
-    Buffer(tf2::Duration cache_time = tf2::Duration(tf2::BUFFER_CORE_DEFAULT_CACHE_TIME), bool debug = false);
+    TF2_ROS_PUBLIC Buffer(tf2::Duration cache_time = tf2::Duration(tf2::BUFFER_CORE_DEFAULT_CACHE_TIME), bool debug = false);
 
     /** \brief Get the transform between two frames by frame ID.
      * \param target_frame The frame to which data should be transformed
@@ -67,6 +68,7 @@ namespace tf2_ros
      * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
      * tf2::ExtrapolationException, tf2::InvalidArgumentException
      */
+    TF2_ROS_PUBLIC
     virtual geometry_msgs::msg::TransformStamped 
     lookupTransform(const std::string& target_frame, const std::string& source_frame,
                     const tf2::TimePoint& time, const tf2::Duration timeout) const;
@@ -83,6 +85,7 @@ namespace tf2_ros
      * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
      * tf2::ExtrapolationException, tf2::InvalidArgumentException
      */
+    TF2_ROS_PUBLIC
     virtual geometry_msgs::msg::TransformStamped 
     lookupTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
                     const std::string& source_frame, const tf2::TimePoint& source_time,
@@ -97,6 +100,7 @@ namespace tf2_ros
      * \param errstr A pointer to a string which will be filled with why the transform failed, if not NULL
      * \return True if the transform is possible, false otherwise 
      */
+    TF2_ROS_PUBLIC
     virtual bool
     canTransform(const std::string& target_frame, const std::string& source_frame, 
                  const tf2::TimePoint& target_time, const tf2::Duration timeout, std::string* errstr = NULL) const;
@@ -111,6 +115,7 @@ namespace tf2_ros
      * \param errstr A pointer to a string which will be filled with why the transform failed, if not NULL
      * \return True if the transform is possible, false otherwise 
      */
+    TF2_ROS_PUBLIC
     virtual bool
       canTransform(const std::string& target_frame, const tf2::TimePoint& target_time,
                    const std::string& source_frame, const tf2::TimePoint& source_time,

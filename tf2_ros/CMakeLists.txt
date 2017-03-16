@@ -54,6 +54,7 @@ target_link_libraries(${PROJECT_NAME}
   ${tf2_msgs_LIBRARIES}
   )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE "TF2_ROS_BUILDING_DLL")
 # TODO(tfoote) port server client interfaces
 # # buffer_server executable
 # add_executable(buffer_server src/buffer_server_main.cpp)

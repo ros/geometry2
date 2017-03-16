@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
+ * Copyright (c) 2017 Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,49 +27,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** \author Tully Foote */
+#ifndef TF2_ROS__VISIBILITY_CONTROL_H_
+#define TF2_ROS__VISIBILITY_CONTROL_H_
 
-#ifndef TF2_TRANSFORM_DATATYPES_H
-#define TF2_TRANSFORM_DATATYPES_H
+// This logic was borrowed (then namespaced) from the examples on the gcc wiki:
+//     https://gcc.gnu.org/wiki/Visibility
 
-#include <chrono>
-#include <string>
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef __GNUC__
+    #define TF2_ROS_EXPORT __attribute__ ((dllexport))
+    #define TF2_ROS_IMPORT __attribute__ ((dllimport))
+  #else
+    #define TF2_ROS_EXPORT __declspec(dllexport)
+    #define TF2_ROS_IMPORT __declspec(dllimport)
+  #endif
+  #ifdef TF2_ROS_BUILDING_DLL
+    #define TF2_ROS_PUBLIC TF2_ROS_EXPORT
+  #else
+    #define TF2_ROS_PUBLIC TF2_ROS_IMPORT
+  #endif
+  #define TF2_ROS_PUBLIC_TYPE TF2_ROS_PUBLIC
+  #define TF2_ROS_LOCAL
+#else
+  #define TF2_ROS_EXPORT __attribute__ ((visibility("default")))
+  #define TF2_ROS_IMPORT
+  #if __GNUC__ >= 4
+    #define TF2_ROS_PUBLIC __attribute__ ((visibility("default")))
+    #define TF2_ROS_LOCAL  __attribute__ ((visibility("hidden")))
+  #else
+    #define TF2_ROS_PUBLIC
+    #define TF2_ROS_LOCAL
+  #endif
+  #define TF2_ROS_PUBLIC_TYPE
+#endif
 
-namespace tf2
-{
-
-/** \brief The data type which will be cross compatable with geometry_msgs
- * This is the tf2 datatype equivilant of a MessageStamped */
-template <typename T>
-class Stamped : public T{
- public:
-  typedef std::chrono::system_clock::time_point TimePoint;
-  TimePoint stamp_; ///< The timestamp associated with this data
-  std::string frame_id_; ///< The frame_id associated this data
-
-  /** Default constructor */
-  Stamped() :frame_id_ ("NO_ID_STAMPED_DEFAULT_CONSTRUCTION"){}; //Default constructor used only for preallocation
-
-  /** Full constructor */
-  Stamped(const T& input, const TimePoint& timestamp, const std::string & frame_id) :
-    T (input), stamp_ ( timestamp ), frame_id_ (frame_id){ } ;
-  
-  /** Copy Constructor */
-  Stamped(const Stamped<T>& s):
-    T (s),
-    stamp_(s.stamp_),
-    frame_id_(s.frame_id_) {}
-  
-  /** Set the data element */
-  void setData(const T& input){*static_cast<T*>(this) = input;};
-};
-
-/** \brief Comparison Operator for Stamped datatypes */
-template <typename T> 
-bool operator==(const Stamped<T> &a, const Stamped<T> &b) {
-  return a.frame_id_ == b.frame_id_ && a.stamp_ == b.stamp_ && static_cast<const T&>(a) == static_cast<const T&>(b);
-};
-
-
-}
-#endif //TF2_TRANSFORM_DATATYPES_H
+#endif  // TF2_ROS__VISIBILITY_CONTROL_H_
