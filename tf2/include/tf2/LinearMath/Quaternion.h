@@ -330,7 +330,7 @@ public:
 
 
 /**@brief Return the negative of a quaternion */
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Quaternion
+TF2SIMD_FORCE_INLINE Quaternion
 operator-(const Quaternion& q)
 {
 	return Quaternion(-q.x(), -q.y(), -q.z(), -q.w());
@@ -339,7 +339,7 @@ operator-(const Quaternion& q)
 
 
 /**@brief Return the product of two quaternions */
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Quaternion
+TF2SIMD_FORCE_INLINE Quaternion
 operator*(const Quaternion& q1, const Quaternion& q2) {
 	return Quaternion(q1.w() * q2.x() + q1.x() * q2.w() + q1.y() * q2.z() - q1.z() * q2.y(),
 		q1.w() * q2.y() + q1.y() * q2.w() + q1.z() * q2.x() - q1.x() * q2.z(),
@@ -347,7 +347,7 @@ operator*(const Quaternion& q1, const Quaternion& q2) {
 		q1.w() * q2.w() - q1.x() * q2.x() - q1.y() * q2.y() - q1.z() * q2.z()); 
 }
 
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Quaternion
+TF2SIMD_FORCE_INLINE Quaternion
 operator*(const Quaternion& q, const Vector3& w)
 {
 	return Quaternion( q.w() * w.x() + q.y() * w.z() - q.z() * w.y(),
@@ -356,7 +356,7 @@ operator*(const Quaternion& q, const Vector3& w)
 		-q.x() * w.x() - q.y() * w.y() - q.z() * w.z()); 
 }
 
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Quaternion
+TF2SIMD_FORCE_INLINE Quaternion
 operator*(const Vector3& w, const Quaternion& q)
 {
 	return Quaternion( w.x() * q.w() + w.y() * q.z() - w.z() * q.y(),
@@ -366,7 +366,7 @@ operator*(const Vector3& w, const Quaternion& q)
 }
 
 /**@brief Calculate the dot product between two quaternions */
-TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar 
+TF2SIMD_FORCE_INLINE tf2Scalar 
 dot(const Quaternion& q1, const Quaternion& q2) 
 { 
 	return q1.dot(q2); 
@@ -374,28 +374,28 @@ dot(const Quaternion& q1, const Quaternion& q2)
 
 
 /**@brief Return the length of a quaternion */
-TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar
+TF2SIMD_FORCE_INLINE tf2Scalar
 length(const Quaternion& q) 
 { 
 	return q.length(); 
 }
 
 /**@brief Return the ***half*** angle between two quaternions*/
-TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar
+TF2SIMD_FORCE_INLINE tf2Scalar
 angle(const Quaternion& q1, const Quaternion& q2) 
 { 
 	return q1.angle(q2); 
 }
 
 /**@brief Return the shortest angle between two quaternions*/
-TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar
+TF2SIMD_FORCE_INLINE tf2Scalar
 angleShortestPath(const Quaternion& q1, const Quaternion& q2) 
 { 
 	return q1.angleShortestPath(q2); 
 }
 
 /**@brief Return the inverse of a quaternion*/
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Quaternion
+TF2SIMD_FORCE_INLINE Quaternion
 inverse(const Quaternion& q) 
 {
 	return q.inverse();
@@ -406,13 +406,13 @@ inverse(const Quaternion& q)
  * @param q2 The second quaternion 
  * @param t The ration between q1 and q2.  t = 0 return q1, t=1 returns q2 
  * Slerp assumes constant velocity between positions. */
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Quaternion
+TF2SIMD_FORCE_INLINE Quaternion
 slerp(const Quaternion& q1, const Quaternion& q2, const tf2Scalar& t) 
 {
 	return q1.slerp(q2, t);
 }
 
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
+TF2SIMD_FORCE_INLINE Vector3 
 quatRotate(const Quaternion& rotation, const Vector3& v) 
 {
 	Quaternion q = rotation * v;
@@ -420,7 +420,7 @@ quatRotate(const Quaternion& rotation, const Vector3& v)
 	return Vector3(q.getX(),q.getY(),q.getZ());
 }
 
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Quaternion 
+TF2SIMD_FORCE_INLINE Quaternion 
 shortestArcQuat(const Vector3& v0, const Vector3& v1) // Game Programming Gems 2.10. make sure v0,v1 are normalized
 {
 	Vector3 c = v0.cross(v1);
@@ -439,7 +439,7 @@ shortestArcQuat(const Vector3& v0, const Vector3& v1) // Game Programming Gems 2
 	return Quaternion(c.getX()*rs,c.getY()*rs,c.getZ()*rs,s * 0.5f);
 }
 
-TF2_PUBLIC TF2SIMD_FORCE_INLINE Quaternion 
+TF2SIMD_FORCE_INLINE Quaternion 
 shortestArcQuatNormalize2(Vector3& v0,Vector3& v1)
 {
 	v0.normalize();

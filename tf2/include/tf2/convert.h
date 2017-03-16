@@ -55,7 +55,6 @@ namespace tf2 {
  * This method needs to be implemented by client library developers
  */
 template <class T>
-TF2_PUBLIC
   void doTransform(const T& data_in, T& data_out, const geometry_msgs::msg::TransformStamped& transform);
 
 /**\brief Get the timestamp from data 
@@ -63,7 +62,6 @@ TF2_PUBLIC
  * \return The timestamp associated with the data. 
  */
 template <class T>
-TF2_PUBLIC
   const tf2::TimePoint& getTimestamp(const T& t);
 
 /**\brief Get the frame_id from data 
@@ -71,14 +69,12 @@ TF2_PUBLIC
  * \return The frame_id associated with the data. 
  */
 template <class T>
-TF2_PUBLIC
   const std::string& getFrameId(const T& t);
 
 
 
 /* An implementation for Stamped<P> datatypes */
 template <class P>
-TF2_PUBLIC
   const tf2::TimePoint& getTimestamp(const tf2::Stamped<P>& t)
   {
     return t.stamp_;
@@ -86,7 +82,6 @@ TF2_PUBLIC
 
 /* An implementation for Stamped<P> datatypes */
 template <class P>
-TF2_PUBLIC
   const std::string& getFrameId(const tf2::Stamped<P>& t)
   {
     return t.frame_id_;
@@ -99,7 +94,6 @@ TF2_PUBLIC
  * \return the conversion as a ROS message
  */
 template<typename A, typename B>
-TF2_PUBLIC
   B toMsg(const A& a);
 
 /** Function that converts from a ROS message type to another type. It has to be
@@ -109,7 +103,6 @@ TF2_PUBLIC
  * \param b the object to convert to
  */
 template<typename A, typename B>
-TF2_PUBLIC
   void fromMsg(const A&, B& b);
 
 /** Function that converts any type to any type (messages or not).
@@ -120,7 +113,6 @@ TF2_PUBLIC
  * \param b the object to convert to
  */
 template <class A, class B>
-TF2_PUBLIC
   void convert(const A& a, B& b)
   {
     //printf("In double type convert\n");
@@ -128,7 +120,6 @@ TF2_PUBLIC
   }
 
 template <class A>
-TF2_PUBLIC
   void convert(const A& a1, A& a2)
   {
     //printf("In single type convert\n");

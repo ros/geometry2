@@ -29,7 +29,6 @@ namespace tf2 {
  * \param roll roll
  */
 template <class A>
-TF2_PUBLIC
   void getEulerYPR(const A& a, double& yaw, double& pitch, double& roll)
   {
     tf2::Quaternion q = impl::toQuaternion(a);
@@ -44,7 +43,6 @@ TF2_PUBLIC
  * \param yaw yaw
  */
 template <class A>
-TF2_PUBLIC
   double getYaw(const A& a)
   {
     tf2::Quaternion q = impl::toQuaternion(a);
@@ -55,7 +53,6 @@ TF2_PUBLIC
  * \return an object of class A that is an identity transform
  */
 template <class A>
-TF2_PUBLIC
   A getTransformIdentity()
   {
     tf2::Transform t;
