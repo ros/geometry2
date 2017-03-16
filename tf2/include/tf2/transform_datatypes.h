@@ -67,8 +67,8 @@ class TF2_PUBLIC Stamped : public T{
 };
 
 /** \brief Comparison Operator for Stamped datatypes */
-TF2_PUBLIC
 template <typename T> 
+TF2_PUBLIC
 bool operator==(const Stamped<T> &a, const Stamped<T> &b) {
   return a.frame_id_ == b.frame_id_ && a.stamp_ == b.stamp_ && static_cast<const T&>(a) == static_cast<const T&>(b);
 };

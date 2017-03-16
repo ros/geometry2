@@ -34,7 +34,7 @@ namespace tf2
  * It has an un-used w component to suit 16-byte alignment when tf2::Vector3 is stored in containers. This extra component can be used by derived classes (Quaternion?) or by user
  * Ideally, this class should be replaced by a platform optimized TF2SIMD version that keeps the data in registers
  */
-ATTRIBUTE_ALIGNED16(class) Vector3
+ATTRIBUTE_ALIGNED16(class) TF2_PUBLIC Vector3
 {
 public:
 
@@ -350,48 +350,48 @@ public:
 };
 
 /**@brief Return the sum of two vectors (Point symantics)*/
-TF2SIMD_FORCE_INLINE Vector3 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
 operator+(const Vector3& v1, const Vector3& v2) 
 {
 	return Vector3(v1.m_floats[0] + v2.m_floats[0], v1.m_floats[1] + v2.m_floats[1], v1.m_floats[2] + v2.m_floats[2]);
 }
 
 /**@brief Return the elementwise product of two vectors */
-TF2SIMD_FORCE_INLINE Vector3 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
 operator*(const Vector3& v1, const Vector3& v2) 
 {
 	return Vector3(v1.m_floats[0] * v2.m_floats[0], v1.m_floats[1] * v2.m_floats[1], v1.m_floats[2] * v2.m_floats[2]);
 }
 
 /**@brief Return the difference between two vectors */
-TF2SIMD_FORCE_INLINE Vector3 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
 operator-(const Vector3& v1, const Vector3& v2)
 {
 	return Vector3(v1.m_floats[0] - v2.m_floats[0], v1.m_floats[1] - v2.m_floats[1], v1.m_floats[2] - v2.m_floats[2]);
 }
 /**@brief Return the negative of the vector */
-TF2SIMD_FORCE_INLINE Vector3 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
 operator-(const Vector3& v)
 {
 	return Vector3(-v.m_floats[0], -v.m_floats[1], -v.m_floats[2]);
 }
 
 /**@brief Return the vector scaled by s */
-TF2SIMD_FORCE_INLINE Vector3 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
 operator*(const Vector3& v, const tf2Scalar& s)
 {
 	return Vector3(v.m_floats[0] * s, v.m_floats[1] * s, v.m_floats[2] * s);
 }
 
 /**@brief Return the vector scaled by s */
-TF2SIMD_FORCE_INLINE Vector3 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
 operator*(const tf2Scalar& s, const Vector3& v)
 { 
 	return v * s; 
 }
 
 /**@brief Return the vector inversely scaled by s */
-TF2SIMD_FORCE_INLINE Vector3
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3
 operator/(const Vector3& v, const tf2Scalar& s)
 {
 	tf2FullAssert(s != tf2Scalar(0.0));
@@ -399,14 +399,14 @@ operator/(const Vector3& v, const tf2Scalar& s)
 }
 
 /**@brief Return the vector inversely scaled by s */
-TF2SIMD_FORCE_INLINE Vector3
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3
 operator/(const Vector3& v1, const Vector3& v2)
 {
 	return Vector3(v1.m_floats[0] / v2.m_floats[0],v1.m_floats[1] / v2.m_floats[1],v1.m_floats[2] / v2.m_floats[2]);
 }
 
 /**@brief Return the dot product between two vectors */
-TF2SIMD_FORCE_INLINE tf2Scalar 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar 
 tf2Dot(const Vector3& v1, const Vector3& v2) 
 { 
 	return v1.dot(v2); 
@@ -414,7 +414,7 @@ tf2Dot(const Vector3& v1, const Vector3& v2)
 
 
 /**@brief Return the distance squared between two vectors */
-TF2SIMD_FORCE_INLINE tf2Scalar
+TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar
 tf2Distance2(const Vector3& v1, const Vector3& v2) 
 { 
 	return v1.distance2(v2); 
@@ -422,27 +422,27 @@ tf2Distance2(const Vector3& v1, const Vector3& v2)
 
 
 /**@brief Return the distance between two vectors */
-TF2SIMD_FORCE_INLINE tf2Scalar
+TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar
 tf2Distance(const Vector3& v1, const Vector3& v2) 
 { 
 	return v1.distance(v2); 
 }
 
 /**@brief Return the angle between two vectors */
-TF2SIMD_FORCE_INLINE tf2Scalar
+TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar
 tf2Angle(const Vector3& v1, const Vector3& v2) 
 { 
 	return v1.angle(v2); 
 }
 
 /**@brief Return the cross product of two vectors */
-TF2SIMD_FORCE_INLINE Vector3 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
 tf2Cross(const Vector3& v1, const Vector3& v2) 
 { 
 	return v1.cross(v2); 
 }
 
-TF2SIMD_FORCE_INLINE tf2Scalar
+TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar
 tf2Triple(const Vector3& v1, const Vector3& v2, const Vector3& v3)
 {
 	return v1.triple(v2, v3);
@@ -452,7 +452,7 @@ tf2Triple(const Vector3& v1, const Vector3& v2, const Vector3& v3)
  * @param v1 One vector 
  * @param v2 The other vector 
  * @param t The ration of this to v (t = 0 => return v1, t=1 => return v2) */
-TF2SIMD_FORCE_INLINE Vector3 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 
 lerp(const Vector3& v1, const Vector3& v2, const tf2Scalar& t)
 {
 	return v1.lerp(v2, t);
@@ -460,22 +460,22 @@ lerp(const Vector3& v1, const Vector3& v2, const tf2Scalar& t)
 
 
 
-TF2SIMD_FORCE_INLINE tf2Scalar Vector3::distance2(const Vector3& v) const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar Vector3::distance2(const Vector3& v) const
 {
 	return (v - *this).length2();
 }
 
-TF2SIMD_FORCE_INLINE tf2Scalar Vector3::distance(const Vector3& v) const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE tf2Scalar Vector3::distance(const Vector3& v) const
 {
 	return (v - *this).length();
 }
 
-TF2SIMD_FORCE_INLINE Vector3 Vector3::normalized() const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 Vector3::normalized() const
 {
 	return *this / length();
 } 
 
-TF2SIMD_FORCE_INLINE Vector3 Vector3::rotate( const Vector3& wAxis, const tf2Scalar angle ) const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3 Vector3::rotate( const Vector3& wAxis, const tf2Scalar angle ) const
 {
 	// wAxis must be a unit lenght vector
 
@@ -488,7 +488,7 @@ TF2SIMD_FORCE_INLINE Vector3 Vector3::rotate( const Vector3& wAxis, const tf2Sca
 	return ( o + x * tf2Cos( angle ) + y * tf2Sin( angle ) );
 }
 
-class tf2Vector4 : public Vector3
+class TF2_PUBLIC tf2Vector4 : public Vector3
 {
 public:
 
@@ -618,7 +618,7 @@ public:
 
 
 ///tf2SwapVector3Endian swaps vector endianness, useful for network and cross-platform serialization
-TF2SIMD_FORCE_INLINE void	tf2SwapScalarEndian(const tf2Scalar& sourceVal, tf2Scalar& destVal)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE void	tf2SwapScalarEndian(const tf2Scalar& sourceVal, tf2Scalar& destVal)
 {
 	unsigned char* dest = (unsigned char*) &destVal;
 	unsigned char* src  = (unsigned char*) &sourceVal;
@@ -632,7 +632,7 @@ TF2SIMD_FORCE_INLINE void	tf2SwapScalarEndian(const tf2Scalar& sourceVal, tf2Sca
     dest[7] = src[0];
 }
 ///tf2SwapVector3Endian swaps vector endianness, useful for network and cross-platform serialization
-TF2SIMD_FORCE_INLINE void	tf2SwapVector3Endian(const Vector3& sourceVec, Vector3& destVec)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE void	tf2SwapVector3Endian(const Vector3& sourceVec, Vector3& destVec)
 {
 	for (int i=0;i<4;i++)
 	{
@@ -642,7 +642,7 @@ TF2SIMD_FORCE_INLINE void	tf2SwapVector3Endian(const Vector3& sourceVec, Vector3
 }
 
 ///tf2UnSwapVector3Endian swaps vector endianness, useful for network and cross-platform serialization
-TF2SIMD_FORCE_INLINE void	tf2UnSwapVector3Endian(Vector3& vector)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE void	tf2UnSwapVector3Endian(Vector3& vector)
 {
 
 	Vector3	swappedVec;
@@ -653,7 +653,7 @@ TF2SIMD_FORCE_INLINE void	tf2UnSwapVector3Endian(Vector3& vector)
 	vector = swappedVec;
 }
 
-TF2SIMD_FORCE_INLINE void tf2PlaneSpace1 (const Vector3& n, Vector3& p, Vector3& q)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE void tf2PlaneSpace1 (const Vector3& n, Vector3& p, Vector3& q)
 {
   if (tf2Fabs(n.z()) > TF2SIMDSQRT12) {
     // choose p in y-z plane
@@ -685,42 +685,42 @@ struct	Vector3DoubleData
 
 };
 
-TF2SIMD_FORCE_INLINE	void	Vector3::serializeFloat(struct	Vector3FloatData& dataOut) const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE	void	Vector3::serializeFloat(struct	Vector3FloatData& dataOut) const
 {
 	///could also do a memcpy, check if it is worth it
 	for (int i=0;i<4;i++)
 		dataOut.m_floats[i] = float(m_floats[i]);
 }
 
-TF2SIMD_FORCE_INLINE void	Vector3::deSerializeFloat(const struct	Vector3FloatData& dataIn)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE void	Vector3::deSerializeFloat(const struct	Vector3FloatData& dataIn)
 {
 	for (int i=0;i<4;i++)
 		m_floats[i] = tf2Scalar(dataIn.m_floats[i]);
 }
 
 
-TF2SIMD_FORCE_INLINE	void	Vector3::serializeDouble(struct	Vector3DoubleData& dataOut) const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE	void	Vector3::serializeDouble(struct	Vector3DoubleData& dataOut) const
 {
 	///could also do a memcpy, check if it is worth it
 	for (int i=0;i<4;i++)
 		dataOut.m_floats[i] = double(m_floats[i]);
 }
 
-TF2SIMD_FORCE_INLINE void	Vector3::deSerializeDouble(const struct	Vector3DoubleData& dataIn)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE void	Vector3::deSerializeDouble(const struct	Vector3DoubleData& dataIn)
 {
 	for (int i=0;i<4;i++)
 		m_floats[i] = tf2Scalar(dataIn.m_floats[i]);
 }
 
 
-TF2SIMD_FORCE_INLINE	void	Vector3::serialize(struct	Vector3Data& dataOut) const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE	void	Vector3::serialize(struct	Vector3Data& dataOut) const
 {
 	///could also do a memcpy, check if it is worth it
 	for (int i=0;i<4;i++)
 		dataOut.m_floats[i] = m_floats[i];
 }
 
-TF2SIMD_FORCE_INLINE void	Vector3::deSerialize(const struct	Vector3Data& dataIn)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE void	Vector3::deSerialize(const struct	Vector3Data& dataIn)
 {
 	for (int i=0;i<4;i++)
 		m_floats[i] = dataIn.m_floats[i];

@@ -29,7 +29,7 @@ namespace tf2
 
 /**@brief The Transform class supports rigid transforms with only translation and rotation and no scaling/shear.
  *It can be used in combination with Vector3, Quaternion and Matrix3x3 linear algebra classes. */
-class Transform {
+class TF2_PUBLIC Transform {
 	
   ///Storage for the rotation
 	Matrix3x3 m_basis;
@@ -218,14 +218,14 @@ public:
 };
 
 
-TF2SIMD_FORCE_INLINE Vector3
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Vector3
 Transform::invXform(const Vector3& inVec) const
 {
 	Vector3 v = inVec - m_origin;
 	return (m_basis.transpose() * v);
 }
 
-TF2SIMD_FORCE_INLINE Transform 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Transform 
 Transform::inverseTimes(const Transform& t) const  
 {
 	Vector3 v = t.getOrigin() - m_origin;
@@ -233,7 +233,7 @@ Transform::inverseTimes(const Transform& t) const
 			v * m_basis);
 }
 
-TF2SIMD_FORCE_INLINE Transform 
+TF2_PUBLIC TF2SIMD_FORCE_INLINE Transform 
 Transform::operator*(const Transform& t) const
 {
 	return Transform(m_basis * t.m_basis, 
@@ -241,7 +241,7 @@ Transform::operator*(const Transform& t) const
 }
 
 /**@brief Test if two transforms have all elements equal */
-TF2SIMD_FORCE_INLINE bool operator==(const Transform& t1, const Transform& t2)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE bool operator==(const Transform& t1, const Transform& t2)
 {
    return ( t1.getBasis()  == t2.getBasis() &&
             t1.getOrigin() == t2.getOrigin() );
@@ -263,32 +263,32 @@ struct	TransformDoubleData
 
 
 
-TF2SIMD_FORCE_INLINE	void	Transform::serialize(TransformData& dataOut) const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE	void	Transform::serialize(TransformData& dataOut) const
 {
 	m_basis.serialize(dataOut.m_basis);
 	m_origin.serialize(dataOut.m_origin);
 }
 
-TF2SIMD_FORCE_INLINE	void	Transform::serializeFloat(TransformFloatData& dataOut) const
+TF2_PUBLIC TF2SIMD_FORCE_INLINE	void	Transform::serializeFloat(TransformFloatData& dataOut) const
 {
 	m_basis.serializeFloat(dataOut.m_basis);
 	m_origin.serializeFloat(dataOut.m_origin);
 }
 
 
-TF2SIMD_FORCE_INLINE	void	Transform::deSerialize(const TransformData& dataIn)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE	void	Transform::deSerialize(const TransformData& dataIn)
 {
 	m_basis.deSerialize(dataIn.m_basis);
 	m_origin.deSerialize(dataIn.m_origin);
 }
 
-TF2SIMD_FORCE_INLINE	void	Transform::deSerializeFloat(const TransformFloatData& dataIn)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE	void	Transform::deSerializeFloat(const TransformFloatData& dataIn)
 {
 	m_basis.deSerializeFloat(dataIn.m_basis);
 	m_origin.deSerializeFloat(dataIn.m_origin);
 }
 
-TF2SIMD_FORCE_INLINE	void	Transform::deSerializeDouble(const TransformDoubleData& dataIn)
+TF2_PUBLIC TF2SIMD_FORCE_INLINE	void	Transform::deSerializeDouble(const TransformDoubleData& dataIn)
 {
 	m_basis.deSerializeDouble(dataIn.m_basis);
 	m_origin.deSerializeDouble(dataIn.m_origin);

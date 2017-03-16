@@ -32,7 +32,7 @@ namespace tf2
 #ifndef USE_LIBSPE2
 ATTRIBUTE_ALIGNED16(class) QuadWord
 #else
-class QuadWord
+class TF2_PUBLIC QuadWord
 #endif
 {
 protected:

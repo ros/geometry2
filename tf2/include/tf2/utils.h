@@ -28,8 +28,8 @@ namespace tf2 {
  * \param pitch pitch
  * \param roll roll
  */
-TF2_PUBLIC
 template <class A>
+TF2_PUBLIC
   void getEulerYPR(const A& a, double& yaw, double& pitch, double& roll)
   {
     tf2::Quaternion q = impl::toQuaternion(a);
@@ -43,8 +43,8 @@ template <class A>
  * \param a the object to get data from (it represents a rotation/quaternion)
  * \param yaw yaw
  */
-TF2_PUBLIC
 template <class A>
+TF2_PUBLIC
   double getYaw(const A& a)
   {
     tf2::Quaternion q = impl::toQuaternion(a);
@@ -54,8 +54,8 @@ template <class A>
 /** Return the identity for any type that can be converted to a tf2::Transform
  * \return an object of class A that is an identity transform
  */
-TF2_PUBLIC
 template <class A>
+TF2_PUBLIC
   A getTransformIdentity()
   {
     tf2::Transform t;

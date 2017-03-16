@@ -54,39 +54,39 @@ namespace tf2 {
  * 
  * This method needs to be implemented by client library developers
  */
-TF2_PUBLIC
 template <class T>
+TF2_PUBLIC
   void doTransform(const T& data_in, T& data_out, const geometry_msgs::msg::TransformStamped& transform);
 
 /**\brief Get the timestamp from data 
  * \param t The data input.
  * \return The timestamp associated with the data. 
  */
-TF2_PUBLIC
 template <class T>
+TF2_PUBLIC
   const tf2::TimePoint& getTimestamp(const T& t);
 
 /**\brief Get the frame_id from data 
  * \param t The data input.
  * \return The frame_id associated with the data. 
  */
-TF2_PUBLIC
 template <class T>
+TF2_PUBLIC
   const std::string& getFrameId(const T& t);
 
 
 
 /* An implementation for Stamped<P> datatypes */
-TF2_PUBLIC
 template <class P>
+TF2_PUBLIC
   const tf2::TimePoint& getTimestamp(const tf2::Stamped<P>& t)
   {
     return t.stamp_;
   }
 
 /* An implementation for Stamped<P> datatypes */
-TF2_PUBLIC
 template <class P>
+TF2_PUBLIC
   const std::string& getFrameId(const tf2::Stamped<P>& t)
   {
     return t.frame_id_;
@@ -98,8 +98,8 @@ template <class P>
  * \param a an object of whatever type
  * \return the conversion as a ROS message
  */
-TF2_PUBLIC
 template<typename A, typename B>
+TF2_PUBLIC
   B toMsg(const A& a);
 
 /** Function that converts from a ROS message type to another type. It has to be
@@ -108,8 +108,8 @@ template<typename A, typename B>
  * \param a a ROS message to convert from
  * \param b the object to convert to
  */
-TF2_PUBLIC
 template<typename A, typename B>
+TF2_PUBLIC
   void fromMsg(const A&, B& b);
 
 /** Function that converts any type to any type (messages or not).
@@ -119,16 +119,16 @@ template<typename A, typename B>
  * \param a an object to convert from
  * \param b the object to convert to
  */
-TF2_PUBLIC
 template <class A, class B>
+TF2_PUBLIC
   void convert(const A& a, B& b)
   {
     //printf("In double type convert\n");
     impl::Converter<ros::message_traits::IsMessage<A>::value, ros::message_traits::IsMessage<B>::value>::convert(a, b);
   }
 
-TF2_PUBLIC
 template <class A>
+TF2_PUBLIC
   void convert(const A& a1, A& a2)
   {
     //printf("In single type convert\n");
