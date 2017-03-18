@@ -54,9 +54,10 @@ enum class TF2Error : std::uint8_t {
  * This inherits from ros::exception 
  * which inherits from std::runtime_exception
  */
-class TF2_PUBLIC TransformException: public std::runtime_error
+class TransformException: public std::runtime_error
 { 
 public:
+  TF2_PUBLIC
   TransformException(const std::string errorDescription) : std::runtime_error(errorDescription) { ; };
 };
 
@@ -66,9 +67,10 @@ public:
    * This is an exception class to be thrown in the case 
    * that the Reference Frame tree is not connected between
    * the frames requested. */
-class TF2_PUBLIC ConnectivityException:public TransformException
+class ConnectivityException:public TransformException
 { 
 public:
+  TF2_PUBLIC
   ConnectivityException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
@@ -81,18 +83,20 @@ public:
  * being published, or a parent frame was not set correctly 
  * causing the tree to be broken.  
  */
-class TF2_PUBLIC LookupException: public TransformException
+class LookupException: public TransformException
 { 
 public:
+  TF2_PUBLIC
   LookupException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
   /** \brief An exception class to notify that the requested value would have required extrapolation beyond current limits.
    * 
    */
-class TF2_PUBLIC ExtrapolationException: public TransformException
+class ExtrapolationException: public TransformException
 { 
 public:
+  TF2_PUBLIC
   ExtrapolationException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
@@ -101,9 +105,10 @@ public:
  * usually it's an uninitalized Quaternion (0,0,0,0)
  * 
  */
-class TF2_PUBLIC InvalidArgumentException: public TransformException
+class InvalidArgumentException: public TransformException
 { 
 public:
+  TF2_PUBLIC
   InvalidArgumentException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
@@ -111,9 +116,10 @@ public:
  * 
  * 
  */
-class TF2_PUBLIC TimeoutException: public TransformException
+class TimeoutException: public TransformException
 { 
 public:
+  TF2_PUBLIC
   TimeoutException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 

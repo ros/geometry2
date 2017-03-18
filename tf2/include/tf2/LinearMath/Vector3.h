@@ -35,7 +35,7 @@ namespace tf2
  * It has an un-used w component to suit 16-byte alignment when tf2::Vector3 is stored in containers. This extra component can be used by derived classes (Quaternion?) or by user
  * Ideally, this class should be replaced by a platform optimized TF2SIMD version that keeps the data in registers
  */
-ATTRIBUTE_ALIGNED16(class) TF2_PUBLIC Vector3
+ATTRIBUTE_ALIGNED16(class) Vector3
 {
 public:
 
@@ -314,6 +314,7 @@ public:
 			m_floats[3] = tf2Scalar(0.);
 		}
 
+                TF2_PUBLIC
 		void	getSkewSymmetricMatrix(Vector3* v0,Vector3* v1,Vector3* v2) const
 		{
 			v0->setValue(0.		,-z()		,y());
@@ -321,6 +322,7 @@ public:
 			v2->setValue(-y()	,x()	,0.);
 		}
 
+                TF2_PUBLIC
 		void	setZero()
 		{
 			setValue(tf2Scalar(0.),tf2Scalar(0.),tf2Scalar(0.));
@@ -489,7 +491,7 @@ TF2SIMD_FORCE_INLINE Vector3 Vector3::rotate( const Vector3& wAxis, const tf2Sca
 	return ( o + x * tf2Cos( angle ) + y * tf2Sin( angle ) );
 }
 
-class TF2_PUBLIC tf2Vector4 : public Vector3
+class tf2Vector4 : public Vector3
 {
 public:
 
@@ -514,6 +516,7 @@ public:
 
 
 
+        TF2_PUBLIC
 	tf2Scalar	getW() const { return m_floats[3];}
 
 

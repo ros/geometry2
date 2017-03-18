@@ -30,18 +30,20 @@ namespace tf2
 
 /**@brief The Matrix3x3 class implements a 3x3 rotation matrix, to perform linear algebra in combination with Quaternion, Transform and Vector3.
 * Make sure to only include a pure orthogonal matrix without scaling. */
-class TF2_PUBLIC Matrix3x3 {
+class Matrix3x3 {
 
 	///Data storage for the matrix, each vector is a row of the matrix
 	Vector3 m_el[3];
 
 public:
 	/** @brief No initializaion constructor */
+        TF2_PUBLIC
 	Matrix3x3 () {}
 
 	//		explicit Matrix3x3(const tf2Scalar *m) { setFromOpenGLSubMatrix(m); }
 
 	/**@brief Constructor from Quaternion */
+        TF2_PUBLIC
 	explicit Matrix3x3(const Quaternion& q) { setRotation(q); }
 	/*
 	template <typename tf2Scalar>
@@ -51,6 +53,7 @@ public:
 	}
 	*/
 	/** @brief Constructor with row major formatting */
+        TF2_PUBLIC
 	Matrix3x3(const tf2Scalar& xx, const tf2Scalar& xy, const tf2Scalar& xz,
 		const tf2Scalar& yx, const tf2Scalar& yy, const tf2Scalar& yz,
 		const tf2Scalar& zx, const tf2Scalar& zy, const tf2Scalar& zz)
@@ -113,10 +116,12 @@ public:
 	/** @brief Multiply by the target matrix on the right
 	*  @param m Rotation matrix to be applied 
 	* Equivilant to this = this * m */
+        TF2_PUBLIC
 	Matrix3x3& operator*=(const Matrix3x3& m); 
 
 	/** @brief Set from a carray of tf2Scalars 
 	*  @param m A pointer to the beginning of an array of 9 tf2Scalars */
+        TF2_PUBLIC
 	void setFromOpenGLSubMatrix(const tf2Scalar *m)
 	{
 		m_el[0].setValue(m[0],m[4],m[8]);
@@ -134,6 +139,7 @@ public:
 	*  @param zx Bottom Left
 	*  @param zy Bottom Middle
 	*  @param zz Bottom Right*/
+        TF2_PUBLIC
 	void setValue(const tf2Scalar& xx, const tf2Scalar& xy, const tf2Scalar& xz, 
 		const tf2Scalar& yx, const tf2Scalar& yy, const tf2Scalar& yz, 
 		const tf2Scalar& zx, const tf2Scalar& zy, const tf2Scalar& zz)
@@ -145,6 +151,7 @@ public:
 
 	/** @brief Set the matrix from a quaternion
 	*  @param q The Quaternion to match */  
+        TF2_PUBLIC
 	void setRotation(const Quaternion& q) 
 	{
 		tf2Scalar d = q.length2();
@@ -168,6 +175,7 @@ public:
 	* angles are applied in ZYX order. I.e a vector is first rotated 
 	* about X then Y and then Z
 	**/
+        TF2_PUBLIC
 	void setEulerYPR(tf2Scalar eulerZ, tf2Scalar eulerY,tf2Scalar eulerX)  { 
 		tf2Scalar ci ( tf2Cos(eulerX)); 
 		tf2Scalar cj ( tf2Cos(eulerY)); 
@@ -191,11 +199,13 @@ public:
          * @param yaw Yaw aboud Z axis
          * 
 	 **/
+        TF2_PUBLIC
 	void setRPY(tf2Scalar roll, tf2Scalar pitch,tf2Scalar yaw) { 
                setEulerYPR(yaw, pitch, roll);
 	}
 
 	/**@brief Set the matrix to the identity */
+        TF2_PUBLIC
 	void setIdentity()
 	{ 
 		setValue(tf2Scalar(1.0), tf2Scalar(0.0), tf2Scalar(0.0), 
@@ -203,6 +213,7 @@ public:
 			tf2Scalar(0.0), tf2Scalar(0.0), tf2Scalar(1.0)); 
 	}
 
+        TF2_PUBLIC
 	static const Matrix3x3&	getIdentity()
 	{
 		static const Matrix3x3 identityMatrix(tf2Scalar(1.0), tf2Scalar(0.0), tf2Scalar(0.0), 
@@ -213,6 +224,7 @@ public:
 
 	/**@brief Fill the values of the matrix into a 9 element array 
 	* @param m The array to be filled */
+        TF2_PUBLIC
 	void getOpenGLSubMatrix(tf2Scalar *m) const 
 	{
 		m[0]  = tf2Scalar(m_el[0].x()); 
@@ -231,6 +243,7 @@ public:
 
 	/**@brief Get the matrix represented as a quaternion 
 	* @param q The quaternion which will be set */
+        TF2_PUBLIC
 	void getRotation(Quaternion& q) const
 	{
 		tf2Scalar trace = m_el[0].x() + m_el[1].y() + m_el[2].z();
@@ -269,6 +282,7 @@ public:
 	* @param yaw Yaw around Z axis
 	* @param pitch Pitch around Y axis
 	* @param roll around X axis */	
+        TF2_PUBLIC
 	void getEulerYPR(tf2Scalar& yaw, tf2Scalar& pitch, tf2Scalar& roll, unsigned int solution_number = 1) const
 	{
 		struct Euler
@@ -341,6 +355,7 @@ public:
 	* @param pitch Pitch around Y axis
 	* @param yaw Yaw around Z axis
 	* @param solution_number Which solution of two possible solutions ( 1 or 2) are possible values*/	
+        TF2_PUBLIC
 	void getRPY(tf2Scalar& roll, tf2Scalar& pitch, tf2Scalar& yaw, unsigned int solution_number = 1) const
 	{
 	getEulerYPR(yaw, pitch, roll, solution_number);
@@ -349,6 +364,7 @@ public:
 	/**@brief Create a scaled copy of the matrix 
 	* @param s Scaling vector The elements of the vector will scale each column */
 
+        TF2_PUBLIC
 	Matrix3x3 scaled(const Vector3& s) const
 	{
 		return Matrix3x3(m_el[0].x() * s.x(), m_el[0].y() * s.y(), m_el[0].z() * s.z(),
@@ -357,17 +373,24 @@ public:
 	}
 
 	/**@brief Return the determinant of the matrix */
+        TF2_PUBLIC
 	tf2Scalar            determinant() const;
 	/**@brief Return the adjoint of the matrix */
+        TF2_PUBLIC
 	Matrix3x3 adjoint() const;
 	/**@brief Return the matrix with all values non negative */
+        TF2_PUBLIC
 	Matrix3x3 absolute() const;
 	/**@brief Return the transpose of the matrix */
+        TF2_PUBLIC
 	Matrix3x3 transpose() const;
 	/**@brief Return the inverse of the matrix */
+        TF2_PUBLIC
 	Matrix3x3 inverse() const; 
 
+        TF2_PUBLIC
 	Matrix3x3 transposeTimes(const Matrix3x3& m) const;
+        TF2_PUBLIC
 	Matrix3x3 timesTranspose(const Matrix3x3& m) const;
 
 	TF2SIMD_FORCE_INLINE tf2Scalar tdotx(const Vector3& v) const 
@@ -393,6 +416,7 @@ public:
 	* 
 	* Note that this matrix is assumed to be symmetric. 
 	*/
+        TF2_PUBLIC
 	void diagonalize(Matrix3x3& rot, tf2Scalar threshold, int maxSteps)
 	{
 		rot.setIdentity();
@@ -481,19 +505,25 @@ public:
 	* @param c1 The second column to use for calculating the cofactor
 	* See http://en.wikipedia.org/wiki/Cofactor_(linear_algebra) for more details
 	*/
+        TF2_PUBLIC
 	tf2Scalar cofac(int r1, int c1, int r2, int c2) const 
 	{
 		return m_el[r1][c1] * m_el[r2][c2] - m_el[r1][c2] * m_el[r2][c1];
 	}
 
+        TF2_PUBLIC
 	void	serialize(struct	Matrix3x3Data& dataOut) const;
 
+        TF2_PUBLIC
 	void	serializeFloat(struct	Matrix3x3FloatData& dataOut) const;
 
+        TF2_PUBLIC
 	void	deSerialize(const struct	Matrix3x3Data& dataIn);
 
+        TF2_PUBLIC
 	void	deSerializeFloat(const struct	Matrix3x3FloatData& dataIn);
 
+        TF2_PUBLIC
 	void	deSerializeDouble(const struct	Matrix3x3DoubleData& dataIn);
 
 };

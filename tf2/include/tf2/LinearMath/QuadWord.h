@@ -33,7 +33,7 @@ namespace tf2
 #ifndef USE_LIBSPE2
 ATTRIBUTE_ALIGNED16(class) QuadWord
 #else
-class TF2_PUBLIC QuadWord
+class QuadWord
 #endif
 {
 protected:
@@ -44,6 +44,7 @@ protected:
 		tf2Scalar	m_floats[4];
 	};
 public:
+        TF2_PUBLIC
 	vec_float4	get128() const
 	{
 		return mVec128;

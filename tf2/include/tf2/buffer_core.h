@@ -58,7 +58,7 @@ typedef std::pair<TimePoint, CompactFrameID> P_TimeAndFrameID;
 typedef uint32_t TransformableCallbackHandle;
 typedef uint64_t TransformableRequestHandle;
 
-class TF2_PUBLIC TimeCacheInterface;
+class TimeCacheInterface;
 using TimeCacheInterfacePtr = std::shared_ptr<TimeCacheInterface>;
 
 enum TransformableResult
@@ -88,10 +88,11 @@ static constexpr Duration BUFFER_CORE_DEFAULT_CACHE_TIME = std::chrono::seconds(
  *
  * All function calls which pass frame ids can potentially throw the exception tf::LookupException
  */
-class TF2_PUBLIC BufferCore
+class BufferCore
 {
 public:
   /************* Constants ***********************/
+  TF2_PUBLIC
   static const uint32_t MAX_GRAPH_DEPTH = 1000UL;  //!< The default amount of time to cache data in seconds
 
   /** Constructor
@@ -99,10 +100,12 @@ public:
    * \param cache_time How long to keep a history of transforms in nanoseconds
    *
    */
+  TF2_PUBLIC
   BufferCore(tf2::Duration cache_time_ = BUFFER_CORE_DEFAULT_CACHE_TIME);
   virtual ~BufferCore(void);
 
   /** \brief Clear all data */
+  TF2_PUBLIC
   void clear();
 
   /** \brief Add transform information to the tf data structure
@@ -111,6 +114,7 @@ public:
    * \param is_static Record this transform as a static transform.  It will be good across all time.  (This cannot be changed after the first call.)
    * \return True unless an error occured
    */
+  TF2_PUBLIC
   bool setTransform(const geometry_msgs::msg::TransformStamped& transform, const std::string & authority, bool is_static = false);
 
   /*********** Accessors *************/
@@ -124,6 +128,7 @@ public:
    * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
+  TF2_PUBLIC
   geometry_msgs::msg::TransformStamped 
     lookupTransform(const std::string& target_frame, const std::string& source_frame,
 		    const TimePoint& time) const;
@@ -140,6 +145,7 @@ public:
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
 
+  TF2_PUBLIC
   geometry_msgs::msg::TransformStamped
     lookupTransform(const std::string& target_frame, const TimePoint& target_time,
 		    const std::string& source_frame, const TimePoint& source_time,
@@ -195,6 +201,7 @@ public:
    * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
    * \return True if the transform is possible, false otherwise 
    */
+  TF2_PUBLIC
   bool canTransform(const std::string& target_frame, const std::string& source_frame,
                     const TimePoint& time, std::string* error_msg = NULL) const;
   
@@ -207,6 +214,7 @@ public:
    * \param error_msg A pointer to a string which will be filled with why the transform failed, if not NULL
    * \return True if the transform is possible, false otherwise 
    */
+  TF2_PUBLIC
   bool canTransform(const std::string& target_frame, const TimePoint& target_time,
                     const std::string& source_frame, const TimePoint& source_time,
                     const std::string& fixed_frame, std::string* error_msg = NULL) const;
@@ -214,27 +222,34 @@ public:
   /** \brief A way to see what frames have been cached in yaml format
    * Useful for debugging tools
    */
+  TF2_PUBLIC
   std::string allFramesAsYAML(TimePoint current_time) const;
 
   /** Backwards compatibility for #84
   */
+  TF2_PUBLIC
   std::string allFramesAsYAML() const;
 
   /** \brief A way to see what frames have been cached
    * Useful for debugging
    */
+  TF2_PUBLIC
   std::string allFramesAsString() const;
   
   using TransformableCallback = std::function<void(TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
                                                    TimePoint time, TransformableResult result)>;
 
   /// \brief Internal use only
+  TF2_PUBLIC
   TransformableCallbackHandle addTransformableCallback(const TransformableCallback& cb);
   /// \brief Internal use only
+  TF2_PUBLIC
   void removeTransformableCallback(TransformableCallbackHandle handle);
   /// \brief Internal use only
+  TF2_PUBLIC
   TransformableRequestHandle addTransformableRequest(TransformableCallbackHandle handle, const std::string& target_frame, const std::string& source_frame, TimePoint time);
   /// \brief Internal use only
+  TF2_PUBLIC
   void cancelTransformableRequest(TransformableRequestHandle handle);
 
 
@@ -242,8 +257,10 @@ public:
 
   // Tell the buffer that there are multiple threads serviciing it. 
   // This is useful for derived classes to know if they can block or not. 
+  TF2_PUBLIC
   void setUsingDedicatedThread(bool value) { using_dedicated_thread_ = value;};
   // Get the state of using_dedicated_thread_
+  TF2_PUBLIC
   bool isUsingDedicatedThread() const { return using_dedicated_thread_;};
   
 
@@ -254,46 +271,57 @@ public:
 
   /**@brief Check if a frame exists in the tree
    * @param frame_id_str The frame id in question  */
+  TF2_PUBLIC
   bool _frameExists(const std::string& frame_id_str) const;
 
   /**@brief Fill the parent of a frame.
    * @param frame_id The frame id of the frame in question
    * @param parent The reference to the string to fill the parent
    * Returns true unless "NO_PARENT" */
+  TF2_PUBLIC
   bool _getParent(const std::string& frame_id, TimePoint time, std::string& parent) const;
 
   /** \brief A way to get a std::vector of available frame ids */
+  TF2_PUBLIC
   void _getFrameStrings(std::vector<std::string>& ids) const;
 
 
+  TF2_PUBLIC
   CompactFrameID _lookupFrameNumber(const std::string& frameid_str) const { 
     return lookupFrameNumber(frameid_str); 
   }
+  TF2_PUBLIC
   CompactFrameID _lookupOrInsertFrameNumber(const std::string& frameid_str) {
     return lookupOrInsertFrameNumber(frameid_str); 
   }
 
+  TF2_PUBLIC
   tf2::TF2Error _getLatestCommonTime(CompactFrameID target_frame, CompactFrameID source_frame, TimePoint& time, std::string* error_string) const {
     std::unique_lock<std::mutex> lock(frame_mutex_);
     return getLatestCommonTime(target_frame, source_frame, time, error_string);
   }
 
+  TF2_PUBLIC
   CompactFrameID _validateFrameId(const char* function_name_arg, const std::string& frame_id) const {
     return validateFrameId(function_name_arg, frame_id);
   }
 
   /**@brief Get the duration over which this transformer will cache */
+  TF2_PUBLIC
   tf2::Duration getCacheLength() { return cache_time_;}
 
   /** \brief Backwards compatabilityA way to see what frames have been cached
    * Useful for debugging
    */
+  TF2_PUBLIC
   std::string _allFramesAsDot(TimePoint current_time) const;
+  TF2_PUBLIC
   std::string _allFramesAsDot() const;
 
   /** \brief Backwards compatabilityA way to see what frames are in a chain
    * Useful for debugging
    */
+  TF2_PUBLIC
   void _chainAsVector(const std::string & target_frame, TimePoint target_time, const std::string & source_frame, TimePoint source_time, const std::string & fixed_frame, std::vector<std::string>& output) const;
 
 private:

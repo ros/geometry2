@@ -26,20 +26,23 @@ namespace tf2
 {
 
 /**@brief The Quaternion implements quaternion to perform linear algebra rotations in combination with Matrix3x3, Vector3 and Transform. */
-class TF2_PUBLIC Quaternion : public QuadWord {
+class Quaternion : public QuadWord {
 public:
   /**@brief No initialization constructor */
+        TF2_PUBLIC
 	Quaternion() {}
 
 	//		template <typename tf2Scalar>
 	//		explicit Quaternion(const tf2Scalar *v) : Tuple4<tf2Scalar>(v) {}
   /**@brief Constructor from scalars */
+        TF2_PUBLIC
 	Quaternion(const tf2Scalar& x, const tf2Scalar& y, const tf2Scalar& z, const tf2Scalar& w) 
 		: QuadWord(x, y, z, w) 
 	{}
   /**@brief Axis angle Constructor
    * @param axis The axis which the rotation is around
    * @param angle The magnitude of the rotation around the angle (Radians) */
+        TF2_PUBLIC
 	Quaternion(const Vector3& axis, const tf2Scalar& angle) 
 	{ 
 		setRotation(axis, angle); 
@@ -47,6 +50,7 @@ public:
   /**@brief Set the rotation using axis angle notation 
    * @param axis The axis around which to rotate
    * @param angle The magnitude of the rotation in Radians */
+        TF2_PUBLIC
 	void setRotation(const Vector3& axis, const tf2Scalar& angle)
 	{
 		tf2Scalar d = axis.length();
@@ -59,6 +63,7 @@ public:
    * @param yaw Angle around Y
    * @param pitch Angle around X
    * @param roll Angle around Z */
+        TF2_PUBLIC
 	void setEuler(const tf2Scalar& yaw, const tf2Scalar& pitch, const tf2Scalar& roll)
 	{
 		tf2Scalar halfYaw = tf2Scalar(yaw) * tf2Scalar(0.5);  
@@ -79,6 +84,7 @@ public:
    * @param roll Angle around X 
    * @param pitch Angle around Y
    * @param yaw Angle around Z*/
+        TF2_PUBLIC
   void setRPY(const tf2Scalar& roll, const tf2Scalar& pitch, const tf2Scalar& yaw)
 	{
 		tf2Scalar halfYaw = tf2Scalar(yaw) * tf2Scalar(0.5);  
@@ -105,6 +111,7 @@ public:
 
   /**@brief Sutf2ract out a quaternion
    * @param q The quaternion to sutf2ract from this one */
+        TF2_PUBLIC
 	Quaternion& operator-=(const Quaternion& q) 
 	{
 		m_floats[0] -= q.x(); m_floats[1] -= q.y(); m_floats[2] -= q.z(); m_floats[3] -= q.m_floats[3];
@@ -113,6 +120,7 @@ public:
 
   /**@brief Scale this quaternion
    * @param s The scalar to scale by */
+        TF2_PUBLIC
 	Quaternion& operator*=(const tf2Scalar& s)
 	{
 		m_floats[0] *= s; m_floats[1] *= s; m_floats[2] *= s; m_floats[3] *= s;
@@ -122,6 +130,7 @@ public:
   /**@brief Multiply this quaternion by q on the right
    * @param q The other quaternion 
    * Equivilant to this = this * q */
+        TF2_PUBLIC
 	Quaternion& operator*=(const Quaternion& q)
 	{
 		setValue(m_floats[3] * q.x() + m_floats[0] * q.m_floats[3] + m_floats[1] * q.z() - m_floats[2] * q.y(),
@@ -132,18 +141,21 @@ public:
 	}
   /**@brief Return the dot product between this quaternion and another
    * @param q The other quaternion */
+        TF2_PUBLIC
 	tf2Scalar dot(const Quaternion& q) const
 	{
 		return m_floats[0] * q.x() + m_floats[1] * q.y() + m_floats[2] * q.z() + m_floats[3] * q.m_floats[3];
 	}
 
   /**@brief Return the length squared of the quaternion */
+        TF2_PUBLIC
 	tf2Scalar length2() const
 	{
 		return dot(*this);
 	}
 
   /**@brief Return the length of the quaternion */
+        TF2_PUBLIC
 	tf2Scalar length() const
 	{
 		return tf2Sqrt(length2());
@@ -151,6 +163,7 @@ public:
 
   /**@brief Normalize the quaternion 
    * Such that x^2 + y^2 + z^2 +w^2 = 1 */
+        TF2_PUBLIC
 	Quaternion& normalize() 
 	{
 		return *this /= length();
@@ -167,6 +180,7 @@ public:
 
   /**@brief Return an inversely scaled versionof this quaternion
    * @param s The inverse scale factor */
+        TF2_PUBLIC
 	Quaternion operator/(const tf2Scalar& s) const
 	{
 		tf2Assert(s != tf2Scalar(0.0));
@@ -175,6 +189,7 @@ public:
 
   /**@brief Inversely scale this quaternion
    * @param s The scale factor */
+        TF2_PUBLIC
 	Quaternion& operator/=(const tf2Scalar& s) 
 	{
 		tf2Assert(s != tf2Scalar(0.0));
@@ -182,12 +197,14 @@ public:
 	}
 
   /**@brief Return a normalized version of this quaternion */
+        TF2_PUBLIC
 	Quaternion normalized() const 
 	{
 		return *this / length();
 	} 
   /**@brief Return the ***half*** angle between this quaternion and the other 
    * @param q The other quaternion */
+        TF2_PUBLIC
 	tf2Scalar angle(const Quaternion& q) const 
 	{
 		tf2Scalar s = tf2Sqrt(length2() * q.length2());
@@ -196,6 +213,7 @@ public:
 	}
 	/**@brief Return the angle between this quaternion and the other along the shortest path
 	* @param q The other quaternion */
+        TF2_PUBLIC
 	tf2Scalar angleShortestPath(const Quaternion& q) const 
 	{
 		tf2Scalar s = tf2Sqrt(length2() * q.length2());
@@ -206,6 +224,7 @@ public:
 			return tf2Acos(dot(q) / s) * tf2Scalar(2.0);
 	}
   /**@brief Return the angle of rotation represented by this quaternion */
+        TF2_PUBLIC
 	tf2Scalar getAngle() const 
 	{
 		tf2Scalar s = tf2Scalar(2.) * tf2Acos(m_floats[3]);
@@ -213,6 +232,7 @@ public:
 	}
 
 	/**@brief Return the angle of rotation represented by this quaternion along the shortest path*/
+        TF2_PUBLIC
 	tf2Scalar getAngleShortestPath() const 
 	{
 	tf2Scalar s;
@@ -225,6 +245,7 @@ public:
 	}
 
 	/**@brief Return the axis of the rotation represented by this quaternion */
+        TF2_PUBLIC
 	Vector3 getAxis() const
 	{
 		tf2Scalar s_squared = tf2Scalar(1.) - tf2Pow(m_floats[3], tf2Scalar(2.));
@@ -235,6 +256,7 @@ public:
 	}
 
 	/**@brief Return the inverse of this quaternion */
+        TF2_PUBLIC
 	Quaternion inverse() const
 	{
 		return Quaternion(-m_floats[0], -m_floats[1], -m_floats[2], m_floats[3]);
@@ -292,6 +314,7 @@ public:
    * @param q The other quaternion to interpolate with 
    * @param t The ratio between this and q to interpolate.  If t = 0 the result is this, if t=1 the result is q.
    * Slerp interpolates assuming constant velocity.  */
+        TF2_PUBLIC
 	Quaternion slerp(const Quaternion& q, const tf2Scalar& t) const
 	{
           tf2Scalar theta = angleShortestPath(q) / tf2Scalar(2.0);
@@ -318,6 +341,7 @@ public:
 		}
 	}
 
+        TF2_PUBLIC
 	static const Quaternion&	getIdentity()
 	{
 		static const Quaternion identityQuat(tf2Scalar(0.),tf2Scalar(0.),tf2Scalar(0.),tf2Scalar(1.));
