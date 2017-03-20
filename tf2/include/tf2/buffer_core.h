@@ -102,6 +102,8 @@ public:
    */
   TF2_PUBLIC
   BufferCore(tf2::Duration cache_time_ = BUFFER_CORE_DEFAULT_CACHE_TIME);
+
+  TF2_PUBLIC
   virtual ~BufferCore(void);
 
   /** \brief Clear all data */
