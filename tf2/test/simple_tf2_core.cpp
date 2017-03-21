@@ -114,6 +114,143 @@ TEST(tf2_canTransform, One_Exists)
   EXPECT_FALSE(tfc.canTransform("foo", "bar", ros::Time().fromSec(1.0)));
 }
 
+void addChild(const std::string& parent, const std::string& child,
+              tf2::BufferCore& tfc, bool isStatic = false, double time = 1.0)
+{
+  geometry_msgs::TransformStamped st;
+  st.header.frame_id = parent;
+  st.header.stamp = ros::Time(time);
+  st.child_frame_id = child;
+  st.transform.rotation.w = 1;
+  EXPECT_TRUE(tfc.setTransform(st, "authority1", isStatic));
+}
+
+TEST(tf2_NoParent, Child_NoParent)
+{
+  tf2::BufferCore tfc;
+  addChild("root", "child2", tfc);
+  addChild("c3", "c4", tfc);
+  addChild("NO_PARENT", "c3", tfc);
+  addChild("NO_PARENT", "root", tfc);
+  EXPECT_FALSE(tfc.canTransform("c3", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("c3", "c4", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("child2", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("c4", "root", ros::Time().fromSec(1.0)));
+  addChild("root", "c4", tfc);
+  EXPECT_TRUE(tfc.canTransform("c4", "root", ros::Time().fromSec(1.0)));
+}
+
+TEST(tf2_erase, Basic_Clear)
+{
+  tf2::BufferCore tfc;
+  geometry_msgs::TransformStamped st;
+  st.header.frame_id = "foo";
+  st.header.stamp = ros::Time(1.0);
+  st.child_frame_id = "child";
+  st.transform.rotation.w = 1;
+  EXPECT_TRUE(tfc.setTransform(st, "authority1"));
+  EXPECT_TRUE(tfc.canTransform("child", "foo", ros::Time().fromSec(1.0)));
+  tfc.erase("foo");
+  EXPECT_FALSE(tfc.canTransform("child", "foo", ros::Time().fromSec(1.0)));
+}
+
+// R
+// | \
+// C1  C2
+// |
+// C3
+// |
+// C4
+TEST(tf2_erase, Clear_With_Parent)
+{
+  tf2::BufferCore tfc;
+  addChild("root", "child1", tfc);
+  addChild("root", "child2", tfc);
+  addChild("child1", "child3", tfc);
+  addChild("child3", "child4", tfc);
+  EXPECT_TRUE(tfc.canTransform("child1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("child2", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("child3", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("child3", "child2", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("child4", "child3", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc._frameExists("child1"));
+  EXPECT_NO_THROW(tfc.lookupTransform("child4", "child3", ros::Time().fromSec(1.0)));
+  tfc.erase("child1");
+  EXPECT_FALSE(tfc._frameExists("child1"));
+  EXPECT_TRUE(tfc.canTransform("child2", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("child4", "child3", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("child1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("child3", "child1", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("child3", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("child3", "child2", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("child4", "root", ros::Time().fromSec(1.0)));
+  addChild("root", "child4", tfc);
+  EXPECT_TRUE(tfc.canTransform("child4", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("child4", "child2", ros::Time().fromSec(1.0)));
+}
+
+// R
+// | \
+// S2 B1
+// | \  \
+// S3 S4 S1
+TEST(tf2_erase, Clear_Static_Frame)
+{
+  tf2::BufferCore tfc;
+  addChild("root", "b1", tfc, false);
+  addChild("b1", "s1", tfc, true);
+  addChild("root", "s2", tfc, true);
+  addChild("s2", "s3", tfc, true);
+  addChild("s2", "s4", tfc, true);
+  EXPECT_TRUE(tfc.canTransform("b1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s3", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s4", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s4", "s1", ros::Time().fromSec(1.0)));
+  tfc.erase("s2");
+  EXPECT_TRUE(tfc.canTransform("b1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s3", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s4", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s4", "s1", ros::Time().fromSec(1.0)));
+}
+
+// R
+// | \
+// S2-B1
+// | \  \
+// S3 S4 S1
+TEST(tf2_erase, Clear_Static_Frame_Multiple_Link)
+{
+  tf2::BufferCore tfc;
+  addChild("root", "b1", tfc, false);
+  addChild("b1", "s1", tfc, true);
+  addChild("root", "s2", tfc, true);
+  addChild("s2", "b1", tfc, false, 0.9);
+  addChild("s2", "s3", tfc, true);
+  addChild("s2", "s4", tfc, true);
+  EXPECT_TRUE(tfc.canTransform("b1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("b1", "s2", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s3", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s4", "root", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s4", "s1", ros::Time().fromSec(1.0)));
+  tfc.erase("s2");
+  EXPECT_TRUE(tfc.canTransform("b1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("b1", "s2", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s3", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s4", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s4", "s1", ros::Time().fromSec(1.0)));
+  tfc.erase("NO_PARENT");
+  EXPECT_TRUE(tfc.canTransform("b1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("b1", "s2", ros::Time().fromSec(1.0)));
+  EXPECT_TRUE(tfc.canTransform("s1", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s3", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s4", "root", ros::Time().fromSec(1.0)));
+  EXPECT_FALSE(tfc.canTransform("s4", "s1", ros::Time().fromSec(1.0)));
+}
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
