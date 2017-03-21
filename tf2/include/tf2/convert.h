@@ -41,6 +41,7 @@
 #include <tf2/exceptions.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <tf2/impl/convert.h>
+#include <tf2/visibility_control.h>
 
 namespace tf2 {
 

@@ -19,6 +19,7 @@ subject to the following restrictions:
 
 
 #include "Matrix3x3.h"
+#include "tf2/visibility_control.h"
 
 
 namespace tf2
@@ -39,6 +40,7 @@ class Transform {
 public:
 	
   /**@brief No initialization constructor */
+        TF2_PUBLIC
 	Transform() {}
   /**@brief Constructor from Quaternion (optional Vector3 )
    * @param q Rotation from quaternion 
@@ -118,6 +120,7 @@ public:
 	TF2SIMD_FORCE_INLINE const Vector3&   getOrigin()   const { return m_origin; }
 
   /**@brief Return a quaternion representing the rotation */
+        TF2_PUBLIC
 	Quaternion getRotation() const { 
 		Quaternion q;
 		m_basis.getRotation(q);
@@ -127,6 +130,7 @@ public:
 	
   /**@brief Set from an array 
    * @param m A pointer to a 15 element array (12 rotation(row major padded on the right by 1), and 3 translation */
+        TF2_PUBLIC
 	void setFromOpenGLMatrix(const tf2Scalar *m)
 	{
 		m_basis.setFromOpenGLSubMatrix(m);
@@ -135,6 +139,7 @@ public:
 
   /**@brief Fill an array representation
    * @param m A pointer to a 15 element array (12 rotation(row major padded on the right by 1), and 3 translation */
+        TF2_PUBLIC
 	void getOpenGLMatrix(tf2Scalar *m) const 
 	{
 		m_basis.getOpenGLSubMatrix(m);
@@ -168,6 +173,7 @@ public:
 
 
   /**@brief Set this transformation to the identity */
+        TF2_PUBLIC
 	void setIdentity()
 	{
 		m_basis.setIdentity();
@@ -176,6 +182,7 @@ public:
 
   /**@brief Multiply this Transform by another(this = this * another) 
    * @param t The other transform */
+        TF2_PUBLIC
 	Transform& operator*=(const Transform& t) 
 	{
 		m_origin += m_basis * t.m_origin;
@@ -184,6 +191,7 @@ public:
 	}
 
   /**@brief Return the inverse of this transform */
+        TF2_PUBLIC
 	Transform inverse() const
 	{ 
 		Matrix3x3 inv = m_basis.transpose();
@@ -193,26 +201,34 @@ public:
   /**@brief Return the inverse of this transform times the other transform
    * @param t The other transform 
    * return this.inverse() * the other */
+        TF2_PUBLIC
 	Transform inverseTimes(const Transform& t) const;  
 
   /**@brief Return the product of this transform and the other */
+        TF2_PUBLIC
 	Transform operator*(const Transform& t) const;
 
   /**@brief Return an identity transform */
+        TF2_PUBLIC
 	static const Transform&	getIdentity()
 	{
 		static const Transform identityTransform(Matrix3x3::getIdentity());
 		return identityTransform;
 	}
 
+        TF2_PUBLIC
 	void	serialize(struct	TransformData& dataOut) const;
 
+        TF2_PUBLIC
 	void	serializeFloat(struct	TransformFloatData& dataOut) const;
 
+        TF2_PUBLIC
 	void	deSerialize(const struct	TransformData& dataIn);
 
+        TF2_PUBLIC
 	void	deSerializeDouble(const struct	TransformDoubleData& dataIn);
 
+        TF2_PUBLIC
 	void	deSerializeFloat(const struct	TransformFloatData& dataIn);
 
 };

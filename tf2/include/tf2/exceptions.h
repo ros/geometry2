@@ -35,6 +35,8 @@
 #include <stdexcept>
 #include <cstdint>
 
+#include <tf2/visibility_control.h>
+
 namespace tf2{
 
 enum class TF2Error : std::uint8_t {
@@ -55,6 +57,7 @@ enum class TF2Error : std::uint8_t {
 class TransformException: public std::runtime_error
 { 
 public:
+  TF2_PUBLIC
   TransformException(const std::string errorDescription) : std::runtime_error(errorDescription) { ; };
 };
 
@@ -67,6 +70,7 @@ public:
 class ConnectivityException:public TransformException
 { 
 public:
+  TF2_PUBLIC
   ConnectivityException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
@@ -82,15 +86,17 @@ public:
 class LookupException: public TransformException
 { 
 public:
+  TF2_PUBLIC
   LookupException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
   /** \brief An exception class to notify that the requested value would have required extrapolation beyond current limits.
    * 
    */
-class ExtrapolationException: public TransformException 
+class ExtrapolationException: public TransformException
 { 
 public:
+  TF2_PUBLIC
   ExtrapolationException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
@@ -99,9 +105,10 @@ public:
  * usually it's an uninitalized Quaternion (0,0,0,0)
  * 
  */
-class InvalidArgumentException: public TransformException  
+class InvalidArgumentException: public TransformException
 { 
 public:
+  TF2_PUBLIC
   InvalidArgumentException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
@@ -109,9 +116,10 @@ public:
  * 
  * 
  */
-class TimeoutException: public TransformException  
+class TimeoutException: public TransformException
 { 
 public:
+  TF2_PUBLIC
   TimeoutException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 

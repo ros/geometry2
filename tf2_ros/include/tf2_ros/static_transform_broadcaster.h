@@ -38,6 +38,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
+#include "tf2_ros/visibility_control.h"
 
 namespace tf2_ros
 {
@@ -49,15 +50,18 @@ namespace tf2_ros
 
 class StaticTransformBroadcaster{
 public:
-  /** \brief Constructor (needs a ros::Node reference) */
-  StaticTransformBroadcaster();
+
+  TF2_ROS_PUBLIC
+  StaticTransformBroadcaster(rclcpp::node::Node::SharedPtr node);
 
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
+  TF2_ROS_PUBLIC
   void sendTransform(const geometry_msgs::msg::TransformStamped & transform);
 
   /** \brief Send a vector of TransformStamped messages
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
+  TF2_ROS_PUBLIC
   void sendTransform(const std::vector<geometry_msgs::msg::TransformStamped> & transforms);
 
 private:

@@ -18,6 +18,7 @@ subject to the following restrictions:
 
 #include "Scalar.h"
 #include "MinMax.h"
+#include "tf2/visibility_control.h"
 
 
 #if defined (__CELLOS_LV2) && defined (__SPU__)
@@ -43,6 +44,7 @@ protected:
 		tf2Scalar	m_floats[4];
 	};
 public:
+        TF2_PUBLIC
 	vec_float4	get128() const
 	{
 		return mVec128;

@@ -33,13 +33,13 @@
 #ifndef TF2_ROS_TRANSFORMBROADCASTER_H
 #define TF2_ROS_TRANSFORMBROADCASTER_H
 
-
-
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include "tf2_msgs/msg/tf_message.hpp"
+#include "tf2_ros/visibility_control.h"
+
 namespace tf2_ros
 {
-
 
 /** \brief This class provides an easy way to publish coordinate frame transform information.  
  * It will handle all the messaging and stuffing of messages.  And the function prototypes lay out all the 
@@ -48,7 +48,8 @@ namespace tf2_ros
 class TransformBroadcaster{
 public:
   /** \brief Constructor (needs a ros::Node reference) */
-  TransformBroadcaster();
+  TF2_ROS_PUBLIC
+  TransformBroadcaster(rclcpp::node::Node::SharedPtr node);
 
   /** \brief Send a StampedTransform 
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
@@ -60,10 +61,12 @@ public:
 
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
+  TF2_ROS_PUBLIC
   void sendTransform(const geometry_msgs::msg::TransformStamped & transform);
 
   /** \brief Send a vector of TransformStamped messages
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
+  TF2_ROS_PUBLIC
   void sendTransform(const std::vector<geometry_msgs::msg::TransformStamped> & transforms);
 
 private:

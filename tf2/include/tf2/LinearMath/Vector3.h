@@ -20,6 +20,7 @@ subject to the following restrictions:
 
 #include "Scalar.h"
 #include "MinMax.h"
+#include "tf2/visibility_control.h"
 
 namespace tf2
 {
@@ -313,6 +314,7 @@ public:
 			m_floats[3] = tf2Scalar(0.);
 		}
 
+                TF2_PUBLIC
 		void	getSkewSymmetricMatrix(Vector3* v0,Vector3* v1,Vector3* v2) const
 		{
 			v0->setValue(0.		,-z()		,y());
@@ -320,6 +322,7 @@ public:
 			v2->setValue(-y()	,x()	,0.);
 		}
 
+                TF2_PUBLIC
 		void	setZero()
 		{
 			setValue(tf2Scalar(0.),tf2Scalar(0.),tf2Scalar(0.));
@@ -513,6 +516,7 @@ public:
 
 
 
+        TF2_PUBLIC
 	tf2Scalar	getW() const { return m_floats[3];}
 
 

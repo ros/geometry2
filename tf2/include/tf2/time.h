@@ -35,6 +35,8 @@
 #include <string>
 #include <thread>
 
+#include <tf2/visibility_control.h>
+
 namespace tf2
 {
   using Duration = std::chrono::duration<double, std::nano>;
@@ -59,6 +61,7 @@ namespace tf2
     return durationToSec(Duration(timepoint.time_since_epoch()));
   }
 
+  TF2_PUBLIC
   std::string displayTimePoint(const TimePoint& stamp);
 
 }

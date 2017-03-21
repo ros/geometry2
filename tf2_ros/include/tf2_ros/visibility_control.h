@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Willow Garage, Inc.
+ * Copyright (c) 2017 Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,60 +27,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** \author Tully Foote */
+#ifndef TF2_ROS__VISIBILITY_CONTROL_H_
+#define TF2_ROS__VISIBILITY_CONTROL_H_
 
-#ifndef TF2_TRANSFORM_STORAGE_H
-#define TF2_TRANSFORM_STORAGE_H
+// This logic was borrowed (then namespaced) from the examples on the gcc wiki:
+//     https://gcc.gnu.org/wiki/Visibility
 
-#include <tf2/LinearMath/Vector3.h>
-#include <tf2/LinearMath/Quaternion.h>
-
-#include "tf2/time.h"
-#include <tf2/visibility_control.h>
-
-namespace tf2
-{
-
-
-
-typedef uint32_t CompactFrameID;
-
-/** \brief Storage for transforms and their parent */
-class TransformStorage
-{
-public:
-  TF2_PUBLIC
-  TransformStorage();
-  TF2_PUBLIC
-  TransformStorage(const TimePoint& stamp, const Quaternion& q, const Vector3& t, CompactFrameID frame_id,
-                   CompactFrameID child_frame_id);
-
-  TF2_PUBLIC
-  TransformStorage(const TransformStorage& rhs)
-  {
-    *this = rhs;
-  }
-
-  TF2_PUBLIC
-  TransformStorage& operator=(const TransformStorage& rhs)
-  {
-#if 01
-    rotation_ = rhs.rotation_;
-    translation_ = rhs.translation_;
-    stamp_ = rhs.stamp_;
-    frame_id_ = rhs.frame_id_;
-    child_frame_id_ = rhs.child_frame_id_;
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef __GNUC__
+    #define TF2_ROS_EXPORT __attribute__ ((dllexport))
+    #define TF2_ROS_IMPORT __attribute__ ((dllimport))
+  #else
+    #define TF2_ROS_EXPORT __declspec(dllexport)
+    #define TF2_ROS_IMPORT __declspec(dllimport)
+  #endif
+  #ifdef TF2_ROS_BUILDING_DLL
+    #define TF2_ROS_PUBLIC TF2_ROS_EXPORT
+  #else
+    #define TF2_ROS_PUBLIC TF2_ROS_IMPORT
+  #endif
+  #define TF2_ROS_PUBLIC_TYPE TF2_ROS_PUBLIC
+  #define TF2_ROS_LOCAL
+#else
+  #define TF2_ROS_EXPORT __attribute__ ((visibility("default")))
+  #define TF2_ROS_IMPORT
+  #if __GNUC__ >= 4
+    #define TF2_ROS_PUBLIC __attribute__ ((visibility("default")))
+    #define TF2_ROS_LOCAL  __attribute__ ((visibility("hidden")))
+  #else
+    #define TF2_ROS_PUBLIC
+    #define TF2_ROS_LOCAL
+  #endif
+  #define TF2_ROS_PUBLIC_TYPE
 #endif
-    return *this;
-  }
 
-  tf2::Quaternion rotation_;
-  tf2::Vector3 translation_;
-  TimePoint stamp_;
-  CompactFrameID frame_id_;
-  CompactFrameID child_frame_id_;
-};
-
-}
-
-#endif // TF2_TRANSFORM_STORAGE_H
+#endif  // TF2_ROS__VISIBILITY_CONTROL_H_

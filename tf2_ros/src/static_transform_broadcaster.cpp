@@ -37,14 +37,14 @@
 
 namespace tf2_ros {
 
-StaticTransformBroadcaster::StaticTransformBroadcaster()
+StaticTransformBroadcaster::StaticTransformBroadcaster(rclcpp::node::Node::SharedPtr node):
+  node_(node)
 {
-  node_ = rclcpp::node::Node::make_shared("static_transform_publisher");
   rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
   custom_qos_profile.depth = 100;
   // TODO(tfoote) latched equivalent
   publisher_ = node_->create_publisher<tf2_msgs::msg::TFMessage>("tf_static", custom_qos_profile);
-};
+}
 
 void StaticTransformBroadcaster::sendTransform(const geometry_msgs::msg::TransformStamped & msgtf)
 {
@@ -53,13 +53,12 @@ void StaticTransformBroadcaster::sendTransform(const geometry_msgs::msg::Transfo
   sendTransform(v1);
 }
 
-
 void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::msg::TransformStamped> & msgtf)
 {
-  for (std::vector<geometry_msgs::msg::TransformStamped>::const_iterator it_in = msgtf.begin(); it_in != msgtf.end(); ++it_in)
+  for (auto it_in = msgtf.begin(); it_in != msgtf.end(); ++it_in)
   {
     bool match_found = false;
-    for (std::vector<geometry_msgs::msg::TransformStamped>::iterator it_msg = net_message_.transforms.begin(); it_msg != net_message_.transforms.end(); ++it_msg)
+    for (auto it_msg = net_message_.transforms.begin(); it_msg != net_message_.transforms.end(); ++it_msg)
     {
       if (it_in->child_frame_id == it_msg->child_frame_id)
       {
@@ -74,6 +73,5 @@ void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::
 
   publisher_->publish(net_message_);
 }
-
 
 }
