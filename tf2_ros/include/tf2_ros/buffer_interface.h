@@ -42,20 +42,32 @@
 
 namespace tf2_ros
 {
+  inline builtin_interfaces::msg::Time toMsg(const tf2::TimePoint & t)
+  {
+    std::chrono::nanoseconds ns = \
+      std::chrono::duration_cast<std::chrono::nanoseconds>(t.time_since_epoch());
+    std::chrono::seconds s = \
+      std::chrono::duration_cast<std::chrono::seconds>(t.time_since_epoch());
+    builtin_interfaces::msg::Time time_msg;
+    time_msg.sec = (int32_t)s.count();
+    time_msg.nanosec = (uint32_t)(ns.count() % 1000000000ull);
+    return time_msg;
+  }
+
+  inline const tf2::TimePoint& fromMsg(const builtin_interfaces::msg::Time & time_msg)
+  {
+    int64_t d = time_msg.sec * 1000000000ull + time_msg.nanosec;
+    tf2::TimePoint t = tf2::TimePoint(std::chrono::nanoseconds(d));
+    return std::move(t);
+  }
+
   // TODO(tfoote) replace this with something easier
   inline builtin_interfaces::msg::Time get_now_msg()
   {
     // TODO(tfoote) update to use an rclcpp now in future implementation
     // msg.header.stamp = builtin_interfaces::msg::Time.now();
     auto now = std::chrono::system_clock::now();
-    std::chrono::nanoseconds ns = \
-      std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch());
-    std::chrono::seconds s = \
-      std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
-    builtin_interfaces::msg::Time t;
-    t.sec = (int32_t)s.count();
-    t.nanosec = (uint32_t)(ns.count() % 1000000000ull);
-    return t;
+    return toMsg(now);
   }
 
   inline double timeToSec(const builtin_interfaces::msg::Time & time_msg)
