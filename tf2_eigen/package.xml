@@ -9,12 +9,12 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>geometry_msgs</depend>
+  <depend>tf2</depend>
+
   <build_depend>cmake_modules</build_depend>
   <build_depend>eigen</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>tf2</build_depend>
 
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>tf2</exec_depend>
+  <build_export_depend>eigen</build_export_depend>
 
 </package>
