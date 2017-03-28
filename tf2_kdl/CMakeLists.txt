@@ -28,17 +28,17 @@ install(PROGRAMS scripts/test.py
 
 if(CATKIN_ENABLE_TESTING)
 
-find_package(catkin REQUIRED COMPONENTS rostest tf2 tf2_ros tf2_msgs)
+  find_package(catkin REQUIRED COMPONENTS rostest tf2 tf2_ros tf2_msgs)
 
-add_executable(test_kdl EXCLUDE_FROM_ALL test/test_tf2_kdl.cpp)
-find_package (Threads)
-target_link_libraries(test_kdl ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${orocos_kdl_LIBRARIES} ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+  add_executable(test_kdl EXCLUDE_FROM_ALL test/test_tf2_kdl.cpp)
+  find_package(Threads)
+  target_link_libraries(test_kdl ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${orocos_kdl_LIBRARIES} ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
-add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test_python.launch)
+  add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
+  add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test_python.launch)
 
-if(TARGET tests)
-  add_dependencies(tests test_kdl)
-endif()
+  if(TARGET tests)
+    add_dependencies(tests test_kdl)
+  endif()
 
 endif()
