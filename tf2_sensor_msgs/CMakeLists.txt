@@ -25,7 +25,7 @@ catkin_python_setup()
 if(CATKIN_ENABLE_TESTING)
   catkin_add_nosetests(test/test_tf2_sensor_msgs.py)
 
-  find_package(catkin REQUIRED COMPONENTS sensor_msgs rostest tf2_ros tf2)
+  find_package(catkin REQUIRED COMPONENTS geometry_msgs sensor_msgs rostest tf2_ros tf2)
 
   include_directories(${EIGEN_INCLUDE_DIRS})
 
