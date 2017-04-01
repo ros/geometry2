@@ -193,6 +193,18 @@ void fromMsg(const geometry_msgs::Vector3Stamped& msg, tf2::Stamped<tf2::Vector3
  * \param in A tf2 Vector3 object.
  * \return The Vector3 converted to a geometry_msgs message type.
  */
+template <>
+inline
+geometry_msgs::Point toMsg(const tf2::Vector3& in)
+{
+  geometry_msgs::Point out;
+  out.x = in.getX();
+  out.y = in.getY();
+  out.z = in.getZ();
+  return out;
+}
+
+
 inline
 void toMsg(const tf2::Vector3& in, geometry_msgs::Point& out)
 {
@@ -533,7 +545,7 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& 
 }
 
 /** \brief Convert as stamped tf2 Pose type to its equivalent geometry_msgs representation.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * This function is a specialization of the (toMsg) template defined in tf2/convert.h.
  * \param in An instance of the tf2::Pose specialization of the tf2::Stamped template.
  * \return The PoseStamped converted to a geometry_msgs PoseStamped message type.
  */
