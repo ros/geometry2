@@ -2,6 +2,22 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.15 (2017-01-24)
+-------------------
+
+0.5.14 (2017-01-16)
+-------------------
+* Improve tf compatibility (`#192 <https://github.com/ros/geometry2/issues/192>`_)
+  getLatestCommonTime() is needed to implement the TF API.
+  See `ros/geometry#134 <https://github.com/ros/geometry/issues/134>`_
+* Add missing type checks at Python/C++ tf2 transform interface `#159 <https://github.com/ros/geometry2/issues/159>`_ (`#197 <https://github.com/ros/geometry2/issues/197>`_)
+* Make tf2_py compatible with python3. (`#173 <https://github.com/ros/geometry2/issues/173>`_)
+  * tf2_py: Use PyUnicode objects for text in python3.
+  * tf2_py: Make module initialization python3 compatible.
+  * tf2_py: Fix type definition for python3.
+  * tf2_py: Move and rename PyObject_BorrowAttrString.
+* Contributors: Maarten de Vries, Timo Röhling, alex
+
 0.5.13 (2016-03-04)
 -------------------
 

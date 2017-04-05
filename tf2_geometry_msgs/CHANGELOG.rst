@@ -2,6 +2,14 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.15 (2017-01-24)
+-------------------
+
+0.5.14 (2017-01-16)
+-------------------
+* Add doxygen documentation for tf2_geometry_msgs
+* Contributors: Jackie Kay
+
 0.5.13 (2016-03-04)
 -------------------
 * Add missing python_orocos_kdl dependency

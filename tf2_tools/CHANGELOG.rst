@@ -2,6 +2,14 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.15 (2017-01-24)
+-------------------
+
+0.5.14 (2017-01-16)
+-------------------
+* Remove old load_manifest from view_frames (`#182 <https://github.com/ros/geometry2/issues/182>`_)
+* Contributors: Jochen Sprickerhof
+
 0.5.13 (2016-03-04)
 -------------------
 * casted el to string in view_frames

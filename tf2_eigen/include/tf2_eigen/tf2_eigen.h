@@ -80,6 +80,7 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>
+inline
 void doTransform(const Eigen::Vector3d& t_in, Eigen::Vector3d& t_out, const geometry_msgs::TransformStamped& transform)
 {
   t_out = Eigen::Vector3d(transformToEigen(transform) * t_in);
@@ -166,6 +167,7 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>
+inline
 void doTransform(const Eigen::Affine3d& t_in,
                  Eigen::Affine3d& t_out,
                  const geometry_msgs::TransformStamped& transform) {

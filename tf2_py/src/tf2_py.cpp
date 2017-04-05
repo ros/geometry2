@@ -228,20 +228,19 @@ static PyObject *canTransformFullCore(PyObject *self, PyObject *args, PyObject *
   return Py_BuildValue("bs", can_transform, error_msg.c_str());
 }
 
-/* Debugging stuff that may need to be implemented later
 static PyObject *asListOfStrings(std::vector< std::string > los)
 {
   PyObject *r = PyList_New(los.size());
   size_t i;
   for (i = 0; i < los.size(); i++) {
-    PyList_SetItem(r, i, toPythonString(los[i]));
+    PyList_SetItem(r, i, stringToPython(los[i]));
   }
   return r;
 }
 
-static PyObject *chain(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *_chain(PyObject *self, PyObject *args, PyObject *kw)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *target_frame, *source_frame, *fixed_frame;
   ros::Time target_time, source_time;
   std::vector< std::string > output;
@@ -257,20 +256,23 @@ static PyObject *chain(PyObject *self, PyObject *args, PyObject *kw)
                         &fixed_frame))
     return NULL;
 
-  WRAP(t->chainAsVector(target_frame, target_time, source_frame, source_time, fixed_frame, output));
+  WRAP(bc->_chainAsVector(target_frame, target_time, source_frame, source_time, fixed_frame, output));
   return asListOfStrings(output);
 }
 
-static PyObject *getLatestCommonTime(PyObject *self, PyObject *args, PyObject *kw)
+static PyObject *getLatestCommonTime(PyObject *self, PyObject *args)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
-  char *source, *dest;
-  std::string error_string;
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  char *target_frame, *source_frame;
+  tf2::CompactFrameID target_id, source_id;
   ros::Time time;
+  std::string error_string;
 
-  if (!PyArg_ParseTuple(args, "ss", &source, &dest))
+  if (!PyArg_ParseTuple(args, "ss", &target_frame, &source_frame))
     return NULL;
-  int r = t->getLatestCommonTime(source, dest, time, &error_string);
+  WRAP(target_id = bc->_validateFrameId("get_latest_common_time", target_frame));
+  WRAP(source_id = bc->_validateFrameId("get_latest_common_time", source_frame));
+  int r = bc->_getLatestCommonTime(target_id, source_id, time, &error_string);
   if (r == 0) {
     PyObject *rospy_time = PyObject_GetAttrString(pModulerospy, "Time");
     PyObject *args = Py_BuildValue("ii", time.sec, time.nsec);
@@ -279,11 +281,10 @@ static PyObject *getLatestCommonTime(PyObject *self, PyObject *args, PyObject *k
     Py_DECREF(rospy_time);
     return ob;
   } else {
-    PyErr_SetString(tf_exception, error_string.c_str());
+    PyErr_SetString(tf2_exception, error_string.c_str());
     return NULL;
   }
 }
-*/
 
 static PyObject *lookupTransformCore(PyObject *self, PyObject *args, PyObject *kw)
 {
@@ -373,6 +374,18 @@ static PyObject *lookupTwistFullCore(PyObject *self, PyObject *args)
       twist.angular.x, twist.angular.y, twist.angular.z);
 }
 */
+static inline int checkTranslationType(PyObject* o)
+{
+  PyTypeObject *translation_type = (PyTypeObject*) PyObject_GetAttrString(pModulegeometrymsgs, "Vector3");
+  return PyObject_TypeCheck(o, translation_type);
+}
+
+static inline int checkRotationType(PyObject* o)
+{
+  PyTypeObject *rotation_type = (PyTypeObject*) PyObject_GetAttrString(pModulegeometrymsgs, "Quaternion");
+  return PyObject_TypeCheck(o, rotation_type);
+}
+
 static PyObject *setTransform(PyObject *self, PyObject *args)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
@@ -390,11 +403,23 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
     return NULL;
 
   PyObject *mtransform = pythonBorrowAttrString(py_transform, "transform");
+
   PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
+  if (!checkTranslationType(translation)) {
+    PyErr_SetString(PyExc_TypeError, "transform.translation must be of type Vector3");
+    return NULL;
+  }
+
   transform.transform.translation.x = PyFloat_AsDouble(pythonBorrowAttrString(translation, "x"));
   transform.transform.translation.y = PyFloat_AsDouble(pythonBorrowAttrString(translation, "y"));
   transform.transform.translation.z = PyFloat_AsDouble(pythonBorrowAttrString(translation, "z"));
+
   PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
+  if (!checkRotationType(rotation)) {
+    PyErr_SetString(PyExc_TypeError, "transform.rotation must be of type Quaternion");
+    return NULL;
+  }
+
   transform.transform.rotation.x = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "x"));
   transform.transform.rotation.y = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "y"));
   transform.transform.rotation.z = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "z"));
@@ -422,10 +447,21 @@ static PyObject *setTransformStatic(PyObject *self, PyObject *args)
 
   PyObject *mtransform = pythonBorrowAttrString(py_transform, "transform");
   PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
+  if (!checkTranslationType(translation)) {
+    PyErr_SetString(PyExc_TypeError, "transform.translation must be of type Vector3");
+    return NULL;
+  }
+
   transform.transform.translation.x = PyFloat_AsDouble(pythonBorrowAttrString(translation, "x"));
   transform.transform.translation.y = PyFloat_AsDouble(pythonBorrowAttrString(translation, "y"));
   transform.transform.translation.z = PyFloat_AsDouble(pythonBorrowAttrString(translation, "z"));
+
   PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
+  if (!checkRotationType(rotation)) {
+    PyErr_SetString(PyExc_TypeError, "transform.rotation must be of type Quaternion");
+    return NULL;
+  }
+
   transform.transform.rotation.x = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "x"));
   transform.transform.rotation.y = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "y"));
   transform.transform.rotation.z = PyFloat_AsDouble(pythonBorrowAttrString(rotation, "z"));
@@ -443,24 +479,33 @@ static PyObject *clear(PyObject *self, PyObject *args)
   Py_RETURN_NONE;
 }
 
-/* May come back eventually, but not in public api right now
-static PyObject *frameExists(PyObject *self, PyObject *args)
+static PyObject *_frameExists(PyObject *self, PyObject *args)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   char *frame_id_str;
   if (!PyArg_ParseTuple(args, "s", &frame_id_str))
     return NULL;
-  return PyBool_FromLong(t->frameExists(frame_id_str));
+  return PyBool_FromLong(bc->_frameExists(frame_id_str));
 }
 
-static PyObject *getFrameStrings(PyObject *self, PyObject *args)
+static PyObject *_getFrameStrings(PyObject *self, PyObject *args)
 {
-  tf::Transformer *t = ((transformer_t*)self)->t;
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
   std::vector< std::string > ids;
-  t->getFrameStrings(ids);
+  bc->_getFrameStrings(ids);
   return asListOfStrings(ids);
 }
-*/
+
+static PyObject *_allFramesAsDot(PyObject *self, PyObject *args, PyObject *kw)
+{
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  static const char *keywords[] = { "time", NULL };
+  ros::Time time;
+  if (!PyArg_ParseTupleAndKeywords(args, kw, "|O&", (char**)keywords, rostime_converter, &time))
+    return NULL;
+  return PyString_FromString(bc->_allFramesAsDot(time.toSec()).c_str());
+}
+
 
 static struct PyMethodDef buffer_core_methods[] =
 {
@@ -470,11 +515,12 @@ static struct PyMethodDef buffer_core_methods[] =
   {"set_transform_static", setTransformStatic, METH_VARARGS},
   {"can_transform_core", (PyCFunction)canTransformCore, METH_KEYWORDS},
   {"can_transform_full_core", (PyCFunction)canTransformFullCore, METH_KEYWORDS},
-  //{"chain", (PyCFunction)chain, METH_KEYWORDS},
+  {"_chain", (PyCFunction)_chain, METH_KEYWORDS},
   {"clear", (PyCFunction)clear, METH_KEYWORDS},
-  //{"frameExists", (PyCFunction)frameExists, METH_VARARGS},
-  //{"getFrameStrings", (PyCFunction)getFrameStrings, METH_VARARGS},
-  //{"getLatestCommonTime", (PyCFunction)getLatestCommonTime, METH_VARARGS},
+  {"_frameExists", (PyCFunction)_frameExists, METH_VARARGS},
+  {"_getFrameStrings", (PyCFunction)_getFrameStrings, METH_VARARGS},
+  {"_allFramesAsDot", (PyCFunction)_allFramesAsDot, METH_KEYWORDS},
+  {"get_latest_common_time", (PyCFunction)getLatestCommonTime, METH_VARARGS},
   {"lookup_transform_core", (PyCFunction)lookupTransformCore, METH_KEYWORDS},
   {"lookup_transform_full_core", (PyCFunction)lookupTransformFullCore, METH_KEYWORDS},
   //{"lookupTwistCore", (PyCFunction)lookupTwistCore, METH_KEYWORDS},

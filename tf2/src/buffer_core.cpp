@@ -41,6 +41,9 @@
 namespace tf2
 {
 
+// Tolerance for acceptable quaternion normalization
+static double QUATERNION_NORMALIZATION_TOLERANCE = 10e-3;
+
 /** \brief convert Transform msg to Transform */
 void transformMsgToTF2(const geometry_msgs::Transform& msg, tf2::Transform& tf2)
 {tf2 = tf2::Transform(tf2::Quaternion(msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w), tf2::Vector3(msg.translation.x, msg.translation.y, msg.translation.z));}
@@ -238,6 +241,19 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
               stripped.transform.translation.x, stripped.transform.translation.y, stripped.transform.translation.z,
               stripped.transform.rotation.x, stripped.transform.rotation.y, stripped.transform.rotation.z, stripped.transform.rotation.w
               );
+    error_exists = true;
+  }
+
+  bool valid = std::abs((stripped.transform.rotation.w * stripped.transform.rotation.w
+                        + stripped.transform.rotation.x * stripped.transform.rotation.x
+                        + stripped.transform.rotation.y * stripped.transform.rotation.y
+                        + stripped.transform.rotation.z * stripped.transform.rotation.z) - 1.0f) < QUATERNION_NORMALIZATION_TOLERANCE;
+
+  if (!valid) 
+  {
+    logError("TF_DENORMALIZED_QUATERNION: Ignoring transform for child_frame_id \"%s\" from authority \"%s\" because of an invalid quaternion in the transform (%f %f %f %f)",
+             stripped.child_frame_id.c_str(), authority.c_str(),
+             stripped.transform.rotation.x, stripped.transform.rotation.y, stripped.transform.rotation.z, stripped.transform.rotation.w);
     error_exists = true;
   }
 
