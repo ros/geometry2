@@ -32,8 +32,6 @@
 #include <gtest/gtest.h>
 #include <tf2/convert.h>
 
-static const double EPS = 1e-3;
-
 TEST(TfEigen, ConvertVector3dStamped)
 {
   const tf2::Stamped<Eigen::Vector3d> v(Eigen::Vector3d(1,2,3), ros::Time(5), "test");
@@ -90,24 +88,24 @@ TEST(TfEigen, ConvertAffine3d)
 TEST(TfEigen, ConvertTransform)
 {
   Eigen::Matrix4d tm;
-  
+
   double alpha = M_PI/4.0;
   double theta = M_PI/6.0;
   double gamma = M_PI/12.0;
-  
+
   tm << cos(theta)*cos(gamma),-cos(theta)*sin(gamma),sin(theta), 1, //
   cos(alpha)*sin(gamma)+sin(alpha)*sin(theta)*cos(gamma),cos(alpha)*cos(gamma)-sin(alpha)*sin(theta)*sin(gamma),-sin(alpha)*cos(theta), 2, //
   sin(alpha)*sin(gamma)-cos(alpha)*sin(theta)*cos(gamma),cos(alpha)*sin(theta)*sin(gamma)+sin(alpha)*cos(gamma),cos(alpha)*cos(theta), 3, //
   0, 0, 0, 1;
-  
+
   Eigen::Affine3d T(tm);
-  
+
   geometry_msgs::TransformStamped msg = tf2::eigenToTransform(T);
   Eigen::Affine3d Tback = tf2::transformToEigen(msg);
-  
+
   EXPECT_TRUE(T.isApprox(Tback));
   EXPECT_TRUE(tm.isApprox(Tback.matrix()));
-    
+
 }
 
 
