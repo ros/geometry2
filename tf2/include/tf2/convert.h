@@ -62,7 +62,8 @@ template <class T>
 
 /**\brief Get the frame_id from data 
  * \param t The data input.
- * \return The frame_id associated with the data. 
+ * \return The frame_id associated with the data. The lifetime of the returned
+ * reference is bound to the life time of the argument.
  */
 template <class T>
   const std::string& getFrameId(const T& t);
