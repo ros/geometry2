@@ -67,7 +67,7 @@ KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
  * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
  * \param t VectorStamped message to extract the timestamp from.
  * \return The timestamp of the message. The lifetime of the returned reference
- * is bound to the life time of the argument.
+ * is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -77,7 +77,7 @@ inline
  * This function is a specialization of the getFrameId template defined in tf2/convert.h.
  * \param t VectorStamped message to extract the frame ID from.
  * \return A string containing the frame ID of the message. The lifetime of the
- * returned reference is bound to the life time of the argument.
+ * returned reference is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -133,7 +133,7 @@ void fromMsg(const geometry_msgs::Vector3Stamped& msg, geometry_msgs::Vector3Sta
  * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
  * \param t PointStamped message to extract the timestamp from.
  * \return The timestamp of the message. The lifetime of the returned reference
- * is bound to the life time of the argument.
+ * is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -143,7 +143,7 @@ inline
  * This function is a specialization of the getFrameId template defined in tf2/convert.h.
  * \param t PointStamped message to extract the frame ID from.
  * \return A string containing the frame ID of the message. The lifetime of the
- * returned reference is bound to the life time of the argument.
+ * returned reference is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -198,7 +198,7 @@ void fromMsg(const geometry_msgs::PointStamped& msg, geometry_msgs::PointStamped
  * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
  * \param t PoseStamped message to extract the timestamp from.
  * \return The timestamp of the message. The lifetime of the returned reference
- * is bound to the life time of the argument.
+ * is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -208,7 +208,7 @@ inline
  * This function is a specialization of the getFrameId template defined in tf2/convert.h.
  * \param t PoseStamped message to extract the frame ID from.
  * \return A string containing the frame ID of the message. The lifetime of the
- * returned reference is bound to the life time of the argument.
+ * returned reference is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -300,7 +300,7 @@ void fromMsg(const geometry_msgs::Quaternion& in, tf2::Quaternion& out)
  * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
  * \param t QuaternionStamped message to extract the timestamp from.
  * \return The timestamp of the message. The lifetime of the returned reference
- * is bound to the life time of the argument.
+ * is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -310,7 +310,7 @@ const ros::Time& getTimestamp(const geometry_msgs::QuaternionStamped& t)  {retur
  * This function is a specialization of the getFrameId template defined in tf2/convert.h.
  * \param t QuaternionStamped message to extract the frame ID from.
  * \return A string containing the frame ID of the message. The lifetime of the
- * returned reference is bound to the life time of the argument.
+ * returned reference is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -400,7 +400,7 @@ void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quate
  * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
  * \param t TransformStamped message to extract the timestamp from.
  * \return The timestamp of the message. The lifetime of the returned reference
- * is bound to the life time of the argument.
+ * is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -410,7 +410,7 @@ const ros::Time& getTimestamp(const geometry_msgs::TransformStamped& t)  {return
  * This function is a specialization of the getFrameId template defined in tf2/convert.h.
  * \param t TransformStamped message to extract the frame ID from.
  * \return A string containing the frame ID of the message. The lifetime of the
- * returned reference is bound to the life time of the argument.
+ * returned reference is bound to the lifetime of the argument.
  */
 template <>
 inline

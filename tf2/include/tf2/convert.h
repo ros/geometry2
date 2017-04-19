@@ -55,7 +55,7 @@ template <class T>
 /**\brief Get the timestamp from data 
  * \param t The data input.
  * \return The timestamp associated with the data. The lifetime of the returned
- * reference is bound to the life time of the argument.
+ * reference is bound to the lifetime of the argument.
  */
 template <class T>
   const ros::Time& getTimestamp(const T& t);
@@ -63,7 +63,7 @@ template <class T>
 /**\brief Get the frame_id from data 
  * \param t The data input.
  * \return The frame_id associated with the data. The lifetime of the returned
- * reference is bound to the life time of the argument.
+ * reference is bound to the lifetime of the argument.
  */
 template <class T>
   const std::string& getFrameId(const T& t);

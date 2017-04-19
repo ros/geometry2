@@ -47,7 +47,7 @@ namespace tf2
  * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
  * \param t PointCloud2 message to extract the timestamp from.
  * \return The timestamp of the message. The lifetime of the returned reference
- * is bound to the life time of the argument.
+ * is bound to the lifetime of the argument.
  */
 template <>
 inline
@@ -57,7 +57,7 @@ const ros::Time& getTimestamp(const sensor_msgs::PointCloud2& p) {return p.heade
  * This function is a specialization of the getFrameId template defined in tf2/convert.h.
  * \param t PointCloud2 message to extract the frame ID from.
  * \return A string containing the frame ID of the message. The lifetime of the
- * returned reference is bound to the life time of the argument.
+ * returned reference is bound to the lifetime of the argument.
  */
 template <>
 inline
