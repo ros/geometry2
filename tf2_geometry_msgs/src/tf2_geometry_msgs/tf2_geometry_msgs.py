@@ -26,11 +26,15 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # author: Wim Meeussen
+# quaterion implementation has been taken from the transforms3d package (author: Matthew Brett)
+# link: https://pypi.python.org/pypi/transforms3d
 
 from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped
-import PyKDL
+import numpy as np
 import rospy
 import tf2_ros
+
+import PyKDL
 
 def to_msg_msg(msg):
     return msg
@@ -54,9 +58,72 @@ def transform_to_kdl(t):
                                     t.transform.translation.z))
 
 
-# PointStamped
+def qmult(q1, q2):
+    ''' Multiply two quaternions
+    Parameters
+    ----------
+    q1 : 4 element sequence
+    q2 : 4 element sequence
+    Returns
+    -------
+    q12 : shape (4,) array
+    Notes
+    -----
+    See : http://en.wikipedia.org/wiki/Quaternions#Hamilton_product
+    '''
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    w = w1*w2 - x1*x2 - y1*y2 - z1*z2
+    x = w1*x2 + x1*w2 + y1*z2 - z1*y2
+    y = w1*y2 + y1*w2 + z1*x2 - x1*z2
+    z = w1*z2 + z1*w2 + x1*y2 - y1*x2
+    return np.array([w, x, y, z])
+
+
+def qconjugate(q):
+    ''' Conjugate of quaternion
+    Parameters
+    ----------
+    q : 4 element sequence
+       w, i, j, k of quaternion
+    Returns
+    -------
+    conjq : array shape (4,)
+       w, i, j, k of conjugate of `q`
+    '''
+    return np.array(q) * np.array([1.0, -1, -1, -1])
+
+def rotate_vector(v, q):
+    ''' Apply transformation in quaternion `q` to vector `v`
+    Parameters
+    ----------
+    v : 3 element sequence
+       3 dimensional vector
+    q : 4 element sequence
+       w, i, j, k of quaternion
+    Returns
+    -------
+    vdash : array shape (3,)
+       `v` rotated by quaternion `q`
+    Notes
+    -----
+    See: http://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Describing_rotations_with_quaternions
+    '''
+    varr = np.zeros((4,))
+    varr[1:] = v
+
+    return qmult(q, qmult(varr, qconjugate(q)))[1:]
+
+
+def quaterion_from_transform(transform):
+   return [transform.transform.rotation.w, transform.transform.rotation.x, transform.transform.rotation.y, transform.transform.rotation.z]
+
+def translation_from_transform(transform):
+   return np.array([transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z])
+
 def do_transform_point(point, transform):
-    p = transform_to_kdl(transform) * PyKDL.Vector(point.point.x, point.point.y, point.point.z)
+    point = np.array([point.point.x, point.point.y, point.point.z])
+    p = np.add(rotate_vector(point, quaterion_from_transform(transform)), translation_from_transform(transform))
     res = PointStamped()
     res.point.x = p[0]
     res.point.y = p[1]
@@ -68,10 +135,8 @@ tf2_ros.TransformRegistration().add(PointStamped, do_transform_point)
 
 # Vector3Stamped
 def do_transform_vector3(vector3, transform):
-    transform.transform.translation.x = 0;
-    transform.transform.translation.y = 0;
-    transform.transform.translation.z = 0;
-    p = transform_to_kdl(transform) * PyKDL.Vector(vector3.vector.x, vector3.vector.y, vector3.vector.z)
+    vector = np.array([vector3.vector.x, vector3.vector.y, vector3.vector.z])
+    p = rotate_vector(vector, quaterion_from_transform(transform))
     res = Vector3Stamped()
     res.vector.x = p[0]
     res.vector.y = p[1]
@@ -82,14 +147,18 @@ tf2_ros.TransformRegistration().add(Vector3Stamped, do_transform_vector3)
 
 # PoseStamped
 def do_transform_pose(pose, transform):
-    f = transform_to_kdl(transform) * PyKDL.Frame(PyKDL.Rotation.Quaternion(pose.pose.orientation.x, pose.pose.orientation.y,
-                                                                          pose.pose.orientation.z, pose.pose.orientation.w),
-                                                PyKDL.Vector(pose.pose.position.x, pose.pose.position.y, pose.pose.position.z))
+    position = np.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z])
+    p = np.add(rotate_vector(position, quaterion_from_transform(transform)), translation_from_transform(transform));
+    rotation = [pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w];
+    q = qmult(rotation, quaterion_from_transform(transform));
     res = PoseStamped()
-    res.pose.position.x = f.p[0]
-    res.pose.position.y = f.p[1]
-    res.pose.position.z = f.p[2]
-    (res.pose.orientation.x, res.pose.orientation.y, res.pose.orientation.z, res.pose.orientation.w) = f.M.GetQuaternion()
+    res.pose.position.x = p[0]
+    res.pose.position.y = p[1]
+    res.pose.position.z = p[2]
+    res.pose.orientation.w = q[0]
+    res.pose.orientation.x = q[1]
+    res.pose.orientation.y = q[2]
+    res.pose.orientation.z = q[3]
     res.header = transform.header
     return res
 tf2_ros.TransformRegistration().add(PoseStamped, do_transform_pose)

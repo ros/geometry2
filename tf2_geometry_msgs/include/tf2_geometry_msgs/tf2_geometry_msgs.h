@@ -41,23 +41,36 @@
 #include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
+
 #include <kdl/frames.hpp>
 
 namespace tf2
 {
 
-/** \brief Convert a TransformStamped message to a KDL frame.
+ /** \brief Convert a TransformStamped message to a KDL frame.
+  * \param t TransformStamped message to convert.
+  * \return The converted KDL Frame.
+  * \deprecated This function is deprecated: KDL-dependecies of this package will be removed in the future.
+  */
+ inline
+ KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
+   {
+     return KDL::Frame(KDL::Rotation::Quaternion(t.transform.rotation.x, t.transform.rotation.y,
+             t.transform.rotation.z, t.transform.rotation.w),
+           KDL::Vector(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z));
+ }
+
+/** \brief Convert a TransformStamped message to a tf2 Transform.
  * \param t TransformStamped message to convert.
- * \return The converted KDL Frame.
+ * \return The converted tf2 Transform.
  */
 inline
-KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
-  {
-    return KDL::Frame(KDL::Rotation::Quaternion(t.transform.rotation.x, t.transform.rotation.y, 
-						t.transform.rotation.z, t.transform.rotation.w),
-		      KDL::Vector(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z));
-  }
-
+tf2::Transform msgToTf2(const geometry_msgs::TransformStamped& t)
+{
+  return tf2::Transform(
+     tf2::Quaternion(t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w),
+     tf2::Vector3(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z));
+}
 
 /********************/
 /** Vector3Stamped **/
@@ -91,7 +104,7 @@ template <>
 inline
   void doTransform(const geometry_msgs::Vector3Stamped& t_in, geometry_msgs::Vector3Stamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    KDL::Vector v_out = gmTransformToKDL(transform).M * KDL::Vector(t_in.vector.x, t_in.vector.y, t_in.vector.z);
+    tf2::Vector3 v_out = msgToTf2(transform).getBasis() * tf2::Vector3(t_in.vector.x, t_in.vector.y, t_in.vector.z);
     t_out.vector.x = v_out[0];
     t_out.vector.y = v_out[1];
     t_out.vector.z = v_out[2];
@@ -120,7 +133,6 @@ void fromMsg(const geometry_msgs::Vector3Stamped& msg, geometry_msgs::Vector3Sta
 {
   out = msg;
 }
-
 
 
 /******************/
@@ -155,7 +167,7 @@ template <>
 inline
   void doTransform(const geometry_msgs::PointStamped& t_in, geometry_msgs::PointStamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    KDL::Vector v_out = gmTransformToKDL(transform) * KDL::Vector(t_in.point.x, t_in.point.y, t_in.point.z);
+    tf2::Vector3 v_out = msgToTf2(transform) * tf2::Vector3(t_in.point.x, t_in.point.y, t_in.point.z);
     t_out.point.x = v_out[0];
     t_out.point.y = v_out[1];
     t_out.point.z = v_out[2];
@@ -181,73 +193,6 @@ geometry_msgs::PointStamped toMsg(const geometry_msgs::PointStamped& in)
  */
 inline
 void fromMsg(const geometry_msgs::PointStamped& msg, geometry_msgs::PointStamped& out)
-{
-  out = msg;
-}
-
-
-/*****************/
-/** PoseStamped **/
-/*****************/
-
-/** \brief Extract a timestamp from the header of a Pose message.
- * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
- * \param t PoseStamped message to extract the timestamp from.
- * \return The timestamp of the message.
- */
-template <>
-inline
-  const ros::Time& getTimestamp(const geometry_msgs::PoseStamped& t)  {return t.header.stamp;}
-
-/** \brief Extract a frame ID from the header of a Pose message.
- * This function is a specialization of the getFrameId template defined in tf2/convert.h.
- * \param t PoseStamped message to extract the frame ID from.
- * \return A string containing the frame ID of the message.
- */
-template <>
-inline
-  const std::string& getFrameId(const geometry_msgs::PoseStamped& t)  {return t.header.frame_id;}
-
-/** \brief Apply a geometry_msgs TransformStamped to an geometry_msgs Pose type.
- * This function is a specialization of the doTransform template defined in tf2/convert.h.
- * \param t_in The pose to transform, as a timestamped Pose3 message.
- * \param t_out The transformed pose, as a timestamped Pose3 message.
- * \param transform The timestamped transform to apply, as a TransformStamped message.
- */
-template <>
-inline
-  void doTransform(const geometry_msgs::PoseStamped& t_in, geometry_msgs::PoseStamped& t_out, const geometry_msgs::TransformStamped& transform)
-  {
-    KDL::Vector v(t_in.pose.position.x, t_in.pose.position.y, t_in.pose.position.z);
-    KDL::Rotation r = KDL::Rotation::Quaternion(t_in.pose.orientation.x, t_in.pose.orientation.y, t_in.pose.orientation.z, t_in.pose.orientation.w);
-
-    KDL::Frame v_out = gmTransformToKDL(transform) * KDL::Frame(r, v);
-    t_out.pose.position.x = v_out.p[0];
-    t_out.pose.position.y = v_out.p[1];
-    t_out.pose.position.z = v_out.p[2];
-    v_out.M.GetQuaternion(t_out.pose.orientation.x, t_out.pose.orientation.y, t_out.pose.orientation.z, t_out.pose.orientation.w);
-    t_out.header.stamp = transform.header.stamp;
-    t_out.header.frame_id = transform.header.frame_id;
-  }
-
-/** \brief Trivial "conversion" function for Pose message type.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in A PoseStamped message.
- * \return The input argument.
- */
-inline
-geometry_msgs::PoseStamped toMsg(const geometry_msgs::PoseStamped& in)
-{
-  return in;
-}
-
-/** \brief Trivial "conversion" function for Pose message type.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param msg A PoseStamped message.
- * \param out The input argument.
- */
-inline
-void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& out)
 {
   out = msg;
 }
@@ -360,10 +305,7 @@ geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in)
   geometry_msgs::QuaternionStamped out;
   out.header.stamp = in.stamp_;
   out.header.frame_id = in.frame_id_;
-  out.quaternion.w = in.getW();
-  out.quaternion.x = in.getX();
-  out.quaternion.y = in.getY();
-  out.quaternion.z = in.getZ();
+  out.quaternion = toMsg(static_cast<const tf2::Quaternion&>(in));
   return out;
 }
 
@@ -384,71 +326,95 @@ void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quate
 }
 
 
-/**********************/
-/** TransformStamped **/
-/**********************/
+/**********/
+/** Pose **/
+/**********/
 
-/** \brief Extract a timestamp from the header of a Transform message.
+/** \brief Convert a tf2 Transform type to an equivalent geometry_msgs Pose message.
+ * \param in A tf2 Transform object.
+ * \param out The Transform converted to a geometry_msgs Pose message type.
+ */
+inline
+void toMsg(const tf2::Transform& in, geometry_msgs::Pose& out )
+{
+  out.position.x = in.getOrigin().getX();
+  out.position.y = in.getOrigin().getY();
+  out.position.z = in.getOrigin().getZ();
+  out.orientation = toMsg(in.getRotation());
+}
+
+/** \brief Convert a geometry_msgs Pose message to an equivalent tf2 Transform type.
+ * \param in A Pose message.
+ * \param out The Pose converted to a tf2 Transform type.
+ */
+inline
+void fromMsg(const geometry_msgs::Pose& in, tf2::Transform& out)
+{
+  out.setOrigin(tf2::Vector3(in.position.x, in.position.y, in.position.z));
+  // w at the end in the constructor
+  out.setRotation(tf2::Quaternion(in.orientation.x, in.orientation.y, in.orientation.z, in.orientation.w));
+}
+
+
+/*****************/
+/** PoseStamped **/
+/*****************/
+
+/** \brief Extract a timestamp from the header of a Pose message.
  * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
- * \param t TransformStamped message to extract the timestamp from.
+ * \param t PoseStamped message to extract the timestamp from.
  * \return The timestamp of the message.
  */
 template <>
 inline
-const ros::Time& getTimestamp(const geometry_msgs::TransformStamped& t)  {return t.header.stamp;}
+  const ros::Time& getTimestamp(const geometry_msgs::PoseStamped& t)  {return t.header.stamp;}
 
-/** \brief Extract a frame ID from the header of a Transform message.
+/** \brief Extract a frame ID from the header of a Pose message.
  * This function is a specialization of the getFrameId template defined in tf2/convert.h.
- * \param t TransformStamped message to extract the frame ID from.
+ * \param t PoseStamped message to extract the frame ID from.
  * \return A string containing the frame ID of the message.
  */
 template <>
 inline
-const std::string& getFrameId(const geometry_msgs::TransformStamped& t)  {return t.header.frame_id;}
+  const std::string& getFrameId(const geometry_msgs::PoseStamped& t)  {return t.header.frame_id;}
 
-/** \brief Apply a geometry_msgs TransformStamped to an geometry_msgs Transform type.
+/** \brief Apply a geometry_msgs TransformStamped to an geometry_msgs Pose type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h.
- * \param t_in The frame to transform, as a timestamped Transform3 message.
- * \param t_out The frame transform, as a timestamped Transform3 message.
+ * \param t_in The pose to transform, as a timestamped Pose3 message.
+ * \param t_out The transformed pose, as a timestamped Pose3 message.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
  */
 template <>
 inline
-void doTransform(const geometry_msgs::TransformStamped& t_in, geometry_msgs::TransformStamped& t_out, const geometry_msgs::TransformStamped& transform)
+  void doTransform(const geometry_msgs::PoseStamped& t_in, geometry_msgs::PoseStamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    KDL::Vector v(t_in.transform.translation.x, t_in.transform.translation.y,
-                  t_in.transform.translation.z);
-    KDL::Rotation r = KDL::Rotation::Quaternion(t_in.transform.rotation.x,
-                                                t_in.transform.rotation.y, t_in.transform.rotation.z, t_in.transform.rotation.w);
+    tf2::Vector3 v(t_in.pose.position.x, t_in.pose.position.y, t_in.pose.position.z);
+    tf2::Quaternion r(t_in.pose.orientation.x, t_in.pose.orientation.y, t_in.pose.orientation.z, t_in.pose.orientation.w);
 
-    KDL::Frame v_out = gmTransformToKDL(transform) * KDL::Frame(r, v);
-    t_out.transform.translation.x = v_out.p[0];
-    t_out.transform.translation.y = v_out.p[1];
-    t_out.transform.translation.z = v_out.p[2];
-    v_out.M.GetQuaternion(t_out.transform.rotation.x, t_out.transform.rotation.y,
-                          t_out.transform.rotation.z, t_out.transform.rotation.w);
-    t_out.header.stamp = transform.header.stamp;
+    tf2::Transform v_out = msgToTf2(transform) * tf2::Transform(r, v);
+
+    toMsg(v_out, t_out.pose);
     t_out.header.frame_id = transform.header.frame_id;
   }
 
-/** \brief Trivial "conversion" function for Transform message type.
+/** \brief Trivial "conversion" function for Pose message type.
  * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in A TransformStamped message.
+ * \param in A PoseStamped message.
  * \return The input argument.
  */
 inline
-geometry_msgs::TransformStamped toMsg(const geometry_msgs::TransformStamped& in)
+geometry_msgs::PoseStamped toMsg(const geometry_msgs::PoseStamped& in)
 {
   return in;
 }
 
-/** \brief Convert a TransformStamped message to its equivalent tf2 representation.
+/** \brief Trivial "conversion" function for Pose message type.
  * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param msg A TransformStamped message type.
- * \param out The TransformStamped converted to the equivalent tf2 type.
+ * \param msg A PoseStamped message.
+ * \param out The input argument.
  */
 inline
-void fromMsg(const geometry_msgs::TransformStamped& msg, geometry_msgs::TransformStamped& out)
+void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& out)
 {
   out = msg;
 }
@@ -488,33 +454,67 @@ void fromMsg(const geometry_msgs::Transform& in, tf2::Transform& out)
 }
 
 
-/**********/
-/** Pose **/
-/**********/
+/**********************/
+/** TransformStamped **/
+/**********************/
 
-/** \brief Convert a tf2 Transform type to an equivalent geometry_msgs Pose message.
- * \param in A tf2 Transform object.
- * \param out The Transform converted to a geometry_msgs Pose message type.
+/** \brief Extract a timestamp from the header of a Transform message.
+ * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
+ * \param t TransformStamped message to extract the timestamp from.
+ * \return The timestamp of the message.
+ */
+template <>
+inline
+const ros::Time& getTimestamp(const geometry_msgs::TransformStamped& t)  {return t.header.stamp;}
+
+/** \brief Extract a frame ID from the header of a Transform message.
+ * This function is a specialization of the getFrameId template defined in tf2/convert.h.
+ * \param t TransformStamped message to extract the frame ID from.
+ * \return A string containing the frame ID of the message.
+ */
+template <>
+inline
+const std::string& getFrameId(const geometry_msgs::TransformStamped& t)  {return t.header.frame_id;}
+
+/** \brief Apply a geometry_msgs TransformStamped to an geometry_msgs Transform type.
+ * This function is a specialization of the doTransform template defined in tf2/convert.h.
+ * \param t_in The frame to transform, as a timestamped Transform3 message.
+ * \param t_out The frame transform, as a timestamped Transform3 message.
+ * \param transform The timestamped transform to apply, as a TransformStamped message.
+ */
+template <>
+inline
+void doTransform(const geometry_msgs::TransformStamped& t_in, geometry_msgs::TransformStamped& t_out, const geometry_msgs::TransformStamped& transform)
+  {
+    tf2::Vector3 v(t_in.transform.translation.x, t_in.transform.translation.y, t_in.transform.translation.z);
+    tf2::Quaternion r(t_in.transform.rotation.x, t_in.transform.rotation.y, t_in.transform.rotation.z, t_in.transform.rotation.w);
+
+    tf2::Transform v_out = msgToTf2(transform) * tf2::Transform(r, v);
+    t_out.transform = toMsg(v_out);
+    t_out.header.stamp = transform.header.stamp;
+    t_out.header.frame_id = transform.header.frame_id;
+  }
+
+/** \brief Trivial "conversion" function for Transform message type.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in A TransformStamped message.
+ * \return The input argument.
  */
 inline
-void toMsg(const tf2::Transform& in, geometry_msgs::Pose& out )
+geometry_msgs::TransformStamped toMsg(const geometry_msgs::TransformStamped& in)
 {
-  out.position.x = in.getOrigin().getX();
-  out.position.y = in.getOrigin().getY();
-  out.position.z = in.getOrigin().getZ();
-  out.orientation = toMsg(in.getRotation());
+  return in;
 }
 
-/** \brief Convert a geometry_msgs Pose message to an equivalent tf2 Transform type.
- * \param in A Pose message.
- * \param out The Pose converted to a tf2 Transform type.
+/** \brief Convert a TransformStamped message to its equivalent tf2 representation.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param msg A TransformStamped message type.
+ * \param out The TransformStamped converted to the equivalent tf2 type.
  */
 inline
-void fromMsg(const geometry_msgs::Pose& in, tf2::Transform& out)
+void fromMsg(const geometry_msgs::TransformStamped& msg, geometry_msgs::TransformStamped& out)
 {
-  out.setOrigin(tf2::Vector3(in.position.x, in.position.y, in.position.z));
-  // w at the end in the constructor
-  out.setRotation(tf2::Quaternion(in.orientation.x, in.orientation.y, in.orientation.z, in.orientation.w));
+  out = msg;
 }
 
 } // namespace
