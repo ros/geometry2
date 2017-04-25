@@ -31,27 +31,6 @@
 #include <tf2_ros/transform_listener.h>
 #include <sys/time.h>
 
-
-void seed_rand()
-{
-  //Seed random number generator with current microseond count
-  timeval temp_time_struct;
-  gettimeofday(&temp_time_struct,NULL);
-  srand(temp_time_struct.tv_usec);
-};
-
-void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xvalues, std::vector<double>& yvalues, std::vector<double>&zvalues)
-{
-  seed_rand();
-  for ( uint64_t i = 0; i < runs ; i++ )
-  {
-    xvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-    yvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-    zvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-  }
-}
-
-
 using namespace tf2;
 
 TEST(tf2_ros_transform, transform_listener)
