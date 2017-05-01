@@ -200,10 +200,7 @@ static PyObject *canTransformCore(PyObject *self, PyObject *args, PyObject *kw)
 
   if (!PyArg_ParseTupleAndKeywords(args, kw, "ssO&", (char**)keywords, &target_frame, &source_frame, rostime_converter, &time))
     return NULL;
-  std::string error_msg;
-  bool can_transform = bc->canTransform(target_frame, source_frame, time, &error_msg);
-  //return PyBool_FromLong(t->canTransform(target_frame, source_frame, time));
-  return Py_BuildValue("bs", can_transform, error_msg.c_str());
+  return PyBool_FromLong(bc->canTransform(target_frame, source_frame, time));
 }
 
 static PyObject *canTransformFullCore(PyObject *self, PyObject *args, PyObject *kw)
@@ -222,10 +219,7 @@ static PyObject *canTransformFullCore(PyObject *self, PyObject *args, PyObject *
                         &source_time,
                         &fixed_frame))
     return NULL;
-  std::string error_msg;
-  bool can_transform = bc->canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, &error_msg);
-  //return PyBool_FromLong(t->canTransform(target_frame, target_time, source_frame, source_time, fixed_frame));
-  return Py_BuildValue("bs", can_transform, error_msg.c_str());
+  return PyBool_FromLong(bc->canTransform(target_frame, target_time, source_frame, source_time, fixed_frame));
 }
 
 static PyObject *asListOfStrings(std::vector< std::string > los)
