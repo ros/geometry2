@@ -98,7 +98,7 @@ int main(int argc, char **argv){
   t.child_frame_id = "B";
   tf_buffer->setTransform(t, "test");
 
-  bool ret = RUN_ALL_TESTS();
+  int ret = RUN_ALL_TESTS();
   delete tf_buffer;
   return ret;
 }
