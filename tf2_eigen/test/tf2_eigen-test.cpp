@@ -56,6 +56,55 @@ TEST(TfEigen, ConvertVector3d)
   EXPECT_EQ(v, v1);
 }
 
+TEST(TfEigen, ConvertQuaterniondStamped)
+{
+  const tf2::Stamped<Eigen::Quaterniond> v(Eigen::Quaterniond(1,2,3,4), ros::Time(5), "test");
+
+  tf2::Stamped<Eigen::Quaterniond> v1;
+  geometry_msgs::QuaternionStamped p1;
+  tf2::convert(v, p1);
+  tf2::convert(p1, v1);
+
+  EXPECT_EQ(v.frame_id_, v1.frame_id_);
+  EXPECT_EQ(v.stamp_, v1.stamp_);
+  EXPECT_EQ(v.w(), v1.w());
+  EXPECT_EQ(v.x(), v1.x());
+  EXPECT_EQ(v.y(), v1.y());
+  EXPECT_EQ(v.z(), v1.z());
+}
+
+TEST(TfEigen, ConvertQuaterniond)
+{
+  const Eigen::Quaterniond v(1,2,3,4);
+
+  Eigen::Quaterniond v1;
+  geometry_msgs::Quaternion p1;
+  tf2::convert(v, p1);
+  tf2::convert(p1, v1);
+
+  EXPECT_EQ(v.w(), v1.w());
+  EXPECT_EQ(v.x(), v1.x());
+  EXPECT_EQ(v.y(), v1.y());
+  EXPECT_EQ(v.z(), v1.z());
+}
+
+TEST(TfEigen, TransformQuaterion) {
+ const tf2::Stamped<Eigen::Quaterniond> in(Eigen::Quaterniond(Eigen::AngleAxisd(1, Eigen::Vector3d::UnitX())), ros::Time(5), "test");
+ const Eigen::Affine3d r(Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitY()));
+ const tf2::Stamped<Eigen::Quaterniond> expected(Eigen::Quaterniond(Eigen::AngleAxisd(1, Eigen::Vector3d::UnitZ())), ros::Time(10), "expected");
+
+ geometry_msgs::TransformStamped trafo = tf2::eigenToTransform(r);
+ trafo.header.stamp = ros::Time(10);
+ trafo.header.frame_id = "expected";
+
+ tf2::Stamped<Eigen::Quaterniond> out;
+ tf2::doTransform(in, out, trafo);
+
+ EXPECT_TRUE(out.isApprox(expected));
+ EXPECT_EQ(expected.stamp_, out.stamp_);
+ EXPECT_EQ(expected.frame_id_, out.frame_id_);
+}
+
 TEST(TfEigen, ConvertAffine3dStamped)
 {
   const Eigen::Affine3d v_nonstamped(Eigen::Translation3d(1,2,3) * Eigen::AngleAxis<double>(1, Eigen::Vector3d::UnitX()));
