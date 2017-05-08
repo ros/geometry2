@@ -6,14 +6,49 @@
 
 \section codeapi Code API
 
-To broadcast transforms using ROS:
+\subsection To broadcast transforms using ROS
+\subsubsection Adding a TransformBroadcaster to an existing Python node
 - Call ros::init() to initialize a node.
 - Construct a tf2_ros::TransformBroadcaster.
 - Pass a geometry_msgs::TransformStamped message to tf2_ros::TransformBroadcaster::sendTransform().
   - Alternatively, pass a vector of geometry_msgs::TransformStamped messages.
 - Use tf2_ros::StaticTransformBroadcaster for "latching" behavior when transforms that are not expected to change.
 
-To listen for transforms using ROS:
+\subsubsection Launching a dedicated static_transform_publisher node
+A node dedicated to publish a static transformation can be launched directly from a launch file using the following syntax.
+
+In the launch file:
+\code
+<node pkg="tf2_ros" type="static_transform_publisher" name="publisher_name" args="tf_frame_to_be_published_parameter_name"/>
+\endcode
+
+The tf_frame_to_be_published_parameter_name can be defined in a yaml file using the following syntax:
+- RPY
+\code
+    tf_frame_to_be_published_parameter_name/header/frame_id: "parent_frame_id"
+    tf_frame_to_be_published_parameter_name/child_frame_id: "child_frame_id"
+    tf_frame_to_be_published_parameter_name/transform/translation/x: 0.0
+    tf_frame_to_be_published_parameter_name/transform/translation/y: 0.0
+    tf_frame_to_be_published_parameter_name/transform/translation/z: 0.0
+    tf_frame_to_be_published_parameter_name/transform/rotation/R: deg(0.0)
+    tf_frame_to_be_published_parameter_name/transform/rotation/P: deg(0.0)
+    tf_frame_to_be_published_parameter_name/transform/rotation/Y: deg(0.0)
+\endcode
+- Quaternions
+\code
+    tf_frame_to_be_published_parameter_name/header/frame_id: "parent_frame_id"
+    tf_frame_to_be_published_parameter_name/child_frame_id: "child_frame_id"
+    tf_frame_to_be_published_parameter_name/transform/translation/x: 0.0
+    tf_frame_to_be_published_parameter_name/transform/translation/y: 0.0
+    tf_frame_to_be_published_parameter_name/transform/translation/z: 0.0
+    tf_frame_to_be_published_parameter_name/transform/rotation/x: 0.0
+    tf_frame_to_be_published_parameter_name/transform/rotation/y: 0.0
+    tf_frame_to_be_published_parameter_name/transform/rotation/z: 0.0
+    tf_frame_to_be_published_parameter_name/transform/rotation/w: 1.0
+\endcode
+
+
+\subsection To listen for transforms using ROS
 - Construct an instance of a class that implements tf2_ros::BufferInterface.
   - tf2_ros::Buffer is the standard implementation which offers a tf2_frames service that can respond to requests with a tf2_msgs::FrameGraph.
   - tf2_ros::BufferClient uses an actionlib::SimpleActionClient to wait for the requested transform to become available.
@@ -27,7 +62,7 @@ To listen for transforms using ROS:
 - Construct a tf2_ros::MessageFilter with the TransformListener to apply a transformation to incoming frames.
   - This is especially useful when streaming sensor data.
 
-List of exceptions thrown in this library:
+\subsection List of exceptions thrown in this library
 - tf2::LookupException
 - tf2::ConnectivityException
 - tf2::ExtrapolationException

@@ -32,7 +32,7 @@
 #include "tf2_ros/static_transform_broadcaster.h"
 
 
-bool validateXmlRpcTf(XmlRpc::XmlRpcValue tf_data) {
+bool validateXmlRpcTfQuaternion(XmlRpc::XmlRpcValue tf_data) {
   // Validate a TF stored in XML RPC format: ensures the appropriate fields
   // exist. Note this does not check data types.
   return tf_data.hasMember("child_frame_id") &&
@@ -48,6 +48,23 @@ bool validateXmlRpcTf(XmlRpc::XmlRpcValue tf_data) {
          tf_data["transform"]["rotation"].hasMember("y") &&
          tf_data["transform"]["rotation"].hasMember("z") &&
          tf_data["transform"]["rotation"].hasMember("w");
+};
+
+bool validateXmlRpcTfRPY(XmlRpc::XmlRpcValue tf_data) {
+  // Validate a TF stored in XML RPC format: ensures the appropriate fields
+  // exist. Note this does not check data types.
+  return tf_data.hasMember("child_frame_id") &&
+         tf_data.hasMember("header") &&
+         tf_data["header"].hasMember("frame_id") &&
+         tf_data.hasMember("transform") &&
+         tf_data["transform"].hasMember("translation") &&
+         tf_data["transform"]["translation"].hasMember("x") &&
+         tf_data["transform"]["translation"].hasMember("y") &&
+         tf_data["transform"]["translation"].hasMember("z") &&
+         tf_data["transform"].hasMember("rotation") &&
+         tf_data["transform"]["rotation"].hasMember("R") &&
+         tf_data["transform"]["rotation"].hasMember("P") &&
+         tf_data["transform"]["rotation"].hasMember("Y");
 };
 
 int main(int argc, char ** argv)
@@ -98,21 +115,43 @@ int main(int argc, char ** argv)
     }
 
     // Check that all required members are present & of the right type.
-    if (!validateXmlRpcTf(tf_data)) {
+    if (validateXmlRpcTfQuaternion(tf_data)) {
+      msg.transform.translation.x = (double) tf_data["transform"]["translation"]["x"];
+      msg.transform.translation.y = (double) tf_data["transform"]["translation"]["y"];
+      msg.transform.translation.z = (double) tf_data["transform"]["translation"]["z"];
+      msg.transform.rotation.x = (double) tf_data["transform"]["rotation"]["x"];
+      msg.transform.rotation.y = (double) tf_data["transform"]["rotation"]["y"];
+      msg.transform.rotation.z = (double) tf_data["transform"]["rotation"]["z"];
+      msg.transform.rotation.w = (double) tf_data["transform"]["rotation"]["w"];
+      msg.header.stamp = ros::Time::now();
+      msg.header.frame_id = (std::string) tf_data["header"]["frame_id"];
+      msg.child_frame_id = (std::string) tf_data["child_frame_id"];
+    }
+    else if (validateXmlRpcTfRPY(tf_data)) {
+      msg.transform.translation.x = (double) tf_data["transform"]["translation"]["x"];
+      msg.transform.translation.y = (double) tf_data["transform"]["translation"]["y"];
+      msg.transform.translation.z = (double) tf_data["transform"]["translation"]["z"];
+
+      tf2::Quaternion quat;
+      quat.setRPY((double) tf_data["transform"]["rotation"]["R"],
+                  (double) tf_data["transform"]["rotation"]["P"],
+                  (double) tf_data["transform"]["rotation"]["Y"]);
+
+      msg.transform.rotation.x = quat.x();
+      msg.transform.rotation.y = quat.y();
+      msg.transform.rotation.z = quat.z();
+      msg.transform.rotation.w = quat.w();
+
+      msg.header.stamp = ros::Time::now();
+      msg.header.frame_id = (std::string) tf_data["header"]["frame_id"];
+      msg.child_frame_id = (std::string) tf_data["child_frame_id"];
+    }
+    else {
       ROS_FATAL_STREAM("Could not validate XmlRpcC for TF data: " << tf_data);
       return -1;
     }
 
-    msg.transform.translation.x = (double) tf_data["transform"]["translation"]["x"];
-    msg.transform.translation.y = (double) tf_data["transform"]["translation"]["y"];
-    msg.transform.translation.z = (double) tf_data["transform"]["translation"]["z"];
-    msg.transform.rotation.x = (double) tf_data["transform"]["rotation"]["x"];
-    msg.transform.rotation.y = (double) tf_data["transform"]["rotation"]["y"];
-    msg.transform.rotation.z = (double) tf_data["transform"]["rotation"]["z"];
-    msg.transform.rotation.w = (double) tf_data["transform"]["rotation"]["w"];
-    msg.header.stamp = ros::Time::now();
-    msg.header.frame_id = (std::string) tf_data["header"]["frame_id"];
-    msg.child_frame_id = (std::string) tf_data["child_frame_id"];
+
   }
   else
   {
