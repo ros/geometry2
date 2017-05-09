@@ -11,8 +11,8 @@ catkin_package(
    DEPENDS console_bridge
    CATKIN_DEPENDS geometry_msgs tf2_msgs rostime)
 
+include_directories (src/bt)
 include_directories(include ${catkin_INCLUDE_DIRS} ${console_bridge_INCLUDE_DIRS})
-include_directories (src/bt) 
 
 # export user definitions
 
