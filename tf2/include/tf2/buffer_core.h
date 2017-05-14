@@ -46,6 +46,7 @@
 //////////////////////////backwards startup for porting
 //#include "tf/tf.h"
 
+#include <boost/container/flat_map.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/function.hpp>
@@ -102,6 +103,12 @@ public:
 
   /** \brief Clear all data */
   void clear();
+
+  /** \brief Erase a specified frame
+   * \param frame_id_str The name of the frame that will be deleted.
+   * This function will remove the frame, and reparent all its children frames to NO_PARENT.
+   */
+  void erase(const std::string& frame_id_str);
 
   /** \brief Add transform information to the tf data structure
    * \param transform The transform to store
@@ -317,9 +324,9 @@ private:
   
   /** \brief The pointers to potential frames that the tree can be made of.
    * The frames will be dynamically allocated at run time when set the first time. */
-  typedef std::vector<TimeCacheInterfacePtr> V_TimeCacheInterface;
-  V_TimeCacheInterface frames_;
-  
+  typedef boost::container::flat_map<CompactFrameID, TimeCacheInterfacePtr> M_TimeCacheInterface;
+  M_TimeCacheInterface frames_;
+
   /** \brief A mutex to protect testing and allocating new frames on the above vector. */
   mutable boost::mutex frame_mutex_;
 
@@ -327,9 +334,14 @@ private:
   typedef boost::unordered_map<std::string, CompactFrameID> M_StringToCompactFrameID;
   M_StringToCompactFrameID frameIDs_;
   /** \brief A map from CompactFrameID frame_id_numbers to string for debugging and output */
-  std::vector<std::string> frameIDs_reverse;
+  typedef boost::container::flat_map<CompactFrameID, std::string> M_CompactFrameIDToString;
+  M_CompactFrameIDToString frameIDs_reverse;
+  /** \brief A frame counter used to increment the id of the newly created
+   * frames, even after deletion of some.
+  */
+  unsigned int frame_counter_;
   /** \brief A map to lookup the most recent authority for a given frame */
-  std::map<CompactFrameID, std::string> frame_authority_;
+  M_CompactFrameIDToString frame_authority_;
 
 
   /// How long to cache transform history

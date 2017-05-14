@@ -78,3 +78,12 @@ ros::Time StaticCache::getOldestTimestamp()
   return ros::Time();
 };
 
+void tf2::StaticCache::unparentFrame(tf2::CompactFrameID &id)
+{
+  if (storage_.frame_id_ == id)
+  {
+    storage_.frame_id_ = 0;
+  }
+}
+
+
