@@ -77,8 +77,9 @@ TEST(tf2_ros_transform_listener, time_backwards)
   // make sure it arrives
   ros::spinOnce();
   sleep(1);
+  ros::spinOnce();
 
-  //Send anoterh message to trigger clock test on an unrelated frame
+  //Send another message to trigger clock test on an unrelated frame
   msg.header.stamp = ros::Time(110, 0);
   msg.header.frame_id = "foo2";
   msg.child_frame_id = "bar2";
@@ -87,6 +88,7 @@ TEST(tf2_ros_transform_listener, time_backwards)
   // make sure it arrives
   ros::spinOnce();
   sleep(1);
+  ros::spinOnce();
 
   //verify the data's been cleared
   ASSERT_FALSE(buffer.canTransform("foo", "bar", ros::Time(101, 0)));
