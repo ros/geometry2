@@ -31,6 +31,7 @@ from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped
 import PyKDL
 import rospy
 import tf2_ros
+import copy
 
 def to_msg_msg(msg):
     return msg
@@ -68,6 +69,7 @@ tf2_ros.TransformRegistration().add(PointStamped, do_transform_point)
 
 # Vector3Stamped
 def do_transform_vector3(vector3, transform):
+    transform = copy.deepcopy(transform)
     transform.transform.translation.x = 0;
     transform.transform.translation.y = 0;
     transform.transform.translation.z = 0;

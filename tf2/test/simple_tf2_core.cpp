@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,33 +34,12 @@
 #include "tf2/LinearMath/Vector3.h"
 #include "tf2/exceptions.h"
 
-void seed_rand()
-{
-  //Seed random number generator with current microseond count
-  timeval temp_time_struct;
-  gettimeofday(&temp_time_struct,NULL);
-  srand(temp_time_struct.tv_usec);
-};
-
-void generate_rand_vectors(double scale, uint64_t runs, std::vector<double>& xvalues, std::vector<double>& yvalues, std::vector<double>&zvalues)
-{
-  seed_rand();
-  for ( uint64_t i = 0; i < runs ; i++ )
-  {
-    xvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-    yvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-    zvalues[i] = 1.0 * ((double) rand() - (double)RAND_MAX /2.0) /(double)RAND_MAX;
-  }
-}
-
-
-
 TEST(tf2, setTransformFail)
 {
   tf2::BufferCore tfc;
   geometry_msgs::TransformStamped st;
   EXPECT_FALSE(tfc.setTransform(st, "authority1"));
-  
+
 }
 
 TEST(tf2, setTransformValid)
@@ -72,7 +51,7 @@ TEST(tf2, setTransformValid)
   st.child_frame_id = "child";
   st.transform.rotation.w = 1;
   EXPECT_TRUE(tfc.setTransform(st, "authority1"));
-  
+
 }
 
 TEST(tf2, setTransformInvalidQuaternion)
@@ -84,21 +63,21 @@ TEST(tf2, setTransformInvalidQuaternion)
   st.child_frame_id = "child";
   st.transform.rotation.w = 0;
   EXPECT_FALSE(tfc.setTransform(st, "authority1"));
-  
+
 }
 
 TEST(tf2_lookupTransform, LookupException_Nothing_Exists)
 {
   tf2::BufferCore tfc;
   EXPECT_THROW(tfc.lookupTransform("a", "b", ros::Time().fromSec(1.0)), tf2::LookupException);
-  
+
 }
 
 TEST(tf2_canTransform, Nothing_Exists)
 {
   tf2::BufferCore tfc;
   EXPECT_FALSE(tfc.canTransform("a", "b", ros::Time().fromSec(1.0)));
-  
+
 }
 
 TEST(tf2_lookupTransform, LookupException_One_Exists)
@@ -111,7 +90,7 @@ TEST(tf2_lookupTransform, LookupException_One_Exists)
   st.transform.rotation.w = 1;
   EXPECT_TRUE(tfc.setTransform(st, "authority1"));
   EXPECT_THROW(tfc.lookupTransform("foo", "bar", ros::Time().fromSec(1.0)), tf2::LookupException);
-  
+
 }
 
 TEST(tf2_canTransform, One_Exists)

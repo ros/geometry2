@@ -32,8 +32,6 @@
 #include <gtest/gtest.h>
 #include <tf2/convert.h>
 
-static const double EPS = 1e-3;
-
 TEST(TfEigen, ConvertVector3dStamped)
 {
   const tf2::Stamped<Eigen::Vector3d> v(Eigen::Vector3d(1,2,3), ros::Time(5), "test");
@@ -56,6 +54,55 @@ TEST(TfEigen, ConvertVector3d)
   tf2::convert(p1, v1);
 
   EXPECT_EQ(v, v1);
+}
+
+TEST(TfEigen, ConvertQuaterniondStamped)
+{
+  const tf2::Stamped<Eigen::Quaterniond> v(Eigen::Quaterniond(1,2,3,4), ros::Time(5), "test");
+
+  tf2::Stamped<Eigen::Quaterniond> v1;
+  geometry_msgs::QuaternionStamped p1;
+  tf2::convert(v, p1);
+  tf2::convert(p1, v1);
+
+  EXPECT_EQ(v.frame_id_, v1.frame_id_);
+  EXPECT_EQ(v.stamp_, v1.stamp_);
+  EXPECT_EQ(v.w(), v1.w());
+  EXPECT_EQ(v.x(), v1.x());
+  EXPECT_EQ(v.y(), v1.y());
+  EXPECT_EQ(v.z(), v1.z());
+}
+
+TEST(TfEigen, ConvertQuaterniond)
+{
+  const Eigen::Quaterniond v(1,2,3,4);
+
+  Eigen::Quaterniond v1;
+  geometry_msgs::Quaternion p1;
+  tf2::convert(v, p1);
+  tf2::convert(p1, v1);
+
+  EXPECT_EQ(v.w(), v1.w());
+  EXPECT_EQ(v.x(), v1.x());
+  EXPECT_EQ(v.y(), v1.y());
+  EXPECT_EQ(v.z(), v1.z());
+}
+
+TEST(TfEigen, TransformQuaterion) {
+ const tf2::Stamped<Eigen::Quaterniond> in(Eigen::Quaterniond(Eigen::AngleAxisd(1, Eigen::Vector3d::UnitX())), ros::Time(5), "test");
+ const Eigen::Affine3d r(Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitY()));
+ const tf2::Stamped<Eigen::Quaterniond> expected(Eigen::Quaterniond(Eigen::AngleAxisd(1, Eigen::Vector3d::UnitZ())), ros::Time(10), "expected");
+
+ geometry_msgs::TransformStamped trafo = tf2::eigenToTransform(r);
+ trafo.header.stamp = ros::Time(10);
+ trafo.header.frame_id = "expected";
+
+ tf2::Stamped<Eigen::Quaterniond> out;
+ tf2::doTransform(in, out, trafo);
+
+ EXPECT_TRUE(out.isApprox(expected));
+ EXPECT_EQ(expected.stamp_, out.stamp_);
+ EXPECT_EQ(expected.frame_id_, out.frame_id_);
 }
 
 TEST(TfEigen, ConvertAffine3dStamped)
@@ -90,24 +137,24 @@ TEST(TfEigen, ConvertAffine3d)
 TEST(TfEigen, ConvertTransform)
 {
   Eigen::Matrix4d tm;
-  
+
   double alpha = M_PI/4.0;
   double theta = M_PI/6.0;
   double gamma = M_PI/12.0;
-  
+
   tm << cos(theta)*cos(gamma),-cos(theta)*sin(gamma),sin(theta), 1, //
   cos(alpha)*sin(gamma)+sin(alpha)*sin(theta)*cos(gamma),cos(alpha)*cos(gamma)-sin(alpha)*sin(theta)*sin(gamma),-sin(alpha)*cos(theta), 2, //
   sin(alpha)*sin(gamma)-cos(alpha)*sin(theta)*cos(gamma),cos(alpha)*sin(theta)*sin(gamma)+sin(alpha)*cos(gamma),cos(alpha)*cos(theta), 3, //
   0, 0, 0, 1;
-  
+
   Eigen::Affine3d T(tm);
-  
+
   geometry_msgs::TransformStamped msg = tf2::eigenToTransform(T);
   Eigen::Affine3d Tback = tf2::transformToEigen(msg);
-  
+
   EXPECT_TRUE(T.isApprox(Tback));
   EXPECT_TRUE(tm.isApprox(Tback.matrix()));
-    
+
 }
 
 
@@ -115,6 +162,5 @@ TEST(TfEigen, ConvertTransform)
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
 
-  bool ret = RUN_ALL_TESTS();
-  return ret;
+  return RUN_ALL_TESTS();
 }

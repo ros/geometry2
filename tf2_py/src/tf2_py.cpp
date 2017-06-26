@@ -377,13 +377,28 @@ static PyObject *lookupTwistFullCore(PyObject *self, PyObject *args)
 static inline int checkTranslationType(PyObject* o)
 {
   PyTypeObject *translation_type = (PyTypeObject*) PyObject_GetAttrString(pModulegeometrymsgs, "Vector3");
-  return PyObject_TypeCheck(o, translation_type);
+  int type_check = PyObject_TypeCheck(o, translation_type);
+  int attr_check = PyObject_HasAttrString(o, "x") &&
+                   PyObject_HasAttrString(o, "y") &&
+                   PyObject_HasAttrString(o, "z");
+  if (!type_check) {
+    PyErr_WarnEx(PyExc_UserWarning, "translation should be of type Vector3", 1);
+  }
+  return attr_check;
 }
 
 static inline int checkRotationType(PyObject* o)
 {
   PyTypeObject *rotation_type = (PyTypeObject*) PyObject_GetAttrString(pModulegeometrymsgs, "Quaternion");
-  return PyObject_TypeCheck(o, rotation_type);
+  int type_check = PyObject_TypeCheck(o, rotation_type);
+  int attr_check = PyObject_HasAttrString(o, "w") &&
+                   PyObject_HasAttrString(o, "x") &&
+                   PyObject_HasAttrString(o, "y") &&
+                   PyObject_HasAttrString(o, "z");
+  if (!type_check) {
+    PyErr_WarnEx(PyExc_UserWarning, "translation should be of type Quaternion", 1);
+  }
+  return attr_check;
 }
 
 static PyObject *setTransform(PyObject *self, PyObject *args)
@@ -406,7 +421,7 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
 
   PyObject *translation = pythonBorrowAttrString(mtransform, "translation");
   if (!checkTranslationType(translation)) {
-    PyErr_SetString(PyExc_TypeError, "transform.translation must be of type Vector3");
+    PyErr_SetString(PyExc_TypeError, "transform.translation must have members x, y, z");
     return NULL;
   }
 
@@ -416,7 +431,7 @@ static PyObject *setTransform(PyObject *self, PyObject *args)
 
   PyObject *rotation = pythonBorrowAttrString(mtransform, "rotation");
   if (!checkRotationType(rotation)) {
-    PyErr_SetString(PyExc_TypeError, "transform.rotation must be of type Quaternion");
+    PyErr_SetString(PyExc_TypeError, "transform.rotation must have members w, x, y, z");
     return NULL;
   }
 
