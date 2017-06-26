@@ -92,7 +92,7 @@ catkin_package(
 link_libraries(${PYTHON_LIBRARIES})
 add_library(tf2_py src/tf2_py.cpp)
 target_link_libraries(tf2_py ${catkin_LIBRARIES})
-add_dependencies(tf2_py tf2_msgs_gencpp)
+add_dependencies(tf2_py ${catkin_EXPORTED_TARGETS})
 
 set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
 set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")

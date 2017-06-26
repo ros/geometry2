@@ -47,12 +47,12 @@ add_library(${PROJECT_NAME}
   src/transform_broadcaster.cpp
   src/static_transform_broadcaster.cpp
 )
-add_dependencies(${PROJECT_NAME} tf2_msgs_gencpp)
+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 # buffer_server executable
 add_executable(${PROJECT_NAME}_buffer_server src/buffer_server_main.cpp)
-add_dependencies(${PROJECT_NAME}_buffer_server tf2_msgs_gencpp)
+add_dependencies(${PROJECT_NAME}_buffer_server ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_buffer_server
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -66,7 +66,7 @@ set_target_properties(${PROJECT_NAME}_buffer_server
 add_executable(${PROJECT_NAME}_static_transform_publisher
   src/static_transform_broadcaster_program.cpp
 )
-add_dependencies(${PROJECT_NAME}_static_transform_publisher tf2_msgs_gencpp)
+add_dependencies(${PROJECT_NAME}_static_transform_publisher ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_static_transform_publisher
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -111,9 +111,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 # tf2_ros_test_listener
 add_executable(${PROJECT_NAME}_test_listener EXCLUDE_FROM_ALL test/listener_unittest.cpp)
-add_dependencies(${PROJECT_NAME}_test_listener tf2_msgs_gencpp)
+add_dependencies(${PROJECT_NAME}_test_listener ${catkin_EXPORTED_TARGETS})
 add_executable(${PROJECT_NAME}_test_time_reset EXCLUDE_FROM_ALL test/time_reset_test.cpp)
-add_dependencies(${PROJECT_NAME}_test_time_reset tf2_msgs_gencpp)
+add_dependencies(${PROJECT_NAME}_test_time_reset ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_test_listener
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
