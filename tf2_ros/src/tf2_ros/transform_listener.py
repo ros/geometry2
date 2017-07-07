@@ -38,7 +38,7 @@ class TransformListener():
     This class takes an object that instantiates the :class:`BufferInterface` interface, to which
     it propagates changes to the tf frame graph.
     """
-    def __init__(self, buffer):
+    def __init__(self, buffer, queue_size=None):
         """
         .. function:: __init__(buffer)
 
@@ -47,9 +47,9 @@ class TransformListener():
             :param buffer: The buffer to propagate changes to when tf info updates.
         """
         self.buffer = buffer
-        self.tf_sub = rospy.Subscriber("/tf", TFMessage, self.callback)
+        self.tf_sub = rospy.Subscriber("/tf", TFMessage, self.callback, queue_size=queue_size)
         self.tf_static_sub = rospy.Subscriber("/tf_static", TFMessage, self.static_callback)
-    
+
     def __del__(self):
         self.unregister()
 
