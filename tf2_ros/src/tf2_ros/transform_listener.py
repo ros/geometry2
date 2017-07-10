@@ -38,18 +38,21 @@ class TransformListener():
     This class takes an object that instantiates the :class:`BufferInterface` interface, to which
     it propagates changes to the tf frame graph.
     """
-    def __init__(self, buffer):
+    def __init__(self, buffer, queue_size=None, buff_size=65536, tcp_nodelay=False):
         """
         .. function:: __init__(buffer)
 
             Constructor.
 
             :param buffer: The buffer to propagate changes to when tf info updates.
+            :param queue_size (int) - maximum number of messages to receive at a time. This will generally be 1 or None (infinite, default). buff_size should be increased if this parameter is set as incoming data still needs to sit in the incoming buffer before being discarded. Setting queue_size buff_size to a non-default value affects all subscribers to this topic in this process.
+            :param buff_size (int) - incoming message buffer size in bytes. If queue_size is set, this should be set to a number greater than the queue_size times the average message size. Setting buff_size to a non-default value affects all subscribers to this topic in this process.
+            :param tcp_nodelay (bool) - if True, request TCP_NODELAY from publisher. Use of this option is not generally recommended in most cases as it is better to rely on timestamps in message data. Setting tcp_nodelay to True enables TCP_NODELAY for all subscribers in the same python process.
         """
         self.buffer = buffer
-        self.tf_sub = rospy.Subscriber("/tf", TFMessage, self.callback)
-        self.tf_static_sub = rospy.Subscriber("/tf_static", TFMessage, self.static_callback)
-    
+        self.tf_sub = rospy.Subscriber("/tf", TFMessage, self.callback, queue_size=queue_size, buff_size=buff_size, tcp_nodelay=tcp_nodelay)
+        self.tf_static_sub = rospy.Subscriber("/tf_static", TFMessage, self.static_callback, queue_size=queue_size, buff_size=buff_size, tcp_nodelay=tcp_nodelay)
+
     def __del__(self):
         self.unregister()
 
