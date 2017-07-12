@@ -140,7 +140,10 @@ namespace tf2_ros
     catch(tf2::TransformException& ex)
     {
       if(errstr)
+      { 
+        errstr->clear();
         *errstr = ex.what();
+      }
       return false;
     }
   }
@@ -157,7 +160,10 @@ namespace tf2_ros
     catch(tf2::TransformException& ex)
     {
       if(errstr)
+      {
+        errstr->clear();
         *errstr = ex.what();
+      }
       return false;
     }
   }
