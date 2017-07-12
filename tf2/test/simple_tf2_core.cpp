@@ -78,6 +78,10 @@ TEST(tf2_canTransform, Nothing_Exists)
   tf2::BufferCore tfc;
   EXPECT_FALSE(tfc.canTransform("a", "b", ros::Time().fromSec(1.0)));
 
+  std::string error_msg = std::string();
+  EXPECT_FALSE(tfc.canTransform("a", "b", ros::Time().fromSec(1.0), &error_msg));
+  ASSERT_STREQ(error_msg.c_str(), "canTransform: target_frame a does not exist. canTransform: source_frame b does not exist.");
+
 }
 
 TEST(tf2_lookupTransform, LookupException_One_Exists)
