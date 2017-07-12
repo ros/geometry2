@@ -105,7 +105,9 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
   PyObject_SetAttrString(pheader, "stamp", time_obj);
   Py_DECREF(time_obj);
 
-  PyObject_SetAttrString(pheader, "frame_id", stringToPython(transform->header.frame_id));
+  PyObject *frame_id = stringToPython(transform->header.frame_id);
+  PyObject_SetAttrString(pheader, "frame_id", frame_id);
+  Py_DECREF(frame_id);
   Py_DECREF(pheader);
 
   PyObject *ptransform = PyObject_GetAttrString(pinst, "transform");
@@ -113,17 +115,33 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
   PyObject *protation = PyObject_GetAttrString(ptransform, "rotation");
   Py_DECREF(ptransform);
 
-  PyObject_SetAttrString(pinst, "child_frame_id", stringToPython(transform->child_frame_id));
+  PyObject *child_frame_id = stringToPython(transform->child_frame_id);
+  PyObject_SetAttrString(pinst, "child_frame_id", child_frame_id);
+  Py_DECREF(child_frame_id);
 
-  PyObject_SetAttrString(ptranslation, "x", PyFloat_FromDouble(transform->transform.translation.x));
-  PyObject_SetAttrString(ptranslation, "y", PyFloat_FromDouble(transform->transform.translation.y));
-  PyObject_SetAttrString(ptranslation, "z", PyFloat_FromDouble(transform->transform.translation.z));
+  PyObject *trans_x = PyFloat_FromDouble(transform->transform.translation.x);
+  PyObject *trans_y = PyFloat_FromDouble(transform->transform.translation.y);
+  PyObject *trans_z = PyFloat_FromDouble(transform->transform.translation.z);
+  PyObject_SetAttrString(ptranslation, "x", trans_x);
+  PyObject_SetAttrString(ptranslation, "y", trans_y);
+  PyObject_SetAttrString(ptranslation, "z", trans_z);
+  Py_DECREF(trans_x);
+  Py_DECREF(trans_y);
+  Py_DECREF(trans_z);
   Py_DECREF(ptranslation);
 
-  PyObject_SetAttrString(protation, "x", PyFloat_FromDouble(transform->transform.rotation.x));
-  PyObject_SetAttrString(protation, "y", PyFloat_FromDouble(transform->transform.rotation.y));
-  PyObject_SetAttrString(protation, "z", PyFloat_FromDouble(transform->transform.rotation.z));
-  PyObject_SetAttrString(protation, "w", PyFloat_FromDouble(transform->transform.rotation.w));
+  PyObject *rot_x = PyFloat_FromDouble(transform->transform.rotation.x);
+  PyObject *rot_y = PyFloat_FromDouble(transform->transform.rotation.y);
+  PyObject *rot_z = PyFloat_FromDouble(transform->transform.rotation.z);
+  PyObject *rot_w = PyFloat_FromDouble(transform->transform.rotation.w);
+  PyObject_SetAttrString(protation, "x", rot_x);
+  PyObject_SetAttrString(protation, "y", rot_y);
+  PyObject_SetAttrString(protation, "z", rot_z);
+  PyObject_SetAttrString(protation, "w", rot_w);
+  Py_DECREF(rot_x);
+  Py_DECREF(rot_y);
+  Py_DECREF(rot_z);
+  Py_DECREF(rot_w);
   Py_DECREF(protation);
 
   return pinst;
