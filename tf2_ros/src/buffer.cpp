@@ -117,6 +117,12 @@ bool
 Buffer::canTransform(const std::string& target_frame, const std::string& source_frame, 
                      const ros::Time& time, const ros::Duration timeout, std::string* errstr) const
 {
+  // Clear the errstr before populating it if it's valid.
+  if (errstr)
+    {
+      errstr->clear();
+    }
+
   if (!checkAndErrorDedicatedThreadPresent(errstr))
     return false;
 
@@ -140,6 +146,12 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
                      const std::string& source_frame, const ros::Time& source_time,
                      const std::string& fixed_frame, const ros::Duration timeout, std::string* errstr) const
 {
+  // Clear the errstr before populating it if it's valid.
+  if (errstr)
+    {
+      errstr->clear();
+    }
+
   if (!checkAndErrorDedicatedThreadPresent(errstr))
     return false;
 
