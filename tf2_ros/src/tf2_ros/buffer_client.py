@@ -177,6 +177,7 @@ class BufferClient(tf2_ros.BufferInterface):
         while not rospy.is_shutdown() and not self.__is_done(self.client.get_state()) and not timed_out:
             if rospy.Time.now() > start_time + goal.timeout + self.timeout_padding:
                 timed_out = True
+                break
             r.sleep()
 
         #This shouldn't happen, but could in rare cases where the server hangs
@@ -190,8 +191,10 @@ class BufferClient(tf2_ros.BufferInterface):
         return self.__process_result(self.client.get_result())
 
     def __process_result(self, result):
-        if result == None or result.error == None:
-            raise tf2.TransformException("The BufferServer returned None for result or result.error!  Something is likely wrong with the server.")
+        if result == None:
+            raise tf2.TransformException("The BufferServer returned None for result!  Something is likely wrong with the server.")
+        if result.error == None:
+            raise tf2.TransformException("The BufferServer returned None for result.error!  Something is likely wrong with the server.")
         if result.error.error != result.error.NO_ERROR:
             if result.error.error == result.error.LOOKUP_ERROR:
                 raise tf2.LookupException(result.error.error_string)
@@ -207,4 +210,3 @@ class BufferClient(tf2_ros.BufferInterface):
             raise tf2.TransformException(result.error.error_string)
 
         return result.transform
-
