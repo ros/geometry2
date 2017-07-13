@@ -52,6 +52,7 @@ namespace tf2_ros
 
   void BufferServer::checkTransforms(const ros::TimerEvent& e)
   {
+    (void) e; //Unused
     boost::mutex::scoped_lock l(mutex_);
     for(std::list<GoalInfo>::iterator it = active_goals_.begin(); it != active_goals_.end();)
     {
