@@ -61,6 +61,38 @@ KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
 		      KDL::Vector(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z));
   }
 
+
+/*************/
+/** Vector3 **/
+/*************/
+
+/** \brief Convert a tf2 Vector3 type to its equivalent geometry_msgs representation.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in A tf2 Vector3 object.
+ * \return The Vector3 converted to a geometry_msgs message type.
+ */
+inline
+geometry_msgs::Vector3 toMsg(const tf2::Vector3& in)
+{
+  geometry_msgs::Vector3 out;
+  out.x = in.getX();
+  out.y = in.getY();
+  out.z = in.getZ();
+  return out;
+}
+
+/** \brief Convert a Vector3 message to its equivalent tf2 representation.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
+ * \param in A Vector3 message type.
+ * \param out The Vector3 converted to a tf2 type.
+ */
+inline
+void fromMsg(const geometry_msgs::Vector3& in, tf2::Vector3& out)
+{
+  out = tf2::Vector3(in.x, in.y, in.z);
+}
+
+
 /********************/
 /** Vector3Stamped **/
 /********************/
@@ -98,7 +130,7 @@ geometry_msgs::Vector3Stamped toMsg(const geometry_msgs::Vector3Stamped& in)
 }
 
 /** \brief Trivial "conversion" function for Vector3 message type.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
  * \param msg A Vector3Stamped message.
  * \param out The input argument.
  */
@@ -108,6 +140,65 @@ void fromMsg(const geometry_msgs::Vector3Stamped& msg, geometry_msgs::Vector3Sta
   out = msg;
 }
 
+/** \brief Convert as stamped tf2 Vector3 type to its equivalent geometry_msgs representation.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in An instance of the tf2::Vector3 specialization of the tf2::Stamped template.
+ * \return The Vector3Stamped converted to a geometry_msgs Vector3Stamped message type.
+ */
+template <>
+inline
+geometry_msgs::Vector3Stamped toMsg(const tf2::Stamped<tf2::Vector3>& in)
+{
+  geometry_msgs::Vector3Stamped out;
+  out.header.stamp = in.stamp_;
+  out.header.frame_id = in.frame_id_;
+  out.vector.x = in.getX();
+  out.vector.y = in.getY();
+  out.vector.z = in.getZ();
+  return out;
+}
+
+/** \brief Convert a Vector3Stamped message to its equivalent tf2 representation.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
+ * \param msg A Vector3Stamped message.
+ * \param out The Vector3Stamped converted to the equivalent tf2 type.
+ */
+inline
+void fromMsg(const geometry_msgs::Vector3Stamped& msg, tf2::Stamped<tf2::Vector3>& out)
+{
+  out.stamp_ = msg.header.stamp;
+  out.frame_id_ = msg.header.frame_id;
+  out.setData(tf2::Vector3(msg.vector.x, msg.vector.y, msg.vector.z));
+}
+
+
+/***********/
+/** Point **/
+/***********/
+
+/** \brief Convert a tf2 Vector3 type to its equivalent geometry_msgs representation.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in A tf2 Vector3 object.
+ * \return The Vector3 converted to a geometry_msgs message type.
+ */
+inline
+void toMsg(const tf2::Vector3& in, geometry_msgs::Point& out)
+{
+  out.x = in.getX();
+  out.y = in.getY();
+  out.z = in.getZ();
+}
+
+/** \brief Convert a Vector3 message to its equivalent tf2 representation.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
+ * \param in A Vector3 message type.
+ * \param out The Vector3 converted to a tf2 type.
+ */
+inline
+void fromMsg(const geometry_msgs::Point& in, tf2::Vector3& out)
+{
+  out = tf2::Vector3(in.x, in.y, in.z);
+}
 
 
 /******************/
@@ -146,7 +237,7 @@ geometry_msgs::PointStamped toMsg(const geometry_msgs::PointStamped& in)
 }
 
 /** \brief Trivial "conversion" function for Point message type.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
  * \param msg A PointStamped message.
  * \param out The input argument.
  */
@@ -154,6 +245,37 @@ inline
 void fromMsg(const geometry_msgs::PointStamped& msg, geometry_msgs::PointStamped& out)
 {
   out = msg;
+}
+
+/** \brief Convert as stamped tf2 Vector3 type to its equivalent geometry_msgs representation.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in An instance of the tf2::Vector3 specialization of the tf2::Stamped template.
+ * \return The Vector3Stamped converted to a geometry_msgs PointStamped message type.
+ */
+template <>
+inline
+geometry_msgs::PointStamped toMsg(const tf2::Stamped<tf2::Vector3>& in)
+{
+  geometry_msgs::PointStamped out;
+  out.header.stamp = in.stamp_;
+  out.header.frame_id = in.frame_id_;
+  out.point.x = in.getX();
+  out.point.y = in.getY();
+  out.point.z = in.getZ();
+  return out;
+}
+
+/** \brief Convert a PointStamped message to its equivalent tf2 representation.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
+ * \param msg A PointStamped message.
+ * \param out The PointStamped converted to the equivalent tf2 type.
+ */
+inline
+void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<tf2::Vector3>& out)
+{
+  out.stamp_ = msg.header.stamp;
+  out.frame_id_ = msg.header.frame_id;
+  out.setData(tf2::Vector3(msg.point.x, msg.point.y, msg.point.z));
 }
 
 
@@ -178,7 +300,7 @@ geometry_msgs::Quaternion toMsg(const tf2::Quaternion& in)
 }
 
 /** \brief Convert a Quaternion message to its equivalent tf2 representation.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
  * \param in A Quaternion message type.
  * \param out The Quaternion converted to a tf2 type.
  */
@@ -226,7 +348,7 @@ geometry_msgs::QuaternionStamped toMsg(const geometry_msgs::QuaternionStamped& i
 }
 
 /** \brief Trivial "conversion" function for Quaternion message type.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
  * \param msg A QuaternionStamped message.
  * \param out The input argument.
  */
@@ -238,7 +360,7 @@ void fromMsg(const geometry_msgs::QuaternionStamped& msg, geometry_msgs::Quatern
 
 /** \brief Convert as stamped tf2 Quaternion type to its equivalent geometry_msgs representation.
  * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in A instance of the tf2::Quaternion specialization of the tf2::Stamped template.
+ * \param in An instance of the tf2::Quaternion specialization of the tf2::Stamped template.
  * \return The QuaternionStamped converted to a geometry_msgs QuaternionStamped message type.
  */
 template <>
@@ -256,7 +378,7 @@ geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in)
 }
 
 /** \brief Convert a QuaternionStamped message to its equivalent tf2 representation.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
  * \param in A QuaternionStamped message type.
  * \param out The QuaternionStamped converted to the equivalent tf2 type.
  */
@@ -281,11 +403,9 @@ void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quate
  * \param out The Transform converted to a geometry_msgs Pose message type.
  */
 inline
-void toMsg(const tf2::Transform& in, geometry_msgs::Pose& out )
+void toMsg(const tf2::Transform& in, geometry_msgs::Pose& out)
 {
-  out.position.x = in.getOrigin().getX();
-  out.position.y = in.getOrigin().getY();
-  out.position.z = in.getOrigin().getZ();
+  toMsg(in.getOrigin(), out.position);
   out.orientation = toMsg(in.getRotation());
 }
 
@@ -346,6 +466,38 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& 
   out = msg;
 }
 
+/** \brief Convert as stamped tf2 Pose type to its equivalent geometry_msgs representation.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in An instance of the tf2::Pose specialization of the tf2::Stamped template.
+ * \return The PoseStamped converted to a geometry_msgs PoseStamped message type.
+ */
+template <>
+inline
+geometry_msgs::PoseStamped toMsg(const tf2::Stamped<tf2::Transform>& in)
+{
+  geometry_msgs::PoseStamped out;
+  out.header.stamp = in.stamp_;
+  out.header.frame_id = in.frame_id_;
+  toMsg(in.getOrigin(), out.pose.position);
+  out.pose.orientation = toMsg(in.getRotation());
+  return out;
+}
+
+/** \brief Convert a PoseStamped message to its equivalent tf2 representation.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
+ * \param msg A PoseStamped message.
+ * \param out The PoseStamped converted to the equivalent tf2 type.
+ */
+inline
+void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<tf2::Transform>& out)
+{
+  out.stamp_ = msg.header.stamp;
+  out.frame_id_ = msg.header.frame_id;
+  tf2::Transform tmp;
+  fromMsg(msg.pose, tmp);
+  out.setData(tmp);
+}
+
 
 /***************/
 /** Transform **/
@@ -360,9 +512,7 @@ inline
 geometry_msgs::Transform toMsg(const tf2::Transform& in)
 {
   geometry_msgs::Transform out;
-  out.translation.x = in.getOrigin().getX();
-  out.translation.y = in.getOrigin().getY();
-  out.translation.z = in.getOrigin().getZ();
+  out.translation = toMsg(in.getOrigin());
   out.rotation = toMsg(in.getRotation());
   return out;
 }
