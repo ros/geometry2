@@ -403,10 +403,11 @@ void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quate
  * \param out The Transform converted to a geometry_msgs Pose message type.
  */
 inline
-void toMsg(const tf2::Transform& in, geometry_msgs::Pose& out)
+geometry_msgs::Pose& toMsg(const tf2::Transform& in, geometry_msgs::Pose& out)
 {
   toMsg(in.getOrigin(), out.position);
   out.orientation = toMsg(in.getRotation());
+  return out;
 }
 
 /** \brief Convert a geometry_msgs Pose message to an equivalent tf2 Transform type.
@@ -525,9 +526,13 @@ geometry_msgs::Transform toMsg(const tf2::Transform& in)
 inline
 void fromMsg(const geometry_msgs::Transform& in, tf2::Transform& out)
 {
-  out.setOrigin(tf2::Vector3(in.translation.x, in.translation.y, in.translation.z));
+  tf2::Vector3 v;
+  fromMsg(in.translation, v);
+  out.setOrigin(v);
   // w at the end in the constructor
-  out.setRotation(tf2::Quaternion(in.rotation.x, in.rotation.y, in.rotation.z, in.rotation.w));
+  tf2::Quaternion q;
+  fromMsg(in.rotation, q);
+  out.setRotation(q);
 }
 
 
@@ -587,10 +592,10 @@ inline
   {
     tf2::Transform t;
     fromMsg(transform.transform, t);
-    tf2::Vector3 v_out = t * tf2::Vector3(t_in.point.x, t_in.point.y, t_in.point.z);
-    t_out.point.x = v_out[0];
-    t_out.point.y = v_out[1];
-    t_out.point.z = v_out[2];
+    tf2::Vector3 v_in;
+    fromMsg(t_in.point, v_in);
+    tf2::Vector3 v_out = t * v_in;
+    toMsg(v_out, t_out.point);
     t_out.header.stamp = transform.header.stamp;
     t_out.header.frame_id = transform.header.frame_id;
   }
@@ -606,9 +611,11 @@ template <>
 inline
 void doTransform(const geometry_msgs::QuaternionStamped& t_in, geometry_msgs::QuaternionStamped& t_out, const geometry_msgs::TransformStamped& transform)
 {
-  tf2::Quaternion q_out = tf2::Quaternion(transform.transform.rotation.x, transform.transform.rotation.y,
-                                          transform.transform.rotation.z, transform.transform.rotation.w)*
-                          tf2::Quaternion(t_in.quaternion.x, t_in.quaternion.y, t_in.quaternion.z, t_in.quaternion.w);
+  tf2::Quaternion t, q_in;
+  fromMsg(transform.transform.rotation, t);
+  fromMsg(t_in.quaternion, q_in);
+
+  tf2::Quaternion q_out = t * q_in;
   t_out.quaternion = toMsg(q_out);
   t_out.header.stamp = transform.header.stamp;
   t_out.header.frame_id = transform.header.frame_id;
@@ -625,8 +632,10 @@ template <>
 inline
 void doTransform(const geometry_msgs::PoseStamped& t_in, geometry_msgs::PoseStamped& t_out, const geometry_msgs::TransformStamped& transform)
 {
-  tf2::Vector3 v(t_in.pose.position.x, t_in.pose.position.y, t_in.pose.position.z);
-  tf2::Quaternion r(t_in.pose.orientation.x, t_in.pose.orientation.y, t_in.pose.orientation.z, t_in.pose.orientation.w);
+  tf2::Vector3 v;
+  fromMsg(t_in.pose.position, v);
+  tf2::Quaternion r;
+  fromMsg(t_in.pose.orientation, r);
 
   tf2::Transform t;
   fromMsg(transform.transform, t);
@@ -646,11 +655,12 @@ template <>
 inline
 void doTransform(const geometry_msgs::TransformStamped& t_in, geometry_msgs::TransformStamped& t_out, const geometry_msgs::TransformStamped& transform)
   {
-    tf2::Vector3 v(t_in.transform.translation.x, t_in.transform.translation.y, t_in.transform.translation.z);
-    tf2::Quaternion r(t_in.transform.rotation.x, t_in.transform.rotation.y, t_in.transform.rotation.z, t_in.transform.rotation.w);
+    tf2::Transform input;
+    fromMsg(t_in.transform, input);
+
     tf2::Transform t;
     fromMsg(transform.transform, t);
-    tf2::Transform v_out = t * tf2::Transform(r, v);
+    tf2::Transform v_out = t * input;
 
     toMsg(v_out);
     t_out.header.stamp = transform.header.stamp;
