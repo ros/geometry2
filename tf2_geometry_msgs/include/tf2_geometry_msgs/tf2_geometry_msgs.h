@@ -662,7 +662,7 @@ void doTransform(const geometry_msgs::TransformStamped& t_in, geometry_msgs::Tra
     fromMsg(transform.transform, t);
     tf2::Transform v_out = t * input;
 
-    toMsg(v_out);
+    t_out.transform = toMsg(v_out);
     t_out.header.stamp = transform.header.stamp;
     t_out.header.frame_id = transform.header.frame_id;
   }
