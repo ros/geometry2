@@ -367,12 +367,10 @@ public:
     }
     else
     {
+      boost::unique_lock< boost::shared_mutex > unique_lock(messages_mutex_);
       // If this message is about to push us past our queue size, erase the oldest message
       if (queue_size_ != 0 && message_count_ + 1 > queue_size_)
       {
-        // While we're using the reference keep a shared lock on the messages.
-        boost::shared_lock< boost::shared_mutex > shared_lock(messages_mutex_);
-
         ++dropped_message_count_;
         const MessageInfo& front = messages_.front();
         TF2_ROS_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_,
@@ -380,26 +378,19 @@ public:
 
         V_TransformableRequestHandle::const_iterator it = front.handles.begin();
         V_TransformableRequestHandle::const_iterator end = front.handles.end();
+
         for (; it != end; ++it)
         {
           bc_.cancelTransformableRequest(*it);
         }
 
         messageDropped(front.event, filter_failure_reasons::Unknown);
-        // Unlock the shared lock and get a unique lock. Upgradeable lock is used in transformable.
-        // There can only be one upgrade lock. It's important the cancelTransformableRequest not deadlock with transformable.
-        // They both require the transformable_requests_mutex_ in BufferCore.
-        shared_lock.unlock();
-        // There is a very slight race condition if an older message arrives in this gap.
-        boost::unique_lock< boost::shared_mutex > unique_lock(messages_mutex_);
         messages_.pop_front();
          --message_count_;
       }
 
       // Add the message to our list
       info.event = evt;
-      // Lock access to the messages_ before modifying them.
-      boost::unique_lock< boost::shared_mutex > unique_lock(messages_mutex_);
       messages_.push_back(info);
       ++message_count_;
     }
