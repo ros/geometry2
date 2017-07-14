@@ -2,8 +2,8 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.16 (2017-07-14)
+-------------------
 * fix memory leak calling Py_DECREF for all created PyObject
 * replaced dependencies on tf2_msgs_gencpp by exported dependencies
 * Relax strict type checks at setTransform to only check for members (`#221 <https://github.com/ros/geometry2/issues/221>`_)

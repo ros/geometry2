@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.16 (2017-07-14)
+-------------------
 * remove explicit templating to standardize on overloading. But provide backwards compatibility with deprecation.
 * Merge pull request `#144 <https://github.com/ros/geometry2/issues/144>`_ from clearpathrobotics/dead_lock_fix
   Solve a bug that causes a deadlock in MessageFilter

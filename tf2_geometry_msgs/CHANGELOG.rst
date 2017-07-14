@@ -2,8 +2,8 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.16 (2017-07-14)
+-------------------
 * remove explicit templating to standardize on overloading. But provide backwards compatibility with deprecation.
 * adding unit tests for conversions
 * Copy transform before altering it in do_transform_vector3 [issue 233] (`#235 <https://github.com/ros/geometry2/issues/235>`_)
