@@ -2,6 +2,15 @@
 Changelog for package tf2_sensor_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix do_transform_cloud for multi-channelled pointcloud2. (`#241 <https://github.com/ros/geometry2/issues/241>`_)
+* store gtest return value as int (`#229 <https://github.com/ros/geometry2/issues/229>`_)
+* Document the lifetime of the returned reference for getFrameId and getTimestamp
+* Find eigen in a much nicer way.
+* Switch tf2_sensor_msgs over to package format 2.
+* Contributors: Atsushi Watanabe, Chris Lalancette, dhood
+
 0.5.15 (2017-01-24)
 -------------------
 

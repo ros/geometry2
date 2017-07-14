@@ -2,6 +2,17 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove generate_rand_vectors() from a number of tests. (`#227 <https://github.com/ros/geometry2/issues/227>`_)
+  * Remove a slew of trailing whitespace.
+  Signed-off-by: Chris Lalancette <clalancette@osrfoundation.org>
+  * Remove generate_rand_vectors() from a number of tests.
+  It was never used, so there is no reason to carry it around.
+  Signed-off-by: Chris Lalancette <clalancette@osrfoundation.org>
+* store gtest return value as int (`#229 <https://github.com/ros/geometry2/issues/229>`_)
+* Contributors: Chris Lalancette, dhood
+
 0.5.15 (2017-01-24)
 -------------------
 

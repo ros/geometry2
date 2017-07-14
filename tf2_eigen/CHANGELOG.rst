@@ -2,6 +2,16 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix return value to prevent warnings on windows (`#237 <https://github.com/ros/geometry2/issues/237>`_)
+* fixing include directory order to support overlays (`#231 <https://github.com/ros/geometry2/issues/231>`_)
+* tf2_eigen: added support for Quaternion and QuaternionStamped (`#230 <https://github.com/ros/geometry2/issues/230>`_)
+* Remove an unused variable from the tf2_eigen test. (`#215 <https://github.com/ros/geometry2/issues/215>`_)
+* Find eigen in a much nicer way.
+* Switch tf2_eigen to use package.xml format 2. (`#216 <https://github.com/ros/geometry2/issues/216>`_)
+* Contributors: Chris Lalancette, Mikael Arguedas, Tully Foote, cwecht
+
 0.5.15 (2017-01-24)
 -------------------
 * fixup `#186 <https://github.com/ros/geometry2/issues/186>`_: inline template specializations (`#200 <https://github.com/ros/geometry2/issues/200>`_)
@@ -42,4 +52,3 @@ Changelog for package tf2_eigen
 * fixing CMakeLists.txt from `#97 <https://github.com/ros/geometry_experimental/issues/97>`_
 * create tf2_eigen.
 * Contributors: Tully Foote, koji
-

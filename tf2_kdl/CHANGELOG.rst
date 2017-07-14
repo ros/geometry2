@@ -2,6 +2,13 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* store gtest return value as int (`#229 <https://github.com/ros/geometry2/issues/229>`_)
+* Find eigen in a much nicer way.
+* Switch tf2_kdl over to package.xml format 2.
+* Contributors: Chris Lalancette, dhood
+
 0.5.15 (2017-01-24)
 -------------------
 

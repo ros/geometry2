@@ -2,6 +2,21 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove explicit templating to standardize on overloading. But provide backwards compatibility with deprecation.
+* Merge pull request `#144 <https://github.com/ros/geometry2/issues/144>`_ from clearpathrobotics/dead_lock_fix
+  Solve a bug that causes a deadlock in MessageFilter
+* Resolve 2 places where the error_msg would not be propogated.
+  Fixes `#198 <https://github.com/ros/geometry2/issues/198>`_
+* Remove generate_rand_vectors() from a number of tests. (`#227 <https://github.com/ros/geometry2/issues/227>`_)
+* fixing include directory order to support overlays (`#231 <https://github.com/ros/geometry2/issues/231>`_)
+* replaced dependencies on tf2_msgs_gencpp by exported dependencies
+* Document the lifetime of the returned reference for getFrameId getTimestamp
+* relax normalization tolerance. `#196 <https://github.com/ros/geometry2/issues/196>`_ was too strict for some use cases. (`#220 <https://github.com/ros/geometry2/issues/220>`_)
+* Solve a bug that causes a deadlock in MessageFilter
+* Contributors: Adel Fakih, Chris Lalancette, Christopher Wecht, Tully Foote, dhood
+
 0.5.15 (2017-01-24)
 -------------------
 

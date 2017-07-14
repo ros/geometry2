@@ -2,6 +2,18 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* remove explicit templating to standardize on overloading. But provide backwards compatibility with deprecation.
+* adding unit tests for conversions
+* Copy transform before altering it in do_transform_vector3 [issue 233] (`#235 <https://github.com/ros/geometry2/issues/235>`_)
+* store gtest return value as int (`#229 <https://github.com/ros/geometry2/issues/229>`_)
+* Document the lifetime of the returned reference for getFrameId and getTimestamp
+* tf2_geometry_msgs: using tf2::Transform in doTransform-functions, marked gmTransformToKDL as deprecated
+* Switch tf2_geometry_msgs to use package.xml format 2 (`#217 <https://github.com/ros/geometry2/issues/217>`_)
+* tf2_geometry_msgs: added missing conversion functions
+* Contributors: Christopher Wecht, Sebastian Wagner, Tully Foote, dhood, pAIgn10
+
 0.5.15 (2017-01-24)
 -------------------
 

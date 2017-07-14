@@ -2,6 +2,21 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#144 <https://github.com/ros/geometry2/issues/144>`_ from clearpathrobotics/dead_lock_fix
+  Solve a bug that causes a deadlock in MessageFilter
+* Clear error string if it exists from the external entry points.
+  Fixes `#117 <https://github.com/ros/geometry2/issues/117>`_
+* Make buff_size and tcp_nodelay and subscriber queue size mutable.
+* Remove generate_rand_vectors() from a number of tests. (`#227 <https://github.com/ros/geometry2/issues/227>`_)
+  * Remove generate_rand_vectors() from a number of tests.
+* Log jump duration on backwards time jump detection. (`#234 <https://github.com/ros/geometry2/issues/234>`_)
+* replaced dependencies on tf2_msgs_gencpp by exported dependencies
+* Use new-style objects in python 2
+* Solve a bug that causes a deadlock in MessageFilter
+* Contributors: Adel Fakih, Chris Lalancette, Christopher Wecht, Eric Wieser, Koji Terada, Stephan, Tully Foote, koji_terada
+
 0.5.15 (2017-01-24)
 -------------------
 * tf2_ros: add option to unregister TransformListener (`#201 <https://github.com/ros/geometry2/issues/201>`_)

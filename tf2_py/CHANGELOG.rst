@@ -2,6 +2,14 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix memory leak calling Py_DECREF for all created PyObject
+* replaced dependencies on tf2_msgs_gencpp by exported dependencies
+* Relax strict type checks at setTransform to only check for members (`#221 <https://github.com/ros/geometry2/issues/221>`_)
+* expose deprecated methods in tf2_py API to support better backwards compatibility. Fixes `#206 <https://github.com/ros/geometry2/issues/206>`_
+* Contributors: Christopher Wecht, Sergio Ramos, Tully Foote, alex
+
 0.5.15 (2017-01-24)
 -------------------
 
@@ -96,4 +104,3 @@ Changelog for package tf2_py
 0.4.0 (2013-06-27)
 ------------------
 * splitting rospy dependency into tf2_py so tf2 is pure c++ library.
-
