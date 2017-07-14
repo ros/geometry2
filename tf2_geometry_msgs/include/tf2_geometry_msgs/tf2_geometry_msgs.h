@@ -182,11 +182,12 @@ void fromMsg(const geometry_msgs::Vector3Stamped& msg, tf2::Stamped<tf2::Vector3
  * \return The Vector3 converted to a geometry_msgs message type.
  */
 inline
-void toMsg(const tf2::Vector3& in, geometry_msgs::Point& out)
+geometry_msgs::Point& toMsg(const tf2::Vector3& in, geometry_msgs::Point& out)
 {
   out.x = in.getX();
   out.y = in.getY();
   out.z = in.getZ();
+  return out;
 }
 
 /** \brief Convert a Vector3 message to its equivalent tf2 representation.
@@ -252,11 +253,9 @@ void fromMsg(const geometry_msgs::PointStamped& msg, geometry_msgs::PointStamped
  * \param in An instance of the tf2::Vector3 specialization of the tf2::Stamped template.
  * \return The Vector3Stamped converted to a geometry_msgs PointStamped message type.
  */
-template <>
 inline
-geometry_msgs::PointStamped toMsg(const tf2::Stamped<tf2::Vector3>& in)
+geometry_msgs::PointStamped toMsg(const tf2::Stamped<tf2::Vector3>& in, geometry_msgs::PointStamped & out)
 {
-  geometry_msgs::PointStamped out;
   out.header.stamp = in.stamp_;
   out.header.frame_id = in.frame_id_;
   out.point.x = in.getX();
@@ -472,11 +471,9 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, geometry_msgs::PoseStamped& 
  * \param in An instance of the tf2::Pose specialization of the tf2::Stamped template.
  * \return The PoseStamped converted to a geometry_msgs PoseStamped message type.
  */
-template <>
 inline
-geometry_msgs::PoseStamped toMsg(const tf2::Stamped<tf2::Transform>& in)
+geometry_msgs::PoseStamped toMsg(const tf2::Stamped<tf2::Transform>& in, geometry_msgs::PoseStamped & out)
 {
-  geometry_msgs::PoseStamped out;
   out.header.stamp = in.stamp_;
   out.header.frame_id = in.frame_id_;
   toMsg(in.getOrigin(), out.pose.position);
@@ -578,6 +575,21 @@ inline
 void fromMsg(const geometry_msgs::TransformStamped& msg, geometry_msgs::TransformStamped& out)
 {
   out = msg;
+}
+
+/** \brief Convert a TransformStamped message to its equivalent tf2 representation.
+ * This function is a specialization of the fromMsg template defined in tf2/convert.h.
+ * \param msg A TransformStamped message.
+ * \param out The TransformStamped converted to the equivalent tf2 type.
+ */
+inline
+void fromMsg(const geometry_msgs::TransformStamped& msg, tf2::Stamped<tf2::Transform>& out)
+{
+  out.stamp_ = msg.header.stamp;
+  out.frame_id_ = msg.header.frame_id;
+  tf2::Transform tmp;
+  fromMsg(msg.transform, tmp);
+  out.setData(tmp);
 }
 
 /** \brief Apply a geometry_msgs TransformStamped to an geometry_msgs Point type.

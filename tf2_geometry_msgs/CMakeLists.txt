@@ -31,6 +31,9 @@ catkin_python_setup()
 
 if(CATKIN_ENABLE_TESTING)
 
+catkin_add_gtest(test_tomsg_frommsg test/test_tomsg_frommsg.cpp)
+target_link_libraries(test_tomsg_frommsg ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+
 find_package(catkin REQUIRED COMPONENTS geometry_msgs rostest tf2_ros tf2)
 
 add_executable(test_geometry_msgs EXCLUDE_FROM_ALL test/test_tf2_geometry_msgs.cpp)
