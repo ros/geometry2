@@ -74,7 +74,38 @@ TEST(TfGeometry, Frame)
   EXPECT_NEAR(v_advanced.pose.orientation.w, 1.0, EPS);
 }
 
+TEST(TfGeometry, Transform)
+{
+  geometry_msgs::TransformStamped v1;
+  v1.transform.translation.x = 1;
+  v1.transform.translation.y = 2;
+  v1.transform.translation.z = 3;
+  v1.transform.rotation.x = 1;
+  v1.header.stamp = ros::Time(2);
+  v1.header.frame_id = "A";
 
+  // simple api
+  geometry_msgs::TransformStamped v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
+  EXPECT_NEAR(v_simple.transform.translation.x, -9, EPS);
+  EXPECT_NEAR(v_simple.transform.translation.y, 18, EPS);
+  EXPECT_NEAR(v_simple.transform.translation.z, 27, EPS);
+  EXPECT_NEAR(v_simple.transform.rotation.x, 0.0, EPS);
+  EXPECT_NEAR(v_simple.transform.rotation.y, 0.0, EPS);
+  EXPECT_NEAR(v_simple.transform.rotation.z, 0.0, EPS);
+  EXPECT_NEAR(v_simple.transform.rotation.w, 1.0, EPS);
+  
+
+  // advanced api
+  geometry_msgs::TransformStamped v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
+							      "A", ros::Duration(3.0));
+  EXPECT_NEAR(v_advanced.transform.translation.x, -9, EPS);
+  EXPECT_NEAR(v_advanced.transform.translation.y, 18, EPS);
+  EXPECT_NEAR(v_advanced.transform.translation.z, 27, EPS);
+  EXPECT_NEAR(v_advanced.transform.rotation.x, 0.0, EPS);
+  EXPECT_NEAR(v_advanced.transform.rotation.y, 0.0, EPS);
+  EXPECT_NEAR(v_advanced.transform.rotation.z, 0.0, EPS);
+  EXPECT_NEAR(v_advanced.transform.rotation.w, 1.0, EPS);
+}
 
 TEST(TfGeometry, Vector)
 {
