@@ -362,7 +362,7 @@ TEST(tf2_geometry_msgs, QuaternionStamped)
   SCOPED_TRACE("m1 v1");
   // expect_near(m1, v1); //TODO implement cross verification explicityly
   geometry_msgs::QuaternionStamped m2;
-  m2 = tf2::toMsg<tf2::Stamped<tf2::Quaternion>, geometry_msgs::QuaternionStamped>(v1);
+  m2 = tf2::toMsg(v1);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }

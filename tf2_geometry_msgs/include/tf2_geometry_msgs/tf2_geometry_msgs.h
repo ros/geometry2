@@ -361,7 +361,6 @@ void fromMsg(const geometry_msgs::QuaternionStamped& msg, geometry_msgs::Quatern
  * \param in An instance of the tf2::Quaternion specialization of the tf2::Stamped template.
  * \return The QuaternionStamped converted to a geometry_msgs QuaternionStamped message type.
  */
-template <>
 inline
 geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in)
 {
@@ -375,12 +374,24 @@ geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in)
   return out;
 }
 
+template <>
+inline
+geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in)  __attribute__ ((deprecated));
+
+
+//Backwards compatibility remove when forked for Lunar or newer
+template <>
+inline
+geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in)
+{
+  return toMsg(in);
+}
+
 /** \brief Convert a QuaternionStamped message to its equivalent tf2 representation.
  * This function is a specialization of the fromMsg template defined in tf2/convert.h.
  * \param in A QuaternionStamped message type.
  * \param out The QuaternionStamped converted to the equivalent tf2 type.
  */
-template <>
 inline
 void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quaternion>& out)
 {
@@ -391,6 +402,17 @@ void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quate
   out.setData(tmp);
 }
 
+template<>
+inline
+void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quaternion>& out) __attribute__ ((deprecated));
+
+//Backwards compatibility remove when forked for Lunar or newer
+template<>
+inline
+void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quaternion>& out)
+{
+    fromMsg(in, out);
+}
 
 /**********/
 /** Pose **/
