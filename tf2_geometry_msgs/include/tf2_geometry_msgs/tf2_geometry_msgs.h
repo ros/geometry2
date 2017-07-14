@@ -145,7 +145,6 @@ void fromMsg(const geometry_msgs::Vector3Stamped& msg, geometry_msgs::Vector3Sta
  * \param in An instance of the tf2::Vector3 specialization of the tf2::Stamped template.
  * \return The Vector3Stamped converted to a geometry_msgs Vector3Stamped message type.
  */
-template <>
 inline
 geometry_msgs::Vector3Stamped toMsg(const tf2::Stamped<tf2::Vector3>& in)
 {
@@ -576,6 +575,23 @@ void fromMsg(const geometry_msgs::TransformStamped& msg, geometry_msgs::Transfor
 {
   out = msg;
 }
+
+/** \brief Convert as stamped tf2 Transform type to its equivalent geometry_msgs representation.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in An instance of the tf2::Transform specialization of the tf2::Stamped template.
+ * \return The tf2::Stamped<tf2::Transform> converted to a geometry_msgs TransformStamped message type.
+ */
+inline
+geometry_msgs::TransformStamped toMsg(const tf2::Stamped<tf2::Transform>& in)
+{
+  geometry_msgs::TransformStamped out;
+  out.header.stamp = in.stamp_;
+  out.header.frame_id = in.frame_id_;
+  out.transform.translation = toMsg(in.getOrigin());
+  out.transform.rotation = toMsg(in.getRotation());
+  return out;
+}
+
 
 /** \brief Convert a TransformStamped message to its equivalent tf2 representation.
  * This function is a specialization of the fromMsg template defined in tf2/convert.h.
