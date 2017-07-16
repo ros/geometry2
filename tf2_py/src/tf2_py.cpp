@@ -536,7 +536,7 @@ static PyObject *_allFramesAsDot(PyObject *self, PyObject *args, PyObject *kw)
   ros::Time time;
   if (!PyArg_ParseTupleAndKeywords(args, kw, "|O&", (char**)keywords, rostime_converter, &time))
     return NULL;
-  return PyString_FromString(bc->_allFramesAsDot(time.toSec()).c_str());
+  return stringToPython(bc->_allFramesAsDot(time.toSec()));
 }
 
 
