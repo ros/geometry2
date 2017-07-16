@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import unittest
 import struct
 import tf2_sensor_msgs

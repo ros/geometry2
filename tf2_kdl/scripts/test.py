@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+
 import unittest
 import rospy
 import PyKDL
@@ -32,7 +34,7 @@ class KDLConversions(unittest.TestCase):
 
         f = PyKDL.Frame(PyKDL.Rotation.RPY(1,2,3), PyKDL.Vector(1,2,3))
         out = b.transform(tf2_ros.Stamped(f, rospy.Time(2), 'a'), 'b')
-        print out
+        print(out)
         self.assertEqual(out.p.x(), 0)
         self.assertEqual(out.p.y(), -2)
         self.assertEqual(out.p.z(), -3)

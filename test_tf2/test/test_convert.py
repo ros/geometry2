@@ -34,6 +34,9 @@
 #* 
 #* Author: Eitan Marder-Eppstein
 #***********************************************************
+
+from __future__ import print_function
+
 PKG = 'test_tf2'
 import roslib; roslib.load_manifest(PKG)
 
@@ -51,15 +54,15 @@ import PyKDL
 class TestConvert(unittest.TestCase):
     def test_convert(self):
         p = tf2_ros.Stamped(PyKDL.Vector(1, 2, 3), rospy.Time(), 'my_frame')
-        print p
+        print(p)
         msg = tf2_ros.convert(p, PointStamped) 
-        print msg
+        print(msg)
         p2 = tf2_ros.convert(msg, PyKDL.Vector)
-        print p2
+        print(p2)
         p2[0] = 100
-        print p
-        print p2
-        print p2.header
+        print(p)
+        print(p2)
+        print(p2.header)
 
 if __name__ == '__main__':
     import rostest
