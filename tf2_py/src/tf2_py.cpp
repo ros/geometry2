@@ -632,7 +632,7 @@ struct PyModuleDef tf_module = {
   module_methods         // methods
 };
 
-PyMODINIT_FUNC PyInit_tf2()
+PyMODINIT_FUNC PyInit__tf2()
 {
   if (!staticInit())
     return NULL;
