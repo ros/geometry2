@@ -154,6 +154,90 @@ TEST(TfGeometry, Point)
   EXPECT_NEAR(v_advanced.point.z, 27, EPS);
 }
 
+TEST(TfGeometry, doTransformPoint)
+{
+  geometry_msgs::Point v1, res;
+  v1.x = 2;
+  v1.y = 1;
+  v1.z = 3;
+
+  geometry_msgs::TransformStamped trafo;
+  trafo.transform.translation.x = -1;
+  trafo.transform.translation.y = 2;
+  trafo.transform.translation.z = -3;
+  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+
+  tf2::doTransform(v1, res, trafo);
+
+  EXPECT_NEAR(res.x, 0, EPS);
+  EXPECT_NEAR(res.y, 0, EPS);
+  EXPECT_NEAR(res.z, 0, EPS);
+}
+
+TEST(TfGeometry, doTransformQuaterion)
+{
+  geometry_msgs::Quaternion v1, res;
+  v1.w = 1;
+
+  geometry_msgs::TransformStamped trafo;
+  trafo.transform.translation.x = -1;
+  trafo.transform.translation.y = 2;
+  trafo.transform.translation.z = -3;
+  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+
+  tf2::doTransform(v1, res, trafo);
+
+  EXPECT_NEAR(res.x, trafo.transform.rotation.x, EPS);
+  EXPECT_NEAR(res.y, trafo.transform.rotation.y, EPS);
+  EXPECT_NEAR(res.z, trafo.transform.rotation.z, EPS);
+  EXPECT_NEAR(res.w, trafo.transform.rotation.w, EPS);
+}
+
+TEST(TfGeometry, doTransformPose)
+{
+  geometry_msgs::Pose v1, res;
+  v1.position.x = 2;
+  v1.position.y = 1;
+  v1.position.z = 3;
+  v1.orientation.w = 1;
+
+  geometry_msgs::TransformStamped trafo;
+  trafo.transform.translation.x = -1;
+  trafo.transform.translation.y = 2;
+  trafo.transform.translation.z = -3;
+  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+
+  tf2::doTransform(v1, res, trafo);
+
+  EXPECT_NEAR(res.position.x, 0, EPS);
+  EXPECT_NEAR(res.position.y, 0, EPS);
+  EXPECT_NEAR(res.position.z, 0, EPS);
+
+  EXPECT_NEAR(res.orientation.x, trafo.transform.rotation.x, EPS);
+  EXPECT_NEAR(res.orientation.y, trafo.transform.rotation.y, EPS);
+  EXPECT_NEAR(res.orientation.z, trafo.transform.rotation.z, EPS);
+  EXPECT_NEAR(res.orientation.w, trafo.transform.rotation.w, EPS);
+}
+
+TEST(TfGeometry, doTransformVector3)
+{
+  geometry_msgs::Vector3 v1, res;
+  v1.x = 2;
+  v1.y = 1;
+  v1.z = 3;
+
+  geometry_msgs::TransformStamped trafo;
+  trafo.transform.translation.x = -1;
+  trafo.transform.translation.y = 2;
+  trafo.transform.translation.z = -3;
+  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+
+  tf2::doTransform(v1, res, trafo);
+
+  EXPECT_NEAR(res.x, 1, EPS);
+  EXPECT_NEAR(res.y, -2, EPS);
+  EXPECT_NEAR(res.z, 3, EPS);
+}
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
