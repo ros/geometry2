@@ -406,3 +406,31 @@ int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+
+TEST(TimeCache, TimeInterpolation)
+{
+  uint64_t runs = 100;
+  
+  tf2::TimeCache  cache;
+
+  uint64_t offset = 200;
+
+  TransformStorage stor;
+  setIdentity(stor);
+  
+  for (uint64_t step = 0; step < 2 ; step++)
+  {
+    stor.frame_id_ = 2;
+    stor.stamp_ = ros::Time().fromNSec(step * 100 + offset);
+    cache.insertData(stor);
+  }
+  
+  for (int pos = 0; pos < 100 ; pos ++)
+  {
+    uint64_t time = offset + pos;
+    cache.getData(ros::Time().fromNSec(time), stor);
+    uint64_t time_out = stor.stamp_.toNSec();
+    EXPECT_EQ(time_out, time);
+  }
+
+}
