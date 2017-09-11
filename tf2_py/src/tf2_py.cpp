@@ -48,7 +48,7 @@
 static PyObject *pModulerospy = NULL;
 static PyObject *pModulegeometrymsgs = NULL;
 static PyObject *tf2_exception = NULL;
-static PyObject *tf2_connectivityexception = NULL, *tf2_lookupexception = NULL, *tf2_extrapolationexception = NULL, 
+static PyObject *tf2_connectivityexception = NULL, *tf2_lookupexception = NULL, *tf2_extrapolationexception = NULL,
                 *tf2_invalidargumentexception = NULL, *tf2_timeoutexception = NULL;
 
 struct buffer_core_t {
@@ -546,17 +546,17 @@ static struct PyMethodDef buffer_core_methods[] =
   {"all_frames_as_string", allFramesAsString, METH_VARARGS},
   {"set_transform", setTransform, METH_VARARGS},
   {"set_transform_static", setTransformStatic, METH_VARARGS},
-  {"can_transform_core", (PyCFunction)canTransformCore, METH_KEYWORDS},
-  {"can_transform_full_core", (PyCFunction)canTransformFullCore, METH_KEYWORDS},
-  {"_chain", (PyCFunction)_chain, METH_KEYWORDS},
-  {"clear", (PyCFunction)clear, METH_KEYWORDS},
+  {"can_transform_core", (PyCFunction)canTransformCore, METH_VARARGS | METH_KEYWORDS},
+  {"can_transform_full_core", (PyCFunction)canTransformFullCore, METH_VARARGS | METH_KEYWORDS},
+  {"_chain", (PyCFunction)_chain, METH_VARARGS | METH_KEYWORDS},
+  {"clear", (PyCFunction)clear, METH_VARARGS | METH_KEYWORDS},
   {"_frameExists", (PyCFunction)_frameExists, METH_VARARGS},
   {"_getFrameStrings", (PyCFunction)_getFrameStrings, METH_VARARGS},
-  {"_allFramesAsDot", (PyCFunction)_allFramesAsDot, METH_KEYWORDS},
+  {"_allFramesAsDot", (PyCFunction)_allFramesAsDot, METH_VARARGS | METH_KEYWORDS},
   {"get_latest_common_time", (PyCFunction)getLatestCommonTime, METH_VARARGS},
-  {"lookup_transform_core", (PyCFunction)lookupTransformCore, METH_KEYWORDS},
-  {"lookup_transform_full_core", (PyCFunction)lookupTransformFullCore, METH_KEYWORDS},
-  //{"lookupTwistCore", (PyCFunction)lookupTwistCore, METH_KEYWORDS},
+  {"lookup_transform_core", (PyCFunction)lookupTransformCore, METH_VARARGS | METH_KEYWORDS},
+  {"lookup_transform_full_core", (PyCFunction)lookupTransformFullCore, METH_VARARGS | METH_KEYWORDS},
+  //{"lookupTwistCore", (PyCFunction)lookupTwistCore, METH_VARARGS | METH_KEYWORDS},
   //{"lookupTwistFullCore", lookupTwistFullCore, METH_VARARGS},
   //{"getTFPrefix", (PyCFunction)getTFPrefix, METH_VARARGS},
   {NULL,          NULL}
