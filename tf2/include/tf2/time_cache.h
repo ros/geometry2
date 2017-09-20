@@ -34,7 +34,7 @@
 
 #include "transform_storage.h"
 
-#include <list>
+#include <deque>
 
 #include <sstream>
 
@@ -116,7 +116,7 @@ class TimeCache : public TimeCacheInterface
   
 
 private:
-  typedef std::list<TransformStorage> L_TransformStorage;
+  typedef std::deque<TransformStorage> L_TransformStorage;
   L_TransformStorage storage_;
 
   ros::Duration max_storage_time_;
