@@ -1158,7 +1158,7 @@ std::string BufferCore::allFramesAsYAML(double current_time) const
   TransformStorage temp;
 
   if (frames_.size() ==1)
-    mstream <<"[]";
+    mstream <<"{}";
 
   mstream.precision(3);
   mstream.setf(std::ios::fixed,std::ios::floatfield);
