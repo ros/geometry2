@@ -240,7 +240,9 @@ TEST(TimeCache, CartesianInterpolation)
     
     for (int pos = 0; pos < 100 ; pos ++)
     {
-      cache.getData(ros::Time().fromNSec(offset + pos), stor);
+      uint64_t time = offset + pos;
+      cache.getData(ros::Time().fromNSec(time), stor);
+      uint64_t time_out = stor.stamp_.toNSec();
       double x_out = stor.translation_.x();
       double y_out = stor.translation_.y();
       double z_out = stor.translation_.z();
@@ -248,6 +250,7 @@ TEST(TimeCache, CartesianInterpolation)
       //       xvalues[0] + (xvalues[1] - xvalues[0]) * (double)pos/100.,
       //       yvalues[0] + (yvalues[1] - yvalues[0]) * (double)pos/100.0,
       //       zvalues[0] + (xvalues[1] - zvalues[0]) * (double)pos/100.0);
+      EXPECT_EQ(time, time_out);
       EXPECT_NEAR(xvalues[0] + (xvalues[1] - xvalues[0]) * (double)pos/100.0, x_out, epsilon);
       EXPECT_NEAR(yvalues[0] + (yvalues[1] - yvalues[0]) * (double)pos/100.0, y_out, epsilon);
       EXPECT_NEAR(zvalues[0] + (zvalues[1] - zvalues[0]) * (double)pos/100.0, z_out, epsilon);
@@ -358,13 +361,16 @@ TEST(TimeCache, AngularInterpolation)
     
     for (int pos = 0; pos < 100 ; pos ++)
     {
-      EXPECT_TRUE(cache.getData(ros::Time().fromNSec(offset + pos), stor)); //get the transform for the position
+      uint64_t time = offset + pos;
+      cache.getData(ros::Time().fromNSec(time), stor);
+      uint64_t time_out = stor.stamp_.toNSec();
       tf2::Quaternion quat (stor.rotation_);
 
       //Generate a ground truth quaternion directly calling slerp
       tf2::Quaternion ground_truth = quats[0].slerp(quats[1], pos/100.0);
       
       //Make sure the transformed one and the direct call match
+      EXPECT_EQ(time, time_out);
       EXPECT_NEAR(0, angle(ground_truth, quat), epsilon);
             
     }
@@ -406,3 +412,4 @@ int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+

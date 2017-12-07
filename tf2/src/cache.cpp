@@ -184,7 +184,7 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
   //Interpolate rotation
   output.rotation_ = slerp( one.rotation_, two.rotation_, ratio);
 
-  output.stamp_ = one.stamp_;
+  output.stamp_ = time;
   output.frame_id_ = one.frame_id_;
   output.child_frame_id_ = one.child_frame_id_;
 }
