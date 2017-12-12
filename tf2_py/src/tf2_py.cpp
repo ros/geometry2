@@ -5,6 +5,10 @@
 
 #include "python_compat.h"
 
+#if PY_VERSION_HEX >= 0x03000000
+#define PyString_FromString PyBytes_FromString
+#endif
+
 // Run x (a tf method, catching TF's exceptions and reraising them as Python exceptions)
 //
 #define WRAP(x) \
