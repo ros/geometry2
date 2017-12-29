@@ -93,6 +93,11 @@ void createExtrapolationException3(ros::Time t0, ros::Time t1, std::string* erro
 }
 } // namespace cache
 
+bool operator>(const TransformStorage& lhs, const TransformStorage& rhs)
+{
+  return lhs.stamp_ > rhs.stamp_;
+}
+
 uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str)
 {
   //No values stored
@@ -151,13 +156,14 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
 
   //At least 2 values stored
   //Find the first value less than the target value
-  L_TransformStorage::iterator storage_it = storage_.begin();
-  while(storage_it != storage_.end())
-  {
-    if (storage_it->stamp_ <= target_time)
-      break;
-    storage_it++;
-  }
+  L_TransformStorage::iterator storage_it;
+  TransformStorage storage_target_time;
+  storage_target_time.stamp_ = target_time;
+
+  storage_it = std::lower_bound(
+      storage_.begin(),
+      storage_.end(),
+      storage_target_time, std::greater<TransformStorage>());
 
   //Finally the case were somewhere in the middle  Guarenteed no extrapolation :-)
   one = &*(storage_it); //Older
