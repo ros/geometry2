@@ -2,8 +2,8 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.17 (2018-01-01)
+-------------------
 * Merge pull request `#268 <https://github.com/ros/geometry2/issues/268>`_ from smnogar/indigo-devel
   Fixed for cases of non-standard python install
 * Contributors: Steve Nogar, Tully Foote

@@ -2,8 +2,8 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.17 (2018-01-01)
+-------------------
 * Merge pull request `#266 <https://github.com/ros/geometry2/issues/266>`_ from randoms/indigo-devel
   fix METH_OLDARGS is no longer supported error in python3
 * Merge pull request `#260 <https://github.com/ros/geometry2/issues/260>`_ from randoms/indigo-devel
