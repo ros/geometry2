@@ -413,11 +413,21 @@ private:
   //Whether it is safe to use canTransform with a timeout. (If another thread is not provided it will always timeout.)
   bool using_dedicated_thread_;
 
+public:
+  friend class TestBufferCore; // For unit testing
+
 };
 
-
-
-
+/** A helper class for testing internal APIs */
+class TestBufferCore
+{
+public:
+  int _walkToTopParent(BufferCore& buffer, ros::Time time, CompactFrameID target_id, CompactFrameID source_id, std::string* error_string, std::vector<CompactFrameID> *frame_chain) const;
+  const std::string& _lookupFrameString(BufferCore& buffer, CompactFrameID frame_id_num) const
+  {
+    return buffer.lookupFrameString(frame_id_num);
+  }
+};
 };
 
 #endif //TF2_CORE_H
