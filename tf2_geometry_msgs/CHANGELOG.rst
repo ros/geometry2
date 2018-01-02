@@ -2,6 +2,9 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.16 (2017-07-14)
 -------------------
 * remove explicit templating to standardize on overloading. But provide backwards compatibility with deprecation.

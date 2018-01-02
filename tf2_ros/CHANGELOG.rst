@@ -2,6 +2,15 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#260 <https://github.com/ros/geometry2/issues/260>`_ from randoms/indigo-devel
+  fix python3 import error
+* Merge pull request `#257 <https://github.com/ros/geometry2/issues/257>`_ from delftrobotics-forks/python3
+  Make tf2_py python3 compatible again
+* Use python3 print function.
+* Contributors: Maarten de Vries, Tully Foote, randoms
+
 0.5.16 (2017-07-14)
 -------------------
 * Merge pull request `#144 <https://github.com/ros/geometry2/issues/144>`_ from clearpathrobotics/dead_lock_fix

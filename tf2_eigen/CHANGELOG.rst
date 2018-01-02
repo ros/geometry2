@@ -2,6 +2,9 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.16 (2017-07-14)
 -------------------
 * fix return value to prevent warnings on windows (`#237 <https://github.com/ros/geometry2/issues/237>`_)

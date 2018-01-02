@@ -2,6 +2,17 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#266 <https://github.com/ros/geometry2/issues/266>`_ from randoms/indigo-devel
+  fix METH_OLDARGS is no longer supported error in python3
+* Merge pull request `#260 <https://github.com/ros/geometry2/issues/260>`_ from randoms/indigo-devel
+  fix python3 import error
+* Merge pull request `#257 <https://github.com/ros/geometry2/issues/257>`_ from delftrobotics-forks/python3
+  Make tf2_py python3 compatible again
+* Use string conversion from python_compat.h.
+* Contributors: Maarten de Vries, Tully Foote, randoms
+
 0.5.16 (2017-07-14)
 -------------------
 * fix memory leak calling Py_DECREF for all created PyObject

@@ -2,6 +2,26 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#278 <https://github.com/ros/geometry2/issues/278>`_ from ros/chain_as_vec_test2
+  Clean up results of _chainAsVector
+* Simple test to check BufferCore::_chainAsVector.
+  Unit tests for walk and chain passing now.
+* Merge pull request `#267 <https://github.com/ros/geometry2/issues/267>`_ from at-wat/speedup-timecache-for-large-buffer
+  Speed-up TimeCache search for large cache time.
+* Merge pull request `#265 <https://github.com/ros/geometry2/issues/265>`_ from vsherrod/interpolation_fix
+  Corrected time output on interpolation function.
+* Add time_interval option to tf2 speed-test.
+* Merge pull request `#269 <https://github.com/ros/geometry2/issues/269>`_ from ros/frames_as_yaml
+  allFrameAsYaml consistently outputting a dict
+* resolve https://github.com/ros/geometry/pull/153 at the source instead of needing the workaround.
+* Speed-up TimeCache search for large cache time.
+* Modified tests for correct time in interpolation to existing tests.
+* Corrected time output on interpolation function.
+  Added unit test to check for this.
+* Contributors: Atsushi Watanabe, Miguel Prada, Tully Foote, Vallan Sherrod
+
 0.5.16 (2017-07-14)
 -------------------
 * remove explicit templating to standardize on overloading. But provide backwards compatibility with deprecation.

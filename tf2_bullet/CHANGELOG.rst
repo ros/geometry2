@@ -2,6 +2,9 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.16 (2017-07-14)
 -------------------
 * store gtest return value as int (`#229 <https://github.com/ros/geometry2/issues/229>`_)

@@ -2,6 +2,13 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#257 <https://github.com/ros/geometry2/issues/257>`_ from delftrobotics-forks/python3
+  Make tf2_py python3 compatible again
+* Use python3 print function.
+* Contributors: Maarten de Vries, Tully Foote
+
 0.5.16 (2017-07-14)
 -------------------
 * Remove generate_rand_vectors() from a number of tests. (`#227 <https://github.com/ros/geometry2/issues/227>`_)
