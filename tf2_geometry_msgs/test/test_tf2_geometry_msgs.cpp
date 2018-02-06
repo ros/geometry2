@@ -74,6 +74,44 @@ TEST(TfGeometry, Frame)
   EXPECT_NEAR(v_advanced.pose.orientation.w, 1.0, EPS);
 }
 
+TEST(TfGeometry, PoseWithCovarianceStamped)
+{
+  geometry_msgs::PoseWithCovarianceStamped v1;
+  v1.pose.pose.position.x = 1;
+  v1.pose.pose.position.y = 2;
+  v1.pose.pose.position.z = 3;
+  v1.pose.pose.orientation.x = 1;
+  v1.header.stamp = ros::Time(2);
+  v1.header.frame_id = "A";
+  v1.pose.covariance[0] = 1;
+  v1.pose.covariance[7] = 1;
+  v1.pose.covariance[13] = 1;
+  v1.pose.covariance[20] = 1;
+  v1.pose.covariance[27] = 1;
+  v1.pose.covariance[35] = 1;
+  
+  // simple api
+  const geometry_msgs::PoseWithCovarianceStamped v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
+  EXPECT_NEAR(v_simple.pose.pose.position.x, -9, EPS);
+  EXPECT_NEAR(v_simple.pose.pose.position.y, 18, EPS);
+  EXPECT_NEAR(v_simple.pose.pose.position.z, 27, EPS);
+  EXPECT_NEAR(v_simple.pose.pose.orientation.x, 0.0, EPS);
+  EXPECT_NEAR(v_simple.pose.pose.orientation.y, 0.0, EPS);
+  EXPECT_NEAR(v_simple.pose.pose.orientation.z, 0.0, EPS);
+  EXPECT_NEAR(v_simple.pose.pose.orientation.w, 1.0, EPS);
+  
+  // advanced api
+  const geometry_msgs::PoseWithCovarianceStamped v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
+							      "A", ros::Duration(3.0));
+  EXPECT_NEAR(v_advanced.pose.pose.position.x, -9, EPS);
+  EXPECT_NEAR(v_advanced.pose.pose.position.y, 18, EPS);
+  EXPECT_NEAR(v_advanced.pose.pose.position.z, 27, EPS);
+  EXPECT_NEAR(v_advanced.pose.pose.orientation.x, 0.0, EPS);
+  EXPECT_NEAR(v_advanced.pose.pose.orientation.y, 0.0, EPS);
+  EXPECT_NEAR(v_advanced.pose.pose.orientation.z, 0.0, EPS);
+  EXPECT_NEAR(v_advanced.pose.pose.orientation.w, 1.0, EPS);
+}
+  
 TEST(TfGeometry, Transform)
 {
   geometry_msgs::TransformStamped v1;
@@ -161,7 +199,8 @@ int main(int argc, char **argv){
   ros::NodeHandle n;
 
   tf_buffer = new tf2_ros::Buffer();
-
+  tf_buffer->setUsingDedicatedThread(true);
+  
   // populate buffer
   geometry_msgs::TransformStamped t;
   t.transform.translation.x = 10;
