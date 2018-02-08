@@ -774,6 +774,7 @@ void doTransform(const geometry_msgs::PoseStamped& t_in, geometry_msgs::PoseStam
 * \param transform The timestamped transform to apply, as a TransformStamped message.
 * \return The transformed covariance matrix.
 */
+inline
 geometry_msgs::PoseWithCovariance::_covariance_type transformCovariance(const geometry_msgs::PoseWithCovariance::_covariance_type& cov_in, const tf2::Transform& transform)
 {
   /**
@@ -794,15 +795,15 @@ geometry_msgs::PoseWithCovariance::_covariance_type transformCovariance(const ge
   // convert the covariance matrix into four 3x3 blocks
   const tf2::Matrix3x3 cov_11(cov_in[0], cov_in[1], cov_in[2],
 			      cov_in[6], cov_in[7], cov_in[8],
-			      cov_in[11], cov_in[12], cov_in[13]);
+			      cov_in[12], cov_in[13], cov_in[14]);
   const tf2::Matrix3x3 cov_12(cov_in[3], cov_in[4], cov_in[5],
 			      cov_in[9], cov_in[10], cov_in[11],
-			      cov_in[14], cov_in[15], cov_in[16]);
-  const tf2::Matrix3x3 cov_21(cov_in[17], cov_in[18], cov_in[19],
-			      cov_in[23], cov_in[24], cov_in[25],
+			      cov_in[15], cov_in[16], cov_in[17]);
+  const tf2::Matrix3x3 cov_21(cov_in[18], cov_in[19], cov_in[20],
+			      cov_in[24], cov_in[25], cov_in[26],
 			      cov_in[30], cov_in[31], cov_in[32]);
-  const tf2::Matrix3x3 cov_22(cov_in[20], cov_in[21], cov_in[22],
-			      cov_in[26], cov_in[27], cov_in[28],
+  const tf2::Matrix3x3 cov_22(cov_in[21], cov_in[22], cov_in[23],
+			      cov_in[27], cov_in[28], cov_in[29],
 			      cov_in[33], cov_in[34], cov_in[35]);
   
   // perform blockwise matrix multiplication
@@ -819,9 +820,9 @@ geometry_msgs::PoseWithCovariance::_covariance_type transformCovariance(const ge
   output[6] = result_11[1][0];
   output[7] = result_11[1][1];
   output[8] = result_11[1][2];
-  output[11] = result_11[2][0];
-  output[12] = result_11[2][1];
-  output[13] = result_11[2][2];
+  output[12] = result_11[2][0];
+  output[13] = result_11[2][1];
+  output[14] = result_11[2][2];
   
   output[3] = result_12[0][0];
   output[4] = result_12[0][1];
@@ -829,26 +830,26 @@ geometry_msgs::PoseWithCovariance::_covariance_type transformCovariance(const ge
   output[9] = result_12[1][0];
   output[10] = result_12[1][1];
   output[11] = result_12[1][2];
-  output[14] = result_12[2][0];
-  output[15] = result_12[2][1];
-  output[16] = result_12[2][2];
+  output[15] = result_12[2][0];
+  output[16] = result_12[2][1];
+  output[17] = result_12[2][2];
   
-  output[17] = result_21[0][0];
-  output[18] = result_21[0][1];
-  output[19] = result_21[0][2];
-  output[23] = result_21[1][0];
-  output[24] = result_21[1][1];
-  output[25] = result_21[1][2];
+  output[18] = result_21[0][0];
+  output[19] = result_21[0][1];
+  output[20] = result_21[0][2];
+  output[24] = result_21[1][0];
+  output[25] = result_21[1][1];
+  output[26] = result_21[1][2];
   output[30] = result_21[2][0];
   output[31] = result_21[2][1];
   output[32] = result_21[2][2];
   
-  output[20] = result_22[0][0];
-  output[21] = result_22[0][1];
-  output[22] = result_22[0][2];
-  output[26] = result_22[1][0];
-  output[27] = result_22[1][1];
-  output[28] = result_22[1][2];
+  output[21] = result_22[0][0];
+  output[22] = result_22[0][1];
+  output[23] = result_22[0][2];
+  output[27] = result_22[1][0];
+  output[28] = result_22[1][1];
+  output[29] = result_22[1][2];
   output[33] = result_22[2][0];
   output[34] = result_22[2][1];
   output[35] = result_22[2][2];
@@ -877,7 +878,7 @@ void doTransform(const geometry_msgs::PoseWithCovarianceStamped& t_in, geometry_
   toMsg(v_out, t_out.pose.pose);
   t_out.header.stamp = transform.header.stamp;
   t_out.header.frame_id = transform.header.frame_id;
-  
+
   t_out.pose.covariance = transformCovariance(t_in.pose.covariance, t);
 }
 
