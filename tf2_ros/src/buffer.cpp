@@ -38,6 +38,8 @@
 namespace tf2_ros
 {
 
+static const double CAN_TRANSFORM_POLLING_SCALE = 0.01;
+
 Buffer::Buffer(ros::Duration cache_time, bool debug) :
   BufferCore(cache_time)
 {
@@ -128,12 +130,13 @@ Buffer::canTransform(const std::string& target_frame, const std::string& source_
 
   // poll for transform if timeout is set
   ros::Time start_time = now_fallback_to_wall();
+  const ros::Duration sleep_duration = timeout * CAN_TRANSFORM_POLLING_SCALE;
   while (now_fallback_to_wall() < start_time + timeout && 
          !canTransform(target_frame, source_frame, time) &&
          (now_fallback_to_wall()+ros::Duration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
          (ros::ok() || !ros::isInitialized())) // Make sure we haven't been stopped (won't work for pytf)
     {
-      sleep_fallback_to_wall(ros::Duration(0.01));
+      sleep_fallback_to_wall(sleep_duration);
     }
   bool retval = canTransform(target_frame, source_frame, time, errstr);
   conditionally_append_timeout_info(errstr, start_time, timeout);
@@ -157,12 +160,13 @@ Buffer::canTransform(const std::string& target_frame, const ros::Time& target_ti
 
   // poll for transform if timeout is set
   ros::Time start_time = now_fallback_to_wall();
+  const ros::Duration sleep_duration = timeout * CAN_TRANSFORM_POLLING_SCALE;
   while (now_fallback_to_wall() < start_time + timeout && 
          !canTransform(target_frame, target_time, source_frame, source_time, fixed_frame) &&
          (now_fallback_to_wall()+ros::Duration(3.0) >= start_time) &&  //don't wait when we detect a bag loop
          (ros::ok() || !ros::isInitialized())) // Make sure we haven't been stopped (won't work for pytf)
          {  
-           sleep_fallback_to_wall(ros::Duration(0.01));
+           sleep_fallback_to_wall(sleep_duration);
          }
   bool retval = canTransform(target_frame, target_time, source_frame, source_time, fixed_frame, errstr);
   conditionally_append_timeout_info(errstr, start_time, timeout);
