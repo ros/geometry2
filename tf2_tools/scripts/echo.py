@@ -7,6 +7,9 @@ import tf2_py as tf2
 import tf2_ros
 
 from geometry_msgs.msg import TransformStamped
+# https://github.com/ros/geometry2/issues/222
+# from tf import transformations
+
 
 class Echo():
     def __init__(self, args):
@@ -18,6 +21,13 @@ class Echo():
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.args.rate), self.lookup)
 
     def lookup(self, event):
+        self.count += 1
+        if self.args.limit:
+            if self.count > self.args.limit:
+                # TODO(lucasw) is there a better method to stop the spin()?
+                rospy.signal_shutdown("tf echo finished")
+                return
+
         cur_time = rospy.Time.now()
         # If the transform is from tf_static the ts.header.stamp will be 0.0
         # when offset == 0 or lookup_time is rospy.Time()
@@ -27,30 +37,28 @@ class Echo():
         else:
             # Get the most recent transform
             lookup_time = rospy.Time()
+
+        msg = "At time {}, (looked up at {}) ".format(lookup_time.to_sec(), cur_time.to_sec())
         try:
             ts = self.tf_buffer.lookup_transform(self.args.source_frame,
                                                  self.args.target_frame,
                                                  lookup_time)
 	except tf2.LookupException as ex:
-	    rospy.logerr(ex)
+	    rospy.logerr(msg + str(ex))
             return
 	except tf2.ExtrapolationException as ex:
-	    rospy.logerr(ex)
+	    rospy.logerr(msg + str(ex))
             return
 
         # The old tf1 static_transform_publisher (which published into /tf, not /tf_static
         # publishes transforms 0.5 seconds into future so the cur_time and header stamp
         # will be identical.
-        msg = "At time {}, (lookup at {})\n".format(ts.header.stamp.to_sec(), cur_time.to_sec())
+        msg = "At time {}, (looked up at {})".format(ts.header.stamp.to_sec(), cur_time.to_sec())
         xyz = ts.transform.translation
-        msg += "- Translation: [{:.3f}, {:.3f}, {:.3f}]\n".format(xyz.x, xyz.y, xyz.z)
+        msg += "\n- Translation: [{:.3f}, {:.3f}, {:.3f}]\n".format(xyz.x, xyz.y, xyz.z)
+        quat = ts.transform.rotation
+        msg += "- Rotation: in Quaternion [{:.3f}, {:.3f}, {:.3f}, {:.3f}]\n".format(quat.x, quat.y, quat.z, quat.w)
         print msg
-
-        self.count += 1
-        if self.args.limit:
-            if self.count >= self.args.limit:
-                # TODO(lucasw) is there a better method to stop the spin()?
-                rospy.signal_shutdown("tf echo finished")
 
 def positive_float(x):
     x = float(x)
