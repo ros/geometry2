@@ -31,33 +31,38 @@ class Echo():
         cur_time = rospy.Time.now()
         # If the transform is from tf_static the ts.header.stamp will be 0.0
         # when offset == 0 or lookup_time is rospy.Time()
-        if self.args.offset:
+        if self.args.time:
+            lookup_time = rospy.Time(self.args.time)
+        elif self.args.offset:
             # If the transform is static this will always work
             lookup_time = cur_time + rospy.Duration(self.args.offset)
         else:
             # Get the most recent transform
             lookup_time = rospy.Time()
 
-        msg = "At time {}, (looked up at {}) ".format(lookup_time.to_sec(), cur_time.to_sec())
         try:
             ts = self.tf_buffer.lookup_transform(self.args.source_frame,
                                                  self.args.target_frame,
                                                  lookup_time)
 	except tf2.LookupException as ex:
+            msg = "At time {}, (current time {}) ".format(lookup_time.to_sec(), cur_time.to_sec())
 	    rospy.logerr(msg + str(ex))
             return
 	except tf2.ExtrapolationException as ex:
+            msg = "(current time {}) ".format(cur_time.to_sec())
 	    rospy.logerr(msg + str(ex))
             return
 
         # The old tf1 static_transform_publisher (which published into /tf, not /tf_static
         # publishes transforms 0.5 seconds into future so the cur_time and header stamp
         # will be identical.
-        msg = "At time {}, (looked up at {})".format(ts.header.stamp.to_sec(), cur_time.to_sec())
+        msg = "At time {}, (current time {})".format(ts.header.stamp.to_sec(), cur_time.to_sec())
         xyz = ts.transform.translation
         msg += "\n- Translation: [{:.3f}, {:.3f}, {:.3f}]\n".format(xyz.x, xyz.y, xyz.z)
         quat = ts.transform.rotation
         msg += "- Rotation: in Quaternion [{:.3f}, {:.3f}, {:.3f}, {:.3f}]\n".format(quat.x, quat.y, quat.z, quat.w)
+        # TODO(lucasw) need to get quaternion to euler from somewhere, but not tf1
+        # or a dependency that isn't in Ubuntu or ros repos
         print msg
 
 def positive_float(x):
@@ -85,7 +90,10 @@ if __name__ == '__main__':
                         help="length of tf buffer cache in seconds",
                         type=positive_float)
     parser.add_argument("-o", "--offset",
-                        help="offset the lookup from current time",
+                        help="offset the lookup from current time, ignored if using -t",
+                        type=float)
+    parser.add_argument("-t", "--time",
+                        help="fixed time to do the lookup",
                         type=float)
     parser.add_argument("-l", "--limit",
                         help="lookup fixed number of times",
