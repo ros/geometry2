@@ -69,6 +69,7 @@ _AXES2TUPLE = {
     'rzxz': (2, 0, 1, 1), 'rxyz': (2, 1, 0, 1), 'rzyz': (2, 1, 1, 1)}
 
 def _euler_from_matrix(matrix, axes='sxyz'):
+    """temporaray import from https://github.com/matthew-brett/transforms3d/blob/master/transforms3d/_gohlketransforms.py for internal use only"""
     try:
         firstaxis, parity, repetition, frame = _AXES2TUPLE[axes.lower()]
     except (AttributeError, KeyError):
@@ -108,6 +109,7 @@ def _euler_from_matrix(matrix, axes='sxyz'):
     return ax, ay, az
 
 def _quaternion_matrix(quaternion):
+    """temporaray import from https://github.com/matthew-brett/transforms3d/blob/master/transforms3d/_gohlketransforms.py for internal use only"""
     q = numpy.array(quaternion, dtype=numpy.float64, copy=True)
     n = numpy.dot(q, q)
     if n < _EPS:
@@ -121,6 +123,7 @@ def _quaternion_matrix(quaternion):
         [                0.0,                 0.0,                 0.0, 1.0]])
 
 def _euler_from_quaternion(quaternion, axes='sxyz'):
+    """temporaray import from https://github.com/matthew-brett/transforms3d/blob/master/transforms3d/_gohlketransforms.py for internal use only"""
     return _euler_from_matrix(_quaternion_matrix(quaternion), axes)
 
 def _euler_from_quaternion_msg(quaternion):
