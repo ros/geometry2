@@ -165,13 +165,13 @@ class Echo():
             ts = self.tf_buffer.lookup_transform(self.args.source_frame,
                                                  self.args.target_frame,
                                                  lookup_time)
-	except tf2.LookupException as ex:
+        except tf2.LookupException as ex:
             msg = "At time {}, (current time {}) ".format(lookup_time.to_sec(), cur_time.to_sec())
-	    rospy.logerr(msg + str(ex))
+            rospy.logerr(msg + str(ex))
             return
-	except tf2.ExtrapolationException as ex:
+        except tf2.ExtrapolationException as ex:
             msg = "(current time {}) ".format(cur_time.to_sec())
-	    rospy.logerr(msg + str(ex))
+            rospy.logerr(msg + str(ex))
             return
 
         # The old tf1 static_transform_publisher (which published into /tf, not /tf_static)
