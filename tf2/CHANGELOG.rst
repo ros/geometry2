@@ -2,6 +2,11 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Replaced deprecated console_bridge macro calls (tests)
+* Contributors: Johannes Meyer, Tully Foote
+
 0.6.0 (2018-03-21)
 ------------------
 * Replaced deprecated log macro calls
