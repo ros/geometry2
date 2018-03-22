@@ -2,6 +2,16 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Boilerplate for Sphinx (`#284 <https://github.com/ros/geometry2/issues/284>`_)
+  Fixes `#264 <https://github.com/ros/geometry2/issues/264>`_
+* tf2_geometry_msgs added doTransform implementations for not stamped types (`#262 <https://github.com/ros/geometry2/issues/262>`_)
+  * tf2_geometry_msgs added doTransform implementations for not stamped Point, Quaterion, Pose and Vector3 message types
+* New functionality to transform PoseWithCovarianceStamped messages. (`#282 <https://github.com/ros/geometry2/issues/282>`_)
+  * New functionality to transform PoseWithCovarianceStamped messages.
+* Contributors: Blake Anderson, Tully Foote, cwecht
+
 0.5.17 (2018-01-01)
 -------------------
 

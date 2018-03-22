@@ -2,6 +2,11 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Replaced deprecated log macro calls
+* Contributors: Tim Rakowski, Tully Foote
+
 0.5.17 (2018-01-01)
 -------------------
 * Merge pull request `#278 <https://github.com/ros/geometry2/issues/278>`_ from ros/chain_as_vec_test2
