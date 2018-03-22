@@ -105,11 +105,11 @@ int main(int argc, char** argv)
 
   std::string v_frame0 = boost::lexical_cast<std::string>(num_levels - 1);
   std::string v_frame1 = boost::lexical_cast<std::string>(num_levels/2 - 1);
-  logInform("%s to %s", v_frame0.c_str(), v_frame1.c_str());
+  CONSOLE_BRIDGE_logInform("%s to %s", v_frame0.c_str(), v_frame1.c_str());
   geometry_msgs::TransformStamped out_t;
 
   const uint32_t count = 1000000;
-  logInform("Doing %d %d-level %lf-interval tests", count, num_levels, time_interval);
+  CONSOLE_BRIDGE_logInform("Doing %d %d-level %lf-interval tests", count, num_levels, time_interval);
 
 #if 01
   {
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    logInform("lookupTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    CONSOLE_BRIDGE_logInform("lookupTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    logInform("lookupTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    CONSOLE_BRIDGE_logInform("lookupTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -149,7 +149,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    logInform("lookupTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    CONSOLE_BRIDGE_logInform("lookupTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -163,7 +163,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    logInform("lookupTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    CONSOLE_BRIDGE_logInform("lookupTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -177,7 +177,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    logInform("canTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    CONSOLE_BRIDGE_logInform("canTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    logInform("canTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    CONSOLE_BRIDGE_logInform("canTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    logInform("canTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    CONSOLE_BRIDGE_logInform("canTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 
@@ -219,7 +219,7 @@ int main(int argc, char** argv)
     ros::WallTime end = ros::WallTime::now();
     ros::WallDuration dur = end - start;
     //ROS_INFO_STREAM(out_t);
-    logInform("canTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    CONSOLE_BRIDGE_logInform("canTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
 }
