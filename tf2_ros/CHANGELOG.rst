@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.0 (2018-03-21)
+------------------
 * tf2_ros::Buffer: canTransform can now deal with timeouts smaller than 10ms by using the hunderdth of the timeout for sleeping (`#286 <https://github.com/ros/geometry2/issues/286>`_)
 * More spinning to make sure the message gets through for `#129 <https://github.com/ros/geometry2/issues/129>`_ `#283 <https://github.com/ros/geometry2/issues/283>`_
 * Contributors: Tully Foote, cwecht

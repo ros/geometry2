@@ -2,8 +2,8 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.0 (2018-03-21)
+------------------
 * Boilerplate for Sphinx (`#284 <https://github.com/ros/geometry2/issues/284>`_)
   Fixes `#264 <https://github.com/ros/geometry2/issues/264>`_
 * tf2_geometry_msgs added doTransform implementations for not stamped types (`#262 <https://github.com/ros/geometry2/issues/262>`_)

@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.0 (2018-03-21)
+------------------
 * Replaced deprecated log macro calls
 * Contributors: Tim Rakowski, Tully Foote
 
