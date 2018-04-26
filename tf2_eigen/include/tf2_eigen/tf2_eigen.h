@@ -34,10 +34,22 @@
 #include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Twist.h>
 
 
 namespace tf2
 {
+
+/** \brief Convert a timestamped transform to the equivalent Eigen data type.
+ * \param t The transform to convert, as a geometry_msgs Transform message.
+ * \return The transform message converted to an Eigen Affine3d transform.
+ */
+ inline
+ Eigen::Affine3d transformToEigen(const geometry_msgs::Transform& t) {
+ return Eigen::Affine3d(Eigen::Translation3d(t.translation.x, t.translation.y, t.translation.z)
+			 * Eigen::Quaterniond(t.rotation.w,
+					      t.rotation.x, t.rotation.y, t.rotation.z));
+}
 
 /** \brief Convert a timestamped transform to the equivalent Eigen data type.
  * \param t The transform to convert, as a geometry_msgs TransformedStamped message.
@@ -45,9 +57,7 @@ namespace tf2
  */
 inline
 Eigen::Affine3d transformToEigen(const geometry_msgs::TransformStamped& t) {
-  return Eigen::Affine3d(Eigen::Translation3d(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z)
-			 * Eigen::Quaterniond(t.transform.rotation.w,
-					      t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z));
+  return transformToEigen(t.transform);
 }
 
 /** \brief Convert an Eigen Affine3d transform to the equivalent geometry_msgs message type.
@@ -294,6 +304,38 @@ void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
                          msg.orientation.z));
 }
 
+/** \brief Convert a Eigen 6x1 Matrix type to a Twist message.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param in The 6x1 Eigen Matrix to convert.
+ * \return The Eigen Matrix converted to a Twist message.
+ */
+inline
+geometry_msgs::Twist toMsg(const Eigen::Matrix<double,6,1>& in) {
+  geometry_msgs::Twist msg;
+  msg.linear.x = in[0];
+  msg.linear.y = in[1];
+  msg.linear.z = in[2];
+  msg.angular.x = in[3];
+  msg.angular.y = in[4];
+  msg.angular.z = in[5];
+  return msg;
+}
+
+/** \brief Convert a Pose message transform type to a Eigen Affine3d.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param msg The Twist message to convert.
+ * \param out The twist converted to a Eigen Matrix.
+ */
+inline
+void fromMsg(const geometry_msgs::Twist &msg, Eigen::Matrix<double,6,1>& out) {
+  out[0] = msg.linear.x;
+  out[1] = msg.linear.y;
+  out[2] = msg.linear.z;
+  out[3] = msg.angular.x;
+  out[4] = msg.angular.y;
+  out[5] = msg.angular.z;
+}
+
 /** \brief Apply a geometry_msgs TransformStamped to a Eigen-specific affine transform data type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h,
  * although it can not be used in tf2_ros::BufferInterface::transform because this
@@ -378,6 +420,16 @@ geometry_msgs::Quaternion toMsg(const Eigen::Quaterniond& in) {
 
 inline
 void fromMsg(const geometry_msgs::Quaternion& msg, Eigen::Quaterniond& out) {
+  tf2::fromMsg(msg, out);
+}
+
+inline
+geometry_msgs::Twist toMsg(const Eigen::Matrix<double,6,1>& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Twist &msg, Eigen::Matrix<double,6,1>& out) {
   tf2::fromMsg(msg, out);
 }
 
