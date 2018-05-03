@@ -2,8 +2,8 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.2 (2018-05-02)
+------------------
 * Adds toMsg & fromMsg for Eigen Vector3 (`#294 <https://github.com/ros/geometry2/issues/294>`_)
   - Adds toMsg for geometry_msgs::Vector3&  with dual argument syntax to
   avoid an overload conflict with
