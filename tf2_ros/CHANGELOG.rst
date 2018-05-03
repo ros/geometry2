@@ -2,6 +2,13 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update buffer_server_name (`#296 <https://github.com/ros/geometry2/issues/296>`_)
+  * use nodename as namespace
+  * Update `#209 <https://github.com/ros/geometry2/issues/209>`_ to provide backwards compatibility.
+* Contributors: Jihoon Lee, Tully Foote
+
 0.6.1 (2018-03-21)
 ------------------
 

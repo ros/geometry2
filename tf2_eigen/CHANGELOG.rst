@@ -2,6 +2,21 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adds toMsg & fromMsg for Eigen Vector3 (`#294 <https://github.com/ros/geometry2/issues/294>`_)
+  - Adds toMsg for geometry_msgs::Vector3&  with dual argument syntax to
+  avoid an overload conflict with
+  geometry_msgs::Point& toMsg(contst Eigen::Vector3d& in)
+  - Adds corresponding fromMsg for Eigen Vector3d and
+  geometry_msgs::Vector3
+  - Fixed typos in description of fromMsg for Twist and Eigen 6x1 Matrix
+* Adds additional conversions for tf2, KDL, Eigen (`#292 <https://github.com/ros/geometry2/issues/292>`_)
+  - adds non-stamped Eigen to Transform function
+  - converts Eigen Matrix Vectors to and from geometry_msgs::Twist
+  - adds to/from message for geometry_msgs::Pose and KDL::Frame
+* Contributors: Ian McMahon
+
 0.6.1 (2018-03-21)
 ------------------
 

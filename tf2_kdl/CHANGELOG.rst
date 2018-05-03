@@ -2,6 +2,14 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adds additional conversions for tf2, KDL, Eigen (`#292 <https://github.com/ros/geometry2/issues/292>`_)
+  - adds non-stamped Eigen to Transform function
+  - converts Eigen Matrix Vectors to and from geometry_msgs::Twist
+  - adds to/from message for geometry_msgs::Pose and KDL::Frame
+* Contributors: Ian McMahon
+
 0.6.1 (2018-03-21)
 ------------------
 

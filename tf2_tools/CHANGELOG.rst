@@ -2,6 +2,18 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Tf2 tools echo (`#289 <https://github.com/ros/geometry2/issues/289>`_)
+  * tf2_tools echo is working but not yet printing the rotation `#287 <https://github.com/ros/geometry2/issues/287>`_
+  * install echo.py
+  * Added quaternion output but importing from tf1 for euler_from_quaternion seems wrong (`#222 <https://github.com/ros/geometry2/issues/222>`_) so not doing that yet.  Also made count exit after n counts even if exceptions occurred, also printing time of lookup for exceptions `#287 <https://github.com/ros/geometry2/issues/287>`_
+  * Fixed time query option, also changing message text to be more clear `#287 <https://github.com/ros/geometry2/issues/287>`_
+  * Added bsd license, code from transform3d transformations.py `#287 <https://github.com/ros/geometry2/issues/287>`_
+  * Get rid of tabs
+  * docstring for each function
+* Contributors: Lucas Walter
+
 0.6.1 (2018-03-21)
 ------------------
 
