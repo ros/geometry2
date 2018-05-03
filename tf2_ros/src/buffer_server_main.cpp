@@ -60,10 +60,23 @@ int main(int argc, char** argv)
   double buffer_size;
   nh.param("buffer_size", buffer_size, 120.0);
 
+  // Legacy behavior re: #209
+  bool use_node_namespace;
+  nh.param("use_node_namespace", use_node_namespace, false);
+  std::string node_name;
+  if (use_node_namespace)
+  {
+    node_name = ros::this_node::getName();
+  }
+  else
+  {
+    node_name = "tf2_buffer_server";
+  }
+
   // WIM: this works fine:
   tf2_ros::Buffer buffer_core(ros::Duration(buffer_size+0)); // WTF??
   tf2_ros::TransformListener listener(buffer_core);
-  tf2_ros::BufferServer buffer_server(buffer_core, "tf2_buffer_server", false);
+  tf2_ros::BufferServer buffer_server(buffer_core, node_name , false);
   buffer_server.start();
   // But you should probably read this instead:
   // http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=439
