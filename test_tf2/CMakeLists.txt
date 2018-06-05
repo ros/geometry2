@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 
+project(test_tf2)
+
 if(NOT CATKIN_ENABLE_TESTING)
   return()
 endif()
-
-project(test_tf2)
-
 
 find_package(catkin REQUIRED COMPONENTS rosconsole roscpp rostest tf tf2 tf2_bullet tf2_ros tf2_geometry_msgs tf2_kdl tf2_msgs)
 find_package(Boost REQUIRED COMPONENTS thread)
