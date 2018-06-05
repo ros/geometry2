@@ -143,7 +143,7 @@ public:
 		    const std::string& source_frame, const ros::Time& source_time,
 		    const std::string& fixed_frame) const;
   
-  /** \brief Lookup the twist of the tracking_frame with respect to the observation frame in the reference_frame using the reference point
+  /* \brief Lookup the twist of the tracking_frame with respect to the observation frame in the reference_frame using the reference point
    * \param tracking_frame The frame to track
    * \param observation_frame The frame from which to measure the twist
    * \param reference_frame The reference frame in which to express the twist
@@ -169,7 +169,7 @@ public:
 		const tf::Point & reference_point, const std::string& reference_point_frame, 
 		const ros::Time& time, const ros::Duration& averaging_interval) const;
   */
-  /** \brief lookup the twist of the tracking frame with respect to the observational frame 
+  /* \brief lookup the twist of the tracking frame with respect to the observational frame
    * 
    * This is a simplified version of
    * lookupTwist with it assumed that the reference point is the
