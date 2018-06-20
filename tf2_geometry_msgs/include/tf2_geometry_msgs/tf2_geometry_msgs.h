@@ -546,30 +546,6 @@ void fromMsg(const geometry_msgs::PoseWithCovariance& msg, geometry_msgs::PoseWi
   out = msg;
 }
 
-/** \brief Convert as tf2 PoseWithCovariance type to its equivalent geometry_msgs representation.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in An instance of the tf2::Pose specialization.
- * \return The PoseWithCovariance converted to a geometry_msgs PoseWithCovariance message type.
- */
-inline
-geometry_msgs::PoseWithCovariance toMsg(const tf2::Transform& in, geometry_msgs::PoseWithCovariance & out)
-{
-  toMsg(in.getOrigin(), out.pose.position);
-  out.pose.orientation = toMsg(in.getRotation());
-  return out;
-}
-
-/** \brief Convert a PoseWithCovariance message to its equivalent tf2 representation.
- * This function is a specialization of the fromMsg template defined in tf2/convert.h.
- * \param msg A PoseWithCovariance message.
- * \param out The PoseWithCovariance converted to the equivalent tf2 type.
- */
-inline
-void fromMsg(const geometry_msgs::PoseWithCovariance& msg, tf2::Transform& out)
-{
-  fromMsg(msg.pose, out);
-}
-
 /*******************************/
 /** PoseWithCovarianceStamped **/
 /*******************************/
