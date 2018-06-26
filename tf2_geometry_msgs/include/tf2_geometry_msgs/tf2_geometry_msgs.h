@@ -1028,7 +1028,7 @@ void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped<std::array<tf
   std::array<tf2::Vector3, 2> tmp_array;
   tmp_array[0] = tmp;
   tmp_array[1] = tmp1;
-  out.setData(tmp);
+  out.setData(tmp_array);
 }
 
 template<>
