@@ -5,7 +5,7 @@ import rospy
 import PyKDL
 import tf2_ros
 import tf2_geometry_msgs
-from geometry_msgs.msg import TransformStamped, PointStamped, Vector3Stamped, PoseStamped
+from geometry_msgs.msg import TransformStamped, PointStamped, Vector3Stamped, PoseStamped, WrenchStamped
 
 class GeometryMsgs(unittest.TestCase):
     def test_transform(self):
@@ -77,6 +77,22 @@ class GeometryMsgs(unittest.TestCase):
         self.assertEqual(out.vector.x, -1)
         self.assertEqual(out.vector.y, 0)
         self.assertEqual(out.vector.z, 0)
+
+        v = WrenchStamped()
+        v.wrench.force.x = 1
+        v.wrench.force.y = 0
+        v.wrench.force.z = 0
+        v.wrench.torque.x = 1
+        v.wrench.torque.y = 0
+        v.wrench.torque.z = 0
+
+        out = tf2_geometry_msgs.do_transform_wrench(v, t)
+        self.assertEqual(out.wrench.force.x, -1)
+        self.assertEqual(out.wrench.force.y, 0)
+        self.assertEqual(out.wrench.force.z, 0)
+        self.assertEqual(out.wrench.torque.x, -1)
+        self.assertEqual(out.wrench.torque.y, 0)
+        self.assertEqual(out.wrench.torque.z, 0)
 
 if __name__ == '__main__':
     import rosunit
