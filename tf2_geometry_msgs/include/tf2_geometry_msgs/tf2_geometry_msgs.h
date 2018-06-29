@@ -42,6 +42,8 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/Wrench.h>
+#include <geometry_msgs/WrenchStamped.h>
 #include <kdl/frames.hpp>
 
 namespace tf2
@@ -975,6 +977,77 @@ inline
     t_out.header.stamp = transform.header.stamp;
     t_out.header.frame_id = transform.header.frame_id;
   }
+
+
+/**********************/
+/*** WrenchStamped ****/
+/**********************/
+template <>
+inline
+const ros::Time& getTimestamp(const geometry_msgs::WrenchStamped& t) {return t.header.stamp;}
+
+
+template <>
+inline
+const std::string& getFrameId(const geometry_msgs::WrenchStamped& t) {return t.header.frame_id;}
+
+
+inline
+geometry_msgs::WrenchStamped toMsg(const geometry_msgs::WrenchStamped& in)
+{
+  return in;
+}
+
+inline
+void fromMsg(const geometry_msgs::WrenchStamped& msg, geometry_msgs::WrenchStamped& out)
+{
+  out = msg;
+}
+
+
+inline
+geometry_msgs::WrenchStamped toMsg(const tf2::Stamped<std::array<tf2::Vector3, 2>>& in, geometry_msgs::WrenchStamped & out)
+{
+  out.header.stamp = in.stamp_;
+  out.header.frame_id = in.frame_id_;
+  out.wrench.force = toMsg(in[0]);
+  out.wrench.torque = toMsg(in[1]);
+  return out;
+}
+
+
+inline
+void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped<std::array<tf2::Vector3, 2>>& out)
+{
+  out.stamp_ = msg.header.stamp;
+  out.frame_id_ = msg.header.frame_id;
+  tf2::Vector3 tmp;
+  fromMsg(msg.wrench.force, tmp);
+  tf2::Vector3 tmp1;
+  fromMsg(msg.wrench.torque, tmp1);
+  std::array<tf2::Vector3, 2> tmp_array;
+  tmp_array[0] = tmp;
+  tmp_array[1] = tmp1;
+  out.setData(tmp_array);
+}
+
+template<>
+inline
+void doTransform(const geometry_msgs::Wrench& t_in, geometry_msgs::Wrench& t_out, const geometry_msgs::TransformStamped& transform)
+{
+  doTransform(t_in.force, t_out.force, transform);
+  doTransform(t_in.torque, t_out.torque, transform);
+}
+
+
+template<>
+inline
+void doTransform(const geometry_msgs::WrenchStamped& t_in, geometry_msgs::WrenchStamped& t_out, const geometry_msgs::TransformStamped& transform)
+{
+  doTransform(t_in.wrench, t_out.wrench, transform);
+  t_out.header.stamp = transform.header.stamp;
+  t_out.header.frame_id = transform.header.frame_id;
+}
 
 } // namespace
 

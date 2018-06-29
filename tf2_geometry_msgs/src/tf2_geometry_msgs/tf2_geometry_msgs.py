@@ -27,7 +27,7 @@
 
 # author: Wim Meeussen
 
-from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped
+from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped, WrenchStamped
 import PyKDL
 import rospy
 import tf2_ros
@@ -95,3 +95,16 @@ def do_transform_pose(pose, transform):
     res.header = transform.header
     return res
 tf2_ros.TransformRegistration().add(PoseStamped, do_transform_pose)
+
+# WrenchStamped
+def do_transform_wrench(wrench, transform):
+    force = Vector3Stamped()
+    torque = Vector3Stamped()
+    force.vector = wrench.wrench.force
+    torque.vector = wrench.wrench.torque
+    res = WrenchStamped()
+    res.wrench.force = do_transform_vector3(force, transform).vector
+    res.wrench.torque = do_transform_vector3(torque, transform).vector
+    res.header = transform.header
+    return res
+tf2_ros.TransformRegistration().add(WrenchStamped, do_transform_wrench)
