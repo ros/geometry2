@@ -88,9 +88,9 @@ def do_transform_pose(pose, transform):
                                                                           pose.pose.orientation.z, pose.pose.orientation.w),
                                                 PyKDL.Vector(pose.pose.position.x, pose.pose.position.y, pose.pose.position.z))
     res = PoseStamped()
-    res.pose.position.x = f.p[0]
-    res.pose.position.y = f.p[1]
-    res.pose.position.z = f.p[2]
+    res.pose.position.x = f[(0, 3)]
+    res.pose.position.y = f[(1, 3)]
+    res.pose.position.z = f[(2, 3)]
     (res.pose.orientation.x, res.pose.orientation.y, res.pose.orientation.z, res.pose.orientation.w) = f.M.GetQuaternion()
     res.header = transform.header
     return res
