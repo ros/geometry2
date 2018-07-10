@@ -2,6 +2,12 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use correct unit test for test_tf2_bullet (`#301 <https://github.com/ros/geometry2/issues/301>`_)
+* update cmake order (`#298 <https://github.com/ros/geometry2/issues/298>`_)
+* Contributors: Tully Foote
+
 0.5.17 (2018-01-01)
 -------------------
 * Merge pull request `#257 <https://github.com/ros/geometry2/issues/257>`_ from delftrobotics-forks/python3

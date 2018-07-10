@@ -2,6 +2,12 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* preserve constness of const argument to avoid warnings (`#307 <https://github.com/ros/geometry2/issues/307>`_)
+* Change comment style for unused doxygen (`#297 <https://github.com/ros/geometry2/issues/297>`_)
+* Contributors: Jacob Perron, Tully Foote
+
 0.5.17 (2018-01-01)
 -------------------
 * Merge pull request `#278 <https://github.com/ros/geometry2/issues/278>`_ from ros/chain_as_vec_test2

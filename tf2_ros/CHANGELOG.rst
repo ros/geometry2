@@ -2,6 +2,12 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* tf2_ros::Buffer: canTransform can now deal with timeouts smaller than… (`#286 <https://github.com/ros/geometry2/issues/286>`_)
+* More spinning to make sure the message gets through for `#129 <https://github.com/ros/geometry2/issues/129>`_
+* Contributors: Tully Foote, cwecht
+
 0.5.17 (2018-01-01)
 -------------------
 * Merge pull request `#260 <https://github.com/ros/geometry2/issues/260>`_ from randoms/indigo-devel

@@ -2,6 +2,14 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Changed access to Vector to prevent memory leak (`#305 <https://github.com/ros/geometry2/issues/305>`_)
+* Boilerplate for Sphinx (`#284 <https://github.com/ros/geometry2/issues/284>`_)
+* tf2_geometry_msgs added doTransform implementations for not stamped P… (`#262 <https://github.com/ros/geometry2/issues/262>`_)
+* New functionality to transform PoseWithCovarianceStamped messages. (`#282 <https://github.com/ros/geometry2/issues/282>`_)
+* Contributors: Blake Anderson, Markus Grimm, Tully Foote, cwecht
+
 0.5.17 (2018-01-01)
 -------------------
 
