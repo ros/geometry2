@@ -2,8 +2,8 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2018-07-09)
+------------------
 * use correct unit test for test_tf2_bullet (`#301 <https://github.com/ros/geometry2/issues/301>`_)
 * update cmake order (`#298 <https://github.com/ros/geometry2/issues/298>`_)
 * Contributors: Tully Foote

@@ -2,8 +2,8 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.3 (2018-07-09)
+------------------
 * Changed access to Vector to prevent memory leak (`#305 <https://github.com/ros/geometry2/issues/305>`_)
 * Added WrenchStamped transformation (`#302 <https://github.com/ros/geometry2/issues/302>`_)
 * Contributors: Denis Štogl, Markus Grimm
