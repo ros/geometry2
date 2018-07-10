@@ -27,7 +27,7 @@
 
 # author: Wim Meeussen
 
-from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped
+from geometry_msgs.msg import PoseStamped, Vector3Stamped, PointStamped, WrenchStamped
 import PyKDL
 import rospy
 import tf2_ros
@@ -88,10 +88,23 @@ def do_transform_pose(pose, transform):
                                                                           pose.pose.orientation.z, pose.pose.orientation.w),
                                                 PyKDL.Vector(pose.pose.position.x, pose.pose.position.y, pose.pose.position.z))
     res = PoseStamped()
-    res.pose.position.x = f.p[0]
-    res.pose.position.y = f.p[1]
-    res.pose.position.z = f.p[2]
+    res.pose.position.x = f[(0, 3)]
+    res.pose.position.y = f[(1, 3)]
+    res.pose.position.z = f[(2, 3)]
     (res.pose.orientation.x, res.pose.orientation.y, res.pose.orientation.z, res.pose.orientation.w) = f.M.GetQuaternion()
     res.header = transform.header
     return res
 tf2_ros.TransformRegistration().add(PoseStamped, do_transform_pose)
+
+# WrenchStamped
+def do_transform_wrench(wrench, transform):
+    force = Vector3Stamped()
+    torque = Vector3Stamped()
+    force.vector = wrench.wrench.force
+    torque.vector = wrench.wrench.torque
+    res = WrenchStamped()
+    res.wrench.force = do_transform_vector3(force, transform).vector
+    res.wrench.torque = do_transform_vector3(torque, transform).vector
+    res.header = transform.header
+    return res
+tf2_ros.TransformRegistration().add(WrenchStamped, do_transform_wrench)
