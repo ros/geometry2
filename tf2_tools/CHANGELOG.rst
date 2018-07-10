@@ -2,6 +2,9 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.6.2 (2018-05-02)
 ------------------
 * Tf2 tools echo (`#289 <https://github.com/ros/geometry2/issues/289>`_)
