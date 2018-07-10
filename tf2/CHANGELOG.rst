@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.18 (2018-07-10)
+-------------------
 * preserve constness of const argument to avoid warnings (`#307 <https://github.com/ros/geometry2/issues/307>`_)
 * Change comment style for unused doxygen (`#297 <https://github.com/ros/geometry2/issues/297>`_)
 * Contributors: Jacob Perron, Tully Foote

@@ -2,8 +2,8 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.18 (2018-07-10)
+-------------------
 * Changed access to Vector to prevent memory leak (`#305 <https://github.com/ros/geometry2/issues/305>`_)
 * Boilerplate for Sphinx (`#284 <https://github.com/ros/geometry2/issues/284>`_)
 * tf2_geometry_msgs added doTransform implementations for not stamped P… (`#262 <https://github.com/ros/geometry2/issues/262>`_)

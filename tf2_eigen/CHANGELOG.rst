@@ -2,8 +2,8 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.18 (2018-07-10)
+-------------------
 * Adds toMsg & fromMsg for Eigen Vector3 (`#294 <https://github.com/ros/geometry2/issues/294>`_)
 * Adds additional conversions for tf2, KDL, Eigen (`#292 <https://github.com/ros/geometry2/issues/292>`_)
 * Contributors: Ian McMahon
