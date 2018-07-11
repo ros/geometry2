@@ -176,7 +176,7 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
 void TimeCache::interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output)
 {
   // Check for zero distance case
-  if( two.stamp_ == one.stamp_ )
+  if ((two.stamp_.toSec() - one.stamp_.toSec()) == 0)
   {
     output = two;
     return;
