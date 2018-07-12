@@ -176,13 +176,13 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
 void TimeCache::interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output)
 {
   // Check for zero distance case
-  if ((two.stamp_.toSec() - one.stamp_.toSec()) == 0)
+  if ((two.stamp_ - one.stamp_).toSec() == 0)
   {
     output = two;
     return;
   }
   //Calculate the ratio
-  tf2Scalar ratio = (time.toSec() - one.stamp_.toSec()) / (two.stamp_.toSec() - one.stamp_.toSec());
+  tf2Scalar ratio = (time - one.stamp_).toSec() / (two.stamp_ - one.stamp_).toSec();
 
   //Interpolate translation
   output.translation_.setInterpolate3(one.translation_, two.translation_, ratio);
