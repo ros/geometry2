@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -60,7 +60,7 @@ TimeCache::TimeCache(ros::Duration max_storage_time)
 : max_storage_time_(max_storage_time)
 {}
 
-namespace cache { // Avoid ODR collisions https://github.com/ros/geometry2/issues/175 
+namespace cache { // Avoid ODR collisions https://github.com/ros/geometry2/issues/175
 // hoisting these into separate functions causes an ~8% speedup.  Removing calling them altogether adds another ~10%
 void createExtrapolationException1(ros::Time t0, ros::Time t1, std::string* error_str)
 {
@@ -176,13 +176,13 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
 void TimeCache::interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output)
 {
   // Check for zero distance case
-  if( two.stamp_ == one.stamp_ )
+  if (two.stamp_ == one.stamp_)
   {
     output = two;
     return;
   }
   //Calculate the ratio
-  tf2Scalar ratio = (time.toSec() - one.stamp_.toSec()) / (two.stamp_.toSec() - one.stamp_.toSec());
+  tf2Scalar ratio = (time - one.stamp_).toSec() / (two.stamp_ - one.stamp_).toSec();
 
   //Interpolate translation
   output.translation_.setInterpolate3(one.translation_, two.translation_, ratio);
@@ -288,14 +288,14 @@ P_TimeAndFrameID TimeCache::getLatestTimeAndParent()
   return std::make_pair(ts.stamp_, ts.frame_id_);
 }
 
-ros::Time TimeCache::getLatestTimestamp() 
-{   
+ros::Time TimeCache::getLatestTimestamp()
+{
   if (storage_.empty()) return ros::Time(); //empty list case
   return storage_.front().stamp_;
 }
 
-ros::Time TimeCache::getOldestTimestamp() 
-{   
+ros::Time TimeCache::getOldestTimestamp()
+{
   if (storage_.empty()) return ros::Time(); //empty list case
   return storage_.back().stamp_;
 }
@@ -303,11 +303,11 @@ ros::Time TimeCache::getOldestTimestamp()
 void TimeCache::pruneList()
 {
   ros::Time latest_time = storage_.begin()->stamp_;
-  
+
   while(!storage_.empty() && storage_.back().stamp_ + max_storage_time_ < latest_time)
   {
     storage_.pop_back();
   }
-  
+
 } // namespace tf2
 }
