@@ -182,7 +182,7 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
     return;
   }
   //Calculate the ratio
-  tf2Scalar ratio = (time.toSec() - one.stamp_.toSec()) / (two.stamp_.toSec() - one.stamp_.toSec());
+  tf2Scalar ratio = (time - one.stamp_).toSec() / (two.stamp_ - one.stamp_).toSec();
 
   //Interpolate translation
   output.translation_.setInterpolate3(one.translation_, two.translation_, ratio);
