@@ -43,7 +43,7 @@ namespace tf2{
 class TransformException: public std::runtime_error
 { 
 public:
-  TransformException(const std::string errorDescription) : std::runtime_error(errorDescription) { ; };
+  TransformException(const std::string& errorDescription) : std::runtime_error(errorDescription) { ; };
 };
 
 
@@ -55,7 +55,7 @@ public:
 class ConnectivityException:public TransformException
 { 
 public:
-  ConnectivityException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
+  ConnectivityException(const std::string& errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
 
@@ -70,7 +70,7 @@ public:
 class LookupException: public TransformException
 { 
 public:
-  LookupException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
+  LookupException(const std::string& errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
   /** \brief An exception class to notify that the requested value would have required extrapolation beyond current limits.
@@ -79,28 +79,28 @@ public:
 class ExtrapolationException: public TransformException 
 { 
 public:
-  ExtrapolationException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
+  ExtrapolationException(const std::string& errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
 /** \brief An exception class to notify that one of the arguments is invalid
  * 
- * usually it's an uninitalized Quaternion (0,0,0,0)
+ * usually it's an uninitialized Quaternion (0,0,0,0)
  * 
  */
 class InvalidArgumentException: public TransformException  
 { 
 public:
-  InvalidArgumentException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
+  InvalidArgumentException(const std::string& errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
-/** \brief An exception class to notify that a timeout has occured
+/** \brief An exception class to notify that a timeout has occurred
  * 
  * 
  */
 class TimeoutException: public TransformException  
 { 
 public:
-  TimeoutException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
+  TimeoutException(const std::string& errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
 
