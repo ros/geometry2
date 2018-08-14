@@ -56,6 +56,8 @@ typedef std::pair<ros::Time, CompactFrameID> P_TimeAndFrameID;
 class TimeCacheInterface
 {
 public:
+  /** \brief Virtual destructor that does nothing */
+  virtual ~TimeCacheInterface() {}
   /** \brief Access data from the cache */
   virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0)=0; //returns false if data unavailable (should be thrown as lookup exception
 
