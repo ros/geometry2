@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
   tf2_ros::StaticTransformBroadcaster broadcaster;
   geometry_msgs::TransformStamped msg;
 
-  if(argc == 10)
+  if(argc >= 10)
   {
     msg.transform.translation.x = atof(argv[1]);
     msg.transform.translation.y = atof(argv[2]);
