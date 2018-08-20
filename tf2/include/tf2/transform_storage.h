@@ -41,7 +41,7 @@
 
 namespace geometry_msgs
 {
-ROS_DECLARE_MESSAGE(TransformStamped);
+ROS_DECLARE_MESSAGE(TransformStamped)
 }
 
 namespace tf2

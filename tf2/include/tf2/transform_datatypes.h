@@ -67,7 +67,7 @@ class Stamped : public T{
 template <typename T> 
 bool operator==(const Stamped<T> &a, const Stamped<T> &b) {
   return a.frame_id_ == b.frame_id_ && a.stamp_ == b.stamp_ && static_cast<const T&>(a) == static_cast<const T&>(b);
-};
+}
 
 
 }
