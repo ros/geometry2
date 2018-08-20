@@ -428,6 +428,6 @@ public:
     return buffer.lookupFrameString(frame_id_num);
   }
 };
-};
+}
 
 #endif //TF2_CORE_H
