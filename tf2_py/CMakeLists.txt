@@ -99,7 +99,7 @@ if (NOT MSVC)
   set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
   set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
 else()
-  set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".dll")
+  set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".pyd")
 endif()
 set_target_properties(tf2_py PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
@@ -149,7 +149,7 @@ if (NOT MSVC)
     DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
   )
 else()
-  install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.dll
+  install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.pyd
     DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
   )
 endif()
