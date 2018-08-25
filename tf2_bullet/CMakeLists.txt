@@ -3,8 +3,12 @@ project(tf2_bullet)
 
 find_package(PkgConfig REQUIRED)
 
+if(MSVC)
+find_package(bullet REQUIRED)
+else()
 set(bullet_FOUND 0)
 pkg_check_modules(bullet REQUIRED bullet)
+endif()
 
 find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2)
 
