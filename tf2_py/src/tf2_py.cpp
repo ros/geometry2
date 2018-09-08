@@ -414,7 +414,7 @@ static inline int checkRotationType(PyObject* o)
                    PyObject_HasAttrString(o, "y") &&
                    PyObject_HasAttrString(o, "z");
   if (!type_check) {
-    PyErr_WarnEx(PyExc_UserWarning, "translation should be of type Quaternion", 1);
+    PyErr_WarnEx(PyExc_UserWarning, "rotation should be of type Quaternion", 1);
   }
   return attr_check;
 }
