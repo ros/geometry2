@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2_ros)
 
+add_compile_options(-std=c++14)
+
 if(NOT ANDROID)
 set(TF2_PY tf2_py)
 endif()
