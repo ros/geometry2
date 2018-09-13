@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 
 project(test_tf2)
 
+add_compile_options(-std=c++14)
+
 if(NOT CATKIN_ENABLE_TESTING)
   return()
 endif()

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2_bullet)
 
+add_compile_options(-std=c++14)
+
 find_package(PkgConfig REQUIRED)
 
 set(bullet_FOUND 0)

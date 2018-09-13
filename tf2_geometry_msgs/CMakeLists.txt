@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(tf2_geometry_msgs)
 
+add_compile_options(-std=c++14)
+
 find_package(orocos_kdl)
 find_package(catkin REQUIRED COMPONENTS geometry_msgs tf2_ros tf2)
 find_package(Boost COMPONENTS thread REQUIRED)
