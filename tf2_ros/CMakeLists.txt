@@ -114,6 +114,9 @@ add_executable(${PROJECT_NAME}_test_listener EXCLUDE_FROM_ALL test/listener_unit
 add_dependencies(${PROJECT_NAME}_test_listener ${catkin_EXPORTED_TARGETS})
 add_executable(${PROJECT_NAME}_test_time_reset EXCLUDE_FROM_ALL test/time_reset_test.cpp)
 add_dependencies(${PROJECT_NAME}_test_time_reset ${catkin_EXPORTED_TARGETS})
+add_executable(${PROJECT_NAME}_test_message_filter EXCLUDE_FROM_ALL test/message_filter_test.cpp)
+add_dependencies(${PROJECT_NAME}_test_message_filter ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(${PROJECT_NAME}_test_listener
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -126,10 +129,18 @@ target_link_libraries(${PROJECT_NAME}_test_time_reset
   ${GTEST_LIBRARIES}
 )
 
+target_link_libraries(${PROJECT_NAME}_test_message_filter
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${GTEST_LIBRARIES}
+)
+
 add_dependencies(tests ${PROJECT_NAME}_test_listener)
 add_dependencies(tests ${PROJECT_NAME}_test_time_reset)
+add_dependencies(tests ${PROJECT_NAME}_test_message_filter)
 
 add_rostest(test/transform_listener_unittest.launch)
 add_rostest(test/transform_listener_time_reset_test.launch)
+add_rostest(test/message_filter_test.launch)
 
 endif()
