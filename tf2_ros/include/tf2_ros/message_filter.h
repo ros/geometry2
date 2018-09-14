@@ -244,7 +244,7 @@ public:
 
     target_frames_.resize(target_frames.size());
     std::transform(target_frames.begin(), target_frames.end(), target_frames_.begin(), this->stripSlash);
-    expected_success_count_ = target_frames_.size() + (time_tolerance_.isZero() ? 0 : 1);
+    expected_success_count_ = target_frames_.size() * (time_tolerance_.isZero() ? 1 : 2);
 
     std::stringstream ss;
     for (V_string::iterator it = target_frames_.begin(); it != target_frames_.end(); ++it)
@@ -269,7 +269,7 @@ public:
   {
     boost::mutex::scoped_lock lock(target_frames_mutex_);
     time_tolerance_ = tolerance;
-    expected_success_count_ = target_frames_.size() + (time_tolerance_.isZero() ? 0 : 1);
+    expected_success_count_ = target_frames_.size() * (time_tolerance_.isZero() ? 1 : 2);
   }
 
   /**
