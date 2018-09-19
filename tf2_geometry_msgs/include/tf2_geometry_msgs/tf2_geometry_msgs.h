@@ -32,6 +32,8 @@
 #ifndef TF2_GEOMETRY_MSGS_H
 #define TF2_GEOMETRY_MSGS_H
 
+#include <boost/array.hpp>
+
 #include <tf2/convert.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
@@ -1006,7 +1008,7 @@ void fromMsg(const geometry_msgs::WrenchStamped& msg, geometry_msgs::WrenchStamp
 
 
 inline
-geometry_msgs::WrenchStamped toMsg(const tf2::Stamped<std::array<tf2::Vector3, 2>>& in, geometry_msgs::WrenchStamped & out)
+geometry_msgs::WrenchStamped toMsg(const tf2::Stamped< boost::array<tf2::Vector3, 2> >& in, geometry_msgs::WrenchStamped& out)
 {
   out.header.stamp = in.stamp_;
   out.header.frame_id = in.frame_id_;
@@ -1017,7 +1019,7 @@ geometry_msgs::WrenchStamped toMsg(const tf2::Stamped<std::array<tf2::Vector3, 2
 
 
 inline
-void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped<std::array<tf2::Vector3, 2>>& out)
+void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped< boost::array<tf2::Vector3, 2> >& out)
 {
   out.stamp_ = msg.header.stamp;
   out.frame_id_ = msg.header.frame_id;
@@ -1025,7 +1027,7 @@ void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped<std::array<tf
   fromMsg(msg.wrench.force, tmp);
   tf2::Vector3 tmp1;
   fromMsg(msg.wrench.torque, tmp1);
-  std::array<tf2::Vector3, 2> tmp_array;
+  boost::array<tf2::Vector3, 2> tmp_array;
   tmp_array[0] = tmp;
   tmp_array[1] = tmp1;
   out.setData(tmp_array);
