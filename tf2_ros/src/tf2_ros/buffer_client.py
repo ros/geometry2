@@ -165,8 +165,17 @@ class BufferClient(tf2_ros.BufferInterface):
     def __is_done(self, state):
         if state == GoalStatus.REJECTED or state == GoalStatus.ABORTED or \
            state == GoalStatus.RECALLED or state == GoalStatus.PREEMPTED or \
-           state == GoalStatus.SUCCEEDED or state == GoalStatus.LOST:
+           state == GoalStatus.LOST:
             return True
+ 
+        # Add special treatment for the succeeded case. When succeeded we need to
+        # make sure the result is available to consider it done. In theory the results
+        # should already be available when state is SUCCEEDED but in practice we experience
+        # cases where this is not true.
+        # where this is not true See https://github.com/ros/geometry2/issues/178.
+        if state == GoalStatus.SUCCEEDED and self.client.get_result():
+            return True
+ 
         return False
 
     def __process_goal(self, goal):
