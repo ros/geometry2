@@ -215,10 +215,10 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3
   fromMsg(msg.point, static_cast<Eigen::Vector3d&>(out));
 }
 
-/** \brief Apply a geometry_msgs Transform to a Eigen-specific affine transform data type.
+/** \brief Apply a geometry_msgs Transform to an Eigen Affine3d transform.
  * This function is a specialization of the doTransform template defined in tf2/convert.h,
  * although it can not be used in tf2_ros::BufferInterface::transform because this
- * functions rely on the existence of a time stamp and a frame id in the type which should
+ * function relies on the existence of a time stamp and a frame id in the type which should
  * get transformed.
  * \param t_in The frame to transform, as a Eigen Affine3d transform.
  * \param t_out The transformed frame, as a Eigen Affine3d transform.
@@ -438,10 +438,10 @@ void fromMsg(const geometry_msgs::Twist &msg, Eigen::Matrix<double,6,1>& out) {
   out[5] = msg.angular.z;
 }
 
-/** \brief Apply a geometry_msgs TransformStamped to a Eigen-specific affine transform data type.
+/** \brief Apply a geometry_msgs TransformStamped to an Eigen Affine3d transform.
  * This function is a specialization of the doTransform template defined in tf2/convert.h,
  * although it can not be used in tf2_ros::BufferInterface::transform because this
- * functions rely on the existence of a time stamp and a frame id in the type which should
+ * function relies on the existence of a time stamp and a frame id in the type which should
  * get transformed.
  * \param t_in The frame to transform, as a timestamped Eigen Affine3d transform.
  * \param t_out The transformed frame, as a timestamped Eigen Affine3d transform.
