@@ -72,7 +72,7 @@ geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
   t.transform.translation.y = T.translation().y();
   t.transform.translation.z = T.translation().z();
 
-  Eigen::Quaterniond q(T.rotation());
+  Eigen::Quaterniond q(T.linear());  // assuming that upper 3x3 matrix is orthonormal
   t.transform.rotation.x = q.x();
   t.transform.rotation.y = q.y();
   t.transform.rotation.z = q.z();
@@ -309,10 +309,11 @@ geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
   msg.position.x = in.translation().x();
   msg.position.y = in.translation().y();
   msg.position.z = in.translation().z();
-  msg.orientation.x = Eigen::Quaterniond(in.rotation()).x();
-  msg.orientation.y = Eigen::Quaterniond(in.rotation()).y();
-  msg.orientation.z = Eigen::Quaterniond(in.rotation()).z();
-  msg.orientation.w = Eigen::Quaterniond(in.rotation()).w();
+  Eigen::Quaterniond q(in.linear());
+  msg.orientation.x = q.x();
+  msg.orientation.y = q.y();
+  msg.orientation.z = q.z();
+  msg.orientation.w = q.w();
   return msg;
 }
 
