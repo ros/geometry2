@@ -314,6 +314,12 @@ geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
   msg.orientation.y = q.y();
   msg.orientation.z = q.z();
   msg.orientation.w = q.w();
+  if (msg.orientation.w < 0) {
+    msg.orientation.x *= -1;
+    msg.orientation.y *= -1;
+    msg.orientation.z *= -1;
+    msg.orientation.w *= -1;
+  }
   return msg;
 }
 
