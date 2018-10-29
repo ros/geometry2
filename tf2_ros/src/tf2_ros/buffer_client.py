@@ -48,9 +48,9 @@ class BufferClient(tf2_ros.BufferInterface):
     """
     Action client-based implementation of BufferInterface.
     """
-    def __init__(self, ns, check_frequency = 10.0, timeout_padding = rospy.Duration.from_sec(2.0)):
+    def __init__(self, ns, check_frequency = None, timeout_padding = rospy.Duration.from_sec(2.0)):
         """
-        .. function:: __init__(ns, check_frequency = 10.0, timeout_padding = rospy.Duration.from_sec(2.0))
+        .. function:: __init__(ns, check_frequency = None, timeout_padding = rospy.Duration.from_sec(2.0))
 
             Constructor.
 
@@ -60,8 +60,10 @@ class BufferClient(tf2_ros.BufferInterface):
         """
         tf2_ros.BufferInterface.__init__(self)
         self.client = actionlib.SimpleActionClient(ns, LookupTransformAction)
-        self.check_frequency = check_frequency
         self.timeout_padding = timeout_padding
+
+        if check_frequency is not None:
+            rospy.logwarn('Argument check_frequency is deprecated and should not be used.')
 
     def wait_for_server(self, timeout = rospy.Duration()):
         """
@@ -162,36 +164,11 @@ class BufferClient(tf2_ros.BufferInterface):
         except tf2.TransformException:
             return False
 
-    def __is_done(self, state):
-        if state == GoalStatus.REJECTED or state == GoalStatus.ABORTED or \
-           state == GoalStatus.RECALLED or state == GoalStatus.PREEMPTED or \
-           state == GoalStatus.LOST:
-            return True
- 
-        # Add special treatment for the succeeded case. When succeeded we need to
-        # make sure the result is available to consider it done. In theory the results
-        # should already be available when state is SUCCEEDED but in practice we experience
-        # cases where this is not true.
-        # where this is not true See https://github.com/ros/geometry2/issues/178.
-        if state == GoalStatus.SUCCEEDED and self.client.get_result():
-            return True
- 
-        return False
-
     def __process_goal(self, goal):
         self.client.send_goal(goal)
-        r = rospy.Rate(self.check_frequency)
-        timed_out = False
-        start_time = rospy.Time.now()
-        while not rospy.is_shutdown() and not self.__is_done(self.client.get_state()) and not timed_out:
-            if rospy.Time.now() > start_time + goal.timeout + self.timeout_padding:
-                timed_out = True
-                break
-            r.sleep()
 
-        #This shouldn't happen, but could in rare cases where the server hangs
-        if timed_out:
-            self.client.cancel_goal()
+        if not self.client.wait_for_result(goal.timeout + self.timeout_padding):
+            #This shouldn't happen, but could in rare cases where the server hangs
             raise tf2.TimeoutException("The LookupTransform goal sent to the BufferServer did not come back in the specified time. Something is likely wrong with the server")
 
         if self.client.get_state() != GoalStatus.SUCCEEDED:
