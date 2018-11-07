@@ -2,6 +2,12 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix issue `#315 <https://github.com/ros/geometry2/issues/315>`_
+* fixed nan interpoaltion issue
+* Contributors: Keller Fabian Rudolf (CC-AD/EYC3), Kuang Fangjun
+
 0.5.18 (2018-07-10)
 -------------------
 * preserve constness of const argument to avoid warnings (`#307 <https://github.com/ros/geometry2/issues/307>`_)

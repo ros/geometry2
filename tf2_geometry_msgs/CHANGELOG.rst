@@ -2,6 +2,15 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use boost::array insted of std:array
+  ... for older C++ version
+* Added WrenchStamped transformation (`#302 <https://github.com/ros/geometry2/issues/302>`_)
+  * Added doTransformation for geometry_msgs/Wrench
+  * Added python implementation of Wrench transform
+* Contributors: Denis Štogl
+
 0.5.18 (2018-07-10)
 -------------------
 * Changed access to Vector to prevent memory leak (`#305 <https://github.com/ros/geometry2/issues/305>`_)

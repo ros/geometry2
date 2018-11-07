@@ -2,6 +2,14 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* improve comments
+* add Eigen::Isometry3d conversions
+* normalize quaternions to be in half-space w >= 0 as in tf1
+* improve computation efficiency
+* Contributors: Robert Haschke
+
 0.5.18 (2018-07-10)
 -------------------
 * Adds toMsg & fromMsg for Eigen Vector3 (`#294 <https://github.com/ros/geometry2/issues/294>`_)
