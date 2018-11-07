@@ -2,6 +2,17 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix(buffer-client): Use actionlib api for obtaining result
+  Use the API provided by actionlib for waiting for result. This will improve the response time and prevent problems with custom solutions (see `#178 <https://github.com/ros/geometry2/issues/178>`_). This change makes constructor parameter check_frequency obsolute and deprecates it.
+* Add check to buffer_client.py to make sure result is available
+  Related issue: `#178 <https://github.com/ros/geometry2/issues/178>`_
+* Add check to reset buffer when rostime goes backwards
+* Fixed the value of expected_success_count\_
+* Added a tf2_ros message filter unittest with multiple target frames and non-zero time tolerance
+* Contributors: Ewoud Pool, Jørgen Borgesen, Stephen Williams
+
 0.6.3 (2018-07-09)
 ------------------
 
