@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.4 (2018-11-06)
+------------------
 * Resolved pedantic warnings
 * fix issue `#315 <https://github.com/ros/geometry2/issues/315>`_
 * fixed nan interpoaltion issue

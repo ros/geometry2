@@ -2,8 +2,8 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.4 (2018-11-06)
+------------------
 * improve comments
 * add Eigen::Isometry3d conversions
 * normalize quaternions to be in half-space w >= 0 as in tf1
