@@ -2,8 +2,8 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.19 (2018-11-06)
+-------------------
 * fix translation vs rotation typo
   Fixes `#324 <https://github.com/ros/geometry2/issues/324>`_
 * Add python3.7 compatibility.

@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.19 (2018-11-06)
+-------------------
 * fix issue `#315 <https://github.com/ros/geometry2/issues/315>`_
 * fixed nan interpoaltion issue
 * Contributors: Keller Fabian Rudolf (CC-AD/EYC3), Kuang Fangjun

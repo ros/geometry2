@@ -2,8 +2,8 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.19 (2018-11-06)
+-------------------
 * Use boost::array insted of std:array
   ... for older C++ version
 * Added WrenchStamped transformation (`#302 <https://github.com/ros/geometry2/issues/302>`_)
