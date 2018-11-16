@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>tf2_eigen</name>
-  <version>0.5.19</version>
+  <version>0.5.20</version>
   <description>tf2_eigen</description>
   <author>Koji Terada</author>
   <maintainer email="terakoji@gmail.com">Koji Terada</maintainer>

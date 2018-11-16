@@ -1,6 +1,6 @@
 <package>
   <name>geometry2</name>
-  <version>0.5.19</version>
+  <version>0.5.20</version>
   <description>
     A metapackage to bring in the default packages second generation Transform Library in ros, tf2.
   </description>

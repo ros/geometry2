@@ -1,6 +1,6 @@
 <package format="2">
   <name>tf2_kdl</name>
-  <version>0.5.19</version>
+  <version>0.5.20</version>
   <description>
     KDL binding for tf2
   </description>
