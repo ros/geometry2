@@ -2,6 +2,11 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix python3 import error
+* Contributors: Timon Engelke
+
 0.6.4 (2018-11-06)
 ------------------
 
