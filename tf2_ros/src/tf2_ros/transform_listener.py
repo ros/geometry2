@@ -27,7 +27,8 @@
 
 # author: Wim Meeussen
 
-import roslib; roslib.load_manifest('tf2_ros')
+import threading
+
 import rospy
 import tf2_ros
 from tf2_msgs.msg import TFMessage
@@ -51,6 +52,7 @@ class TransformListener():
         """
         self.buffer = buffer
         self.last_update = rospy.Time.now()
+        self.last_update_lock = threading.Lock()
         self.tf_sub = rospy.Subscriber("/tf", TFMessage, self.callback, queue_size=queue_size, buff_size=buff_size, tcp_nodelay=tcp_nodelay)
         self.tf_static_sub = rospy.Subscriber("/tf_static", TFMessage, self.static_callback, queue_size=queue_size, buff_size=buff_size, tcp_nodelay=tcp_nodelay)
 
@@ -65,11 +67,14 @@ class TransformListener():
         self.tf_static_sub.unregister()
 
     def check_for_reset(self):
-        now = rospy.Time.now()
-        if now < self.last_update:
-            rospy.logwarn("Detected jump back in time of %fs. Clearing TF buffer." % (self.last_update - now).to_sec())
-            self.buffer.clear()
-        self.last_update = now
+        # Lock to prevent different threads racing on this test and update.
+        # https://github.com/ros/geometry2/issues/341
+        with self.last_update_lock:
+            now = rospy.Time.now()
+            if now < self.last_update:
+                rospy.logwarn("Detected jump back in time of %fs. Clearing TF buffer." % (self.last_update - now).to_sec())
+                self.buffer.clear()
+            self.last_update = now
 
     def callback(self, data):
         self.check_for_reset()
