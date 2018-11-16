@@ -2,6 +2,13 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Protect the time reset logic from a race condition.
+  Fixes `#341 <https://github.com/ros/geometry2/issues/341>`_
+  This could incorrectly trigger a buffer clear if two concurrent callbacks were invoked.
+* Contributors: Tully Foote
+
 0.5.19 (2018-11-06)
 -------------------
 * fix(buffer-client): Use actionlib api for obtaining result

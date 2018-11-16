@@ -2,6 +2,9 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.19 (2018-11-06)
 -------------------
 * fix translation vs rotation typo

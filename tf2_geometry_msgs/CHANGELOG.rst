@@ -2,6 +2,9 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.5.19 (2018-11-06)
 -------------------
 * Use boost::array insted of std:array
