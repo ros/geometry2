@@ -48,6 +48,10 @@ namespace tf2_ros
 class BufferInterface
 {
 public:
+  /** \brief Virtual destructor.
+   * Every class that has virtual methods should have one.
+   */
+  virtual ~BufferInterface() {}
 
   /** \brief Get the transform between two frames by frame ID.
    * \param target_frame The frame to which data should be transformed
