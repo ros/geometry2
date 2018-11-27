@@ -30,6 +30,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
+
 import argparse
 import math
 import numpy
@@ -194,7 +196,7 @@ class Echo():
         msg += "[{:.3f}, {:.3f}, {:.3f}]".format(math.degrees(euler[0]),
                                                  math.degrees(euler[1]),
                                                  math.degrees(euler[2]))
-        print msg
+        print(msg)
 
 def positive_float(x):
     x = float(x)
