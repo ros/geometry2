@@ -60,6 +60,9 @@ int main(int argc, char** argv)
   double buffer_size;
   nh.param("buffer_size", buffer_size, 120.0);
 
+  bool publish_frame_service;
+  nh.param("publish_frame_service", publish_frame_service, false);
+
   // Legacy behavior re: #209
   bool use_node_namespace;
   nh.param("use_node_namespace", use_node_namespace, false);
@@ -74,7 +77,7 @@ int main(int argc, char** argv)
   }
 
   // WIM: this works fine:
-  tf2_ros::Buffer buffer_core(ros::Duration(buffer_size+0)); // WTF??
+  tf2_ros::Buffer buffer_core(ros::Duration(buffer_size+0), publish_frame_service); // WTF??
   tf2_ros::TransformListener listener(buffer_core);
   tf2_ros::BufferServer buffer_server(buffer_core, node_name , false);
   buffer_server.start();
