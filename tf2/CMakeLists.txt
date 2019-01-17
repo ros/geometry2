@@ -3,7 +3,7 @@ project(tf2)
 
 find_package(console_bridge REQUIRED)
 find_package(catkin REQUIRED COMPONENTS geometry_msgs rostime tf2_msgs)
-find_package(Boost REQUIRED COMPONENTS signals system thread)
+find_package(Boost REQUIRED COMPONENTS system thread)
 
 catkin_package(
    INCLUDE_DIRS include
