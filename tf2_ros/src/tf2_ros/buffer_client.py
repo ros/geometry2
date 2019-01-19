@@ -177,9 +177,9 @@ class BufferClient(tf2_ros.BufferInterface):
         return self.__process_result(self.client.get_result())
 
     def __process_result(self, result):
-        if result == None:
+        if result is None:
             raise tf2.TransformException("The BufferServer returned None for result!  Something is likely wrong with the server.")
-        if result.error == None:
+        if result.error is None:
             raise tf2.TransformException("The BufferServer returned None for result.error!  Something is likely wrong with the server.")
         if result.error.error != result.error.NO_ERROR:
             if result.error.error == result.error.LOOKUP_ERROR:
