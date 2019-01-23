@@ -95,7 +95,7 @@ class BufferInterface:
         res = do_transform(object_stamped, self.lookup_transform_full(target_frame, target_time,
                                                                      object_stamped.header.frame_id, object_stamped.header.stamp, 
                                                                      fixed_frame, timeout))
-        if new_type is None:
+        if not new_type:
             return res
 
         return convert(res, new_type)
