@@ -316,6 +316,61 @@ void fromMsg(const geometry_msgs::Quaternion& in, tf2::Quaternion& out)
   out = tf2::Quaternion(in.x, in.y, in.z, in.w);
 }
 
+namespace impl {
+
+/** Function needed for the generalization of toQuaternion
+ * \param q a tf2::Quaternion
+ * \return a copy of the same quaternion
+ */
+inline
+tf2::Quaternion toQuaternion(const tf2::Quaternion& q) {
+    return q;
+  }
+
+/** Function needed for the generalization of toQuaternion
+ * \param q a geometry_msgs::Quaternion
+ * \return a copy of the same quaternion as a tf2::Quaternion
+ */
+inline
+tf2::Quaternion toQuaternion(const geometry_msgs::Quaternion& q) {
+    tf2::Quaternion res;
+    fromMsg(q, res);
+    return res;
+  }
+
+/** Function needed for the generalization of toQuaternion
+ * \param q a geometry_msgs::QuaternionStamped
+ * \return a copy of the same quaternion as a tf2::Quaternion
+ */
+inline
+tf2::Quaternion toQuaternion(const geometry_msgs::QuaternionStamped& q) {
+    tf2::Quaternion res;
+    fromMsg(q.quaternion, res);
+    return res;
+  }
+
+/** Function needed for the generalization of toQuaternion
+ * \param t some tf2::Stamped object
+ * \return a copy of the same quaternion as a tf2::Quaternion
+ */
+template<typename T>
+  tf2::Quaternion toQuaternion(const tf2::Stamped<T>& t) {
+    geometry_msgs::QuaternionStamped q = toMsg(t);
+    return toQuaternion(q);
+  }
+
+/** Generic version of toQuaternion. It tries to convert the argument
+ * to a geometry_msgs::Quaternion
+ * \param t some object
+ * \return a copy of the same quaternion as a tf2::Quaternion
+ */
+template<typename T>
+  tf2::Quaternion toQuaternion(const T& t) {
+    geometry_msgs::Quaternion q = toMsg(t);
+    return toQuaternion(q);
+  }
+} // namespace
+
 
 /***********************/
 /** QuaternionStamped **/
