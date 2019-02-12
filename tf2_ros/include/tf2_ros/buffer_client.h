@@ -39,6 +39,12 @@
 
 #include <tf2_ros/buffer_interface.h>
 #include <actionlib/client/simple_action_client.h>
+
+// Boost winapi.h includes winerror.h, which defines NO_ERROR.
+// this would conflict with tf2_msgs::TF2Error::NO_ERROR.
+#if defined(_WIN32) && defined(NO_ERROR)
+    #undef NO_ERROR
+#endif
 #include <tf2_msgs/LookupTransformAction.h>
 
 namespace tf2_ros
