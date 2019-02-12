@@ -57,7 +57,7 @@ namespace tf2
  * \deprecated
  */
 inline
-KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t) ROS_DEPRECATED;
+ROS_DEPRECATED KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t);
 inline
 KDL::Frame gmTransformToKDL(const geometry_msgs::TransformStamped& t)
   {
@@ -381,7 +381,7 @@ geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in)
 
 template <>
 inline
-geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in) ROS_DEPRECATED;
+ROS_DEPRECATED geometry_msgs::QuaternionStamped toMsg(const tf2::Stamped<tf2::Quaternion>& in);
 
 
 //Backwards compatibility remove when forked for Lunar or newer
@@ -409,7 +409,7 @@ void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quate
 
 template<>
 inline
-void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quaternion>& out) ROS_DEPRECATED;
+ROS_DEPRECATED void fromMsg(const geometry_msgs::QuaternionStamped& in, tf2::Stamped<tf2::Quaternion>& out);
 
 //Backwards compatibility remove when forked for Lunar or newer
 template<>
