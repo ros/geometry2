@@ -20,10 +20,11 @@ add_library(tf2 src/cache.cpp src/buffer_core.cpp src/static_cache.cpp)
 target_link_libraries(tf2 ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${console_bridge_LIBRARIES})
 add_dependencies(tf2 ${catkin_EXPORTED_TARGETS})
 
+# Install library
 install(TARGETS tf2
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/
