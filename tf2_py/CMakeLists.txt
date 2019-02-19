@@ -94,12 +94,12 @@ add_library(tf2_py src/tf2_py.cpp)
 target_link_libraries(tf2_py ${catkin_LIBRARIES})
 add_dependencies(tf2_py ${catkin_EXPORTED_TARGETS})
 
-# The .so extension is meaningless on Windows
-if (NOT MSVC)
+if(WIN32)
+  # use .pyd extension on Windows
+  set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".pyd")
+else()
   set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
   set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
-else()
-  set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".pyd")
 endif()
 set_target_properties(tf2_py PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
@@ -144,12 +144,12 @@ set_target_properties(tf2_py PROPERTIES
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-if (NOT MSVC)
-  install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.so
+if(WIN32)
+  install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.pyd
     DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
   )
 else()
-  install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.pyd
+  install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.so
     DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
   )
 endif()
