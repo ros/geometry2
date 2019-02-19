@@ -94,11 +94,17 @@ add_library(tf2_py src/tf2_py.cpp)
 target_link_libraries(tf2_py ${catkin_LIBRARIES})
 add_dependencies(tf2_py ${catkin_EXPORTED_TARGETS})
 
-set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
-set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
+# The .so extension is meaningless on Windows
+if (NOT MSVC)
+  set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
+  set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
+else()
+  set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".dll")
+endif()
 set_target_properties(tf2_py PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
   LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
+  RUNTIME_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
 )
 #!! rosbuild_add_compile_flags(tf2_py ${SSE_FLAGS}) #conditionally adds sse flags if available
 
@@ -138,10 +144,15 @@ set_target_properties(tf2_py PROPERTIES
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.so
-  DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
-)
-
+if (NOT MSVC)
+  install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.so
+    DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+  )
+else()
+  install(FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/_tf2.dll
+    DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+  )
+endif()
 
 #############
 ## Testing ##
