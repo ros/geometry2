@@ -38,20 +38,6 @@
 #include <tf2_ros/transform_listener.h>
 #include <ros/ros.h>
 
-
-class MyClass
-{
-public:
-  MyClass() {}
-  MyClass(double d) {}
-};
-
-class BlankClass
-{
-public:
-  BlankClass() {}
-};
-
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "tf_buffer");
@@ -76,13 +62,10 @@ int main(int argc, char** argv)
     node_name = "tf2_buffer_server";
   }
 
-  // WIM: this works fine:
-  tf2_ros::Buffer buffer_core(ros::Duration(buffer_size+0), publish_frame_service); // WTF??
+  tf2_ros::Buffer buffer_core(ros::Duration(buffer_size), publish_frame_service);
   tf2_ros::TransformListener listener(buffer_core);
   tf2_ros::BufferServer buffer_server(buffer_core, node_name , false);
   buffer_server.start();
-  // But you should probably read this instead:
-  // http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=439
 
   ros::spin();
 }
