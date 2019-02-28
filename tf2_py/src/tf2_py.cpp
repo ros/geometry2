@@ -616,11 +616,14 @@ PyObject *moduleInit(PyObject *m) {
 }
 
 #if PY_MAJOR_VERSION < 3
-extern "C" void init_tf2()
+extern "C"
 {
-  if (!staticInit())
-    return;
-  moduleInit(Py_InitModule("_tf2", module_methods));
+  ROS_HELPER_EXPORT void init_tf2()
+  {
+    if (!staticInit())
+      return;
+    moduleInit(Py_InitModule("_tf2", module_methods));
+  }
 }
 
 #else
