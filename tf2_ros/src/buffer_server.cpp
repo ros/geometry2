@@ -103,8 +103,8 @@ namespace tf2_ros
         //make sure to pass the result to the client
         //even failed transforms are considered a success
         //since the request was successfully processed
-        it = active_goals_.erase(it);
         info.handle.setSucceeded(result);
+        it = active_goals_.erase(it);
       }
       else
         ++it;
@@ -122,8 +122,8 @@ namespace tf2_ros
       GoalInfo& info = *it;
       if(info.handle == gh)
       {
-        it = active_goals_.erase(it);
         info.handle.setCanceled();
+        it = active_goals_.erase(it);
         return;
       }
       else
