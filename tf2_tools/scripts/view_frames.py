@@ -48,7 +48,7 @@ def main():
     rospy.loginfo('Generating graph in frames.pdf file...')
     rospy.wait_for_service('~tf2_frames')
     srv = rospy.ServiceProxy('~tf2_frames', FrameGraph)
-    data = yaml.load(srv().frame_yaml)
+    data = yaml.safe_load(srv().frame_yaml)
     with open('frames.gv', 'w') as f:
         f.write(generate_dot(data))
     subprocess.Popen('dot -Tpdf frames.gv -o frames.pdf'.split(' ')).communicate()
