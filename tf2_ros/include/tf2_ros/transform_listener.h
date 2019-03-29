@@ -50,16 +50,16 @@ class TransformListener
 
 public:
   /**@brief Constructor for transform listener */
-  TransformListener(tf2::BufferCore& buffer, bool spin_thread = true);
-  TransformListener(tf2::BufferCore& buffer, const ros::NodeHandle& nh, bool spin_thread = true);
+  TransformListener(tf2::BufferCore& buffer, bool spin_thread = true, bool only_static = false);
+  TransformListener(tf2::BufferCore& buffer, const ros::NodeHandle& nh, bool spin_thread = true, bool only_static = false);
 
   ~TransformListener();
 
 private:
 
   /// Initialize this transform listener, subscribing, advertising services, etc.
-  void init();
-  void initWithThread();
+  void init(bool only_static);
+  void initWithThread(bool only_static);
 
   /// Callback function for ros message subscriptoin
   void subscription_callback(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt);

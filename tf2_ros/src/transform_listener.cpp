@@ -35,25 +35,25 @@
 using namespace tf2_ros;
 
 
-TransformListener::TransformListener(tf2::BufferCore& buffer, bool spin_thread):
+TransformListener::TransformListener(tf2::BufferCore& buffer, bool spin_thread, bool only_static):
   dedicated_listener_thread_(NULL), buffer_(buffer), using_dedicated_thread_(false)
 {
   if (spin_thread)
-    initWithThread();
+    initWithThread(only_static);
   else
-    init();
+    init(only_static);
 }
 
-TransformListener::TransformListener(tf2::BufferCore& buffer, const ros::NodeHandle& nh, bool spin_thread)
+TransformListener::TransformListener(tf2::BufferCore& buffer, const ros::NodeHandle& nh, bool spin_thread, bool only_static)
 : dedicated_listener_thread_(NULL)
 , node_(nh)
 , buffer_(buffer)
 , using_dedicated_thread_(false)
 {
   if (spin_thread)
-    initWithThread();
+    initWithThread(only_static);
   else
-    init();
+    init(only_static);
 }
 
 
@@ -67,17 +67,23 @@ TransformListener::~TransformListener()
   }
 }
 
-void TransformListener::init()
+void TransformListener::init(bool only_static)
 {
-  message_subscriber_tf_ = node_.subscribe<tf2_msgs::TFMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1)); ///\todo magic number
+  if (!only_static)
+  {
+    message_subscriber_tf_ = node_.subscribe<tf2_msgs::TFMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1)); ///\todo magic number
+  }
   message_subscriber_tf_static_ = node_.subscribe<tf2_msgs::TFMessage>("/tf_static", 100, boost::bind(&TransformListener::static_subscription_callback, this, _1)); ///\todo magic number
 }
 
-void TransformListener::initWithThread()
+void TransformListener::initWithThread(bool only_static)
 {
   using_dedicated_thread_ = true;
+  if (!only_static)
+  {
   ros::SubscribeOptions ops_tf = ros::SubscribeOptions::create<tf2_msgs::TFMessage>("/tf", 100, boost::bind(&TransformListener::subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
   message_subscriber_tf_ = node_.subscribe(ops_tf);
+  }
   
   ros::SubscribeOptions ops_tf_static = ros::SubscribeOptions::create<tf2_msgs::TFMessage>("/tf_static", 100, boost::bind(&TransformListener::static_subscription_callback, this, _1), ros::VoidPtr(), &tf_message_callback_queue_); ///\todo magic number
   message_subscriber_tf_static_ = node_.subscribe(ops_tf_static);
