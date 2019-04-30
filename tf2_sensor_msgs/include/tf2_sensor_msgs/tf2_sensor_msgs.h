@@ -70,8 +70,8 @@ void doTransform(const sensor_msgs::PointCloud2 &p_in, sensor_msgs::PointCloud2 
 {
   p_out = p_in;
   p_out.header = t_in.header;
-  Eigen::Transform<float,3,Eigen::Affine> t = Eigen::Translation3f(t_in.transform.translation.x, t_in.transform.translation.y,
-                                                                   t_in.transform.translation.z) * Eigen::Quaternion<float>(
+  Eigen::Transform<float,3,Eigen::Isometry> t = Eigen::Translation3f(t_in.transform.translation.x, t_in.transform.translation.y,
+                                                                     t_in.transform.translation.z) * Eigen::Quaternion<float>(
                                                                      t_in.transform.rotation.w, t_in.transform.rotation.x,
                                                                      t_in.transform.rotation.y, t_in.transform.rotation.z);
 
