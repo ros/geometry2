@@ -36,7 +36,7 @@ import argparse
 import math
 import numpy
 import rospy
-# import sys
+import sys
 import tf2_py as tf2
 import tf2_ros
 
@@ -184,18 +184,18 @@ class Echo():
         # will be identical.
         msg = "At time {}, (current time {})".format(ts.header.stamp.to_sec(), cur_time.to_sec())
         xyz = ts.transform.translation
-        msg += "\n- Translation: [{:.3f}, {:.3f}, {:.3f}]\n".format(xyz.x, xyz.y, xyz.z)
+        msg += "\n- Translation: [{:.{p}f}, {:.{p}f}, {:.{p}f}]\n".format(xyz.x, xyz.y, xyz.z, p=self.args.precision)
         quat = ts.transform.rotation
-        msg += "- Rotation: in Quaternion [{:.3f}, {:.3f}, {:.3f}, {:.3f}]\n".format(quat.x, quat.y, quat.z, quat.w)
+        msg += "- Rotation: in Quaternion [{:.{p}f}, {:.{p}f}, {:.{p}f}, {:.{p}f}]\n".format(quat.x, quat.y, quat.z, quat.w, p=self.args.precision)
         # TODO(lucasw) need to get quaternion to euler from somewhere, but not tf1
         # or a dependency that isn't in Ubuntu or ros repos
         euler = _euler_from_quaternion_msg(quat)
         msg += "            in RPY (radian) "
-        msg += "[{:.3f}, {:.3f}, {:.3f}]\n".format(euler[0], euler[1], euler[2])
+        msg += "[{:.{p}f}, {:.{p}f}, {:.{p}f}]\n".format(euler[0], euler[1], euler[2], p=self.args.precision)
         msg += "            in RPY (degree) "
-        msg += "[{:.3f}, {:.3f}, {:.3f}]".format(math.degrees(euler[0]),
+        msg += "[{:.{p}f}, {:.{p}f}, {:.{p}f}]".format(math.degrees(euler[0]),
                                                  math.degrees(euler[1]),
-                                                 math.degrees(euler[2]))
+                                                 math.degrees(euler[2]), p=self.args.precision)
         print(msg)
 
 def positive_float(x):
@@ -212,6 +212,15 @@ def positive_int(x):
 
 if __name__ == '__main__':
     rospy.init_node("echo")
+
+    other_args = rospy.myargv(argv=sys.argv)
+    precision=3
+    try:
+        precision = rospy.get_param('~precision')
+        rospy.loginfo("Precision default value was overriden, new value: %d", precision)
+    except KeyError:
+        pass
+
     parser = argparse.ArgumentParser()
     parser.add_argument("source_frame")  # parent
     parser.add_argument("target_frame")  # child
@@ -231,7 +240,10 @@ if __name__ == '__main__':
     parser.add_argument("-l", "--limit",
                         help="lookup fixed number of times",
                         type=positive_int)
-    args = parser.parse_args()
-
+    parser.add_argument("-p", "--precision",
+                        help="output precision",
+                        default=precision,
+                        type=positive_int)
+    args = parser.parse_args(other_args[1:]) # Remove first arg
     echo = Echo(args)
     rospy.spin()
