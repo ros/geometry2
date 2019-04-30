@@ -36,7 +36,7 @@ import argparse
 import math
 import numpy
 import rospy
-# import sys
+import sys
 import tf2_py as tf2
 import tf2_ros
 
@@ -212,6 +212,15 @@ def positive_int(x):
 
 if __name__ == '__main__':
     rospy.init_node("echo")
+
+    other_args = rospy.myargv(argv=sys.argv)
+    precision=3
+    try:
+        precision = rospy.get_param('~precision')
+        rospy.loginfo("Precision default value was overriden, new value: %d", precision)
+    except KeyError:
+        pass
+
     parser = argparse.ArgumentParser()
     parser.add_argument("source_frame")  # parent
     parser.add_argument("target_frame")  # child
@@ -233,9 +242,8 @@ if __name__ == '__main__':
                         type=positive_int)
     parser.add_argument("-p", "--precision",
                         help="output precision",
-                        default=3,
+                        default=precision,
                         type=positive_int)
-    args = parser.parse_args()
-
+    args = parser.parse_args(other_args[1:]) # Remove first arg
     echo = Echo(args)
     rospy.spin()
