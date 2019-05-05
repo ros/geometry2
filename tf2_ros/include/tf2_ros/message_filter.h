@@ -214,6 +214,10 @@ public:
    */
   ~MessageFilter()
   {
+    if (callback_queue_)
+    {
+      callback_queue_->removeByID((uint64_t)this);
+    }
     message_connection_.disconnect();
 
     clear();
