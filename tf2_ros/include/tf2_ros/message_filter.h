@@ -103,6 +103,19 @@ tf_filter.registerCallback(&MyClass::myCallback, this);
 template<class M>
 class MessageFilter : public MessageFilterBase, public message_filters::SimpleFilter<M>
 {
+  /**
+   * Stores a pointer to the MessageFilter.
+   * To read the pointer, lock to the mutex with a shared_lock to prevent the destructor from invalidating it while
+   * it is used.
+   * If the MessageFilter instance was destroyed, the pointer will be NULL.
+   */
+  struct MessageFilterWeakReference
+  {
+    MessageFilterWeakReference(MessageFilter *filter) : filter(filter) {}
+    //! Makes sure that the pointer is not destroyed while it is accessed
+    boost::shared_mutex mutex;
+    MessageFilter *filter;
+  };
 public:
   typedef boost::shared_ptr<M const> MConstPtr;
   typedef ros::MessageEvent<M const> MEvent;
@@ -214,6 +227,11 @@ public:
    */
   ~MessageFilter()
   {
+    {
+      // Obtain unique write lock, so no one can read the filter before it is overwritten
+      boost::unique_lock<boost::shared_mutex> lock(weak_reference_->mutex);
+      weak_reference_->filter = NULL;
+    }
     message_connection_.disconnect();
 
     clear();
@@ -450,6 +468,7 @@ private:
     expected_success_count_ = 1;
 
     callback_handle_ = bc_.addTransformableCallback(boost::bind(&MessageFilter::transformable, this, _1, _2, _3, _4, _5));
+    weak_reference_.reset(new MessageFilterWeakReference(this));
   }
 
   void transformable(tf2::TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
@@ -581,9 +600,10 @@ private:
 
   struct CBQueueCallback : public ros::CallbackInterface
   {
-    CBQueueCallback(MessageFilter* filter, const MEvent& event, bool success, FilterFailureReason reason)
+    CBQueueCallback(const boost::shared_ptr<MessageFilterWeakReference> &filter_reference, const MEvent& event, bool success,
+                    FilterFailureReason reason)
     : event_(event)
-    , filter_(filter)
+    , filter_reference_(filter_reference)
     , reason_(reason)
     , success_(success)
     {}
@@ -591,13 +611,17 @@ private:
 
     virtual CallResult call()
     {
+      // Read lock for access, it doesn't matter if this section is executed by multiple thread
+      boost::shared_lock<boost::shared_mutex> lock(filter_reference_->mutex);
+      // If the filter was invalidated which means the MessageFilter was destroyed, just return Success
+      if (filter_reference_->filter == NULL) return Success;
       if (success_)
       {
-        filter_->signalMessage(event_);
+        filter_reference_->filter->signalMessage(event_);
       }
       else
       {
-        filter_->signalFailure(event_, reason_);
+        filter_reference_->filter->signalFailure(event_, reason_);
       }
 
       return Success;
@@ -605,7 +629,7 @@ private:
 
   private:
     MEvent event_;
-    MessageFilter* filter_;
+    boost::shared_ptr<MessageFilterWeakReference> filter_reference_;
     FilterFailureReason reason_;
     bool success_;
   };
@@ -614,7 +638,7 @@ private:
   {
     if (callback_queue_)
     {
-      ros::CallbackInterfacePtr cb(new CBQueueCallback(this, evt, false, reason));
+      ros::CallbackInterfacePtr cb(new CBQueueCallback(weak_reference_, evt, false, reason));
       callback_queue_->addCallback(cb, (uint64_t)this);
     }
     else
@@ -627,7 +651,7 @@ private:
   {
     if (callback_queue_)
     {
-      ros::CallbackInterfacePtr cb(new CBQueueCallback(this, evt, true, filter_failure_reasons::Unknown));
+      ros::CallbackInterfacePtr cb(new CBQueueCallback(weak_reference_, evt, true, filter_failure_reasons::Unknown));
       callback_queue_->addCallback(cb, (uint64_t)this);
     }
     else
@@ -705,6 +729,7 @@ private:
   boost::mutex failure_signal_mutex_;
 
   ros::CallbackQueueInterface* callback_queue_;
+  boost::shared_ptr<MessageFilterWeakReference> weak_reference_;
 };
 
 } // namespace tf2
