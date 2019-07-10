@@ -63,10 +63,50 @@ template <>
 inline
 const std::string& getFrameId(const sensor_msgs::PointCloud2 &p) {return p.header.frame_id;}
 
-// this method needs to be implemented by client library developers
-template <>
-inline
-void doTransform(const sensor_msgs::PointCloud2 &p_in, sensor_msgs::PointCloud2 &p_out, const geometry_msgs::TransformStamped& t_in)
+/** \brief Apply the given isometry transform to an xyz-channel in the pointcloud.
+ * \param p_in Input pointcloud.
+ * \param p_out Output pointcloud (can be the same as input).
+ * \param t The transform to apply.
+ * \param channelPrefix Channel name prefix. If prefix is e.g. "vp_", then channels "vp_x", "vp_y" and "vp_z" will be considered.
+ *                      Empty prefix denotes the "x", "y" and "z" channels of point positions.
+ * \param onlyRotation If true, only rotation will be applied (i.e. the channel is just a directional vector).
+ */
+inline void transformChannel(const sensor_msgs::PointCloud2 &p_in,
+    sensor_msgs::PointCloud2 &p_out, const Eigen::Isometry3f& t,
+    const std::string& channelPrefix, bool onlyRotation = false)
+{
+  sensor_msgs::PointCloud2ConstIterator<float> x_in(p_in, channelPrefix + "x");
+  sensor_msgs::PointCloud2ConstIterator<float> y_in(p_in, channelPrefix + "y");
+  sensor_msgs::PointCloud2ConstIterator<float> z_in(p_in, channelPrefix + "z");
+
+  sensor_msgs::PointCloud2Iterator<float> x_out(p_out, channelPrefix + "x");
+  sensor_msgs::PointCloud2Iterator<float> y_out(p_out, channelPrefix + "y");
+  sensor_msgs::PointCloud2Iterator<float> z_out(p_out, channelPrefix + "z");
+
+  Eigen::Vector3f point;
+  for (; x_in != x_in.end(); ++x_in, ++y_in, ++z_in, ++x_out, ++y_out, ++z_out) {
+    if (!onlyRotation)
+      point = t * Eigen::Vector3f(*x_in, *y_in, *z_in);
+    else
+      point = t.linear() * Eigen::Vector3f(*x_in, *y_in, *z_in);
+
+    *x_out = point.x();
+    *y_out = point.y();
+    *z_out = point.z();
+  }
+}
+
+/** \brief Transform given 3D-data channels in the pointcloud using the given transformation.
+ * \param p_in Input point cloud.
+ * \param p_outOutput pointcloud (can be the same as input).
+ * \param t_in The transform to apply.
+ * \param n_channels Number of channels to transform.
+ * \param ... Channels are given as pairs (char* channelPrefix, int onlyRotation),
+ *            where the channelPrefix is the channel prefix passed further to transformChannel()
+ *            and onlyRotation specifies whether the whole transform should be applied or only
+ *            its rotation part (useful for transformation of directions, i.e. normals).
+ */
+inline void doTransformChannels(const sensor_msgs::PointCloud2 &p_in, sensor_msgs::PointCloud2 &p_out, const geometry_msgs::TransformStamped& t_in, int n_channels, ...)
 {
   p_out = p_in;
   p_out.header = t_in.header;
@@ -75,22 +115,35 @@ void doTransform(const sensor_msgs::PointCloud2 &p_in, sensor_msgs::PointCloud2 
                                                                      t_in.transform.rotation.w, t_in.transform.rotation.x,
                                                                      t_in.transform.rotation.y, t_in.transform.rotation.z);
 
-  sensor_msgs::PointCloud2ConstIterator<float> x_in(p_in, "x");
-  sensor_msgs::PointCloud2ConstIterator<float> y_in(p_in, "y");
-  sensor_msgs::PointCloud2ConstIterator<float> z_in(p_in, "z");
+  // transform the positional channels like points, viewpoints and normals
+  va_list vl;
+  va_start(vl, n_channels);
+  for (int i = 0; i < n_channels; ++i) {
+    const std::string prefix(va_arg(vl, char *));
+    const bool onlyRotation = static_cast<bool>(va_arg(vl, int));
+    const auto xField = prefix + "x";
 
-  sensor_msgs::PointCloud2Iterator<float> x_out(p_out, "x");
-  sensor_msgs::PointCloud2Iterator<float> y_out(p_out, "y");
-  sensor_msgs::PointCloud2Iterator<float> z_out(p_out, "z");
-
-  Eigen::Vector3f point;
-  for(; x_in != x_in.end(); ++x_in, ++y_in, ++z_in, ++x_out, ++y_out, ++z_out) {
-    point = t * Eigen::Vector3f(*x_in, *y_in, *z_in);
-    *x_out = point.x();
-    *y_out = point.y();
-    *z_out = point.z();
+    for (const auto &field : p_in.fields) {
+      if (field.name == xField)
+        transformChannel(p_in, p_out, t, prefix, onlyRotation);
+    }
   }
+  va_end(vl);
 }
+
+// this method needs to be implemented by client library developers
+template <>
+inline
+void doTransform(const sensor_msgs::PointCloud2 &p_in, sensor_msgs::PointCloud2 &p_out, const geometry_msgs::TransformStamped& t_in)
+{
+  doTransformChannels(p_in, p_out, t_in,
+      3,
+      "", false,  // points
+      "vp_", false, // viewpoints
+      "normal_", true // normals
+  );
+}
+
 inline
 sensor_msgs::PointCloud2 toMsg(const sensor_msgs::PointCloud2 &in)
 {
