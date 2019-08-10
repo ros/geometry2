@@ -28,7 +28,6 @@
 
 
 #include <tf2_eigen/tf2_eigen.h>
-#include <ros/ros.h>
 #include <gtest/gtest.h>
 #include <tf2/convert.h>
 
