@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
- * All rights reserved.
+ * Copyright (c) 2008, Willow Garage, Inc.  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,7 +30,6 @@
 
 
 #include <tf2_bullet/tf2_bullet.h>
-#include <ros/ros.h>
 #include <gtest/gtest.h>
 #include <tf2/convert.h>
 
