@@ -216,7 +216,7 @@ public:
   {
     message_connection_.disconnect();
 
-    clear();
+    MessageFilter::clear();
 
     TF2_ROS_MESSAGEFILTER_DEBUG("Successful Transforms: %llu, Discarded due to age: %llu, Transform messages received: %llu, Messages received: %llu, Total dropped: %llu",
                            (long long unsigned int)successful_transform_count_,
