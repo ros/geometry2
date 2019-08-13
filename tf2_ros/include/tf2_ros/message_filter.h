@@ -287,6 +287,10 @@ public:
     messages_.clear();
     message_count_ = 0;
 
+    // remove pending callbacks in callback queue as well
+    if (callback_queue_)
+      callback_queue_->removeByID((uint64_t)this);
+
     warned_about_empty_frame_id_ = false;
   }
 
