@@ -35,7 +35,6 @@
 #* Author: Eitan Marder-Eppstein
 #***********************************************************
 PKG = 'test_tf2'
-import roslib; roslib.load_manifest(PKG)
 
 import sys
 import unittest

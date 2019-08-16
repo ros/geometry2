@@ -29,7 +29,6 @@
 
 from __future__ import print_function
 
-import roslib; roslib.load_manifest('tf2_ros')
 import rospy
 import tf2_py as tf2
 import tf2_ros
