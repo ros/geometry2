@@ -40,7 +40,6 @@ import unittest
 
 import rospy
 PKG = 'test_tf2'
-import roslib; roslib.load_manifest(PKG)
 
 
 class TestStaticPublisher(unittest.TestCase):

@@ -34,8 +34,6 @@
 #* 
 #* Author: Eitan Marder-Eppstein
 #***********************************************************
-PKG = 'tf2_ros'
-import roslib; roslib.load_manifest(PKG)
 import rospy
 import actionlib
 import tf2_py as tf2
