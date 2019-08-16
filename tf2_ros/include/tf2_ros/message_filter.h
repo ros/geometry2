@@ -216,7 +216,7 @@ public:
   {
     message_connection_.disconnect();
 
-    clear();
+    MessageFilter::clear();
 
     TF2_ROS_MESSAGEFILTER_DEBUG("Successful Transforms: %llu, Discarded due to age: %llu, Transform messages received: %llu, Messages received: %llu, Total dropped: %llu",
                            (long long unsigned int)successful_transform_count_,
@@ -286,6 +286,10 @@ public:
 
     messages_.clear();
     message_count_ = 0;
+
+    // remove pending callbacks in callback queue as well
+    if (callback_queue_)
+      callback_queue_->removeByID((uint64_t)this);
 
     warned_about_empty_frame_id_ = false;
   }
