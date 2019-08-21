@@ -209,6 +209,73 @@ static PyObject *allFramesAsString(PyObject *self, PyObject *args)
   return stringToPython(bc->allFramesAsString());
 }
 
+static void callTransformableCallback(PyObject *cb, tf2::TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame, ros::Time time, tf2::TransformableResult result) {
+  PyObject *args = PyTuple_New(5);
+  PyTuple_SetItem(args, 0, PyInt_FromLong(request_handle));
+  PyTuple_SetItem(args, 1, PyString_FromString(target_frame.c_str()));
+  PyTuple_SetItem(args, 2, PyString_FromString(source_frame.c_str()));
+
+  PyObject *rospy_time = PyObject_GetAttrString(pModulerospy, "Time");
+  PyObject *time_args = Py_BuildValue("ii", time.sec, time.nsec);
+  PyTuple_SetItem(args, 3, PyObject_CallObject(rospy_time, time_args));
+  Py_DECREF(time_args);
+  Py_DECREF(rospy_time);
+
+  PyTuple_SetItem(args, 4, PyInt_FromLong(result));
+
+  PyObject_CallObject(cb, args);
+}
+
+/// \brief Internal use only
+static PyObject *addTransformableCallbackCore(PyObject *self, PyObject *args)
+{
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  PyObject *cb;
+  if (!PyArg_ParseTuple(args, "O", &cb))
+    return NULL;
+  tf2::TransformableCallbackHandle handle = bc->addTransformableCallback(boost::bind(&callTransformableCallback, cb, _1, _2, _3, _4, _5));
+  return PyInt_FromLong(handle);
+}
+
+/// \brief Internal use only
+static PyObject *removeTransformableCallbackCore(PyObject *self, PyObject *args) {
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  tf2::TransformableCallbackHandle handle;
+
+  if (!PyArg_ParseTuple(args, "i", &handle))
+    return NULL;
+
+  bc->removeTransformableCallback(handle);
+  Py_RETURN_NONE;
+}
+
+/// \brief Internal use only
+static PyObject *addTransformableRequestCore(PyObject *self, PyObject *args) {
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  tf2::TransformableCallbackHandle cb_handle;
+  char *target_frame, *source_frame;
+  ros::Time time;
+
+  if (!PyArg_ParseTuple(args, "issO&", &cb_handle, &target_frame, &source_frame, rostime_converter, &time))
+    return NULL;
+
+  tf2::TransformableRequestHandle request_handle = bc->addTransformableRequest(cb_handle, target_frame, source_frame, time);
+
+  return PyInt_FromLong(request_handle);
+}
+
+/// \brief Internal use only
+static PyObject *cancelTransformableRequestCore(PyObject *self, PyObject *args) {
+  tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
+  tf2::TransformableRequestHandle handle;
+
+  if (!PyArg_ParseTuple(args, "i", &handle))
+    return NULL;
+
+  bc->cancelTransformableRequest(handle);
+  Py_RETURN_NONE;
+}
+
 static PyObject *canTransformCore(PyObject *self, PyObject *args, PyObject *kw)
 {
   tf2::BufferCore *bc = ((buffer_core_t*)self)->bc;
@@ -559,6 +626,10 @@ static struct PyMethodDef buffer_core_methods[] =
   //{"lookupTwistCore", (PyCFunction)lookupTwistCore, METH_VARARGS | METH_KEYWORDS},
   //{"lookupTwistFullCore", lookupTwistFullCore, METH_VARARGS},
   //{"getTFPrefix", (PyCFunction)getTFPrefix, METH_VARARGS},
+  {"add_transformable_callback", (PyCFunction)addTransformableCallbackCore, METH_VARARGS},
+  {"remove_transformable_callback", (PyCFunction)removeTransformableCallbackCore, METH_VARARGS},
+  {"add_transformable_request", (PyCFunction)addTransformableRequestCore, METH_VARARGS},
+  {"cancel_transformable_request", (PyCFunction)cancelTransformableRequestCore, METH_VARARGS},
   {NULL,          NULL}
 };
 
