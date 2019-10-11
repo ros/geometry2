@@ -21,6 +21,7 @@
  
   <exec_depend>python_orocos_kdl</exec_depend>
 
+  <test_depend>ros_environment</test_depend>
   <test_depend>rostest</test_depend>
 </package>
 
