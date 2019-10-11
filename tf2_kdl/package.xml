@@ -21,6 +21,7 @@
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
 
+  <test_depend>ros_environment</test_depend>
   <test_depend>rostest</test_depend>
-
+  
 </package>
