@@ -32,11 +32,13 @@ catkin_python_setup()
 if(CATKIN_ENABLE_TESTING)
 
 catkin_add_gtest(test_tomsg_frommsg test/test_tomsg_frommsg.cpp)
-target_link_libraries(test_tomsg_frommsg ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
+target_include_directories(test_tomsg_frommsg PUBLIC ${orocos_kdl_INCLUDE_DIRS})
+target_link_libraries(test_tomsg_frommsg ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
 find_package(catkin REQUIRED COMPONENTS geometry_msgs rostest tf2_ros tf2)
 
 add_executable(test_geometry_msgs EXCLUDE_FROM_ALL test/test_tf2_geometry_msgs.cpp)
+target_include_directories(test_geometry_msgs PUBLIC ${orocos_kdl_INCLUDE_DIRS})
 target_link_libraries(test_geometry_msgs ${catkin_LIBRARIES} ${GTEST_LIBRARIES} ${orocos_kdl_LIBRARIES})
 add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test.launch)
 add_rostest(${CMAKE_CURRENT_SOURCE_DIR}/test/test_python.launch)
