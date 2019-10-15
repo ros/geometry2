@@ -2,20 +2,19 @@ cmake_minimum_required(VERSION 2.8.3)
 
 project(test_tf2)
 
-if(NOT CATKIN_ENABLE_TESTING)
-  return()
-endif()
-
 find_package(catkin REQUIRED COMPONENTS rosconsole roscpp rostest tf tf2 tf2_bullet tf2_ros tf2_geometry_msgs tf2_kdl tf2_msgs)
 find_package(Boost REQUIRED COMPONENTS thread)
 find_package(orocos_kdl REQUIRED)
 
+catkin_package()
+
+if(NOT CATKIN_ENABLE_TESTING)
+  return()
+endif()
 
 include_directories(${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${orocos_kdl_INCLUDE_DIRS})
 
 link_directories(${orocos_kdl_LIBRARY_DIRS})
-
-catkin_package()
 
 catkin_add_gtest(buffer_core_test test/buffer_core_test.cpp)
 target_link_libraries(buffer_core_test ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
