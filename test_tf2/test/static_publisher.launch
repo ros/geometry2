@@ -29,5 +29,6 @@
 
   <test test-name="test_static_publisher_py"
         pkg="test_tf2"
-        type="test_static_publisher.py"/>
+        type="test_static_publisher.py"
+        launch-prefix="python$(env ROS_PYTHON_VERSION)"/>
 </launch>
