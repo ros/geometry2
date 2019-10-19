@@ -261,7 +261,10 @@ bool TimeCache::insertData(const TransformStorage& new_data)
       break;
     storage_it++;
   }
-  storage_.insert(storage_it, new_data);
+  if (storage_it->stamp_ == new_data.stamp_)
+    *storage_it = new_data;
+  else
+    storage_.insert(storage_it, new_data);
 
   pruneList();
   return true;
