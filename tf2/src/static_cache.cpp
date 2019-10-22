@@ -45,7 +45,7 @@ bool StaticCache::getData(ros::Time time, TransformStorage & data_out, std::stri
   return true;
 };
 
-bool StaticCache::insertData(const TransformStorage& new_data)
+bool StaticCache::insertData(const TransformStorage& new_data, std::string* error_str)
 {
   storage_ = new_data;
   return true;
