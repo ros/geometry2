@@ -213,11 +213,12 @@ void setupTree(tf2::BufferCore& mBC, const std::string& mode, const ros::Time & 
         else
           ts.header.stamp = ros::Time();
 
-        ts.header.frame_id = frame_prefix + frames[i-1];
+	ts.child_frame_id = frame_prefix + frames[i];
         if (i > 1)
-          ts.child_frame_id = frame_prefix + frames[i];
-        else
-          ts.child_frame_id = frames[i]; // connect first frame
+	  ts.header.frame_id = frame_prefix + frames[i-1];
+	else
+	  ts.header.frame_id = frames[i-1];
+
         EXPECT_TRUE(mBC.setTransform(ts, "authority"));
         if (interpolation_space > ros::Duration())
         {
