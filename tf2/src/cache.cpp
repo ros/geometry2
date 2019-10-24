@@ -252,9 +252,9 @@ bool TimeCache::insertData(const TransformStorage& new_data, std::string* error_
     {
       if (error_str)
       {
-	std::stringstream ss;
-	ss << "TF_OLD_DATA ignoring data from the past (Possible reasons are listed at http://wiki.ros.org/tf/Errors%%20explained)";
-	*error_str = ss.str();
+        std::stringstream ss;
+        ss << "TF_OLD_DATA ignoring data from the past (Possible reasons are listed at http://wiki.ros.org/tf/Errors%%20explained)";
+        *error_str = ss.str();
       }
       return false;
     }
