@@ -253,7 +253,7 @@ bool TimeCache::insertData(const TransformStorage& new_data, std::string* error_
       if (error_str)
       {
 	std::stringstream ss;
-	ss << "TF_OLD_DATA ignoring data from the past for frame %s at time %lf according to authority %s\nPossible reasons are listed at http://wiki.ros.org/tf/Errors%%20explained";
+	ss << "TF_OLD_DATA ignoring data from the past (Possible reasons are listed at http://wiki.ros.org/tf/Errors%%20explained)";
 	*error_str = ss.str();
       }
       return false;
@@ -272,7 +272,7 @@ bool TimeCache::insertData(const TransformStorage& new_data, std::string* error_
     if (error_str)
       {
 	std::stringstream ss;
-	ss << "TF_REPEATED_DATA ignoring data with redundant timestamp for frame %s at time %lf according to authority %s";
+	ss << "TF_REPEATED_DATA ignoring data with redundant timestamp";
 	*error_str = ss.str();
       }
     return false;
