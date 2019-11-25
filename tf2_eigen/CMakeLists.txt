@@ -30,7 +30,7 @@ include_directories(include
 
 catkin_package(
   INCLUDE_DIRS include
-  DEPENDS EIGEN3)
+  DEPENDS EIGEN3 tf2)
 
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
