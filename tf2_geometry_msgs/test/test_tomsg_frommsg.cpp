@@ -35,6 +35,13 @@
 
 static const double EPS = 1e-6;
 
+// check whether address of return value is identical to parameter b
+template<class A, class B>
+void check_toMsg(const A& a, B& b) {
+  B& b_ret = tf2::toMsg(a, b);
+  EXPECT_EQ(&b_ret, &b);
+}
+
 tf2::Vector3 get_tf2_vector()
 {
   return tf2::Vector3(1.0, 2.0, 3.0);
@@ -268,7 +275,8 @@ TEST(tf2_geometry_msgs, Vector3)
   fromMsg(m1, v1);
   SCOPED_TRACE("m1 v1");
   expect_near(m1, v1);
-  geometry_msgs::Vector3 m2 = toMsg(v1);
+  geometry_msgs::Vector3 m2;
+  check_toMsg(v1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -281,7 +289,8 @@ TEST(tf2_geometry_msgs, Point)
   SCOPED_TRACE("m1 v1");
   fromMsg(m1, v1);
   expect_near(m1, v1);
-  geometry_msgs::Point m2 = toMsg(v1, m2);
+  geometry_msgs::Point m2;
+  check_toMsg(v1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -294,7 +303,8 @@ TEST(tf2_geometry_msgs, Quaternion)
   SCOPED_TRACE("m1 q1");
   fromMsg(m1, q1);
   expect_near(m1, q1);
-  geometry_msgs::Quaternion m2 = toMsg(q1);
+  geometry_msgs::Quaternion m2;
+  check_toMsg(q1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -307,7 +317,8 @@ TEST(tf2_geometry_msgs, Pose)
   fromMsg(m1, t1);
   SCOPED_TRACE("m1 t1");
   expect_near(m1, t1);
-  geometry_msgs::Pose m2 = toMsg(t1, m2);
+  geometry_msgs::Pose m2;
+  check_toMsg(t1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -320,7 +331,8 @@ TEST(tf2_geometry_msgs, Transform)
   fromMsg(m1, t1);
   SCOPED_TRACE("m1 t1");
   expect_near(m1, t1);
-  geometry_msgs::Transform m2 = toMsg(t1);
+  geometry_msgs::Transform m2;
+  check_toMsg(t1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -334,7 +346,7 @@ TEST(tf2_geometry_msgs, Vector3Stamped)
   SCOPED_TRACE("m1 v1");
   // expect_near(m1, v1);
   geometry_msgs::Vector3Stamped m2;
-  m2 = toMsg(v1);
+  check_toMsg(v1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -348,7 +360,7 @@ TEST(tf2_geometry_msgs, PointStamped)
   SCOPED_TRACE("m1 v1");
   // expect_near(m1, v1); //TODO implement cross verification explicityly
   geometry_msgs::PointStamped m2;
-  m2 = toMsg(v1, m2);
+  check_toMsg(v1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -362,7 +374,7 @@ TEST(tf2_geometry_msgs, QuaternionStamped)
   SCOPED_TRACE("m1 v1");
   // expect_near(m1, v1); //TODO implement cross verification explicityly
   geometry_msgs::QuaternionStamped m2;
-  m2 = tf2::toMsg(v1);
+  check_toMsg(v1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -376,7 +388,7 @@ TEST(tf2_geometry_msgs, PoseStamped)
   fromMsg(m1, v1);
   // expect_near(m1, v1); //TODO implement cross verification explicityly
   geometry_msgs::PoseStamped m2;
-  m2 = tf2::toMsg(v1, m2);
+  check_toMsg(v1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }
@@ -390,7 +402,7 @@ TEST(tf2_geometry_msgs, TransformStamped)
   SCOPED_TRACE("m1 v1");
   // expect_near(m1, v1);
   geometry_msgs::TransformStamped m2;
-  m2 = tf2::toMsg(v1);
+  check_toMsg(v1, m2);
   SCOPED_TRACE("m1 m2");
   expect_near(m1, m2);
 }

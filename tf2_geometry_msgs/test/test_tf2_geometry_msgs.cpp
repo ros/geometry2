@@ -131,7 +131,7 @@ TEST(TfGeometry, PoseWithCovarianceStamped)
   
   // rotate pi/2 radians about x-axis
   geometry_msgs::TransformStamped t_rot;
-  t_rot.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(1,0,0), M_PI/2));
+  tf2::toMsg(tf2::Quaternion(tf2::Vector3(1,0,0), M_PI/2), t_rot.transform.rotation);
   t_rot.header.stamp = ros::Time(2.0);
   t_rot.header.frame_id = "A";
   t_rot.child_frame_id = "rotated";
@@ -251,7 +251,7 @@ TEST(TfGeometry, doTransformPoint)
   trafo.transform.translation.x = -1;
   trafo.transform.translation.y = 2;
   trafo.transform.translation.z = -3;
-  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+  tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0), trafo.transform.rotation);
 
   tf2::doTransform(v1, res, trafo);
 
@@ -269,7 +269,7 @@ TEST(TfGeometry, doTransformQuaterion)
   trafo.transform.translation.x = -1;
   trafo.transform.translation.y = 2;
   trafo.transform.translation.z = -3;
-  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+  tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0), trafo.transform.rotation);
 
   tf2::doTransform(v1, res, trafo);
 
@@ -291,7 +291,7 @@ TEST(TfGeometry, doTransformPose)
   trafo.transform.translation.x = -1;
   trafo.transform.translation.y = 2;
   trafo.transform.translation.z = -3;
-  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+  tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0), trafo.transform.rotation);
 
   tf2::doTransform(v1, res, trafo);
 
@@ -316,7 +316,7 @@ TEST(TfGeometry, doTransformVector3)
   trafo.transform.translation.x = -1;
   trafo.transform.translation.y = 2;
   trafo.transform.translation.z = -3;
-  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+  tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0), trafo.transform.rotation);
 
   tf2::doTransform(v1, res, trafo);
 
@@ -339,7 +339,7 @@ TEST(TfGeometry, doTransformWrench)
  trafo.transform.translation.x = -1;
  trafo.transform.translation.y = 2;
  trafo.transform.translation.z = -3;
- trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+ tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0), trafo.transform.rotation);
 
  tf2::doTransform(v1, res, trafo);
  EXPECT_NEAR(res.force.x, 1, EPS);
