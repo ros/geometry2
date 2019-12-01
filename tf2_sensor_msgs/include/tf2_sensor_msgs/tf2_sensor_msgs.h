@@ -30,7 +30,7 @@
 #ifndef TF2_SENSOR_MSGS_H
 #define TF2_SENSOR_MSGS_H
 
-#include <tf2/convert.h>
+#include <tf2/transform_functions.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <Eigen/Eigen>
@@ -44,7 +44,7 @@ namespace tf2
 /********************/
 
 /** \brief Extract a timestamp from the header of a PointCloud2 message.
- * This function is a specialization of the getTimestamp template defined in tf2/convert.h.
+ * This function is a specialization of the getTimestamp template defined in tf2/transform_functions.h.
  * \param t PointCloud2 message to extract the timestamp from.
  * \return The timestamp of the message. The lifetime of the returned reference
  * is bound to the lifetime of the argument.
@@ -54,7 +54,7 @@ inline
 const ros::Time& getTimestamp(const sensor_msgs::PointCloud2& p) {return p.header.stamp;}
 
 /** \brief Extract a frame ID from the header of a PointCloud2 message.
- * This function is a specialization of the getFrameId template defined in tf2/convert.h.
+ * This function is a specialization of the getFrameId template defined in tf2/transform_functions.h.
  * \param t PointCloud2 message to extract the frame ID from.
  * \return A string containing the frame ID of the message. The lifetime of the
  * returned reference is bound to the lifetime of the argument.
@@ -91,11 +91,16 @@ void doTransform(const sensor_msgs::PointCloud2 &p_in, sensor_msgs::PointCloud2 
     *z_out = point.z();
   }
 }
+
+template <>
 inline
-sensor_msgs::PointCloud2 toMsg(const sensor_msgs::PointCloud2 &in)
+sensor_msgs::PointCloud2& toMsg(const sensor_msgs::PointCloud2 &in, sensor_msgs::PointCloud2& out)
 {
-  return in;
+  out = in;
+  return out;
 }
+
+template <>
 inline
 void fromMsg(const sensor_msgs::PointCloud2 &msg, sensor_msgs::PointCloud2 &out)
 {
