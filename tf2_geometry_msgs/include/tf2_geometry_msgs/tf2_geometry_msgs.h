@@ -32,7 +32,8 @@
 #ifndef TF2_GEOMETRY_MSGS_H
 #define TF2_GEOMETRY_MSGS_H
 
-#include <tf2/convert.h>
+#include <tf2/transform_functions.h>
+#include <tf2/transform_datatypes.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
 #include <geometry_msgs/PointStamped.h>
