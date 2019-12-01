@@ -45,6 +45,9 @@ catkin_add_gtest(test_simple test/simple_tf2_core.cpp)
 target_link_libraries(test_simple tf2  ${console_bridge_LIBRARIES})
 add_dependencies(test_simple ${catkin_EXPORTED_TARGETS})
 
+catkin_add_gtest(test_three_way_convert test/three_way_convert.cpp)
+add_dependencies(test_three_way_convert ${catkin_EXPORTED_TARGETS})
+
 add_executable(speed_test EXCLUDE_FROM_ALL test/speed_test.cpp)
 target_link_libraries(speed_test tf2  ${console_bridge_LIBRARIES})
 add_dependencies(tests speed_test)

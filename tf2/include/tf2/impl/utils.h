@@ -59,7 +59,8 @@ tf2::Quaternion toQuaternion(const geometry_msgs::QuaternionStamped& q) {
  */
 template<typename T>
   tf2::Quaternion toQuaternion(const tf2::Stamped<T>& t) {
-    geometry_msgs::QuaternionStamped q = toMsg(t);
+    geometry_msgs::QuaternionStamped q;
+    toMsg(t, q);
     return toQuaternion(q);
   }
 
@@ -70,7 +71,8 @@ template<typename T>
  */
 template<typename T>
   tf2::Quaternion toQuaternion(const T& t) {
-    geometry_msgs::Quaternion q = toMsg(t);
+    geometry_msgs::Quaternion q;
+    toMsg(t, q);
     return toQuaternion(q);
   }
 

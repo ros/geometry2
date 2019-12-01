@@ -84,10 +84,11 @@ template <class P>
  * implemented by each data type in tf2_* (except ROS messages) as it is
  * used in the "convert" function.
  * \param a an object of whatever type
- * \return the conversion as a ROS message
+ * \param b the ROS message to convert to
+ * \return Reference to parameter b
  */
 template<typename A, typename B>
-  B toMsg(const A& a);
+  B& toMsg(const A& a, B& b);
 
 /** Function that converts from a ROS message type to another type. It has to be
  * implemented by each data type in tf2_* (except ROS messages) as it is used
@@ -97,6 +98,49 @@ template<typename A, typename B>
  */
 template<typename A, typename B>
   void fromMsg(const A&, B& b);
+
+/** Helper struct which holds a common bidirectional geometry_msgs type which can act as
+ * proxy to convert two non-message objects using tf2::convert().
+ * Say, you want to convert an \c Eigen::Vector3d to \c tf2::Vector3.
+ * The methods <tt>template<> void fromMsg(const geometry_msgs::Vector3&, tf2::Vector3&)</tt>
+ * and <tt>template<> void geometry_msgs::Vector3&
+ * toMsg(const Eigen::Vector3d&, geometry_msgs::Vector3 &)</tt>
+ * are implemented, also with \c Eigen::Vector3d and \c tf2::Vector3 swapped.
+ * So we specialise \c BidirectionalTypeMap:
+ * \code
+ * template<>
+ * struct BidirectionalTypeMap<Eigen::Vector3d, tf2::Vector3> {
+ *   using type = geometry_msgs::Vector3;
+ * };
+ * \endcode
+ * Now we can use tf2::convert() to convert back and forth.
+ */
+template <class A, class B>
+  struct BidirectionalTypeMap{
+    using type = std::nullptr_t;
+  };
+
+/** Helper struct which holds a common unidirectional geometry_msgs type which can act as
+ * proxy to convert two non-message objects using tf2::convert().
+ * Say, you want to convert an \c Eigen::Vector3d to \c tf2::Vector3.
+ * The methods <tt>template<> void fromMsg(const geometry_msgs::Vector3&, tf2::Vector3&)</tt>
+ * and <tt>template<> void geometry_msgs::Vector3&
+ * toMsg(const Eigen::Vector3d&, geometry_msgs::Vector3 &)</tt>
+ * are implemented, but the methods the other way around are missing.
+ * So we specialise \c UnidirectionalTypeMap:
+ * \code
+ * template<>
+ * struct UnidirectionalTypeMap<Eigen::Vector3d, tf2::Vector3> {
+ *   using type = geometry_msgs::Vector3;
+ * };
+ * \endcode
+ * Now we can use tf2::convert() to convert an \c Eigen::Vector3d to \c tf2::Vector3
+ * bot not to convert a \c tf2::Vector3 to \c Eigen::Vector3d.
+ */
+template <class A, class B>
+  struct UnidirectionalTypeMap{
+    using type = std::nullptr_t;
+  };
 
 }
 
