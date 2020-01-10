@@ -2,6 +2,18 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix compile error missing ros/ros.h (`#400 <https://github.com/ros/geometry2/issues/400>`_)
+  * ros/ros.h -> ros/time.h
+  * tf2_eigen doesn't need ros/ros.h
+* rework Eigen functions namespace hack
+* separate transform function declarations into transform_functions.h
+* use ROS_DEPRECATED macro for portability (`#362 <https://github.com/ros/geometry2/issues/362>`_)
+* Remove `signals` from find_package(Boost COMPONENTS ...).
+* Remove legacy inclusion in CMakeLists of tf2.
+* Contributors: James Xu, Maarten de Vries, Marco Tranzatto, Shane Loretz, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 

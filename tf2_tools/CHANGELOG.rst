@@ -2,6 +2,13 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Allow to choose output precision in echo `#377 <https://github.com/ros/geometry2/issues/377>`_ 
+* use yaml.safe_load instead of deprecated yaml.load `#373 <https://github.com/ros/geometry2/issues/373>`_
+* Python 3 compatibility: relative imports and print statement
+* Contributors: Mikael Arguedas, Timon Engelke, Tully Foote, Victor Lamoine
+
 0.6.5 (2018-11-16)
 ------------------
 

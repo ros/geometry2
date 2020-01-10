@@ -2,6 +2,14 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Make kdl headers available (`#419 <https://github.com/ros/geometry2/issues/419>`_)
+* Fix python3 compatibility for noetic (`#416 <https://github.com/ros/geometry2/issues/416>`_)
+* add <array> from STL (`#366 <https://github.com/ros/geometry2/issues/366>`_)
+* use ROS_DEPRECATED macro for portability (`#362 <https://github.com/ros/geometry2/issues/362>`_)
+* Contributors: James Xu, Shane Loretz, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 * Fix python3 import error

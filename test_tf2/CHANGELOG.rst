@@ -2,6 +2,13 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update shebang and add launch prefixes for python3 support (`#421 <https://github.com/ros/geometry2/issues/421>`_)
+* Always call catkin_package() (`#418 <https://github.com/ros/geometry2/issues/418>`_)
+* Remove roslib.load_manifest `#404 <https://github.com/ros/geometry2/issues/404>`_ from otamachan/remove-load-manifest
+* Contributors: Shane Loretz, Tamaki Nishino, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 

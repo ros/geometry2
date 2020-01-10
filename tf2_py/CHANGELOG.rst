@@ -2,6 +2,14 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use .pyd instead of .so on Windows and export symbols `#363 <https://github.com/ros/geometry2/issues/363>`_ from kejxu/fix_tf2_py_export
+* limit MSVC-only change to MSVC scope (`#10 <https://github.com/ros/geometry2/issues/10>`_)
+* Fix the pyd extension and export the init function.
+* use windows counterpart for .so extension
+* Contributors: James Xu, Sean Yen, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 

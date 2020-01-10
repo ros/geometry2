@@ -2,6 +2,21 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove roslib.load_manifest `#404 <https://github.com/ros/geometry2/issues/404>`_
+* Fix message filter `#402 <https://github.com/ros/geometry2/issues/402>`_
+* resolve virtual function call in destructor
+* remove pending callbacks in clear()
+* spelling fix: seperate -> separate `#372 <https://github.com/ros/geometry2/issues/372>`_
+* Fix dangling iterator references in buffer_server.cpp `#369 <https://github.com/ros/geometry2/issues/369>`_
+* Remove some useless code from buffer_server_main.cpp `#368 <https://github.com/ros/geometry2/issues/368>`_
+* Mark check_frequency as deprecated in docstring.
+* Follow `#337 <https://github.com/ros/geometry2/issues/337>`_: use actionlib API in BufferClient::processGoal()
+* Test for equality to None with 'is' instead of '==' `#355 <https://github.com/ros/geometry2/issues/355>`_
+* added parameter to advertise tf2-frames as a service, if needed
+* Contributors: Daniel Ingram, Emre Sahin, JonasTietz, Lucas Walter, Michael Grupp, Robert Haschke, Tamaki Nishino, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 * Protect the time reset logic from a race condition.
