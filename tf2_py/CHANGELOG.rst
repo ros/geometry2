@@ -2,8 +2,8 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2020-01-09)
+------------------
 * use .pyd instead of .so on Windows and export symbols `#363 <https://github.com/ros/geometry2/issues/363>`_ from kejxu/fix_tf2_py_export
 * limit MSVC-only change to MSVC scope (`#10 <https://github.com/ros/geometry2/issues/10>`_)
 * Fix the pyd extension and export the init function.

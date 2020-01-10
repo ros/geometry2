@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2020-01-09)
+------------------
 * Remove roslib.load_manifest `#404 <https://github.com/ros/geometry2/issues/404>`_
 * Fix message filter `#402 <https://github.com/ros/geometry2/issues/402>`_
 * resolve virtual function call in destructor

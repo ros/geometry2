@@ -2,8 +2,8 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2020-01-09)
+------------------
 * Make kdl headers available (`#419 <https://github.com/ros/geometry2/issues/419>`_)
 * Fix python3 compatibility for noetic (`#416 <https://github.com/ros/geometry2/issues/416>`_)
 * Remove roslib.load_manifest `#404 <https://github.com/ros/geometry2/issues/404>`_ from otamachan/remove-load-manifest

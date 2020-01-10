@@ -2,8 +2,8 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.6 (2020-01-09)
+------------------
 * Fix compile error missing ros/ros.h (`#400 <https://github.com/ros/geometry2/issues/400>`_)
   * ros/ros.h -> ros/time.h
   * tf2_bullet doesn't need ros.h
