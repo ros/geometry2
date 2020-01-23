@@ -29,7 +29,7 @@
 #ifndef TF2_EIGEN_H
 #define TF2_EIGEN_H
 
-#include <tf2/transform_functions.h>
+#include <tf2/convert.h>
 #include <Eigen/Geometry>
 #include <geometry_msgs/QuaternionStamped.h>
 #include <geometry_msgs/PointStamped.h>
@@ -520,7 +520,66 @@ void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<Eigen::Isometry
 
 } // namespace
 
-// tf2/convert.h needs to be included after all toMsg/fromMsg are defined
-#include <tf2/convert.h>
+
+namespace Eigen {
+// This is needed to make the usage of the following conversion functions usable in tf2::convert().
+// According to clangs error note 'fromMsg'/'toMsg' should be declared prior to the call site or
+// in an associated namespace of one of its arguments. The stamped versions of this conversion
+// functions work because they have tf2::Stamped as an argument which is the same namespace as
+// which 'fromMsg'/'toMsg' is defined in. The non-stamped versions have no argument which is
+// defined in tf2, so it take the following definitions in Eigen namespace to make them usable in
+// tf2::convert().
+
+inline
+geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+geometry_msgs::Pose toMsg(const Eigen::Isometry3d& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Point& msg, Eigen::Vector3d& out) {
+  tf2::fromMsg(msg, out);
+}
+
+inline
+geometry_msgs::Point toMsg(const Eigen::Vector3d& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+  tf2::fromMsg(msg, out);
+}
+
+inline
+void fromMsg(const geometry_msgs::Pose& msg, Eigen::Isometry3d& out) {
+  tf2::fromMsg(msg, out);
+}
+
+inline
+geometry_msgs::Quaternion toMsg(const Eigen::Quaterniond& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Quaternion& msg, Eigen::Quaterniond& out) {
+  tf2::fromMsg(msg, out);
+}
+
+inline
+geometry_msgs::Twist toMsg(const Eigen::Matrix<double,6,1>& in) {
+  return tf2::toMsg(in);
+}
+
+inline
+void fromMsg(const geometry_msgs::Twist &msg, Eigen::Matrix<double,6,1>& out) {
+  tf2::fromMsg(msg, out);
+}
+
+} // namespace
 
 #endif // TF2_EIGEN_H
