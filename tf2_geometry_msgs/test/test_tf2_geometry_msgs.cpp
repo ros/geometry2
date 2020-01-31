@@ -351,6 +351,32 @@ TEST(TfGeometry, doTransformWrench)
  EXPECT_NEAR(res.torque.z, 3, EPS);
 }
 
+TEST(TfGeometry, doTransformTwist)
+{
+ geometry_msgs::Twist v1, res;
+ v1.linear.x = 2;
+ v1.linear.y = 1;
+ v1.linear.z = 3;
+ v1.angular.x = 2;
+ v1.angular.y = 1;
+ v1.angular.z = 3;
+
+ geometry_msgs::TransformStamped trafo;
+ trafo.transform.translation.x = -1;
+ trafo.transform.translation.y = 2;
+ trafo.transform.translation.z = -3;
+ trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
+
+ tf2::doTransform(v1, res, trafo);
+ EXPECT_NEAR(res.linear.x, 1, EPS);
+ EXPECT_NEAR(res.linear.y, -2, EPS);
+ EXPECT_NEAR(res.linear.z, 3, EPS);
+
+ EXPECT_NEAR(res.angular.x, 1, EPS);
+ EXPECT_NEAR(res.angular.y, -2, EPS);
+ EXPECT_NEAR(res.angular.z, 3, EPS);
+}
+
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "test");

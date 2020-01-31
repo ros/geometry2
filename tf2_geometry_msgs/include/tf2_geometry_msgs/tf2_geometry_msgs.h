@@ -44,6 +44,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Wrench.h>
 #include <geometry_msgs/WrenchStamped.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <kdl/frames.hpp>
 
 #include <array>
@@ -1049,6 +1050,77 @@ inline
 void doTransform(const geometry_msgs::WrenchStamped& t_in, geometry_msgs::WrenchStamped& t_out, const geometry_msgs::TransformStamped& transform)
 {
   doTransform(t_in.wrench, t_out.wrench, transform);
+  t_out.header.stamp = transform.header.stamp;
+  t_out.header.frame_id = transform.header.frame_id;
+}
+
+
+/**********************/
+/*** TwistStamped ****/
+/**********************/
+template <>
+inline
+const ros::Time& getTimestamp(const geometry_msgs::TwistStamped& t) {return t.header.stamp;}
+
+
+template <>
+inline
+const std::string& getFrameId(const geometry_msgs::TwistStamped& t) {return t.header.frame_id;}
+
+
+inline
+geometry_msgs::TwistStamped toMsg(const geometry_msgs::TwistStamped& in)
+{
+  return in;
+}
+
+inline
+void fromMsg(const geometry_msgs::TwistStamped& msg, geometry_msgs::TwistStamped& out)
+{
+  out = msg;
+}
+
+
+inline
+geometry_msgs::TwistStamped toMsg(const tf2::Stamped<std::array<tf2::Vector3, 2>>& in, geometry_msgs::TwistStamped& out)
+{
+  out.header.stamp = in.stamp_;
+  out.header.frame_id = in.frame_id_;
+  out.twist.linear = toMsg(in[0]);
+  out.twist.angular = toMsg(in[1]);
+  return out;
+}
+
+
+inline
+void fromMsg(const geometry_msgs::TwistStamped& msg, tf2::Stamped<std::array<tf2::Vector3, 2>>& out)
+{
+  out.stamp_ = msg.header.stamp;
+  out.frame_id_ = msg.header.frame_id;
+  tf2::Vector3 tmp;
+  fromMsg(msg.twist.linear, tmp);
+  tf2::Vector3 tmp1;
+  fromMsg(msg.twist.angular, tmp1);
+  std::array<tf2::Vector3, 2> tmp_array;
+  tmp_array[0] = tmp;
+  tmp_array[1] = tmp1;
+  out.setData(tmp_array);
+}
+
+template<>
+inline
+void doTransform(const geometry_msgs::Twist& t_in, geometry_msgs::Twist& t_out, const geometry_msgs::TransformStamped& transform)
+{
+  doTransform(t_in.linear, t_out.linear, transform);
+  doTransform(t_in.angular, t_out.angular, transform);
+}
+
+
+template<>
+inline
+void doTransform(const geometry_msgs::TwistStamped& t_in, geometry_msgs::TwistStamped& t_out, const geometry_msgs::TransformStamped& transform)
+{
+  doTransform(t_in.twist, t_out.twist, transform);
   t_out.header.stamp = transform.header.stamp;
   t_out.header.frame_id = transform.header.frame_id;
 }
