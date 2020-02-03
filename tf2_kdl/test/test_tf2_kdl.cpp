@@ -30,6 +30,7 @@
 /** \author Wim Meeussen */
 
 
+#include <tf2/convert.h>
 #include <tf2_kdl/tf2_kdl.h>
 #include <kdl/frames_io.hpp>
 #include <gtest/gtest.h>
