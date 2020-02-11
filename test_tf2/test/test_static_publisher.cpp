@@ -31,7 +31,6 @@
 #include <tf2/buffer_core.h>
 #include "tf2/exceptions.h"
 #include <tf2_ros/static_transform_broadcaster.h>
-#include <sys/time.h>
 #include <ros/ros.h>
 #include "rostest/permuter.h"
 
