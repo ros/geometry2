@@ -27,10 +27,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <cmath>
 #include <gtest/gtest.h>
 #include <tf2/buffer_core.h>
 #include "tf2/exceptions.h"
-#include <sys/time.h>
 #include <ros/ros.h>
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btTransform.h"
@@ -288,7 +288,7 @@ TEST(BufferCore_setTransform, NoInsertWithNan)
   tranStamped.header.frame_id = "same_frame";
   tranStamped.child_frame_id = "other_frame";
   EXPECT_TRUE(mBC.setTransform(tranStamped, "authority"));
-  tranStamped.transform.translation.x = 0.0/0.0;
+  tranStamped.transform.translation.x = std::nan("");
   EXPECT_TRUE(std::isnan(tranStamped.transform.translation.x));
   EXPECT_FALSE(mBC.setTransform(tranStamped, "authority"));
 

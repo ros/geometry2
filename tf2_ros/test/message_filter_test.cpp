@@ -37,6 +37,8 @@
 #include <tf2_ros/transform_listener.h>
 
 #include <gtest/gtest.h>
+#include <thread>
+#include <chrono>
 
 
 void spin_for_a_second()
@@ -44,7 +46,7 @@ void spin_for_a_second()
   ros::spinOnce();
   for (uint8_t i = 0; i < 10; ++i)
   {
-    usleep(100);
+    std::this_thread::sleep_for(std::chrono::microseconds(100));
     ros::spinOnce();
   }
 }
