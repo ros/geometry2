@@ -39,6 +39,12 @@ TEST(tf2_ros_transform, transform_listener)
   tf2_ros::TransformListener tfl(buffer);
 }
 
+TEST(tf2_ros_transform, transform_listener_transport_hints)
+{
+  tf2_ros::Buffer buffer;
+  tf2_ros::TransformListener tfl(buffer, true, ros::TransportHints().tcpNoDelay());
+}
+
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "transform_listener_unittest");
