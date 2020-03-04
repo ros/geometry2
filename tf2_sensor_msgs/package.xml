@@ -19,7 +19,7 @@
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
 
-  <exec_depend>python_orocos_kdl</exec_depend>
+  <exec_depend>python3-pykdl</exec_depend>
   <exec_depend>rospy</exec_depend>
 
   <build_export_depend>eigen</build_export_depend>
