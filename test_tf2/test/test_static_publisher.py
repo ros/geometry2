@@ -63,7 +63,7 @@ class TestStaticPublisher(unittest.TestCase):
         cmd = 'rosrun tf2_ros static_transform_publisher'
         with self.assertRaises(subprocess.CalledProcessError) as cm:
             ret = subprocess.check_output(
-                cmd.split(' '), stderr=subprocess.STDOUT)
+                cmd.split(' '), stderr=subprocess.STDOUT, text=True)
         self.assertEqual(255, cm.exception.returncode)
         self.assertIn('not having the right number of arguments',
                       cm.exception.output)
@@ -73,7 +73,7 @@ class TestStaticPublisher(unittest.TestCase):
         cmd = 'rosrun tf2_ros static_transform_publisher /test_tf2/tf_null'
         with self.assertRaises(subprocess.CalledProcessError) as cm:
             ret = subprocess.check_output(
-                cmd.split(' '), stderr=subprocess.STDOUT)
+                cmd.split(' '), stderr=subprocess.STDOUT, text=True)
 
         self.assertEqual(255, cm.exception.returncode)
         self.assertIn('Could not read TF', cm.exception.output)
@@ -83,7 +83,7 @@ class TestStaticPublisher(unittest.TestCase):
         cmd = 'rosrun tf2_ros static_transform_publisher /test_tf2/tf_invalid'
         with self.assertRaises(subprocess.CalledProcessError) as cm:
             ret = subprocess.check_output(
-                cmd.split(' '), stderr=subprocess.STDOUT)
+                cmd.split(' '), stderr=subprocess.STDOUT, text=True)
 
         self.assertEqual(255, cm.exception.returncode)
         self.assertIn('Could not validate XmlRpcC', cm.exception.output)
