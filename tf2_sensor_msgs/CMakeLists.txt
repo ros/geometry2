@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(tf2_sensor_msgs)
 
 find_package(catkin REQUIRED COMPONENTS cmake_modules sensor_msgs tf2_ros tf2)
