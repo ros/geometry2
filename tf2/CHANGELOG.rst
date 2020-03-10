@@ -2,6 +2,32 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
+  Signed-off-by: Shane Loretz <sloretz@osrfoundation.org>
+* Fix compile error missing ros/ros.h (`#400 <https://github.com/ros/geometry2/issues/400>`_)
+  * ros/ros.h -> ros/time.h
+  tf2 package depends on rostime
+  * tf2_bullet doesn't need ros.h
+  Signed-off-by: Shane Loretz <sloretz@osrfoundation.org>
+  * tf2_eigen doesn't need ros/ros.h
+  Signed-off-by: Shane Loretz <sloretz@osrfoundation.org>
+* Merge pull request `#367 <https://github.com/ros/geometry2/issues/367>`_ from kejxu/add_tf2_namespace_to_avoid_name_collision
+  rework Eigen functions namespace hack
+* separate transform function declarations into transform_functions.h
+* use ROS_DEPRECATED macro for portability (`#362 <https://github.com/ros/geometry2/issues/362>`_)
+  * use ROS_DEPRECATED for better portability
+  * change ROS_DEPRECATED position (`#5 <https://github.com/ros/geometry2/issues/5>`_)
+* Remove `signals` from find_package(Boost COMPONENTS ...).
+  tf2 is using signals2, which is not the same library.
+  Additionally, signals2 has always been header only, and header only
+  libraries must not be listed in find_package.
+  Boost 1.69 removed the old signals library entirely, so the otherwise
+  useless `COMPONENTS signals` actually breaks the build.
+* Remove legacy inclusion in CMakeLists of tf2.
+* Contributors: James Xu, Maarten de Vries, Marco Tranzatto, Shane Loretz, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 

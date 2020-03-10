@@ -2,6 +2,11 @@
 Changelog for package geometry2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
+* Contributors: Shane Loretz
+
 0.6.5 (2018-11-16)
 ------------------
 

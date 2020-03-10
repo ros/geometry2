@@ -2,6 +2,17 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
+* Fix compile error missing ros/ros.h (`#400 <https://github.com/ros/geometry2/issues/400>`_)
+  * ros/ros.h -> ros/time.h
+  * tf2_bullet doesn't need ros.h
+  * tf2_eigen doesn't need ros/ros.h
+* Merge pull request `#367 <https://github.com/ros/geometry2/issues/367>`_ from kejxu/add_tf2_namespace_to_avoid_name_collision
+* separate transform function declarations into transform_functions.h
+* Contributors: James Xu, Shane Loretz, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 

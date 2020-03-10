@@ -2,6 +2,16 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
+* Use text=True to fix Python3 incompatibility (`#446 <https://github.com/ros/geometry2/issues/446>`_)
+* Update shebang and add launch prefixes for python3 support (`#421 <https://github.com/ros/geometry2/issues/421>`_)
+* Always call catkin_package() (`#418 <https://github.com/ros/geometry2/issues/418>`_)
+* Merge pull request `#404 <https://github.com/ros/geometry2/issues/404>`_ from otamachan/remove-load-manifest
+* Remove roslib.load_manifest
+* Contributors: Shane Loretz, Tamaki Nishino, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 

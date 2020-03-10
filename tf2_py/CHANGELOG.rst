@@ -2,6 +2,16 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
+* Merge pull request `#363 <https://github.com/ros/geometry2/issues/363>`_ from kejxu/fix_tf2_py_export
+  use .pyd instead of .so on Windows and export symbols
+* limit MSVC-only change to MSVC scope (`#10 <https://github.com/ros/geometry2/issues/10>`_)
+* Fix the pyd extension and export the init function.
+* use windows counterpart for .so extension
+* Contributors: James Xu, Sean Yen, Shane Loretz, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 

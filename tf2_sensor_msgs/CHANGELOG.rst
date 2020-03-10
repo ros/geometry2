@@ -2,6 +2,15 @@
 Changelog for package tf2_sensor_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Replace kdl packages with rosdep keys (`#447 <https://github.com/ros/geometry2/issues/447>`_)
+* Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
+* Merge pull request `#378 <https://github.com/ros/geometry2/issues/378>`_ from peci1/tf2_sensor_msgs_isometry
+  Affine->Isometry
+* Python 3 compatibility: relative imports and print statement
+* Contributors: Martin Pecka, Shane Loretz, Timon Engelke, Tully Foote
+
 0.6.5 (2018-11-16)
 ------------------
 
