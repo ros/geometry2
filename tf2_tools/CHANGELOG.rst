@@ -2,6 +2,9 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.6.6 (2020-01-09)
 ------------------
 * Allow to choose output precision in echo `#377 <https://github.com/ros/geometry2/issues/377>`_ 

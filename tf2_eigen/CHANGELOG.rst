@@ -2,6 +2,11 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Revert "rework Eigen functions namespace hack" (`#436 <https://github.com/ros/geometry2/issues/436>`_)
+* Contributors: Tully Foote
+
 0.6.6 (2020-01-09)
 ------------------
 * Fix compile error missing ros/ros.h (`#400 <https://github.com/ros/geometry2/issues/400>`_)

@@ -2,6 +2,9 @@
 Changelog for package tf2_sensor_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.6.6 (2020-01-09)
 ------------------
 * Affine->Isometry `#378 <https://github.com/ros/geometry2/issues/378>`_

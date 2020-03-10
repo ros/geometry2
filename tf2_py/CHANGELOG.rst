@@ -2,6 +2,11 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [Windows][melodic-devel] Fix install locations (`#442 <https://github.com/ros/geometry2/issues/442>`_)
+* Contributors: Sean Yen
+
 0.6.6 (2020-01-09)
 ------------------
 * use .pyd instead of .so on Windows and export symbols `#363 <https://github.com/ros/geometry2/issues/363>`_ from kejxu/fix_tf2_py_export
