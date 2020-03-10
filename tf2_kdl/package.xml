@@ -17,7 +17,7 @@
 
   <build_export_depend>eigen</build_export_depend> <!-- needed by kdl internally -->
 
-  <depend>orocos_kdl</depend>
+  <depend>liborocos-kdl-dev</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
 
