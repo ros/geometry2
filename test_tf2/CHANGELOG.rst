@@ -2,8 +2,8 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2020-03-09)
+------------------
 * Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
 * Use text=True to fix Python3 incompatibility (`#446 <https://github.com/ros/geometry2/issues/446>`_)
 * Update shebang and add launch prefixes for python3 support (`#421 <https://github.com/ros/geometry2/issues/421>`_)

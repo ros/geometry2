@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2020-03-09)
+------------------
 * Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
 * Add arguments to TransformListener constructors that accept TransportHints for the tf topic subscriber (`#438 <https://github.com/ros/geometry2/issues/438>`_)
 * Merge pull request `#404 <https://github.com/ros/geometry2/issues/404>`_ from otamachan/remove-load-manifest
