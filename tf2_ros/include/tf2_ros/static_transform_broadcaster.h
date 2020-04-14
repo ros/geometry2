@@ -54,7 +54,9 @@ public:
 
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
-  void sendTransform(const geometry_msgs::TransformStamped & transform);
+  void sendTransform(const geometry_msgs::TransformStamped & transform) {
+    sendTransform(std::vector<geometry_msgs::TransformStamped>({transform}));
+  }
 
   /** \brief Send a vector of TransformStamped messages
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
