@@ -34,6 +34,7 @@
 #include "ros/ros.h"
 #include "tf2_msgs/TFMessage.h"
 #include "tf2_ros/static_transform_broadcaster.h"
+#include <algorithm>
 
 namespace tf2_ros {
 
@@ -42,36 +43,22 @@ StaticTransformBroadcaster::StaticTransformBroadcaster()
   publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf_static", 100, true);
 };
 
-void StaticTransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped & msgtf)
-{
-  std::vector<geometry_msgs::TransformStamped> v1;
-  v1.push_back(msgtf);
-  sendTransform(v1);
-}
-
-
 void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::TransformStamped> & msgtf)
 {
-  for (std::vector<geometry_msgs::TransformStamped>::const_iterator it_in = msgtf.begin(); it_in != msgtf.end(); ++it_in)
+  for (const geometry_msgs::TransformStamped& input : msgtf)
   {
-    bool match_found = false;
-    for (std::vector<geometry_msgs::TransformStamped>::iterator it_msg = net_message_.transforms.begin(); it_msg != net_message_.transforms.end(); ++it_msg)
-    {
-      if (it_in->child_frame_id == it_msg->child_frame_id)
-      {
-        *it_msg = *it_in;
-        match_found = true;
-        break;
-      }
-    }
-    if (! match_found)
-      net_message_.transforms.push_back(*it_in);
+    auto predicate = [&input](const geometry_msgs::TransformStamped existing) {
+      return input.child_frame_id == existing.child_frame_id;
+    };
+    auto existing = std::find_if(net_message_.transforms.begin(), net_message_.transforms.end(), predicate);
+
+    if (existing != net_message_.transforms.end())
+      *existing = input;
+    else
+      net_message_.transforms.push_back(input);
   }
 
   publisher_.publish(net_message_);
 }
 
-
 }
-
-
