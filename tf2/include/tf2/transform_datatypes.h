@@ -58,6 +58,16 @@ class Stamped : public T{
     T (s),
     stamp_(s.stamp_),
     frame_id_(s.frame_id_) {}
+
+  /** Copy assignment operator */
+  Stamped<T> & operator=(const Stamped<T> & rhs)
+  {
+    T::operator=(rhs);
+    stamp_ = rhs.stamp_;
+    frame_id_ = rhs.frame_id_;
+    return *this;
+  }
+
   
   /** Set the data element */
   void setData(const T& input){*static_cast<T*>(this) = input;};
