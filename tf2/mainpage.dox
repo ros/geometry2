@@ -30,6 +30,7 @@ Some packages that implement this interface:
 - tf2_geometry_msgs
 - tf2_kdl
 - tf2_sensor_msgs
+- tf2_urdf
 
 More documentation for the conversion interface is available on the <A HREF="http://wiki.ros.org/tf2/Tutorials/Migration/DataConversions">ROS Wiki</A>.
 
