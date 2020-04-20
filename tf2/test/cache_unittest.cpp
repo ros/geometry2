@@ -390,13 +390,17 @@ TEST(TimeCache, DuplicateEntries)
   stor.frame_id_ = 3;
   stor.stamp_ = ros::Time().fromNSec(1);
 
+  stor.translation_.setX(1.0);
+
   cache.insertData(stor);
+
+  stor.translation_.setX(2.0);
 
   cache.insertData(stor);
 
 
   cache.getData(ros::Time().fromNSec(1), stor);
-  
+
   //printf(" stor is %f\n", stor.translation_.x());
   EXPECT_TRUE(!std::isnan(stor.translation_.x()));
   EXPECT_TRUE(!std::isnan(stor.translation_.y()));
@@ -405,6 +409,9 @@ TEST(TimeCache, DuplicateEntries)
   EXPECT_TRUE(!std::isnan(stor.rotation_.y()));
   EXPECT_TRUE(!std::isnan(stor.rotation_.z()));
   EXPECT_TRUE(!std::isnan(stor.rotation_.w()));
+
+  EXPECT_EQ(1, cache.getListLength());
+  EXPECT_DOUBLE_EQ(2.0, stor.translation_.x());
 }
 
 int main(int argc, char **argv){
