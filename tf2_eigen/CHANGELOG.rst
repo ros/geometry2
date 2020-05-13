@@ -2,6 +2,11 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* malcolm: add depends tf2 to catkin_package (`#428 <https://github.com/ros/geometry2/issues/428>`_)
+* Contributors: Malcolm Mielle
+
 0.7.0 (2020-03-09)
 ------------------
 * Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)

@@ -2,6 +2,16 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix to improper ring_45 test, where 'anchor' frame for both inverse and normal transform was frame 'b' instead of frame 'a', thus creating a problem
+* [noetic] cherry-pick Windows fixes from melodic-devel (`#450 <https://github.com/ros/geometry2/issues/450>`_)
+  * [Windows][melodic-devel] Fix install locations (`#442 <https://github.com/ros/geometry2/issues/442>`_)
+  * fixed install locations of tf2
+  * [windows][melodic] more portable fixes. (`#443 <https://github.com/ros/geometry2/issues/443>`_)
+  * more portable fixes.
+* Contributors: Patrick Beeson, Sean Yen
+
 0.7.0 (2020-03-09)
 ------------------
 * Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)

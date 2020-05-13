@@ -2,6 +2,19 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix to improper ring_45 test, where 'anchor' frame for both inverse and normal transform was frame 'b' instead of frame 'a', thus creating a problem
+* Don't insert a TF frame is one of the same timestamp already exists, instead just overwrite it.
+* [Noetic] Add tf2::Stamped<T>::operator=() to fix warnings downstream (`#453 <https://github.com/ros/geometry2/issues/453>`_)
+  * Add tf2::Stamped<T>::operator=()
+* [noetic] cherry-pick Windows fixes from melodic-devel (`#450 <https://github.com/ros/geometry2/issues/450>`_)
+  * [Windows][melodic-devel] Fix install locations (`#442 <https://github.com/ros/geometry2/issues/442>`_)
+  * fixed install locations of tf2
+  * [windows][melodic] more portable fixes. (`#443 <https://github.com/ros/geometry2/issues/443>`_)
+  * more portable fixes.
+* Contributors: Patrick Beeson, Robert Haschke, Sean Yen, Shane Loretz
+
 0.7.0 (2020-03-09)
 ------------------
 * Bump CMake version to avoid CMP0048 warning (`#445 <https://github.com/ros/geometry2/issues/445>`_)
