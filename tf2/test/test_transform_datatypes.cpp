@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, Willow Garage, Inc.
+ * Copyright (c) 2020, Open Source Robotics Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,59 +26,52 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#include <gtest/gtest.h>
 
-/** \author Tully Foote */
-
-#ifndef TF2_TRANSFORM_DATATYPES_H
-#define TF2_TRANSFORM_DATATYPES_H
+#include "tf2/transform_datatypes.h"
 
 #include <string>
-#include "ros/time.h"
 
-namespace tf2
+
+TEST(Stamped, assignment)
 {
+  tf2::Stamped<std::string> first("foobar", ros::Time(0), "my_frame_id");
+  tf2::Stamped<std::string> second("baz", ros::Time(0), "my_frame_id");
 
-/** \brief The data type which will be cross compatable with geometry_msgs
- * This is the tf2 datatype equivilant of a MessageStamped */
-template <typename T>
-class Stamped : public T{
- public:
-  ros::Time stamp_; ///< The timestamp associated with this data
-  std::string frame_id_; ///< The frame_id associated this data
-
-  /** Default constructor */
-  Stamped() :frame_id_ ("NO_ID_STAMPED_DEFAULT_CONSTRUCTION"){}; //Default constructor used only for preallocation
-
-  /** Full constructor */
-  Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id) :
-    T (input), stamp_ ( timestamp ), frame_id_ (frame_id){ } ;
-  
-  /** Copy Constructor */
-  Stamped(const Stamped<T>& s):
-    T (s),
-    stamp_(s.stamp_),
-    frame_id_(s.frame_id_) {}
-
-  /** Copy assignment operator */
-  Stamped<T> & operator=(const Stamped<T> & rhs)
-  {
-    T::operator=(rhs);
-    stamp_ = rhs.stamp_;
-    frame_id_ = rhs.frame_id_;
-    return *this;
-  }
-
-  
-  /** Set the data element */
-  void setData(const T& input){*static_cast<T*>(this) = input;};
-};
-
-/** \brief Comparison Operator for Stamped datatypes */
-template <typename T> 
-bool operator==(const Stamped<T> &a, const Stamped<T> &b) {
-  return a.frame_id_ == b.frame_id_ && a.stamp_ == b.stamp_ && static_cast<const T&>(a) == static_cast<const T&>(b);
+  EXPECT_NE(second, first);
+  second = first;
+  EXPECT_EQ(second, first);
 }
 
+TEST(Stamped, setData)
+{
+  tf2::Stamped<std::string> first("foobar", ros::Time(0), "my_frame_id");
+  tf2::Stamped<std::string> second("baz", ros::Time(0), "my_frame_id");
 
+  EXPECT_NE(second, first);
+  second.setData("foobar");
+  EXPECT_EQ(second, first);
 }
-#endif //TF2_TRANSFORM_DATATYPES_H
+
+TEST(Stamped, copy_constructor)
+{
+  tf2::Stamped<std::string> first("foobar", ros::Time(0), "my_frame_id");
+  tf2::Stamped<std::string> second(first);
+
+  EXPECT_EQ(second, first);
+}
+
+TEST(Stamped, default_constructor)
+{
+  tf2::Stamped<std::string> first("foobar", ros::Time(0), "my_frame_id");
+  tf2::Stamped<std::string> second;
+
+  EXPECT_NE(second, first);
+}
+
+int main(int argc, char **argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  ros::Time::init();
+  return RUN_ALL_TESTS();
+}
