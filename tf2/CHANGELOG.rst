@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.1 (2020-05-13)
+------------------
 * Fix to improper ring_45 test, where 'anchor' frame for both inverse and normal transform was frame 'b' instead of frame 'a', thus creating a problem
 * Don't insert a TF frame is one of the same timestamp already exists, instead just overwrite it.
 * [Noetic] Add tf2::Stamped<T>::operator=() to fix warnings downstream (`#453 <https://github.com/ros/geometry2/issues/453>`_)

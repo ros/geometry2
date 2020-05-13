@@ -2,8 +2,8 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.1 (2020-05-13)
+------------------
 * malcolm: add depends tf2 to catkin_package (`#428 <https://github.com/ros/geometry2/issues/428>`_)
 * Contributors: Malcolm Mielle
 

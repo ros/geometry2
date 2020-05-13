@@ -2,8 +2,8 @@
 Changelog for package tf2_kdl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.1 (2020-05-13)
+------------------
 * import setup from setuptools instead of distutils-core (`#449 <https://github.com/ros/geometry2/issues/449>`_)
 * Contributors: Alejandro Hernández Cordero
 

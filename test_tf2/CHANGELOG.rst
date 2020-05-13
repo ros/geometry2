@@ -2,8 +2,8 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.1 (2020-05-13)
+------------------
 * Fix to improper ring_45 test, where 'anchor' frame for both inverse and normal transform was frame 'b' instead of frame 'a', thus creating a problem
 * [noetic] cherry-pick Windows fixes from melodic-devel (`#450 <https://github.com/ros/geometry2/issues/450>`_)
   * [Windows][melodic-devel] Fix install locations (`#442 <https://github.com/ros/geometry2/issues/442>`_)
