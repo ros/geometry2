@@ -37,7 +37,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} ${GTES
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
-install(PROGRAMS scripts/test.py
+catkin_install_python(PROGRAMS scripts/test.py
          DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # tf2 echo code Copyright (c) 2018, Lucas Walter
 # transformations.py code Copyright (c) 2006-2017, Christoph Gohlke
