@@ -2,6 +2,11 @@
 Changelog for package tf2_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix shebang line for python3 (`#466 <https://github.com/ros/geometry2/issues/466>`_)
+* Contributors: Mikael Arguedas
+
 0.7.1 (2020-05-13)
 ------------------
 

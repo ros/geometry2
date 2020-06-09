@@ -2,6 +2,9 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.7.1 (2020-05-13)
 ------------------
 * StatisTransformBroadcaster: simplify/modernize code
