@@ -66,9 +66,9 @@ void createExtrapolationException1(ros::Time t0, ros::Time t1, std::string* erro
 {
   if (error_str)
   {
-    std::stringstream ss;
-    ss << "Lookup would require extrapolation at time " << t0 << ", but only time " << t1 << " is in the buffer";
-    *error_str = ss.str();
+    char str[116]; // Text without formatting strings has 76, each timestamp has up to 20
+    snprintf(str, 116, "Lookup would require extrapolation at time %.09f, but only time %.09f is in the buffer", t0.toSec(), t1.toSec());
+    *error_str = str;
   }
 }
 
@@ -76,9 +76,9 @@ void createExtrapolationException2(ros::Time t0, ros::Time t1, std::string* erro
 {
   if (error_str)
   {
-    std::stringstream ss;
-    ss << "Lookup would require extrapolation into the future.  Requested time " << t0 << " but the latest data is at time " << t1;
-    *error_str = ss.str();
+    char str[141]; // Text without formatting strings has 100, each timestamp has up to 20
+    snprintf(str, 141, "Lookup would require extrapolation into the future.  Requested time %.09f but the latest data is at time %.09f", t0.toSec(), t1.toSec());
+    *error_str = str;
   }
 }
 
@@ -86,9 +86,9 @@ void createExtrapolationException3(ros::Time t0, ros::Time t1, std::string* erro
 {
   if (error_str)
   {
-    std::stringstream ss;
-    ss << "Lookup would require extrapolation into the past.  Requested time " << t0 << " but the earliest data is at time " << t1;
-    *error_str = ss.str();
+    char str[141]; // Text without formatting strings has 100, each timestamp has up to 20
+    snprintf(str, 141, "Lookup would require extrapolation into the past.  Requested time %.09f but the earliest data is at time %.09f", t0.toSec(), t1.toSec());
+    *error_str = str;
   }
 }
 } // namespace cache
@@ -252,9 +252,7 @@ bool TimeCache::insertData(const TransformStorage& new_data, std::string* error_
     {
       if (error_str)
       {
-        std::stringstream ss;
-        ss << "TF_OLD_DATA ignoring data from the past (Possible reasons are listed at http://wiki.ros.org/tf/Errors%%20explained)";
-        *error_str = ss.str();
+        *error_str = "TF_OLD_DATA ignoring data from the past (Possible reasons are listed at http://wiki.ros.org/tf/Errors%%20explained)";
       }
       return false;
     }
@@ -271,9 +269,7 @@ bool TimeCache::insertData(const TransformStorage& new_data, std::string* error_
   {
     if (error_str)
     {
-      std::stringstream ss;
-      ss << "TF_REPEATED_DATA ignoring data with redundant timestamp";
-      *error_str = ss.str();
+      *error_str = "TF_REPEATED_DATA ignoring data with redundant timestamp";
     }
     return false;
   }

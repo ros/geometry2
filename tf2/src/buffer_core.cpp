@@ -414,9 +414,10 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id,
     {
       if (error_string)
       {
-        std::stringstream ss;
-        ss << *error_string << ", when looking up transform from frame [" << lookupFrameString(source_id) << "] to frame [" << lookupFrameString(target_id) << "]";
-        *error_string = ss.str();
+        // optimize performance by not using stringstream
+        char str[1000];
+        snprintf(str, 1000, "%s, when looking up transform from frame [%s] to frame [%s]", error_string->c_str(), lookupFrameString(source_id).c_str(), lookupFrameString(target_id).c_str());
+        *error_string = str;
       }
 
       return tf2_msgs::TF2Error::EXTRAPOLATION_ERROR;
@@ -460,9 +461,10 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id,
     {
       if (error_string)
       {
-        std::stringstream ss;
-        ss << extrapolation_error_string << ", when looking up transform from frame [" << lookupFrameString(source_id) << "] to frame [" << lookupFrameString(target_id) << "]";
-        *error_string = ss.str();
+        // optimize performance by not using stringstream
+        char str[1000];
+        snprintf(str, 1000, "%s, when looking up transform from frame [%s] to frame [%s]", extrapolation_error_string.c_str(), lookupFrameString(source_id).c_str(), lookupFrameString(target_id).c_str());
+        *error_string = str;
       }
 
       return tf2_msgs::TF2Error::EXTRAPOLATION_ERROR;
