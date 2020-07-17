@@ -407,6 +407,30 @@ TEST(TimeCache, DuplicateEntries)
   EXPECT_TRUE(!std::isnan(stor.rotation_.w()));
 }
 
+TEST(TimeCache, AllowReplaceData)
+{
+  TimeCache cache;
+
+  TransformStorage firstTf;
+  setIdentity(firstTf);
+  firstTf.translation_.setX(0.5);
+  firstTf.frame_id_ = 3;
+  firstTf.stamp_ = ros::Time().fromNSec(1);
+
+  TransformStorage secondTf = firstTf;
+  secondTf.translation_.setX(2.0);
+
+  cache.insertData(firstTf);
+
+  cache.insertData(secondTf);
+
+  TransformStorage stor;
+  cache.getData(ros::Time().fromNSec(1), stor);
+
+  //printf(" stor is %f\n", stor.translation_.x())
+  EXPECT_EQ(stor.translation_, secondTf.translation_);
+}
+
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
