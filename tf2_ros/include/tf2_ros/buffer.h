@@ -45,7 +45,7 @@ namespace tf2_ros
   /** \brief Standard implementation of the tf2_ros::BufferInterface abstract data type.
    *
    * Inherits tf2_ros::BufferInterface and tf2::BufferCore.
-   * Stores known frames and offers a ROS service, "tf_frames", which responds to client requests
+   * Stores known frames and optionally offers a ROS service, "tf2_frames", which responds to client requests
    * with a response containing a tf2_msgs::FrameGraph representing the relationship of known frames.
    */
   class Buffer: public BufferInterface, public tf2::BufferCore
@@ -57,7 +57,7 @@ namespace tf2_ros
     /**
      * @brief  Constructor for a Buffer object
      * @param cache_time How long to keep a history of transforms
-     * @param debug Whether to advertise the view_frames service that exposes debugging information from the buffer
+     * @param debug Whether to advertise the tf2_frames service that exposes debugging information from the buffer
      * @return 
      */
     Buffer(ros::Duration cache_time = ros::Duration(BufferCore::DEFAULT_CACHE_TIME), bool debug = false);
