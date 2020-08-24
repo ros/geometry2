@@ -39,7 +39,7 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
 
     Inherits from :class:`tf2_ros.buffer_interface.BufferInterface` and :class:`tf2.BufferCore`.
 
-    Stores known frames and offers a ROS service, "tf_frames", which responds to client requests
+    Stores known frames and optionally offers a ROS service, "tf2_frames", which responds to client requests
     with a response containing a :class:`tf2_msgs.FrameGraph` representing the relationship of
     known frames. 
     """
