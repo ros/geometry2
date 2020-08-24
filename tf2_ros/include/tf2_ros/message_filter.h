@@ -456,8 +456,8 @@ private:
     callback_handle_ = bc_.addTransformableCallback(boost::bind(&MessageFilter::transformable, this, _1, _2, _3, _4, _5));
   }
 
-  void transformable(tf2::TransformableRequestHandle request_handle, const std::string& target_frame, const std::string& source_frame,
-                     ros::Time time, tf2::TransformableResult result)
+  void transformable(tf2::TransformableRequestHandle request_handle, const std::string& /* target_frame */, const std::string& /* source_frame */,
+                     ros::Time /* time */, tf2::TransformableResult result)
   {
     namespace mt = ros::message_traits;
 
