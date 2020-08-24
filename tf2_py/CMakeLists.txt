@@ -96,7 +96,7 @@ add_dependencies(tf2_py ${catkin_EXPORTED_TARGETS})
 
 if(WIN32)
   # use .pyd extension on Windows
-  set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".pyd")
+  set_target_properties(tf2_py PROPERTIES OUTPUT_NAME "_tf2" SUFFIX ".pyd")
 else()
   set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
   set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
