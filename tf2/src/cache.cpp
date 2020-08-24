@@ -77,7 +77,9 @@ void createExtrapolationException2(ros::Time t0, ros::Time t1, std::string* erro
   if (error_str)
   {
     std::stringstream ss;
-    ss << "Lookup would require extrapolation into the future.  Requested time " << t0 << " but the latest data is at time " << t1;
+    ros::Duration tdiff = t0 - t1;
+    ss << "Lookup would require extrapolation " << tdiff << "s into the future.  Requested time "
+          << t0 << " but the latest data is at time " << t1;
     *error_str = ss.str();
   }
 }
@@ -87,7 +89,9 @@ void createExtrapolationException3(ros::Time t0, ros::Time t1, std::string* erro
   if (error_str)
   {
     std::stringstream ss;
-    ss << "Lookup would require extrapolation into the past.  Requested time " << t0 << " but the earliest data is at time " << t1;
+    ros::Duration tdiff = t1 - t0;
+    ss << "Lookup would require extrapolation " << tdiff << "s into the past.  Requested time "
+        << t0 << " but the earliest data is at time " << t1;
     *error_str = ss.str();
   }
 }
