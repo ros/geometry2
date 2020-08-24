@@ -222,4 +222,31 @@ int main(int argc, char** argv)
     CONSOLE_BRIDGE_logInform("canTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
   }
 #endif
+
+#if 01
+  {
+    ros::WallTime start = ros::WallTime::now();
+    for (uint32_t i = 0; i < count; ++i)
+    {
+      bc.canTransform(v_frame1, v_frame0, ros::Time(3));
+    }
+    ros::WallTime end = ros::WallTime::now();
+    ros::WallDuration dur = end - start;
+    CONSOLE_BRIDGE_logInform("canTransform at Time(3) without error string took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+  }
+#endif
+
+#if 01
+  {
+    ros::WallTime start = ros::WallTime::now();
+    std::string str;
+    for (uint32_t i = 0; i < count; ++i)
+    {
+      bc.canTransform(v_frame1, v_frame0, ros::Time(3), &str);
+    }
+    ros::WallTime end = ros::WallTime::now();
+    ros::WallDuration dur = end - start;
+    CONSOLE_BRIDGE_logInform("canTransform at Time(3) with error string took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+  }
+#endif
 }

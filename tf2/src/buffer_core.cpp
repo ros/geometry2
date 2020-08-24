@@ -358,7 +358,7 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id,
       break;
     }
 
-    CompactFrameID parent = f.gather(cache, time, &extrapolation_error_string);
+    CompactFrameID parent = f.gather(cache, time, error_string ? &extrapolation_error_string : NULL);
     if (parent == 0)
     {
       // Just break out here... there may still be a path from source -> target
