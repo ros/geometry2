@@ -36,8 +36,6 @@
 
 #include <deque>
 
-#include <sstream>
-
 #include <ros/message_forward.h>
 #include <ros/time.h>
 
