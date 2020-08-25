@@ -16,7 +16,6 @@
   <build_depend>rosconsole</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rostest</build_depend>
-  <build_depend>tf</build_depend>
   <build_depend>tf2</build_depend>
   <build_depend>tf2_bullet</build_depend>
   <build_depend>tf2_ros</build_depend>
@@ -28,7 +27,6 @@
   <run_depend>rosconsole</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rostest</run_depend>
-  <run_depend>tf</run_depend>
   <run_depend>tf2</run_depend>
   <run_depend>tf2_bullet</run_depend>
   <run_depend>tf2_ros</run_depend>

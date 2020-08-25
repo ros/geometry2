@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 
 project(test_tf2)
 
-find_package(catkin REQUIRED COMPONENTS rosconsole roscpp rostest tf tf2 tf2_bullet tf2_ros tf2_geometry_msgs tf2_kdl tf2_msgs tf2_eigen)
+find_package(catkin REQUIRED COMPONENTS rosconsole roscpp rostest tf2 tf2_bullet tf2_eigen tf2_geometry_msgs tf2_kdl tf2_msgs tf2_ros)
 find_package(Boost REQUIRED COMPONENTS thread)
 find_package(orocos_kdl REQUIRED)
 
