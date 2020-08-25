@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.3 (2020-08-25)
+------------------
 * Use snprintf instead of stringstream to increase performance of lookupTransform() in error cases.
 * Do not waste time constructing error string if nobody is interested in it in canTransform(). (`#469 <https://github.com/ros/geometry2/issues/469>`_)
 * Output time difference of extrapolation exceptions (`#477 <https://github.com/ros/geometry2/issues/477>`_)

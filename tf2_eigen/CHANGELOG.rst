@@ -2,8 +2,8 @@
 Changelog for package tf2_eigen
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.3 (2020-08-25)
+------------------
 * Cherry-picking various commits from Melodic (`#471 <https://github.com/ros/geometry2/issues/471>`_)
   * Revert "rework Eigen functions namespace hack" (`#436 <https://github.com/ros/geometry2/issues/436>`_)
   * Fixed warnings in message_filter.h (`#434 <https://github.com/ros/geometry2/issues/434>`_)

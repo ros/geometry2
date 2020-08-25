@@ -2,8 +2,8 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.3 (2020-08-25)
+------------------
 * test_tf2: remove unused tf dependency (`#464 <https://github.com/ros/geometry2/issues/464>`_)
 * Cherry-picking various commits from Melodic (`#471 <https://github.com/ros/geometry2/issues/471>`_)
   * Revert "rework Eigen functions namespace hack" (`#436 <https://github.com/ros/geometry2/issues/436>`_)

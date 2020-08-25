@@ -2,8 +2,8 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.3 (2020-08-25)
+------------------
 * Use correct frame service name in docstrings. (`#476 <https://github.com/ros/geometry2/issues/476>`_)
   Replaces the deprecated names
   {tf_frames, view_frames} -> tf2_frames
