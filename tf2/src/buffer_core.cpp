@@ -416,7 +416,7 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id,
       {
         // optimize performance by not using stringstream
         char str[1000];
-        snprintf(str, 1000, "%s, when looking up transform from frame [%s] to frame [%s]", error_string->c_str(), lookupFrameString(source_id).c_str(), lookupFrameString(target_id).c_str());
+        snprintf(str, sizeof(str), "%s, when looking up transform from frame [%s] to frame [%s]", error_string->c_str(), lookupFrameString(source_id).c_str(), lookupFrameString(target_id).c_str());
         *error_string = str;
       }
 
@@ -463,7 +463,7 @@ int BufferCore::walkToTopParent(F& f, ros::Time time, CompactFrameID target_id,
       {
         // optimize performance by not using stringstream
         char str[1000];
-        snprintf(str, 1000, "%s, when looking up transform from frame [%s] to frame [%s]", extrapolation_error_string.c_str(), lookupFrameString(source_id).c_str(), lookupFrameString(target_id).c_str());
+        snprintf(str, sizeof(str), "%s, when looking up transform from frame [%s] to frame [%s]", extrapolation_error_string.c_str(), lookupFrameString(source_id).c_str(), lookupFrameString(target_id).c_str());
         *error_string = str;
       }
 
