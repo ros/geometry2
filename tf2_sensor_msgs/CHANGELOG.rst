@@ -2,6 +2,9 @@
 Changelog for package tf2_sensor_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.7.3 (2020-08-25)
 ------------------
 * Use list instead of set to make build reproducible (`#473 <https://github.com/ros/geometry2/issues/473>`_)

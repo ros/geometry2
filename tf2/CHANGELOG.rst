@@ -2,6 +2,11 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix potential buffer overrun of snprintf (`#479 <https://github.com/ros/geometry2/issues/479>`_)
+* Contributors: Atsushi Watanabe
+
 0.7.3 (2020-08-25)
 ------------------
 * Use snprintf instead of stringstream to increase performance of lookupTransform() in error cases.
