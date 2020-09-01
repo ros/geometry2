@@ -77,7 +77,7 @@ void createExtrapolationException2(ros::Time t0, ros::Time t1, std::string* erro
   if (error_str)
   {
     ros::Duration tdiff = t1 - t0;
-    char str[141]; // Text without formatting strings has 102, each timestamp has up to 20
+    char str[163]; // Text without formatting strings has 102, each timestamp has up to 20
     snprintf(
         str, sizeof(str),
         "Lookup would require extrapolation %.09fs into the future.  Requested time %.09f but the latest data is at time %.09f",
@@ -91,7 +91,7 @@ void createExtrapolationException3(ros::Time t0, ros::Time t1, std::string* erro
   if (error_str)
   {
     ros::Duration tdiff = t1 - t0;
-    char str[141]; // Text without formatting strings has 102, each timestamp has up to 20
+    char str[163]; // Text without formatting strings has 102, each timestamp has up to 20
     snprintf(
         str, sizeof(str),
         "Lookup would require extrapolation %.09fs into the past.  Requested time %.09f but the earliest data is at time %.09f",
