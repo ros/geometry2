@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.5 (2020-09-01)
+------------------
 * restore buffer sizes
 * Contributors: Tully Foote
 
