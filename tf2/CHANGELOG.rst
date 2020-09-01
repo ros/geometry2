@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.4 (2020-09-01)
+------------------
 * Fix potential buffer overrun of snprintf (`#479 <https://github.com/ros/geometry2/issues/479>`_)
 * Contributors: Atsushi Watanabe
 
