@@ -43,11 +43,11 @@ class MultipleStaticTransformBroadcaster(object):
     pub_tf = rospy.Publisher("/tf_static", TFMessage, queue_size=100, latch=True)
     tfs = dict()
 
-    def sendTransform(self, transform):
+    @classmethod
+    def sendTransform(cls, transform):
         if not isinstance(transform, list):
             transform = [transform]
         for tf in transform:
-            MultipleStaticTransformBroadcaster.tfs[(tf.header.frame_id, tf.child_frame_id)] = tf
+            cls.tfs[(tf.header.frame_id, tf.child_frame_id)] = tf
 
-        tfs_msg = TFMessage(MultipleStaticTransformBroadcaster.tfs.values())
-        MultipleStaticTransformBroadcaster.pub_tf.publish(tfs_msg)
+        cls.pub_tf.publish(TFMessage(cls.tfs.values()))
