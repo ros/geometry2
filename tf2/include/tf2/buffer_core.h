@@ -98,6 +98,7 @@ public:
    *
    */
   BufferCore(ros::Duration cache_time_ = ros::Duration(DEFAULT_CACHE_TIME));
+  BufferCore(BufferCore&&) = default;
   virtual ~BufferCore(void);
 
   /** \brief Clear all data */
