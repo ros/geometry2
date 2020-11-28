@@ -65,38 +65,42 @@ inline
     t_out = tf2::Stamped<btVector3>(transformToBullet(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
 
-/** \brief Convert a stamped Bullet Vector3 type to a PointStamped message.
- * This function is a specialization of the toMsg template defined in tf2/convert.h
- * \param in The timestamped Bullet btVector3 to convert.
- * \return The vector converted to a PointStamped message.
- */
-inline
-geometry_msgs::PointStamped toMsg(const tf2::Stamped<btVector3>& in)
+namespace impl
 {
-  geometry_msgs::PointStamped msg;
-  msg.header.stamp = in.stamp_;
-  msg.header.frame_id = in.frame_id_;
-  msg.point.x = in[0];
-  msg.point.y = in[1];
-  msg.point.z = in[2];
-  return msg;
-}
-
-/** \brief Convert a PointStamped message type to a stamped Bullet-specific Vector3 type.
- * This function is a specialization of the fromMsg template defined in tf2/convert.h
- * \param msg The PointStamped message to convert.
- * \param out The point converted to a timestamped Bullet Vector3.
- */
-inline
-void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<btVector3>& out)
+template <>
+struct defaultMessage<btVector3>
 {
-  out.stamp_ = msg.header.stamp;
-  out.frame_id_ = msg.header.frame_id;
-  out[0] = msg.point.x;
-  out[1] = msg.point.y;
-  out[2] = msg.point.z;
-}
+  using type = geometry_msgs::Point;
+};
 
+template <>
+struct ImplDetails<btVector3, geometry_msgs::Point>
+{
+  /** \brief Convert a stamped Bullet Vector3 type to a PointStamped message.
+   * This function is a specialization of the toMsg template defined in tf2/convert.h
+   * \param in The timestamped Bullet btVector3 to convert.
+   * \return The vector converted to a PointStamped message.
+   */
+  static void toMsg(const btVector3& in, geometry_msgs::Point& msg)
+  {
+    msg.x = in[0];
+    msg.y = in[1];
+    msg.z = in[2];
+  }
+
+  /** \brief Convert a PointStamped message type to a stamped Bullet-specific Vector3 type.
+   * This function is a specialization of the fromMsg template defined in tf2/convert.h
+   * \param msg The PointStamped message to convert.
+   * \param out The point converted to a timestamped Bullet Vector3.
+   */
+  static void fromMsg(const geometry_msgs::Point& msg, btVector3& out)
+  {
+    out[0] = msg.x;
+    out[1] = msg.y;
+    out[2] = msg.z;
+  }
+};
+}  // namespace impl
 
 /** \brief Apply a geometry_msgs TransformStamped to a Bullet-specific Transform data type.
  * This function is a specialization of the doTransform template defined in tf2/convert.h

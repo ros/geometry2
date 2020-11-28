@@ -30,13 +30,58 @@
 #ifndef TF2_IMPL_CONVERT_H
 #define TF2_IMPL_CONVERT_H
 
-namespace tf2 {
-namespace impl {
+namespace tf2
+{
+namespace impl
+{
+
+template <class StampedMessage>
+struct stampedMessageTraits
+{
+  // using unstampedType = ...;
+  // static unstampedType& accessMessage(StampedMsg &);
+  // static unstampedType getMessage(StampedMsg const&);
+};
+
+template <class UnstampedMessage>
+struct unstampedMessageTraits
+{
+  // using stampedType = ...;
+};
+
+template <class T>
+struct defaultMessage<tf2::Stamped<T>>
+{
+  using type = typename unstampedMessageTraits<typename defaultMessage<T>::type>::stampedType;
+};
+
+
+template <class Datatype, class StampedMessage>
+struct ImplDetails<tf2::Stamped<Datatype>, StampedMessage>
+{
+  using traits = stampedMessageTraits<StampedMessage>;
+  using unstampedMessage = typename traits::unstampedType;
+
+  static void toMsg(const tf2::Stamped<Datatype>& s, StampedMessage& msg)
+  {
+    tf2::toMsg<>(static_cast<const Datatype&>(s), traits::accessMessage(msg));
+    msg.header.stamp = s.stamp_;
+    msg.header.frame_id = s.frame_id_;
+  }
+
+  static void fromMsg(const StampedMessage& msg, tf2::Stamped<Datatype>& s)
+  {
+    tf2::fromMsg<>(traits::getMessage(msg), static_cast<Datatype&>(s));
+    s.stamp_ = msg.header.stamp;
+    s.frame_id_ = msg.header.frame_id;
+  }
+};
 
 template <bool IS_MESSAGE_A, bool IS_MESSAGE_B>
-class Converter {
+class Converter
+{
 public:
-  template<typename A, typename B>
+  template <typename A, typename B>
   static void convert(const A& a, B& b);
 };
 
@@ -47,44 +92,63 @@ public:
 // if B == A, the templated version of convert with only one argument will be
 // used.
 //
-//template <>
-//template <typename A, typename B>
-//inline void Converter<true, true>::convert(const A& a, B& b);
+// template <>
+// template <typename A, typename B>
+// inline void Converter<true, true>::convert(const A& a, B& b);
 
 template <>
 template <typename A, typename B>
 inline void Converter<true, false>::convert(const A& a, B& b)
 {
-#ifdef _MSC_VER
-  tf2::fromMsg(a, b);
-#else
-  fromMsg(a, b);
-#endif
+  tf2::fromMsg<>(a, b);
 }
 
 template <>
 template <typename A, typename B>
 inline void Converter<false, true>::convert(const A& a, B& b)
 {
-#ifdef _MSC_VER
-  b = tf2::toMsg(a);
-#else
-  b = toMsg(a);
-#endif
+  b = tf2::toMsg<>(a);
 }
 
 template <>
 template <typename A, typename B>
 inline void Converter<false, false>::convert(const A& a, B& b)
 {
-#ifdef _MSC_VER
-  tf2::fromMsg(tf2::toMsg(a), b);
-#else
-  fromMsg(toMsg(a), b);
-#endif
+  tf2::fromMsg<>(tf2::toMsg<>(a), b);
 }
 
-}
-}
+template <typename T>
+using void_t = void;
 
-#endif //TF2_IMPL_CONVERT_H
+template <typename T, int>
+struct DefaultStampedImpl
+{
+  static const ros::Time& getTimestamp(const T& t, void_t<typename stampedMessageTraits<T>::unstampedType>* = nullptr)
+  {
+    return t.header.stamp;
+  }
+
+  static const std::string& getFrameId(const T& t, void_t<typename stampedMessageTraits<T>::unstampedType>* = nullptr)
+  {
+    return t.header.frame_id;
+  }
+};
+
+template <typename T>
+struct DefaultStampedImpl<tf2::Stamped<T>>
+{
+  static const ros::Time& getTimestamp(const tf2::Stamped<T>& t)
+  {
+    return t.stamp_;
+  }
+  static const std::string& getFrameId(const tf2::Stamped<T>& t)
+  {
+    return t.frame_id_;
+  }
+};
+
+
+}  // namespace impl
+}  // namespace tf2
+
+#endif  // TF2_IMPL_CONVERT_H

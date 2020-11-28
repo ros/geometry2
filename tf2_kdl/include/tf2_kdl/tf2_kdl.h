@@ -86,37 +86,53 @@ inline
     t_out = tf2::Stamped<KDL::Vector>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
 
-/** \brief Convert a stamped KDL Vector type to a PointStamped message.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in The timestamped KDL Vector to convert.
- * \return The vector converted to a PointStamped message.
- */
-inline
-geometry_msgs::PointStamped toMsg(const tf2::Stamped<KDL::Vector>& in)
+namespace impl
 {
-  geometry_msgs::PointStamped msg;
-  msg.header.stamp = in.stamp_;
-  msg.header.frame_id = in.frame_id_;
-  msg.point.x = in[0];
-  msg.point.y = in[1];
-  msg.point.z = in[2];
-  return msg;
-}
+template <class Msg>
+struct KDLVectorImplDetails
+{
+  /** \brief Convert a stamped KDL Vector type to a PointStamped message.
+   * This function is a specialization of the toMsg template defined in tf2/convert.h.
+   * \param in The timestamped KDL Vector to convert.
+   * \return The vector converted to a PointStamped message.
+   */
+  static void toMsg(const KDL::Vector& in, Msg& msg)
+  {
+    msg.x = in[0];
+    msg.y = in[1];
+    msg.z = in[2];
+  }
 
-/** \brief Convert a PointStamped message type to a stamped KDL-specific Vector type.
- * This function is a specialization of the fromMsg template defined in tf2/convert.h
- * \param msg The PointStamped message to convert.
- * \param out The point converted to a timestamped KDL Vector.
- */
-inline
-void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<KDL::Vector>& out)
+  /** \brief Convert a PointStamped message type to a stamped KDL-specific Vector type.
+   * This function is a specialization of the fromMsg template defined in tf2/convert.h
+   * \param msg The PointStamped message to convert.
+   * \param out The point converted to a timestamped KDL Vector.
+   */
+  static void fromMsg(const Msg& msg, KDL::Vector& out)
+  {
+    out[0] = msg.x;
+    out[1] = msg.y;
+    out[2] = msg.z;
+  }
+};
+
+template <>
+struct ImplDetails<KDL::Vector, geometry_msgs::Vector3> : KDLVectorImplDetails<geometry_msgs::Vector3>
 {
-  out.stamp_ = msg.header.stamp;
-  out.frame_id_ = msg.header.frame_id;
-  out[0] = msg.point.x;
-  out[1] = msg.point.y;
-  out[2] = msg.point.z;
-}
+};
+
+template <>
+struct ImplDetails<KDL::Vector, geometry_msgs::Point> : KDLVectorImplDetails<geometry_msgs::Point>
+{
+};
+
+template <>
+struct defaultMessage<KDL::Vector>
+{
+  using type = geometry_msgs::Point;
+};
+
+}  // namespace impl
 
 // ---------------------
 // Twist
@@ -133,46 +149,42 @@ inline
   {
     t_out = tf2::Stamped<KDL::Twist>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
-
-/** \brief Convert a stamped KDL Twist type to a TwistStamped message.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in The timestamped KDL Twist to convert.
- * \return The twist converted to a TwistStamped message.
- */
-inline
-geometry_msgs::TwistStamped toMsg(const tf2::Stamped<KDL::Twist>& in)
+namespace impl
 {
-  geometry_msgs::TwistStamped msg;
-  msg.header.stamp = in.stamp_;
-  msg.header.frame_id = in.frame_id_;
-  msg.twist.linear.x = in.vel[0];
-  msg.twist.linear.y = in.vel[1];
-  msg.twist.linear.z = in.vel[2];
-  msg.twist.angular.x = in.rot[0];
-  msg.twist.angular.y = in.rot[1];
-  msg.twist.angular.z = in.rot[2];
-  return msg;
-}
-
-/** \brief Convert a TwistStamped message type to a stamped KDL-specific Twist type.
- * This function is a specialization of the fromMsg template defined in tf2/convert.h
- * \param msg The TwistStamped message to convert.
- * \param out The twist converted to a timestamped KDL Twist.
- */
-inline
-void fromMsg(const geometry_msgs::TwistStamped& msg, tf2::Stamped<KDL::Twist>& out)
+template <>
+struct ImplDetails<KDL::Twist, geometry_msgs::TwistStamped>
 {
-  out.stamp_ = msg.header.stamp;
-  out.frame_id_ = msg.header.frame_id;
-  out.vel[0] = msg.twist.linear.x;
-  out.vel[1] = msg.twist.linear.y;
-  out.vel[2] = msg.twist.linear.z;
-  out.rot[0] = msg.twist.angular.x;
-  out.rot[1] = msg.twist.angular.y;
-  out.rot[2] = msg.twist.angular.z;
-}
+  /** \brief Convert a stamped KDL Twist type to a TwistStamped message.
+   * This function is a specialization of the toMsg template defined in tf2/convert.h.
+   * \param in The timestamped KDL Twist to convert.
+   * \return The twist converted to a TwistStamped message.
+   */
+  static void toMsg(const KDL::Twist& in, geometry_msgs::Twist& msg)
+  {
+    msg.linear.x = in.vel[0];
+    msg.linear.y = in.vel[1];
+    msg.linear.z = in.vel[2];
+    msg.angular.x = in.rot[0];
+    msg.angular.y = in.rot[1];
+    msg.angular.z = in.rot[2];
+  }
 
-
+  /** \brief Convert a TwistStamped message type to a stamped KDL-specific Twist type.
+   * This function is a specialization of the fromMsg template defined in tf2/convert.h
+   * \param msg The TwistStamped message to convert.
+   * \param out The twist converted to a timestamped KDL Twist.
+   */
+  static void fromMsg(const geometry_msgs::Twist& msg, KDL::Twist& out)
+  {
+    out.vel[0] = msg.linear.x;
+    out.vel[1] = msg.linear.y;
+    out.vel[2] = msg.linear.z;
+    out.rot[0] = msg.angular.x;
+    out.rot[1] = msg.angular.y;
+    out.rot[2] = msg.angular.z;
+  }
+};
+}  // namespace impl
 // ---------------------
 // Wrench
 // ---------------------
@@ -189,47 +201,42 @@ inline
     t_out = tf2::Stamped<KDL::Wrench>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
 
-/** \brief Convert a stamped KDL Wrench type to a WrenchStamped message.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in The timestamped KDL Wrench to convert.
- * \return The wrench converted to a WrenchStamped message.
- */
-inline
-geometry_msgs::WrenchStamped toMsg(const tf2::Stamped<KDL::Wrench>& in)
+namespace impl
 {
-  geometry_msgs::WrenchStamped msg;
-  msg.header.stamp = in.stamp_;
-  msg.header.frame_id = in.frame_id_;
-  msg.wrench.force.x = in.force[0];
-  msg.wrench.force.y = in.force[1];
-  msg.wrench.force.z = in.force[2];
-  msg.wrench.torque.x = in.torque[0];
-  msg.wrench.torque.y = in.torque[1];
-  msg.wrench.torque.z = in.torque[2];
-  return msg;
-}
-
-/** \brief Convert a WrenchStamped message type to a stamped KDL-specific Wrench type.
- * This function is a specialization of the fromMsg template defined in tf2/convert.h
- * \param msg The WrenchStamped message to convert.
- * \param out The wrench converted to a timestamped KDL Wrench.
- */
-inline
-void fromMsg(const geometry_msgs::WrenchStamped& msg, tf2::Stamped<KDL::Wrench>& out)
+template <>
+struct ImplDetails<KDL::Wrench, geometry_msgs::WrenchStamped>
 {
-  out.stamp_ = msg.header.stamp;
-  out.frame_id_ = msg.header.frame_id;
-  out.force[0] = msg.wrench.force.x;
-  out.force[1] = msg.wrench.force.y;
-  out.force[2] = msg.wrench.force.z;
-  out.torque[0] = msg.wrench.torque.x;
-  out.torque[1] = msg.wrench.torque.y;
-  out.torque[2] = msg.wrench.torque.z;
-}
+  /** \brief Convert a stamped KDL Wrench type to a WrenchStamped message.
+   * This function is a specialization of the toMsg template defined in tf2/convert.h.
+   * \param in The timestamped KDL Wrench to convert.
+   * \return The wrench converted to a WrenchStamped message.
+   */
+  static void toMsg(const KDL::Wrench& in, geometry_msgs::Wrench& msg)
+  {
+    msg.force.x = in.force[0];
+    msg.force.y = in.force[1];
+    msg.force.z = in.force[2];
+    msg.torque.x = in.torque[0];
+    msg.torque.y = in.torque[1];
+    msg.torque.z = in.torque[2];
+  }
 
-
-
-
+  /** \brief Convert a WrenchStamped message type to a stamped KDL-specific Wrench type.
+   * This function is a specialization of the fromMsg template defined in tf2/convert.h
+   * \param msg The WrenchStamped message to convert.
+   * \param out The wrench converted to a timestamped KDL Wrench.
+   */
+  static void fromMsg(const geometry_msgs::Wrench& msg, KDL::Wrench& out)
+  {
+    out.force[0] = msg.force.x;
+    out.force[1] = msg.force.y;
+    out.force[2] = msg.force.z;
+    out.torque[0] = msg.torque.x;
+    out.torque[1] = msg.torque.y;
+    out.torque[2] = msg.torque.z;
+  }
+};
+}  // namespace impl
 // ---------------------
 // Frame
 // ---------------------
@@ -245,64 +252,38 @@ inline
   {
     t_out = tf2::Stamped<KDL::Frame>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
-
-/** \brief Convert a stamped KDL Frame type to a Pose message.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in The timestamped KDL Frame to convert.
- * \return The frame converted to a Pose message.
- */
-inline
-geometry_msgs::Pose toMsg(const KDL::Frame& in)
+namespace impl
 {
-  geometry_msgs::Pose msg;
-  msg.position.x = in.p[0];
-  msg.position.y = in.p[1];
-  msg.position.z = in.p[2];
-  in.M.GetQuaternion(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w);
-  return msg;
-}
-
-/** \brief Convert a Pose message type to a KDL Frame.
- * This function is a specialization of the fromMsg template defined in tf2/convert.h.
- * \param msg The Pose message to convert.
- * \param out The pose converted to a KDL Frame.
- */
-inline
-void fromMsg(const geometry_msgs::Pose& msg, KDL::Frame& out)
+template <>
+struct ImplDetails<KDL::Frame, geometry_msgs::Pose>
 {
-  out.p[0] = msg.position.x;
-  out.p[1] = msg.position.y;
-  out.p[2] = msg.position.z;
-  out.M = KDL::Rotation::Quaternion(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w);
-}
+  /** \brief Convert a stamped KDL Frame type to a Pose message.
+   * This function is a specialization of the toMsg template defined in tf2/convert.h.
+   * \param in The timestamped KDL Frame to convert.
+   * \return The frame converted to a Pose message.
+   */
+  static void toMsg(const KDL::Frame& in, geometry_msgs::Pose& msg)
+  {
+    msg.position.x = in.p[0];
+    msg.position.y = in.p[1];
+    msg.position.z = in.p[2];
+    in.M.GetQuaternion(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w);
+  }
 
-/** \brief Convert a stamped KDL Frame type to a Pose message.
- * This function is a specialization of the toMsg template defined in tf2/convert.h.
- * \param in The timestamped KDL Frame to convert.
- * \return The frame converted to a PoseStamped message.
- */
-inline
-geometry_msgs::PoseStamped toMsg(const tf2::Stamped<KDL::Frame>& in)
-{
-  geometry_msgs::PoseStamped msg;
-  msg.header.stamp = in.stamp_;
-  msg.header.frame_id = in.frame_id_;
-  msg.pose = toMsg(static_cast<const KDL::Frame&>(in));
-  return msg;
-}
-
-/** \brief Convert a Pose message transform type to a stamped KDL Frame.
- * This function is a specialization of the fromMsg template defined in tf2/convert.h.
- * \param msg The PoseStamped message to convert.
- * \param out The pose converted to a timestamped KDL Frame.
- */
-inline
-void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<KDL::Frame>& out)
-{
-  out.stamp_ = msg.header.stamp;
-  out.frame_id_ = msg.header.frame_id;
-  fromMsg(msg.pose, static_cast<KDL::Frame&>(out));
-}
+  /** \brief Convert a Pose message type to a KDL Frame.
+   * This function is a specialization of the fromMsg template defined in tf2/convert.h.
+   * \param msg The Pose message to convert.
+   * \param out The pose converted to a KDL Frame.
+   */
+  static void fromMsg(const geometry_msgs::Pose& msg, KDL::Frame& out)
+  {
+    out.p[0] = msg.position.x;
+    out.p[1] = msg.position.y;
+    out.p[2] = msg.position.z;
+    out.M = KDL::Rotation::Quaternion(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w);
+  }
+};
+}  // namespace impl
 
 } // namespace
 
