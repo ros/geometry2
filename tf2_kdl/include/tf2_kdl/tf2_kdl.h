@@ -252,6 +252,7 @@ inline
   {
     t_out = tf2::Stamped<KDL::Frame>(transformToKDL(transform) * t_in, transform.header.stamp, transform.header.frame_id);
   }
+
 namespace impl
 {
 template <>
@@ -282,6 +283,12 @@ struct ImplDetails<KDL::Frame, geometry_msgs::Pose>
     out.p[2] = msg.position.z;
     out.M = KDL::Rotation::Quaternion(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w);
   }
+};
+
+template <>
+struct defaultMessage<KDL::Frame>
+{
+  using type = geometry_msgs::Pose;
 };
 }  // namespace impl
 
