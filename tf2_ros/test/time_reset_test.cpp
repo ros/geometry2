@@ -41,7 +41,7 @@ void spin_for_a_second()
   ros::spinOnce();
   for (uint8_t i = 0; i < 10; ++i)
   {
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ros::spinOnce();
   }
 }
