@@ -78,7 +78,7 @@ ros::Time now_fallback_to_wall()
   {
     return ros::Time::now();
   }
-  catch (ros::TimeNotInitializedException ex)
+  catch (const ros::TimeNotInitializedException&)
   {
     ros::WallTime wt = ros::WallTime::now(); 
     return ros::Time(wt.sec, wt.nsec); 
@@ -96,7 +96,7 @@ void sleep_fallback_to_wall(const ros::Duration& d)
   {
       d.sleep();
   }
-  catch (ros::TimeNotInitializedException ex)
+  catch (const ros::TimeNotInitializedException&)
   {
     ros::WallDuration wd = ros::WallDuration(d.sec, d.nsec); 
     wd.sleep();
