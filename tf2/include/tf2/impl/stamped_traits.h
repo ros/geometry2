@@ -136,6 +136,9 @@ struct unstampedMessageTraits<geometry_msgs::Vector3_<Alloc>>
 template <class StampedMessage>
 struct stampedMessageTraits;
 
+// we use partial specializations (with the allocator as template parameter)
+// to avoid including all the message definitons
+
 template <typename Alloc>
 struct stampedMessageTraits<geometry_msgs::PointStamped_<Alloc>>
 {
