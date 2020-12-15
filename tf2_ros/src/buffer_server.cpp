@@ -42,12 +42,12 @@ namespace tf2_ros
     buffer_(buffer),
     server_(ros::NodeHandle(),
             ns,
-            boost::bind(&BufferServer::goalCB, this, _1),
-            boost::bind(&BufferServer::cancelCB, this, _1),
+            boost::bind(&BufferServer::goalCB, this, boost::placeholders::_1),
+            boost::bind(&BufferServer::cancelCB, this, boost::placeholders::_1),
             auto_start)
   {
     ros::NodeHandle n;
-    check_timer_ = n.createTimer(check_period, boost::bind(&BufferServer::checkTransforms, this, _1));
+    check_timer_ = n.createTimer(check_period, boost::bind(&BufferServer::checkTransforms, this, boost::placeholders::_1));
   }
 
   void BufferServer::checkTransforms(const ros::TimerEvent& e)

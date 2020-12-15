@@ -38,7 +38,7 @@
 #include <list>
 #include <vector>
 #include <boost/function.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 
@@ -282,7 +282,7 @@ public:
     TF2_ROS_MESSAGEFILTER_DEBUG("%s", "Cleared");
 
     bc_.removeTransformableCallback(callback_handle_);
-    callback_handle_ = bc_.addTransformableCallback(boost::bind(&MessageFilter::transformable, this, _1, _2, _3, _4, _5));
+    callback_handle_ = bc_.addTransformableCallback(boost::bind(&MessageFilter::transformable, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4, boost::placeholders::_5));
 
     messages_.clear();
     message_count_ = 0;
@@ -425,7 +425,7 @@ public:
   message_filters::Connection registerFailureCallback(const FailureCallback& callback)
   {
     boost::mutex::scoped_lock lock(failure_signal_mutex_);
-    return message_filters::Connection(boost::bind(&MessageFilter::disconnectFailure, this, _1), failure_signal_.connect(callback));
+    return message_filters::Connection(boost::bind(&MessageFilter::disconnectFailure, this, boost::placeholders::_1), failure_signal_.connect(callback));
   }
 
   virtual void setQueueSize( uint32_t new_queue_size )
@@ -453,7 +453,7 @@ private:
     warned_about_empty_frame_id_ = false;
     expected_success_count_ = 1;
 
-    callback_handle_ = bc_.addTransformableCallback(boost::bind(&MessageFilter::transformable, this, _1, _2, _3, _4, _5));
+    callback_handle_ = bc_.addTransformableCallback(boost::bind(&MessageFilter::transformable, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4, boost::placeholders::_5));
   }
 
   void transformable(tf2::TransformableRequestHandle request_handle, const std::string& /* target_frame */, const std::string& /* source_frame */,
