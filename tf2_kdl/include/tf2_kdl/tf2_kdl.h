@@ -152,7 +152,7 @@ inline
 namespace impl
 {
 template <>
-struct ImplDetails<KDL::Twist, geometry_msgs::TwistStamped>
+struct ImplDetails<KDL::Twist, geometry_msgs::Twist>
 {
   /** \brief Convert a stamped KDL Twist type to a TwistStamped message.
    * This function is a specialization of the toMsg template defined in tf2/convert.h.
@@ -184,6 +184,13 @@ struct ImplDetails<KDL::Twist, geometry_msgs::TwistStamped>
     out.rot[2] = msg.angular.z;
   }
 };
+
+template <>
+struct defaultMessage<KDL::Twist>
+{
+  using type = geometry_msgs::Twist;
+};
+
 }  // namespace impl
 // ---------------------
 // Wrench
@@ -204,7 +211,7 @@ inline
 namespace impl
 {
 template <>
-struct ImplDetails<KDL::Wrench, geometry_msgs::WrenchStamped>
+struct ImplDetails<KDL::Wrench, geometry_msgs::Wrench>
 {
   /** \brief Convert a stamped KDL Wrench type to a WrenchStamped message.
    * This function is a specialization of the toMsg template defined in tf2/convert.h.
@@ -235,6 +242,12 @@ struct ImplDetails<KDL::Wrench, geometry_msgs::WrenchStamped>
     out.torque[1] = msg.torque.y;
     out.torque[2] = msg.torque.z;
   }
+};
+
+template <>
+struct defaultMessage<KDL::Wrench>
+{
+  using type = geometry_msgs::Wrench;
 };
 }  // namespace impl
 // ---------------------
