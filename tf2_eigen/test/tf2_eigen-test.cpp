@@ -26,10 +26,25 @@
 
 /** \author Wim Meeussen */
 
+// To get M_PI, especially on Windows.
 
-#include <tf2_eigen/tf2_eigen.h>
+#ifdef _MSC_VER
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+#endif
+
+#include <math.h>
+
+
 #include <gtest/gtest.h>
 #include <tf2/convert.h>
+#include <tf2_eigen/tf2_eigen.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+
+
+#include <memory>
 
 TEST(TfEigen, ConvertVector3dStamped)
 {
@@ -204,9 +219,124 @@ TEST(TfEigen, ConvertTransform)
   EXPECT_TRUE(tm.isApprox(Iback.matrix()));
 }
 
+struct EigenTransform : public ::testing::Test
+{
+  static void SetUpTestSuite()
+  {
+    geometry_msgs::TransformStamped t;
+    transform.transform.translation.x = 10;
+    transform.transform.translation.y = 20;
+    transform.transform.translation.z = 30;
+    transform.transform.rotation.w = 0;
+    transform.transform.rotation.x = 1;
+    transform.transform.rotation.y = 0;
+    transform.transform.rotation.z = 0;
+    transform.header.stamp = ros::Time(2.0);
+    transform.header.frame_id = "A";
+    transform.child_frame_id = "B";
+  }
 
+  template<int mode>
+  void testEigenTransform();
 
-int main(int argc, char **argv){
+  ::testing::AssertionResult doTestEigenQuaternion(
+    const Eigen::Quaterniond & parameter, const Eigen::Quaterniond & expected);
+
+  static geometry_msgs::TransformStamped transform;
+  static constexpr double EPS = 1e-3;
+};
+
+geometry_msgs::TransformStamped EigenTransform::transform;
+
+template<int mode>
+void EigenTransform::testEigenTransform()
+{
+  using T = Eigen::Transform<double, 3, mode>;
+  using stampedT = tf2::Stamped<T>;
+
+  const stampedT i1{
+    T{Eigen::Translation3d{1, 2, 3} *Eigen::Quaterniond{0, 1, 0, 0}}, ros::Time(2), "A"};
+
+  stampedT i_simple;
+  tf2::doTransform(i1, i_simple, transform);
+
+  EXPECT_NEAR(i_simple.translation().x(), 11, EPS);
+  EXPECT_NEAR(i_simple.translation().y(), 18, EPS);
+  EXPECT_NEAR(i_simple.translation().z(), 27, EPS);
+  const auto q1 = Eigen::Quaterniond(i_simple.linear());
+  EXPECT_NEAR(q1.x(), 0.0, EPS);
+  EXPECT_NEAR(q1.y(), 0.0, EPS);
+  EXPECT_NEAR(q1.z(), 0.0, EPS);
+  EXPECT_NEAR(q1.w(), 1.0, EPS);
+}
+
+TEST_F(EigenTransform, Affine3d) {
+  testEigenTransform<Eigen::Affine>();
+}
+
+TEST_F(EigenTransform, Isometry3d) {
+  testEigenTransform<Eigen::Isometry>();
+}
+
+TEST_F(EigenTransform, Vector)
+{
+  const tf2::Stamped<Eigen::Vector3d> v1{{1, 2, 3}, ros::Time(2), "A"};
+
+  // simple api
+  tf2::Stamped<Eigen::Vector3d> v_simple;
+  tf2::doTransform(v1, v_simple, transform);
+
+  EXPECT_NEAR(v_simple.x(), 11, EPS);
+  EXPECT_NEAR(v_simple.y(), 18, EPS);
+  EXPECT_NEAR(v_simple.z(), 27, EPS);
+}
+
+// helper method for Quaternion tests
+::testing::AssertionResult EigenTransform::doTestEigenQuaternion(
+  const Eigen::Quaterniond & parameter, const Eigen::Quaterniond & expected)
+{
+  const tf2::Stamped<Eigen::Quaterniond> q1{parameter, ros::Time(2), "A"};
+  // avoid linking error
+  const double eps = EPS;
+
+  // simple api
+  tf2::Stamped<Eigen::Quaterniond> q_simple;
+  tf2::doTransform(q1, q_simple, transform);
+  // compare rotation matrices, as the quaternions can be ambigous
+  EXPECT_TRUE(q_simple.toRotationMatrix().isApprox(expected.toRotationMatrix(), eps));
+
+  return ::testing::AssertionSuccess();
+}
+
+TEST_F(EigenTransform, QuaternionRotY)
+{
+  // rotated by -90° around y
+  // 0, 0, -1
+  // 0, 1, 0,
+  // 1, 0, 0
+  const Eigen::Quaterniond param{Eigen::AngleAxisd(-1 * M_PI_2, Eigen::Vector3d::UnitY())};
+  const Eigen::Quaterniond expected{0, M_SQRT1_2, 0, -1 * M_SQRT1_2};
+  EXPECT_TRUE(doTestEigenQuaternion(param, expected));
+}
+
+TEST_F(EigenTransform, QuaternionRotX)
+{
+  // rotated by 90° around y
+  const Eigen::Quaterniond param{Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d::UnitX())};
+  const Eigen::Quaterniond expected{Eigen::AngleAxisd(-1 * M_PI_2, Eigen::Vector3d::UnitX())};
+  EXPECT_TRUE(doTestEigenQuaternion(param, expected));
+}
+
+TEST_F(EigenTransform, QuaternionRotZ)
+{
+  // rotated by 180° around z
+  const Eigen::Quaterniond param{Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitZ())};
+  const Eigen::Quaterniond expected{Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY())};
+  EXPECT_TRUE(doTestEigenQuaternion(param, expected));
+}
+
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
 
   return RUN_ALL_TESTS();
