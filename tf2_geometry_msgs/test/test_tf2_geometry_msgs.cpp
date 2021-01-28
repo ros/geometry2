@@ -29,6 +29,14 @@
 
 /** \author Wim Meeussen */
 
+#ifdef _MSC_VER
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+#endif
+
+// To get M_PI, especially on Windows.
+#include <math.h>
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_listener.h>
@@ -61,7 +69,7 @@ TEST(TfGeometry, Frame)
   EXPECT_NEAR(v_simple.pose.orientation.y, 0.0, EPS);
   EXPECT_NEAR(v_simple.pose.orientation.z, 0.0, EPS);
   EXPECT_NEAR(v_simple.pose.orientation.w, 1.0, EPS);
-  
+
   // advanced api
   geometry_msgs::PoseStamped v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
 							      "A", ros::Duration(3.0));
@@ -89,7 +97,7 @@ TEST(TfGeometry, PoseWithCovarianceStamped)
   v1.pose.covariance[21] = 1;
   v1.pose.covariance[28] = 1;
   v1.pose.covariance[35] = 1;
-  
+
   // simple api
   const geometry_msgs::PoseWithCovarianceStamped v_simple = tf_buffer->transform(v1, "B", ros::Duration(2.0));
   EXPECT_NEAR(v_simple.pose.pose.position.x, -9, EPS);
@@ -99,7 +107,7 @@ TEST(TfGeometry, PoseWithCovarianceStamped)
   EXPECT_NEAR(v_simple.pose.pose.orientation.y, 0.0, EPS);
   EXPECT_NEAR(v_simple.pose.pose.orientation.z, 0.0, EPS);
   EXPECT_NEAR(v_simple.pose.pose.orientation.w, 1.0, EPS);
-  
+
   // no rotation in this transformation, so no change to covariance
   EXPECT_NEAR(v_simple.pose.covariance[0], 1.0, EPS);
   EXPECT_NEAR(v_simple.pose.covariance[7], 1.0, EPS);
@@ -107,7 +115,7 @@ TEST(TfGeometry, PoseWithCovarianceStamped)
   EXPECT_NEAR(v_simple.pose.covariance[21], 1.0, EPS);
   EXPECT_NEAR(v_simple.pose.covariance[28], 1.0, EPS);
   EXPECT_NEAR(v_simple.pose.covariance[35], 1.0, EPS);
-  
+
   // advanced api
   const geometry_msgs::PoseWithCovarianceStamped v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
 							      "A", ros::Duration(3.0));
@@ -118,7 +126,7 @@ TEST(TfGeometry, PoseWithCovarianceStamped)
   EXPECT_NEAR(v_advanced.pose.pose.orientation.y, 0.0, EPS);
   EXPECT_NEAR(v_advanced.pose.pose.orientation.z, 0.0, EPS);
   EXPECT_NEAR(v_advanced.pose.pose.orientation.w, 1.0, EPS);
-  
+
   // no rotation in this transformation, so no change to covariance
   EXPECT_NEAR(v_advanced.pose.covariance[0], 1.0, EPS);
   EXPECT_NEAR(v_advanced.pose.covariance[7], 1.0, EPS);
@@ -126,9 +134,9 @@ TEST(TfGeometry, PoseWithCovarianceStamped)
   EXPECT_NEAR(v_advanced.pose.covariance[21], 1.0, EPS);
   EXPECT_NEAR(v_advanced.pose.covariance[28], 1.0, EPS);
   EXPECT_NEAR(v_advanced.pose.covariance[35], 1.0, EPS);
-  
+
   /** now add rotation to transform to test the effect on covariance **/
-  
+
   // rotate pi/2 radians about x-axis
   geometry_msgs::TransformStamped t_rot;
   t_rot.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(1,0,0), M_PI/2));
@@ -136,12 +144,12 @@ TEST(TfGeometry, PoseWithCovarianceStamped)
   t_rot.header.frame_id = "A";
   t_rot.child_frame_id = "rotated";
   tf_buffer->setTransform(t_rot, "rotation_test");
-  
+
   // need to put some covariance in the matrix
   v1.pose.covariance[1] = 1;
   v1.pose.covariance[6] = 1;
   v1.pose.covariance[12] = 1;
-  
+
   // perform rotation
   const geometry_msgs::PoseWithCovarianceStamped v_rotated = tf_buffer->transform(v1, "rotated", ros::Duration(2.0));
 
@@ -155,11 +163,11 @@ TEST(TfGeometry, PoseWithCovarianceStamped)
   EXPECT_NEAR(v_rotated.pose.covariance[12],-1.0, EPS);
   EXPECT_NEAR(v_rotated.pose.covariance[13], 0.0, EPS);
   EXPECT_NEAR(v_rotated.pose.covariance[14], 1.0, EPS);
-  
+
   // set buffer back to original transform
   tf_buffer->setTransform(t, "test");
 }
-  
+
 TEST(TfGeometry, Transform)
 {
   geometry_msgs::TransformStamped v1;
@@ -179,7 +187,7 @@ TEST(TfGeometry, Transform)
   EXPECT_NEAR(v_simple.transform.rotation.y, 0.0, EPS);
   EXPECT_NEAR(v_simple.transform.rotation.z, 0.0, EPS);
   EXPECT_NEAR(v_simple.transform.rotation.w, 1.0, EPS);
-  
+
 
   // advanced api
   geometry_msgs::TransformStamped v_advanced = tf_buffer->transform(v1, "B", ros::Time(2.0),
@@ -351,6 +359,42 @@ TEST(TfGeometry, doTransformWrench)
  EXPECT_NEAR(res.torque.z, 3, EPS);
 }
 
+TEST(TfGeometry, Quaternion)
+{
+  // rotated by -90° around y
+  // 0, 0, -1
+  // 0, 1, 0,
+  // 1, 0, 0
+  geometry_msgs::QuaternionStamped q1, res;
+  q1.quaternion.x = 0;
+  q1.quaternion.y = -1 * M_SQRT1_2;
+  q1.quaternion.z = 0;
+  q1.quaternion.w = M_SQRT1_2;
+  q1.header.stamp = ros::Time(2);
+  q1.header.frame_id = "A";
+
+  // simple api
+  const geometry_msgs::QuaternionStamped q_simple = tf_buffer->transform(
+    q1, "B", ros::Duration(2.0));
+  EXPECT_NEAR(abs(q_simple.quaternion.x), M_SQRT1_2, EPS);
+  EXPECT_NEAR(q_simple.quaternion.y, 0, EPS);
+  EXPECT_NEAR(abs(q_simple.quaternion.z), M_SQRT1_2, EPS);
+  EXPECT_NEAR(q_simple.quaternion.w, 0, EPS);
+  // x and z should have different signs
+  EXPECT_NEAR(abs(q_simple.quaternion.x - q_simple.quaternion.z), M_SQRT2, EPS);
+
+  // advanced api
+  const geometry_msgs::QuaternionStamped q_advanced = tf_buffer->transform(
+    q1, "B", ros::Time(2.0), "A", ros::Duration(3.0));
+  EXPECT_NEAR(abs(q_advanced.quaternion.x), M_SQRT1_2, EPS);
+  EXPECT_NEAR(q_advanced.quaternion.y, 0, EPS);
+  EXPECT_NEAR(abs(q_advanced.quaternion.z), M_SQRT1_2, EPS);
+  EXPECT_NEAR(q_advanced.quaternion.w, 0, EPS);
+  // x and z should have different signs
+  EXPECT_NEAR(abs(q_advanced.quaternion.x - q_advanced.quaternion.z), M_SQRT2, EPS);
+}
+
+
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "test");
@@ -358,7 +402,7 @@ int main(int argc, char **argv){
 
   tf_buffer = new tf2_ros::Buffer();
   tf_buffer->setUsingDedicatedThread(true);
-  
+
   // populate buffer
   t.transform.translation.x = 10;
   t.transform.translation.y = 20;
@@ -373,8 +417,3 @@ int main(int argc, char **argv){
   delete tf_buffer;
   return ret;
 }
-
-
-
-
-
