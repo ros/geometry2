@@ -102,34 +102,6 @@ TEST(TfEigen, ConvertQuaterniond)
   EXPECT_EQ(v.z(), v1.z());
 }
 
-TEST(TfEigen, TransformQuaterion) {
- const tf2::Stamped<Eigen::Quaterniond> in(Eigen::Quaterniond(Eigen::AngleAxisd(1, Eigen::Vector3d::UnitX())), ros::Time(5), "test");
- const Eigen::Isometry3d iso(Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitY()));
- const Eigen::Affine3d affine(iso);
- const tf2::Stamped<Eigen::Quaterniond> expected(Eigen::Quaterniond(Eigen::AngleAxisd(1, Eigen::Vector3d::UnitZ())), ros::Time(10), "expected");
-
- geometry_msgs::TransformStamped trafo = tf2::eigenToTransform(affine);
- trafo.header.stamp = ros::Time(10);
- trafo.header.frame_id = "expected";
-
- tf2::Stamped<Eigen::Quaterniond> out;
- tf2::doTransform(in, out, trafo);
-
- EXPECT_TRUE(out.isApprox(expected));
- EXPECT_EQ(expected.stamp_, out.stamp_);
- EXPECT_EQ(expected.frame_id_, out.frame_id_);
-
- // the same using Isometry
- trafo = tf2::eigenToTransform(iso);
- trafo.header.stamp = ros::Time(10);
- trafo.header.frame_id = "expected";
- tf2::doTransform(in, out, trafo);
-
- EXPECT_TRUE(out.isApprox(expected));
- EXPECT_EQ(expected.stamp_, out.stamp_);
- EXPECT_EQ(expected.frame_id_, out.frame_id_);
-}
-
 TEST(TfEigen, ConvertAffine3dStamped)
 {
   const Eigen::Affine3d v_nonstamped(Eigen::Translation3d(1,2,3) * Eigen::AngleAxis<double>(1, Eigen::Vector3d::UnitX()));
