@@ -103,7 +103,7 @@ else()
   set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
 endif()
 if(APPLE)
-  set_target_properties(${PROJECT_NAME}_boost PROPERTIES
+  set_target_properties(tf2_py PROPERTIES
                         LINK_FLAGS "-undefined dynamic_lookup")
 endif()
 set_target_properties(tf2_py PROPERTIES
