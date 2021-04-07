@@ -34,6 +34,7 @@ import yaml
 import subprocess
 from tf2_msgs.srv import FrameGraph
 import tf2_ros
+import datetime
 
 def main():
     rospy.init_node('view_frames')
@@ -45,13 +46,19 @@ def main():
     listener = tf2_ros.TransformListener(buffer)
     rospy.sleep(5.0)
 
-    rospy.loginfo('Generating graph in frames.pdf file...')
+    rospy.loginfo('Generating graph file...')
     rospy.wait_for_service('~tf2_frames')
     srv = rospy.ServiceProxy('~tf2_frames', FrameGraph)
     data = yaml.safe_load(srv().frame_yaml)
-    with open('frames.gv', 'w') as f:
+    x = datetime.datetime.now().strftime("%F_%H.%M.%S")
+    filename_gv = f"frames_{x:s}.gv"
+    filename_pdf = f"frames_{x:s}.pdf"
+    # with open('frames.gv', 'w') as f:
+    with open(filename_gv, 'w') as f:
         f.write(generate_dot(data))
-    subprocess.Popen('dot -Tpdf frames.gv -o frames.pdf'.split(' ')).communicate()
+    cmd = ["dot", "-Tpdf", filename_gv, "-o", filename_pdf]
+    subprocess.Popen(cmd).communicate()
+    #subprocess.Popen('dot -Tpdf frames.gv -o frames.pdf'.split(' ')).communicate()
 
 def generate_dot(data):
     if len(data) == 0:
