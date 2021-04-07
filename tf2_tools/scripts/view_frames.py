@@ -50,7 +50,7 @@ def main():
     rospy.wait_for_service('~tf2_frames')
     srv = rospy.ServiceProxy('~tf2_frames', FrameGraph)
     data = yaml.safe_load(srv().frame_yaml)
-    x = datetime.datetime.now().strftime("%F_%H.%M.%S")
+    x = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
     filename_gv = f"frames_{x:s}.gv"
     filename_pdf = f"frames_{x:s}.pdf"
     # with open('frames.gv', 'w') as f:
