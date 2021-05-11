@@ -221,7 +221,8 @@ if __name__ == '__main__':
     except KeyError:
         pass
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Display at a regular interval the coordinate of source_frame into target_frame.")
     parser.add_argument("target_frame")
     parser.add_argument("source_frame")
     parser.add_argument("-r", "--rate",
