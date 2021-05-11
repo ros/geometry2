@@ -167,8 +167,8 @@ class Echo():
             lookup_time = rospy.Time()
 
         try:
-            ts = self.tf_buffer.lookup_transform(self.args.source_frame,
-                                                 self.args.target_frame,
+            ts = self.tf_buffer.lookup_transform(self.args.target_frame,
+                                                 self.args.source_frame,
                                                  lookup_time)
         except tf2.LookupException as ex:
             msg = "At time {}, (current time {}) ".format(lookup_time.to_sec(), cur_time.to_sec())
@@ -222,8 +222,8 @@ if __name__ == '__main__':
         pass
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("source_frame")  # parent
-    parser.add_argument("target_frame")  # child
+    parser.add_argument("target_frame")
+    parser.add_argument("source_frame")
     parser.add_argument("-r", "--rate",
                         help="update rate, must be > 0.0",
                         default=1.0,
