@@ -118,7 +118,7 @@ private:
   L_TransformStorage storage_;
 
   ros::Duration max_storage_time_;
-
+  ros::Time last_repeated_warn_time_;
 
   /// A helper function for getData
   //Assumes storage is already locked for it
