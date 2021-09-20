@@ -50,6 +50,9 @@ public:
   /** \brief Constructor (needs a ros::Node reference) */
   TransformBroadcaster();
 
+  /** \brief Constructor (needs a ros::Node reference) */
+  TransformBroadcaster(const ros::NodeHandle& node);
+
   /** \brief Send a StampedTransform 
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
   //  void sendTransform(const StampedTransform & transform);

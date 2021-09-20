@@ -43,6 +43,11 @@ StaticTransformBroadcaster::StaticTransformBroadcaster()
   publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf_static", 100, true);
 };
 
+StaticTransformBroadcaster::StaticTransformBroadcaster(const ros::NodeHandle& node) : node_(node)
+{
+  publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf_static", 100, true);
+};
+
 void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::TransformStamped> & msgtf)
 {
   for (const geometry_msgs::TransformStamped& input : msgtf)

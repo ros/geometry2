@@ -52,6 +52,9 @@ public:
   /** \brief Constructor (needs a ros::Node reference) */
   StaticTransformBroadcaster();
 
+  /** \brief Constructor (needs a ros::Node reference) */
+  StaticTransformBroadcaster(const ros::NodeHandle& node);
+
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id already.  */
   void sendTransform(const geometry_msgs::TransformStamped & transform) {

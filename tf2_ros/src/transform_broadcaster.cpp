@@ -42,6 +42,11 @@ TransformBroadcaster::TransformBroadcaster()
   publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf", 100);
 };
 
+TransformBroadcaster::TransformBroadcaster(const ros::NodeHandle& node) : node_(node)
+{
+  publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf", 100, true);
+};
+
 void TransformBroadcaster::sendTransform(const geometry_msgs::TransformStamped & msgtf)
 {
   std::vector<geometry_msgs::TransformStamped> v1;
