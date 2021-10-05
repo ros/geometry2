@@ -30,10 +30,10 @@
 import threading
 
 import rospy
-import tf2_ros
 from tf2_msgs.msg import TFMessage
 
-class TransformListener():
+
+class TransformListener:
     """
     :class:`TransformListener` is a convenient way to listen for coordinate frame transformation info.
     This class takes an object that instantiates the :class:`BufferInterface` interface, to which
@@ -41,14 +41,14 @@ class TransformListener():
     """
     def __init__(self, buffer, queue_size=None, buff_size=65536, tcp_nodelay=False):
         """
-        .. function:: __init__(buffer)
+        .. function:: __init__(buffer, queue_size=None, buff_size=65536, tcp_nodelay=False):
 
             Constructor.
 
             :param buffer: The buffer to propagate changes to when tf info updates.
-            :param queue_size (int) - maximum number of messages to receive at a time. This will generally be 1 or None (infinite, default). buff_size should be increased if this parameter is set as incoming data still needs to sit in the incoming buffer before being discarded. Setting queue_size buff_size to a non-default value affects all subscribers to this topic in this process.
-            :param buff_size (int) - incoming message buffer size in bytes. If queue_size is set, this should be set to a number greater than the queue_size times the average message size. Setting buff_size to a non-default value affects all subscribers to this topic in this process.
-            :param tcp_nodelay (bool) - if True, request TCP_NODELAY from publisher. Use of this option is not generally recommended in most cases as it is better to rely on timestamps in message data. Setting tcp_nodelay to True enables TCP_NODELAY for all subscribers in the same python process.
+            :param queue_size: Maximum number of messages to receive at a time. This will generally be 1 or None (infinite, default). buff_size should be increased if this parameter is set as incoming data still needs to sit in the incoming buffer before being discarded. Setting queue_size buff_size to a non-default value affects all subscribers to this topic in this process.
+            :param buff_size: Incoming message buffer size in bytes. If queue_size is set, this should be set to a number greater than the queue_size times the average message size. Setting buff_size to a non-default value affects all subscribers to this topic in this process.
+            :param tcp_nodelay: If True, request TCP_NODELAY from publisher. Use of this option is not generally recommended in most cases as it is better to rely on timestamps in message data. Setting tcp_nodelay to True enables TCP_NODELAY for all subscribers in the same python process.
         """
         self.buffer = buffer
         self.last_update = rospy.Time.now()
