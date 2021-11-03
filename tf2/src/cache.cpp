@@ -76,7 +76,9 @@ void createExtrapolationException2(ros::Time t0, ros::Time t1, std::string* erro
 {
   if (error_str)
   {
-    ros::Duration tdiff = t1 - t0;
+    // Want this to come out positive, because this is a future extrapolation problem with t0
+    // t0 needs to come first because it will be bigger than t1
+    ros::Duration tdiff = t0 - t1;
     char str[163]; // Text without formatting strings has 102, each timestamp has up to 20
     snprintf(
         str, sizeof(str),
