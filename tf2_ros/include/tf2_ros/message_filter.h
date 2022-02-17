@@ -96,7 +96,7 @@ public:
  * If you want to hook a MessageFilter into a ROS topic:
 \verbatim
 message_filters::Subscriber<MessageType> sub(node_handle_, "topic", 10);
-tf::MessageFilter<MessageType> tf_filter(sub, tf_listener_, "/map", 10);
+tf2_ros::MessageFilter<MessageType> tf_filter(sub, tf_buffer_, "/map", 10, 0);
 tf_filter.registerCallback(&MyClass::myCallback, this);
 \endverbatim
  */
