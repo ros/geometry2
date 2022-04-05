@@ -241,14 +241,11 @@ def convert(a, b_type):
     #check if an efficient conversion function between the types exists
     try:
         f = c.get_convert((type(a), b_type))
-        print("efficient copy")
         return f(a)
     except TypeException:
         if type(a) == b_type:
-            print("deep copy")
             return deepcopy(a)
 
         f_to = c.get_to_msg(type(a))
         f_from = c.get_from_msg(b_type)
-        print("message copy")
         return f_from(f_to(a))
