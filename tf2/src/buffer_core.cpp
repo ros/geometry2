@@ -1261,7 +1261,11 @@ void BufferCore::removeTransformableCallback(TransformableCallbackHandle handle)
 
   {
     boost::mutex::scoped_lock lock(transformable_requests_mutex_);
-    std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByCallback(handle));
+    auto it = std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByCallback(handle));
+    if (it != transformable_requests_.end())
+    {
+      transformable_requests_.erase(it, transformable_requests_.end());
+    }
   }
 }
 
@@ -1337,7 +1341,11 @@ struct BufferCore::RemoveRequestByID
 void BufferCore::cancelTransformableRequest(TransformableRequestHandle handle)
 {
   boost::mutex::scoped_lock lock(transformable_requests_mutex_);
-  std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByID(handle));
+  auto it = std::remove_if(transformable_requests_.begin(), transformable_requests_.end(), RemoveRequestByID(handle));
+  if (it != transformable_requests_.end())
+  {
+    transformable_requests_.erase(it, transformable_requests_.end());
+  }
 }
 
 
