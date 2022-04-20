@@ -668,6 +668,17 @@ geometry_msgs::TransformStamped toMsg(const geometry_msgs::TransformStamped& in)
   return in;
 }
 
+/** \brief Convert a TransformStamped message to its equivalent tf2 representation.
+ * This function is a specialization of the toMsg template defined in tf2/convert.h.
+ * \param msg A TransformStamped message type.
+ * \param out The input argument
+ */
+inline
+void fromMsg(const geometry_msgs::TransformStamped& msg, geometry_msgs::TransformStamped& out)
+{
+  out = msg;
+}
+
 /** \brief Convert as stamped tf2 Transform type to its equivalent geometry_msgs representation.
  * This function is a specialization of the toMsg template defined in tf2/convert.h.
  * \param in An instance of the tf2::Transform specialization of the tf2::Stamped template.
