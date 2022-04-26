@@ -33,6 +33,8 @@ import tf2_ros
 from tf2_msgs.srv import FrameGraph, FrameGraphResponse
 import rosgraph.masterapi
 
+DEFAULT_CAN_TRANSFORM_POLLING_SCALE = 0.01
+
 class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
     """
     Standard implementation of the :class:`tf2_ros.BufferInterface` abstract data type.
@@ -66,6 +68,8 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
                 m.lookupService('~tf2_frames')
             except (rosgraph.masterapi.Error, rosgraph.masterapi.Failure):   
                 self.frame_server = rospy.Service('~tf2_frames', FrameGraph, self.__get_frames)
+
+        self.CAN_TRANSFORM_POLLING_SCALE = DEFAULT_CAN_TRANSFORM_POLLING_SCALE
 
     def __get_frames(self, req):
        return FrameGraphResponse(self.all_frames_as_yaml()) 
@@ -116,11 +120,11 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
         """
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
-            r= rospy.Rate(20)
+            polling_interval = timeout * self.CAN_TRANSFORM_POLLING_SCALE
             while (rospy.Time.now() < start_time + timeout and 
                    not self.can_transform_core(target_frame, source_frame, time)[0] and
                    (rospy.Time.now()+rospy.Duration(3.0)) >= start_time): # big jumps in time are likely bag loops, so break for them
-                r.sleep()
+                rospy.sleep(polling_interval)
         core_result = self.can_transform_core(target_frame, source_frame, time)
         if return_debug_tuple:
             return core_result
@@ -146,11 +150,11 @@ class Buffer(tf2.BufferCore, tf2_ros.BufferInterface):
         """
         if timeout != rospy.Duration(0.0):
             start_time = rospy.Time.now()
-            r= rospy.Rate(20)
+            polling_interval = timeout * self.CAN_TRANSFORM_POLLING_SCALE
             while (rospy.Time.now() < start_time + timeout and 
                    not self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)[0] and
                    (rospy.Time.now()+rospy.Duration(3.0)) >= start_time): # big jumps in time are likely bag loops, so break for them
-                r.sleep()
+                rospy.sleep(polling_interval)
         core_result = self.can_transform_full_core(target_frame, target_time, source_frame, source_time, fixed_frame)
         if return_debug_tuple:
             return core_result
