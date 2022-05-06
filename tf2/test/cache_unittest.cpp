@@ -325,6 +325,28 @@ TEST(Bullet, Slerp)
 
 }
 
+TEST(TimeCache, SetRPYEqualsSetEuler)
+{
+  uint64_t runs = 100;
+  seed_rand();
+
+  tf2::Quaternion q1, q2;
+  double yaw, pitch, roll;
+
+  for (uint64_t i = 0; i < runs; i++) {
+    yaw = 1.0 * get_rand();
+    pitch = 1.0 * get_rand();
+    roll = 1.0 * get_rand();
+
+    q1.setEuler(yaw, pitch, roll);
+    q2.setRPY(roll, pitch, yaw);
+
+    EXPECT_NEAR(q1.x(), q2.x(), 1e-5);
+    EXPECT_NEAR(q1.y(), q2.y(), 1e-5);
+    EXPECT_NEAR(q1.z(), q2.z(), 1e-5);
+    EXPECT_NEAR(q1.w(), q2.w(), 1e-5);
+  }
+}
 
 TEST(TimeCache, AngularInterpolation)
 {
