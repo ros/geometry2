@@ -101,10 +101,10 @@ if(WIN32)
 else()
   set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
   set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
-endif()
-if(APPLE)
-  set_target_properties(tf2_py PROPERTIES
-                        LINK_FLAGS "-undefined dynamic_lookup")
+  if(APPLE)
+    set_target_properties(tf2_py PROPERTIES
+                          LINK_FLAGS "-undefined dynamic_lookup")
+  endif()
 endif()
 set_target_properties(tf2_py PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
