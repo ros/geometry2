@@ -158,7 +158,6 @@ protected:
     Sink(const std::string &name, int delay = 0) : name_(name), delay_(delay) {}
     void operator()(const boost::shared_ptr<const M> &msg)
     {
-      std::cerr << name_ << " ";
       std::this_thread::sleep_for(std::chrono::milliseconds(delay_));
     }
   };
@@ -170,7 +169,6 @@ public:
     const std::string frame_id("target");
     while (ros::ok() && run)
     {
-      std::cerr << "\ngenerated: ";
       source.generate(frame_id, ros::Time::now());
       rate.sleep();
     }
@@ -231,7 +229,6 @@ TEST_P(MessageFilterFixture, StressTest)
   while (!filters.empty())
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(7));
-    std::cerr << "\033[31m" << filters.front().getName() << "\033[0m ";
     filters.pop_front();
   }
 
