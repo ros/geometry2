@@ -215,8 +215,8 @@ public:
   ~MessageFilter()
   {
     message_connection_.disconnect();
-
     MessageFilter::clear();
+    bc_.removeTransformableCallback(callback_handle_);
 
     TF2_ROS_MESSAGEFILTER_DEBUG("Successful Transforms: %llu, Discarded due to age: %llu, Transform messages received: %llu, Messages received: %llu, Total dropped: %llu",
                            (long long unsigned int)successful_transform_count_,
