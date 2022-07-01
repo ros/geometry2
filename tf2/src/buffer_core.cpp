@@ -1462,7 +1462,7 @@ void BufferCore::testTransformableRequests()
     }
   }
 
-  // unlock before allowing possible user callbacks to avoid potential detadlock (#91)
+  // unlock before allowing possible user callbacks to avoid potential deadlock (#91)
   lock.unlock();
 
   // Backwards compatability callback for tf
