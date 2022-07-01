@@ -364,6 +364,7 @@ public:
       }
     }
 
+    L_MessageInfo msgs_to_drop;
 
     // We can transform already
     if (info.success_count == expected_success_count_)
@@ -376,21 +377,8 @@ public:
       // If this message is about to push us past our queue size, erase the oldest message
       if (queue_size_ != 0 && message_count_ + 1 > queue_size_)
       {
-        ++dropped_message_count_;
-        const MessageInfo& front = messages_.front();
-        TF2_ROS_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_,
-                                (mt::FrameId<M>::value(*front.event.getMessage())).c_str(), mt::TimeStamp<M>::value(*front.event.getMessage()).toSec());
-
-        V_TransformableRequestHandle::const_iterator it = front.handles.begin();
-        V_TransformableRequestHandle::const_iterator end = front.handles.end();
-        for (; it != end; ++it)
-        {
-          bc_.cancelTransformableRequest(*it);
-        }
-
-        messageDropped(front.event, filter_failure_reasons::Unknown);
-
-        messages_.pop_front();
+        // move front element from messages_ to msgs_to_drop for later dropping
+        msgs_to_drop.splice(msgs_to_drop.begin(), messages_, messages_.begin());
         --message_count_;
       }
 
@@ -398,6 +386,19 @@ public:
       info.event = evt;
       messages_.push_back(info);
       ++message_count_;
+    }
+
+    // Delay dropping of messages until we released messages_mutex_ to avoid deadlocks (#91, #101, #144)
+    for (const MessageInfo &msg : msgs_to_drop)
+    {
+      ++dropped_message_count_;
+      TF2_ROS_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_,
+                                  (mt::FrameId<M>::value(*msg.event.getMessage())).c_str(), mt::TimeStamp<M>::value(*msg.event.getMessage()).toSec());
+
+      for (const auto req : msg.handles)
+        bc_.cancelTransformableRequest(req);
+
+      messageDropped(msg.event, filter_failure_reasons::Unknown);
     }
 
     TF2_ROS_MESSAGEFILTER_DEBUG("Added message in frame %s at time %.3f, count now %d", frame_id.c_str(), stamp.toSec(), message_count_);
