@@ -278,13 +278,11 @@ public:
    */
   void clear()
   {
-    boost::unique_lock< boost::shared_mutex > unique_lock(messages_mutex_);
-
-    TF2_ROS_MESSAGEFILTER_DEBUG("%s", "Cleared");
-
     bc_.removeTransformableCallback(callback_handle_);
     callback_handle_ = bc_.addTransformableCallback(boost::bind(&MessageFilter::transformable, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4, boost::placeholders::_5));
 
+    // acquire after remove/addTransformableCallback to avoid deadlock!
+    boost::unique_lock<boost::shared_mutex> unique_lock(messages_mutex_);
     messages_.clear();
     message_count_ = 0;
 
@@ -293,6 +291,7 @@ public:
       callback_queue_->removeByID((uint64_t)this);
 
     warned_about_empty_frame_id_ = false;
+    TF2_ROS_MESSAGEFILTER_DEBUG("%s", "Cleared");
   }
 
   void add(const MEvent& evt)
