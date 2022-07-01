@@ -217,13 +217,13 @@ public:
     message_connection_.disconnect();
     MessageFilter::clear();
     bc_.removeTransformableCallback(callback_handle_);
-    boost::mutex::scoped_lock lock(cbqueue_mutex_); // ensure that no callback queue call is active
 
     TF2_ROS_MESSAGEFILTER_DEBUG("Successful Transforms: %llu, Discarded due to age: %llu, Transform messages received: %llu, Messages received: %llu, Total dropped: %llu",
                            (long long unsigned int)successful_transform_count_,
                            (long long unsigned int)failed_out_the_back_count_, (long long unsigned int)transform_message_count_, 
                            (long long unsigned int)incoming_message_count_, (long long unsigned int)dropped_message_count_);
 
+    boost::unique_lock<boost::shared_mutex> lock(cbqueue_mutex_); // ensure that no more callback queue calls are active
   }
 
   /**
@@ -596,7 +596,7 @@ private:
 
     virtual CallResult call()
     {
-      boost::mutex::scoped_lock lock(filter_->cbqueue_mutex_);
+      boost::shared_lock<boost::shared_mutex> lock(filter_->cbqueue_mutex_);
       if (success_)
       {
         filter_->signalMessage(event_);
@@ -670,7 +670,7 @@ private:
   V_string target_frames_; ///< The frames we need to be able to transform to before a message is ready
   std::string target_frames_string_;
   boost::mutex target_frames_mutex_; ///< A mutex to protect access to the target_frames_ list and target_frames_string.
-  boost::mutex cbqueue_mutex_;       ///< A mutex protecting calls from callback queues
+  boost::shared_mutex cbqueue_mutex_; ///< A mutex protecting calls from callback queues
   uint32_t queue_size_;              ///< The maximum number of messages we queue up
   tf2::TransformableCallbackHandle callback_handle_;
 
