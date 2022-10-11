@@ -2,6 +2,11 @@
 Changelog for package test_tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Switch to new boost/bind/bind.hpp (`#528 <https://github.com/ros/geometry2/issues/528>`_)
+* Contributors: Jochen Sprickerhof
+
 0.7.5 (2020-09-01)
 ------------------
 

@@ -2,6 +2,19 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* tf2_ros polling interval proportional to timeout (`#492 <https://github.com/ros/geometry2/issues/492>`_)
+  * polling interval proportional to timeout
+  * CAN_TRANSFORM_POLLING_SCALE as global
+  * add DEFAULT_CAN_TRANSFORM_POLLING_SCALE
+* Removed print statements from buffer interface (`#530 <https://github.com/ros/geometry2/issues/530>`_)
+* Switch to new boost/bind/bind.hpp (`#528 <https://github.com/ros/geometry2/issues/528>`_)
+* Updating the documentation to reflect current constructor for a MessageFilter (`#527 <https://github.com/ros/geometry2/issues/527>`_)
+* (tf2_ros) Docs working on python 3 (`#521 <https://github.com/ros/geometry2/issues/521>`_)
+* Mitigate flakey test in tf2_ros (`#490 <https://github.com/ros/geometry2/issues/490>`_)
+* Contributors: Atsushi Watanabe, Janno Lunenburg, Jochen Sprickerhof, Matthijs van der Burgh, Shih-Wei Guo, Tassos Natsakis
+
 0.7.5 (2020-09-01)
 ------------------
 
