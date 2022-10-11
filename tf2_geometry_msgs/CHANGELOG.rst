@@ -2,8 +2,8 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.6 (2022-10-11)
+------------------
 * remove method with misleading doc (`#534 <https://github.com/ros/geometry2/issues/534>`_)
 * Contributors: Wellington Castro
 

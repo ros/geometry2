@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.6 (2022-10-11)
+------------------
 * Fix dead loop in message filter (`#532 <https://github.com/ros/geometry2/issues/532>`_)
 * Restore time difference order so future extrapolation exceptions don't show non-sensical negative seconds into the future (`#522 <https://github.com/ros/geometry2/issues/522>`_)
 * Contributors: Feng Zhaolin, Lucas Walter
