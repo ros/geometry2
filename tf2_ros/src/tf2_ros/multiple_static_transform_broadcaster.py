@@ -50,4 +50,4 @@ class MultipleStaticTransformBroadcaster(object):
         for tf in transform:
             cls.tfs[(tf.header.frame_id, tf.child_frame_id)] = tf
 
-        cls.pub_tf.publish(TFMessage(cls.tfs.values()))
+        cls.pub_tf.publish(TFMessage(list(cls.tfs.values())))
