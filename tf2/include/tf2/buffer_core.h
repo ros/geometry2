@@ -107,9 +107,11 @@ public:
    * \param transform The transform to store
    * \param authority The source of the information for this transform
    * \param is_static Record this transform as a static transform.  It will be good across all time.  (This cannot be changed after the first call.)
+   * \param threshold Ignore the transform when (buffer was reset) and transform's stamp > threshold
    * \return True unless an error occured
    */
-  bool setTransform(const geometry_msgs::TransformStamped& transform, const std::string & authority, bool is_static = false);
+  bool setTransform(const geometry_msgs::TransformStamped &transform, const std::string &authority, bool is_static = false,
+                    const ros::Time &threshold = ros::Time(UINT32_MAX, UINT32_MAX));
 
   /*********** Accessors *************/
 

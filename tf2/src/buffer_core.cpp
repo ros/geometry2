@@ -198,7 +198,8 @@ void BufferCore::clear()
   
 }
 
-bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_in, const std::string& authority, bool is_static)
+bool BufferCore::setTransform(const geometry_msgs::TransformStamped &transform_in, const std::string &authority, bool is_static,
+                              const ros::Time &threshold)
 {
 
   /////BACKEARDS COMPATABILITY 
@@ -267,6 +268,11 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
     TimeCacheInterfacePtr frame = getFrame(frame_number);
     if (frame == NULL)
       frame = allocateFrame(frame_number, is_static);
+
+    if (frame->getListLength() == 0 && stripped.header.stamp > threshold) {
+      CONSOLE_BRIDGE_logDebug("TF_FUTURE_DATA: Ignoring data %lfs beyond threshold", (stripped.header.stamp - threshold).toSec());
+      return false;
+    }
 
     std::string error_string;
     if (frame->insertData(TransformStorage(stripped, lookupOrInsertFrameNumber(stripped.header.frame_id), frame_number), &error_string))

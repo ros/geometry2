@@ -103,12 +103,11 @@ void TransformListener::static_subscription_callback(const ros::MessageEvent<tf2
 
 void TransformListener::subscription_callback_impl(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt, bool is_static)
 {
+  const static ros::Duration one_second(1, 0);
   ros::Time now = ros::Time::now();
-  bool time_reset = false;
   if(now < last_update_){
     ROS_WARN_STREAM("Detected jump back in time of " << (last_update_ - now).toSec() << "s. Clearing TF buffer.");
     buffer_.clear();
-    time_reset = true;
   }
   last_update_ = now;
 
@@ -116,12 +115,11 @@ void TransformListener::subscription_callback_impl(const ros::MessageEvent<tf2_m
   std::string authority = msg_evt.getPublisherName(); // lookup the authority
   for (const auto transform : msg_in.transforms)
   {
-    if (time_reset && transform.header.stamp > now)
-      continue;
-
     try
     {
-      buffer_.setTransform(transform, authority, is_static);
+      // ignore transforms within future after a reset to avoid TF_REPEATED_DATA warnings
+      // assume that a reasonable rosbag or simulation episode is longer than 1s
+      buffer_.setTransform(transform, authority, is_static, now + one_second);
     }
 
     catch (tf2::TransformException& ex)
