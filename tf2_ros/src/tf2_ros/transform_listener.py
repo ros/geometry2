@@ -70,20 +70,27 @@ class TransformListener:
         # Lock to prevent different threads racing on this test and update.
         # https://github.com/ros/geometry2/issues/341
         with self.last_update_lock:
+            result = False
             now = rospy.Time.now()
             if now < self.last_update:
                 rospy.logwarn("Detected jump back in time of %fs. Clearing TF buffer." % (self.last_update - now).to_sec())
                 self.buffer.clear()
+                result = True
             self.last_update = now
+            return result, now
 
     def callback(self, data):
-        self.check_for_reset()
+        time_reset, now = self.check_for_reset()
         who = data._connection_header.get('callerid', "default_authority")
         for transform in data.transforms:
+            if time_reset and transform.header.stamp > now:
+                continue
             self.buffer.set_transform(transform, who)
 
     def static_callback(self, data):
-        self.check_for_reset()
+        time_reset, now = self.check_for_reset()
         who = data._connection_header.get('callerid', "default_authority")
         for transform in data.transforms:
+            if time_reset and transform.header.stamp > now:
+                continue
             self.buffer.set_transform_static(transform, who)

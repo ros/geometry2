@@ -104,33 +104,31 @@ void TransformListener::static_subscription_callback(const ros::MessageEvent<tf2
 void TransformListener::subscription_callback_impl(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt, bool is_static)
 {
   ros::Time now = ros::Time::now();
+  bool time_reset = false;
   if(now < last_update_){
     ROS_WARN_STREAM("Detected jump back in time of " << (last_update_ - now).toSec() << "s. Clearing TF buffer.");
     buffer_.clear();
+    time_reset = true;
   }
   last_update_ = now;
 
-
-
   const tf2_msgs::TFMessage& msg_in = *(msg_evt.getConstMessage());
   std::string authority = msg_evt.getPublisherName(); // lookup the authority
-  for (unsigned int i = 0; i < msg_in.transforms.size(); i++)
+  for (const auto transform : msg_in.transforms)
   {
+    if (time_reset && transform.header.stamp > now)
+      continue;
+
     try
     {
-      buffer_.setTransform(msg_in.transforms[i], authority, is_static);
+      buffer_.setTransform(transform, authority, is_static);
     }
-    
+
     catch (tf2::TransformException& ex)
     {
       ///\todo Use error reporting
       std::string temp = ex.what();
-      ROS_ERROR("Failure to set recieved transform from %s to %s with error: %s\n", msg_in.transforms[i].child_frame_id.c_str(), msg_in.transforms[i].header.frame_id.c_str(), temp.c_str());
+      ROS_ERROR("Failure to set recieved transform from %s to %s with error: %s\n", transform.child_frame_id.c_str(), transform.header.frame_id.c_str(), temp.c_str());
     }
   }
 };
-
-
-
-
-
