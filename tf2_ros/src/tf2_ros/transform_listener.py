@@ -28,6 +28,7 @@
 # author: Wim Meeussen
 
 import threading
+import time
 
 import rospy
 from tf2_msgs.msg import TFMessage
@@ -52,6 +53,7 @@ class TransformListener:
         """
         self.buffer = buffer
         self.last_update = rospy.Time.now()
+        self.last_reset = 0.0
         self.last_update_lock = threading.Lock()
         self.tf_sub = rospy.Subscriber("/tf", TFMessage, self.callback, queue_size=queue_size, buff_size=buff_size, tcp_nodelay=tcp_nodelay)
         self.tf_static_sub = rospy.Subscriber("/tf_static", TFMessage, self.static_callback, queue_size=queue_size, buff_size=buff_size, tcp_nodelay=tcp_nodelay)
@@ -70,27 +72,25 @@ class TransformListener:
         # Lock to prevent different threads racing on this test and update.
         # https://github.com/ros/geometry2/issues/341
         with self.last_update_lock:
-            result = False
             now = rospy.Time.now()
             if now < self.last_update:
                 rospy.logwarn("Detected jump back in time of %fs. Clearing TF buffer." % (self.last_update - now).to_sec())
                 self.buffer.clear()
-                result = True
+                self.last_reset = time.time()
             self.last_update = now
-            return result, now
 
     def callback(self, data):
-        time_reset, now = self.check_for_reset()
-        who = data._connection_header.get('callerid', "default_authority")
-        for transform in data.transforms:
-            if time_reset and transform.header.stamp > now:
-                continue
-            self.buffer.set_transform(transform, who)
+        self._process(data, self.buffer.set_transform)
 
     def static_callback(self, data):
-        time_reset, now = self.check_for_reset()
+        self._process(data, self.buffer.set_transform_static)
+
+    def _process(self, data, setter):
+        self.check_for_reset()
         who = data._connection_header.get('callerid', "default_authority")
+        directly_after_reset = time.time() - self.last_reset < 0.5
+        now = rospy.Time.now()
         for transform in data.transforms:
-            if time_reset and transform.header.stamp > now:
+            if transform.header.stamp > now and directly_after_reset:
                 continue
-            self.buffer.set_transform_static(transform, who)
+            setter(transform, who)

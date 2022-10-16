@@ -103,30 +103,36 @@ void TransformListener::static_subscription_callback(const ros::MessageEvent<tf2
 
 void TransformListener::subscription_callback_impl(const ros::MessageEvent<tf2_msgs::TFMessage const>& msg_evt, bool is_static)
 {
-  const static ros::Duration one_second(1, 0);
+  static const ros::WallDuration threshold(0.5);
   ros::Time now = ros::Time::now();
   if(now < last_update_){
     ROS_WARN_STREAM("Detected jump back in time of " << (last_update_ - now).toSec() << "s. Clearing TF buffer.");
     buffer_.clear();
+    last_reset_ = ros::WallTime::now();
   }
   last_update_ = now;
+  bool directly_after_reset = ros::WallTime::now() - last_reset_ < threshold;
 
   const tf2_msgs::TFMessage& msg_in = *(msg_evt.getConstMessage());
   std::string authority = msg_evt.getPublisherName(); // lookup the authority
   for (const auto transform : msg_in.transforms)
   {
+    if (transform.header.stamp > now && directly_after_reset)
+    {
+      ROS_INFO_THROTTLE(1.0, "Ignoring TFs with timestamp in future after reset of ROS time");
+      continue;
+    }
+
     try
     {
-      // ignore transforms within future after a reset to avoid TF_REPEATED_DATA warnings
-      // assume that a reasonable rosbag or simulation episode is longer than 1s
-      buffer_.setTransform(transform, authority, is_static, now + one_second);
+      buffer_.setTransform(transform, authority, is_static);
     }
 
     catch (tf2::TransformException& ex)
     {
       ///\todo Use error reporting
       std::string temp = ex.what();
-      ROS_ERROR("Failure to set recieved transform from %s to %s with error: %s\n", transform.child_frame_id.c_str(), transform.header.frame_id.c_str(), temp.c_str());
+      ROS_ERROR("Failure to set received transform from %s to %s with error: %s\n", transform.child_frame_id.c_str(), transform.header.frame_id.c_str(), temp.c_str());
     }
   }
 };

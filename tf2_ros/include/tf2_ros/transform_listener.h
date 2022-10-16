@@ -77,7 +77,8 @@ private:
   bool using_dedicated_thread_;
   ros::TransportHints transport_hints_;
   ros::Time last_update_;
- 
+  ros::WallTime last_reset_;
+
   void dedicatedListenerThread()
   {
     while (using_dedicated_thread_)
