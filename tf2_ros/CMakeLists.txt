@@ -57,6 +57,7 @@ target_link_libraries(${PROJECT_NAME}_buffer_server
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
+  rt
 )
 set_target_properties(${PROJECT_NAME}_buffer_server
   PROPERTIES OUTPUT_NAME buffer_server
