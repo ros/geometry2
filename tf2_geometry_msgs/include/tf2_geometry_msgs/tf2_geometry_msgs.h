@@ -946,6 +946,7 @@ void doTransform(const geometry_msgs::TransformStamped& t_in, geometry_msgs::Tra
     t_out.transform = toMsg(v_out);
     t_out.header.stamp = transform.header.stamp;
     t_out.header.frame_id = transform.header.frame_id;
+    t_out.child_frame_id = transform.child_frame_id;
   }
 
 /** \brief Apply a geometry_msgs TransformStamped to an geometry_msgs Vector type.
