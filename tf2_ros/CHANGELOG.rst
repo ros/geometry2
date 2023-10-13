@@ -2,6 +2,9 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.7.6 (2022-10-11)
 ------------------
 * tf2_ros polling interval proportional to timeout (`#492 <https://github.com/ros/geometry2/issues/492>`_)

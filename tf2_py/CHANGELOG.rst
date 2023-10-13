@@ -2,6 +2,11 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix(tf2_py) potential memory leak (`#544 <https://github.com/ros/geometry2/issues/544>`_)
+* Contributors: Matthijs van der Burgh
+
 0.7.6 (2022-10-11)
 ------------------
 

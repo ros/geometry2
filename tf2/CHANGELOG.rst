@@ -2,6 +2,12 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix extra comma that gives annoying build warnings with -Wall and -Wpedantic with g++-9 and assuming most other compilers (`#550 <https://github.com/ros/geometry2/issues/550>`_)
+* Add parent frame to warning logs (`#533 <https://github.com/ros/geometry2/issues/533>`_)
+* Contributors: Jack Zender, Stephan
+
 0.7.6 (2022-10-11)
 ------------------
 * Fix dead loop in message filter (`#532 <https://github.com/ros/geometry2/issues/532>`_)
