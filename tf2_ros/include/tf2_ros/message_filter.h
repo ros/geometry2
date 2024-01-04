@@ -215,14 +215,15 @@ public:
   ~MessageFilter()
   {
     message_connection_.disconnect();
-
     MessageFilter::clear();
+    bc_.removeTransformableCallback(callback_handle_);
 
     TF2_ROS_MESSAGEFILTER_DEBUG("Successful Transforms: %llu, Discarded due to age: %llu, Transform messages received: %llu, Messages received: %llu, Total dropped: %llu",
                            (long long unsigned int)successful_transform_count_,
                            (long long unsigned int)failed_out_the_back_count_, (long long unsigned int)transform_message_count_, 
                            (long long unsigned int)incoming_message_count_, (long long unsigned int)dropped_message_count_);
 
+    boost::unique_lock<boost::shared_mutex> lock(cbqueue_mutex_); // ensure that no more callback queue calls are active
   }
 
   /**
@@ -277,13 +278,11 @@ public:
    */
   void clear()
   {
-    boost::unique_lock< boost::shared_mutex > unique_lock(messages_mutex_);
-
-    TF2_ROS_MESSAGEFILTER_DEBUG("%s", "Cleared");
-
     bc_.removeTransformableCallback(callback_handle_);
     callback_handle_ = bc_.addTransformableCallback(boost::bind(&MessageFilter::transformable, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4, boost::placeholders::_5));
 
+    // acquire after remove/addTransformableCallback to avoid deadlock!
+    boost::unique_lock<boost::shared_mutex> unique_lock(messages_mutex_);
     messages_.clear();
     message_count_ = 0;
 
@@ -292,6 +291,7 @@ public:
       callback_queue_->removeByID((uint64_t)this);
 
     warned_about_empty_frame_id_ = false;
+    TF2_ROS_MESSAGEFILTER_DEBUG("%s", "Cleared");
   }
 
   void add(const MEvent& evt)
@@ -363,6 +363,7 @@ public:
       }
     }
 
+    L_MessageInfo msgs_to_drop;
 
     // We can transform already
     if (info.success_count == expected_success_count_)
@@ -371,32 +372,32 @@ public:
     }
     else
     {
-      boost::unique_lock< boost::shared_mutex > unique_lock(messages_mutex_);
+      boost::unique_lock<boost::shared_mutex> unique_lock(messages_mutex_);
       // If this message is about to push us past our queue size, erase the oldest message
       if (queue_size_ != 0 && message_count_ + 1 > queue_size_)
       {
-        ++dropped_message_count_;
-        const MessageInfo& front = messages_.front();
-        TF2_ROS_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_,
-                                (mt::FrameId<M>::value(*front.event.getMessage())).c_str(), mt::TimeStamp<M>::value(*front.event.getMessage()).toSec());
-
-        V_TransformableRequestHandle::const_iterator it = front.handles.begin();
-        V_TransformableRequestHandle::const_iterator end = front.handles.end();
-
-        for (; it != end; ++it)
-        {
-          bc_.cancelTransformableRequest(*it);
-        }
-
-        messageDropped(front.event, filter_failure_reasons::Unknown);
-        messages_.pop_front();
-         --message_count_;
+        // move front element from messages_ to msgs_to_drop for later dropping
+        msgs_to_drop.splice(msgs_to_drop.begin(), messages_, messages_.begin());
+        --message_count_;
       }
 
       // Add the message to our list
       info.event = evt;
       messages_.push_back(info);
       ++message_count_;
+    }
+
+    // Delay dropping of messages until we released messages_mutex_ to avoid deadlocks (#91, #101, #144)
+    for (const MessageInfo &msg : msgs_to_drop)
+    {
+      ++dropped_message_count_;
+      TF2_ROS_MESSAGEFILTER_DEBUG("Removed oldest message because buffer is full, count now %d (frame_id=%s, stamp=%f)", message_count_,
+                                  (mt::FrameId<M>::value(*msg.event.getMessage())).c_str(), mt::TimeStamp<M>::value(*msg.event.getMessage()).toSec());
+
+      for (const auto req : msg.handles)
+        bc_.cancelTransformableRequest(req);
+
+      messageDropped(msg.event, filter_failure_reasons::Unknown);
     }
 
     TF2_ROS_MESSAGEFILTER_DEBUG("Added message in frame %s at time %.3f, count now %d", frame_id.c_str(), stamp.toSec(), message_count_);
@@ -461,7 +462,7 @@ private:
   {
     namespace mt = ros::message_traits;
 
-    boost::upgrade_lock< boost::shared_mutex > lock(messages_mutex_);
+    boost::upgrade_lock<boost::shared_mutex> read_lock(messages_mutex_);
 
     // find the message this request is associated with
     typename L_MessageInfo::iterator msg_it = messages_.begin();
@@ -524,8 +525,6 @@ private:
       can_transform = false;
     }
 
-    // We will be mutating messages now, require unique lock
-    boost::upgrade_to_unique_lock< boost::shared_mutex > uniqueLock(lock);
     if (can_transform)
     {
       TF2_ROS_MESSAGEFILTER_DEBUG("Message ready in frame %s at time %.3f, count now %d", frame_id.c_str(), stamp.toSec(), message_count_ - 1);
@@ -543,6 +542,8 @@ private:
       messageDropped(info.event, filter_failure_reasons::Unknown);
     }
 
+    // We will be mutating messages now, require unique lock
+    boost::upgrade_to_unique_lock<boost::shared_mutex> write_lock(read_lock);
     messages_.erase(msg_it);
     --message_count_;
   }
@@ -595,6 +596,7 @@ private:
 
     virtual CallResult call()
     {
+      boost::shared_lock<boost::shared_mutex> lock(filter_->cbqueue_mutex_);
       if (success_)
       {
         filter_->signalMessage(event_);
@@ -668,7 +670,8 @@ private:
   V_string target_frames_; ///< The frames we need to be able to transform to before a message is ready
   std::string target_frames_string_;
   boost::mutex target_frames_mutex_; ///< A mutex to protect access to the target_frames_ list and target_frames_string.
-  uint32_t queue_size_; ///< The maximum number of messages we queue up
+  boost::shared_mutex cbqueue_mutex_; ///< A mutex protecting calls from callback queues
+  uint32_t queue_size_;              ///< The maximum number of messages we queue up
   tf2::TransformableCallbackHandle callback_handle_;
 
   typedef std::vector<tf2::TransformableRequestHandle> V_TransformableRequestHandle;
