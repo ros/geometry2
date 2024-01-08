@@ -38,6 +38,7 @@
 #include <console_bridge/console.h>
 #include "tf2/LinearMath/Transform.h"
 #include <boost/foreach.hpp>
+#include <boost/tuple/tuple.hpp>
 
 namespace tf2
 {
