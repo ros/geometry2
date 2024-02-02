@@ -11,6 +11,7 @@
 
   <depend>geometry_msgs</depend>
   <depend>tf2</depend>
+  <depend>tf2_ros</depend>
 
   <build_depend>cmake_modules</build_depend>
   <build_depend>eigen</build_depend>

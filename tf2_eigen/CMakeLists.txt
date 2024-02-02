@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   geometry_msgs
   tf2
+  tf2_ros
 )
 
 # Finding Eigen is somewhat complicated because of our need to support Ubuntu

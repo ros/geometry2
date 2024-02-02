@@ -281,7 +281,7 @@ void doTransform(const Eigen::Quaterniond& t_in,
                  const geometry_msgs::TransformStamped& transform) {
   Eigen::Quaterniond t;
   fromMsg(transform.transform.rotation, t);
-  t_out = t.inverse() * t_in * t;
+  t_out = t * t_in;
 }
 
 /** \brief Convert a stamped Eigen Quaterniond type to a QuaternionStamped message.
