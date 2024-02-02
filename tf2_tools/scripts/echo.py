@@ -139,7 +139,7 @@ def _euler_from_quaternion_msg(quaternion):
 
 class Echo():
     def __init__(self, args):
-        self.tf_buffer = tf2_ros.Buffer(cache_time=args.cache_time)
+        self.tf_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(args.cache_time) if args.cache_time else None)
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         self.args = args
 
