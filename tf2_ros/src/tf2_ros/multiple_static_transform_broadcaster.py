@@ -32,25 +32,22 @@
 
 import rospy
 from tf2_msgs.msg import TFMessage
-from geometry_msgs.msg import TransformStamped
 
 
-class StaticTransformBroadcaster(object):
+class MultipleStaticTransformBroadcaster(object):
     """
-    :class:`StaticTransformBroadcaster` is a convenient way to send static transformation on the ``"/tf_static"`` message topic.
+    :class:`MultipleStaticTransformBroadcaster`
+    keeps track of all unique transforms and resends them all to new subscribers
     """
-    already_exists = False
+    # Since only one latched publisher should exist per node, this is a class object
+    pub_tf = rospy.Publisher("/tf_static", TFMessage, queue_size=100, latch=True)
+    tfs = dict()
 
-    def __init__(self):
-        self.pub_tf = rospy.Publisher("/tf_static", TFMessage, queue_size=100, latch=True)
-        if StaticTransformBroadcaster.already_exists:
-            rospy.logwarn("tf2_ros.StaticTransformBroadcaster: Multiple instances not supported, "
-                          "consider using tf2_ros.MultipleStaticTransformBroadcaster")
-        StaticTransformBroadcaster.already_exists = True
-
-    def sendTransform(self, transform):
+    @classmethod
+    def sendTransform(cls, transform):
         if not isinstance(transform, list):
             transform = [transform]
-        self.pub_tf.publish(TFMessage(transform))
+        for tf in transform:
+            cls.tfs[(tf.header.frame_id, tf.child_frame_id)] = tf
 
-
+        cls.pub_tf.publish(TFMessage(list(cls.tfs.values())))
