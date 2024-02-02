@@ -61,6 +61,8 @@ namespace tf2_ros
      * @return 
      */
     Buffer(ros::Duration cache_time = ros::Duration(BufferCore::DEFAULT_CACHE_TIME), bool debug = false);
+    Buffer(Buffer&&) = default;
+    Buffer& operator=(Buffer&&) = default;
 
     /** \brief Get the transform between two frames by frame ID.
      * \param target_frame The frame to which data should be transformed
