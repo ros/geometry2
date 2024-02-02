@@ -186,7 +186,7 @@ class NotImplementedException(Exception):
     subclass of :class:`tf2_ros.buffer_interface.BufferInterface`.
     """
     def __init__(self):
-        self.errstr = 'CanTransform or LookupTransform not implemented'
+        self.errstr = 'CanTransform or LookupTransform is not implemented'
 
 
 class TransformRegistration():
@@ -200,7 +200,7 @@ class TransformRegistration():
 
     def get(self, key):
         if not key in TransformRegistration.__type_map:
-            raise TypeException('Type %s if not loaded or supported'% str(key))
+            raise TypeException('Type %s is not loaded or supported'% str(key))
         else:
             return TransformRegistration.__type_map[key]
 
@@ -220,19 +220,19 @@ class ConvertRegistration():
 
     def get_from_msg(self, key):
         if not key in ConvertRegistration.__from_msg_map:
-            raise TypeException('Type %s if not loaded or supported'% str(key))
+            raise TypeException('Type %s is not loaded or supported'% str(key))
         else:
             return ConvertRegistration.__from_msg_map[key]
 
     def get_to_msg(self, key):
         if not key in ConvertRegistration.__to_msg_map:
-            raise TypeException('Type %s if not loaded or supported'%str(key))
+            raise TypeException('Type %s is not loaded or supported'%str(key))
         else:
             return ConvertRegistration.__to_msg_map[key]
 
     def get_convert(self, key):
         if not key in ConvertRegistration.__convert_map:
-            raise TypeException("Type %s if not loaded or supported" % str(key))
+            raise TypeException("Type %s is not loaded or supported" % str(key))
         else:
             return ConvertRegistration.__convert_map[key]
 
