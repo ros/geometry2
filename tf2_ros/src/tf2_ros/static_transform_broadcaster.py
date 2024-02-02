@@ -39,9 +39,14 @@ class StaticTransformBroadcaster(object):
     """
     :class:`StaticTransformBroadcaster` is a convenient way to send static transformation on the ``"/tf_static"`` message topic.
     """
+    already_exists = False
 
     def __init__(self):
         self.pub_tf = rospy.Publisher("/tf_static", TFMessage, queue_size=100, latch=True)
+        if StaticTransformBroadcaster.already_exists:
+            rospy.logwarn("tf2_ros.StaticTransformBroadcaster: Multiple instances not supported, "
+                          "please use only a single StaticTransformBroadcaster per node")
+        StaticTransformBroadcaster.already_exists = True
 
     def sendTransform(self, transform):
         if not isinstance(transform, list):
