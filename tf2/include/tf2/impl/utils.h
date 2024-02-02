@@ -15,64 +15,26 @@
 #ifndef TF2_IMPL_UTILS_H
 #define TF2_IMPL_UTILS_H
 
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/transform_datatypes.h>
 #include <tf2/LinearMath/Quaternion.h>
 
 namespace tf2 {
 namespace impl {
 
-/** Function needed for the generalization of toQuaternion
- * \param q a tf2::Quaternion
- * \return a copy of the same quaternion
- */
+// functions moved to tf2_geometry_msgs/tf2_geometry_msgs.h to break a cycle
+#ifndef TF2_GEOMETRY_MSGS_H
 inline
-tf2::Quaternion toQuaternion(const tf2::Quaternion& q) {
-    return q;
-  }
+tf2::Quaternion toQuaternion(const tf2::Quaternion& q)
+__attribute__((deprecated("toQuaternion moved to tf2_geometry_msgs, please include tf2_geometry_msgs/tf2_geometry_msgs.h before tf2/impl/utils.h")));
 
-/** Function needed for the generalization of toQuaternion
- * \param q a geometry_msgs::Quaternion
- * \return a copy of the same quaternion as a tf2::Quaternion
- */
-inline
-tf2::Quaternion toQuaternion(const geometry_msgs::Quaternion& q) {
-    tf2::Quaternion res;
-    fromMsg(q, res);
-    return res;
-  }
-
-/** Function needed for the generalization of toQuaternion
- * \param q a geometry_msgs::QuaternionStamped
- * \return a copy of the same quaternion as a tf2::Quaternion
- */
-inline
-tf2::Quaternion toQuaternion(const geometry_msgs::QuaternionStamped& q) {
-    tf2::Quaternion res;
-    fromMsg(q.quaternion, res);
-    return res;
-  }
-
-/** Function needed for the generalization of toQuaternion
- * \param t some tf2::Stamped object
- * \return a copy of the same quaternion as a tf2::Quaternion
- */
 template<typename T>
-  tf2::Quaternion toQuaternion(const tf2::Stamped<T>& t) {
-    geometry_msgs::QuaternionStamped q = toMsg(t);
-    return toQuaternion(q);
-  }
+  tf2::Quaternion toQuaternion(const tf2::Stamped<T>& t)
+__attribute__((deprecated("toQuaternion moved to tf2_geometry_msgs, please include tf2_geometry_msgs/tf2_geometry_msgs.h before tf2/impl/utils.h")));
 
-/** Generic version of toQuaternion. It tries to convert the argument
- * to a geometry_msgs::Quaternion
- * \param t some object
- * \return a copy of the same quaternion as a tf2::Quaternion
- */
 template<typename T>
-  tf2::Quaternion toQuaternion(const T& t) {
-    geometry_msgs::Quaternion q = toMsg(t);
-    return toQuaternion(q);
-  }
+  tf2::Quaternion toQuaternion(const T& t)
+__attribute__((deprecated("toQuaternion moved to tf2_geometry_msgs, please include tf2_geometry_msgs/tf2_geometry_msgs.h before tf2/impl/utils.h")));
+#endif
 
 /** The code below is blantantly copied from urdfdom_headers
  * only the normalization has been added.
