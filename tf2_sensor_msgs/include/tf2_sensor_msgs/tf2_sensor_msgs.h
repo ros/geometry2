@@ -83,12 +83,25 @@ void doTransform(const sensor_msgs::PointCloud2 &p_in, sensor_msgs::PointCloud2 
   sensor_msgs::PointCloud2Iterator<float> y_out(p_out, "y");
   sensor_msgs::PointCloud2Iterator<float> z_out(p_out, "z");
 
-  Eigen::Vector3f point;
+  // Using individual matrix elements directly is apparently faster than relying on Eigen
+  double r11 = t(0, 0);
+  double r12 = t(0, 1);
+  double r13 = t(0, 2);
+  double r21 = t(1, 0);
+  double r22 = t(1, 1);
+  double r23 = t(1, 2);
+  double r31 = t(2, 0);
+  double r32 = t(2, 1);
+  double r33 = t(2, 2);
+  double t1 = t(0, 3);
+  double t2 = t(1, 3);
+  double t3 = t(2, 3);
+
   for(; x_in != x_in.end(); ++x_in, ++y_in, ++z_in, ++x_out, ++y_out, ++z_out) {
-    point = t * Eigen::Vector3f(*x_in, *y_in, *z_in);
-    *x_out = point.x();
-    *y_out = point.y();
-    *z_out = point.z();
+    // Equivalent to "point = t * Eigen::Vector3f(*x_in, *y_in, *z_in);"
+    *x_out = *x_in * r11 + *y_in * r12 + *z_in * r13 + t1;
+    *y_out = *x_in * r21 + *y_in * r22 + *z_in * r23 + t2;
+    *z_out = *x_in * r31 + *y_in * r32 + *z_in * r33 + t3;
   }
 }
 inline
