@@ -42,6 +42,7 @@
 namespace tf2_ros
 {
 
+struct StaticTransformBroadcasterImpl;
 
 /** \brief This class provides an easy way to publish coordinate frame transform information.  
  * It will handle all the messaging and stuffing of messages.  And the function prototypes lay out all the 
@@ -63,11 +64,7 @@ public:
   void sendTransform(const std::vector<geometry_msgs::TransformStamped> & transforms);
 
 private:
-  /// Internal reference to ros::Node
-  ros::NodeHandle node_;
-  ros::Publisher publisher_;
-  tf2_msgs::TFMessage net_message_;
-
+  std::shared_ptr<StaticTransformBroadcasterImpl> impl_;
 };
 
 }

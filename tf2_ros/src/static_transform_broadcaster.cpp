@@ -35,12 +35,37 @@
 #include "tf2_msgs/TFMessage.h"
 #include "tf2_ros/static_transform_broadcaster.h"
 #include <algorithm>
+#include <mutex>
 
 namespace tf2_ros {
 
+struct StaticTransformBroadcasterImpl {
+  ros::NodeHandle node_;  // internal reference to node
+  ros::Publisher publisher_;
+  tf2_msgs::TFMessage net_message_;  // message comprising all static transforms
+
+  StaticTransformBroadcasterImpl() {
+    publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf_static", 100, true);
+  }
+  StaticTransformBroadcasterImpl(const StaticTransformBroadcasterImpl& other) = delete;
+
+  static std::shared_ptr<StaticTransformBroadcasterImpl> getInstance() {
+    static std::mutex mutex;
+    static std::weak_ptr<StaticTransformBroadcasterImpl> singleton;
+
+    std::lock_guard<std::mutex> lock(mutex);
+    if (singleton.expired()) {  // create a new instance if required
+      auto result = std::make_shared<StaticTransformBroadcasterImpl>();
+      singleton = result;
+      return result;
+    }  // otherwise return existing one
+    return singleton.lock();
+  }
+};
+
 StaticTransformBroadcaster::StaticTransformBroadcaster()
 {
-  publisher_ = node_.advertise<tf2_msgs::TFMessage>("/tf_static", 100, true);
+  impl_ = StaticTransformBroadcasterImpl::getInstance();
 };
 
 void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::TransformStamped> & msgtf)
@@ -50,15 +75,17 @@ void StaticTransformBroadcaster::sendTransform(const std::vector<geometry_msgs::
     auto predicate = [&input](const geometry_msgs::TransformStamped existing) {
       return input.child_frame_id == existing.child_frame_id;
     };
-    auto existing = std::find_if(net_message_.transforms.begin(), net_message_.transforms.end(), predicate);
 
-    if (existing != net_message_.transforms.end())
+    auto& transforms = impl_->net_message_.transforms;
+    auto existing = std::find_if(transforms.begin(), transforms.end(), predicate);
+
+    if (existing != transforms.end())
       *existing = input;
     else
-      net_message_.transforms.push_back(input);
+      transforms.push_back(input);
   }
 
-  publisher_.publish(net_message_);
+  impl_->publisher_.publish(impl_->net_message_);
 }
 
 }
