@@ -36,6 +36,11 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Twist.h>
 
+#define TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN \
+_Pragma("GCC diagnostic push")\
+_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define TF2_EIGEN_IGNORE_DEPRECATED_CALL_END \
+_Pragma("GCC diagnostic pop")
 
 namespace tf2
 {
@@ -490,7 +495,9 @@ ROS_DEPRECATED geometry_msgs::PoseStamped toMsg(const tf2::Stamped<Eigen::Affine
   geometry_msgs::PoseStamped msg;
   msg.header.stamp = in.stamp_;
   msg.header.frame_id = in.frame_id_;
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
   msg.pose = toMsg(static_cast<const Eigen::Affine3d&>(in));
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
   return msg;
 }
 
@@ -516,7 +523,9 @@ ROS_DEPRECATED void fromMsg(const geometry_msgs::PoseStamped& msg,
 {
   out.stamp_ = msg.header.stamp;
   out.frame_id_ = msg.header.frame_id;
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
   fromMsg(msg.pose, static_cast<Eigen::Affine3d&>(out));
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
 }
 
 inline
@@ -540,8 +549,10 @@ namespace Eigen {
 // tf2::convert().
 
 inline
-geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+ROS_DEPRECATED geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
   return tf2::toMsg(in);
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
 }
 
 inline
@@ -560,8 +571,10 @@ geometry_msgs::Point toMsg(const Eigen::Vector3d& in) {
 }
 
 inline
-void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+ROS_DEPRECATED void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
   tf2::fromMsg(msg, out);
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
 }
 
 inline
@@ -590,5 +603,8 @@ void fromMsg(const geometry_msgs::Twist &msg, Eigen::Matrix<double,6,1>& out) {
 }
 
 } // namespace
+
+#undef TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
+#undef TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
 
 #endif // TF2_EIGEN_H
