@@ -36,6 +36,11 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Twist.h>
 
+#define TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN \
+_Pragma("GCC diagnostic push")\
+_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define TF2_EIGEN_IGNORE_DEPRECATED_CALL_END \
+_Pragma("GCC diagnostic pop")
 
 namespace tf2
 {
@@ -62,9 +67,10 @@ Eigen::Isometry3d transformToEigen(const geometry_msgs::TransformStamped& t) {
 /** \brief Convert an Eigen Affine3d transform to the equivalent geometry_msgs message type.
  * \param T The transform to convert, as an Eigen Affine3d transform.
  * \return The transform converted to a TransformStamped message.
+ * \deprecated Use Isometry3d instead.
  */
 inline
-geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
+ROS_DEPRECATED geometry_msgs::TransformStamped eigenToTransform(const Eigen::Affine3d& T)
 {
   geometry_msgs::TransformStamped t;
   t.transform.translation.x = T.translation().x();
@@ -223,12 +229,14 @@ void fromMsg(const geometry_msgs::PointStamped& msg, tf2::Stamped<Eigen::Vector3
  * \param t_in The frame to transform, as a Eigen Affine3d transform.
  * \param t_out The transformed frame, as a Eigen Affine3d transform.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
+ * \deprecated Use Isometry3d instead.
  */
 template <>
 inline
-void doTransform(const Eigen::Affine3d& t_in,
-                 Eigen::Affine3d& t_out,
-                 const geometry_msgs::TransformStamped& transform) {
+ROS_DEPRECATED void doTransform(
+    const Eigen::Affine3d& t_in,
+    Eigen::Affine3d& t_out,
+    const geometry_msgs::TransformStamped& transform) {
   t_out = Eigen::Affine3d(transformToEigen(transform) * t_in);
 }
 
@@ -330,9 +338,10 @@ void doTransform(const tf2::Stamped<Eigen::Quaterniond>& t_in,
  * This function is a specialization of the toMsg template defined in tf2/convert.h.
  * \param in The Eigen Affine3d to convert.
  * \return The Eigen transform converted to a Pose message.
+ * \deprecated Use Isometry3d instead.
  */
 inline
-geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+ROS_DEPRECATED geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
   geometry_msgs::Pose msg;
   msg.position.x = in.translation().x();
   msg.position.y = in.translation().y();
@@ -380,9 +389,10 @@ geometry_msgs::Pose toMsg(const Eigen::Isometry3d& in) {
  * This function is a specialization of the toMsg template defined in tf2/convert.h.
  * \param msg The Pose message to convert.
  * \param out The pose converted to a Eigen Affine3d.
+ * \deprecated USe Isometry3d instead.
  */
 inline
-void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+ROS_DEPRECATED void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
   out = Eigen::Affine3d(
       Eigen::Translation3d(msg.position.x, msg.position.y, msg.position.z) *
       Eigen::Quaterniond(msg.orientation.w,
@@ -446,10 +456,11 @@ void fromMsg(const geometry_msgs::Twist &msg, Eigen::Matrix<double,6,1>& out) {
  * \param t_in The frame to transform, as a timestamped Eigen Affine3d transform.
  * \param t_out The transformed frame, as a timestamped Eigen Affine3d transform.
  * \param transform The timestamped transform to apply, as a TransformStamped message.
+ * \deprecated Use Isometry3d instead.
  */
 template <>
 inline
-void doTransform(const tf2::Stamped<Eigen::Affine3d>& t_in,
+ROS_DEPRECATED void doTransform(const tf2::Stamped<Eigen::Affine3d>& t_in,
 		 tf2::Stamped<Eigen::Affine3d>& t_out,
 		 const geometry_msgs::TransformStamped& transform) {
   t_out = tf2::Stamped<Eigen::Affine3d>(transformToEigen(transform) * t_in, transform.header.stamp, transform.header.frame_id);
@@ -476,14 +487,17 @@ void doTransform(const tf2::Stamped<Eigen::Isometry3d>& t_in,
  * This function is a specialization of the toMsg template defined in tf2/convert.h.
  * \param in The timestamped Eigen Affine3d to convert.
  * \return The Eigen transform converted to a PoseStamped message.
+ * \deprecated Use Isometry3d instead.
  */
 inline
-geometry_msgs::PoseStamped toMsg(const tf2::Stamped<Eigen::Affine3d>& in)
+ROS_DEPRECATED geometry_msgs::PoseStamped toMsg(const tf2::Stamped<Eigen::Affine3d>& in)
 {
   geometry_msgs::PoseStamped msg;
   msg.header.stamp = in.stamp_;
   msg.header.frame_id = in.frame_id_;
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
   msg.pose = toMsg(static_cast<const Eigen::Affine3d&>(in));
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
   return msg;
 }
 
@@ -501,13 +515,17 @@ geometry_msgs::PoseStamped toMsg(const tf2::Stamped<Eigen::Isometry3d>& in)
  * This function is a specialization of the toMsg template defined in tf2/convert.h.
  * \param msg The PoseStamped message to convert.
  * \param out The pose converted to a timestamped Eigen Affine3d.
+ * \deprecated Use Isometry3d instead.
  */
 inline
-void fromMsg(const geometry_msgs::PoseStamped& msg, tf2::Stamped<Eigen::Affine3d>& out)
+ROS_DEPRECATED void fromMsg(const geometry_msgs::PoseStamped& msg,
+                            tf2::Stamped<Eigen::Affine3d>& out)
 {
   out.stamp_ = msg.header.stamp;
   out.frame_id_ = msg.header.frame_id;
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
   fromMsg(msg.pose, static_cast<Eigen::Affine3d&>(out));
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
 }
 
 inline
@@ -531,8 +549,10 @@ namespace Eigen {
 // tf2::convert().
 
 inline
-geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+ROS_DEPRECATED geometry_msgs::Pose toMsg(const Eigen::Affine3d& in) {
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
   return tf2::toMsg(in);
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
 }
 
 inline
@@ -551,8 +571,10 @@ geometry_msgs::Point toMsg(const Eigen::Vector3d& in) {
 }
 
 inline
-void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+ROS_DEPRECATED void fromMsg(const geometry_msgs::Pose& msg, Eigen::Affine3d& out) {
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
   tf2::fromMsg(msg, out);
+  TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
 }
 
 inline
@@ -581,5 +603,8 @@ void fromMsg(const geometry_msgs::Twist &msg, Eigen::Matrix<double,6,1>& out) {
 }
 
 } // namespace
+
+#undef TF2_EIGEN_IGNORE_DEPRECATED_CALL_BEGIN
+#undef TF2_EIGEN_IGNORE_DEPRECATED_CALL_END
 
 #endif // TF2_EIGEN_H

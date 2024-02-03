@@ -26,10 +26,17 @@
 
 /** \author Wim Meeussen */
 
+#define TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_BEGIN \
+_Pragma("GCC diagnostic push")\
+_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_END \
+_Pragma("GCC diagnostic pop")
 
+TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_BEGIN
 #include <tf2_eigen/tf2_eigen.h>
-#include <gtest/gtest.h>
 #include <tf2/convert.h>
+TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_END
+#include <gtest/gtest.h>
 
 TEST(TfEigen, ConvertVector3dStamped)
 {
@@ -93,7 +100,9 @@ TEST(TfEigen, TransformQuaterion) {
  const Eigen::Affine3d affine(iso);
  const tf2::Stamped<Eigen::Quaterniond> expected(Eigen::Quaterniond(Eigen::AngleAxisd(1, Eigen::Vector3d::UnitZ())), ros::Time(10), "expected");
 
+ TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_BEGIN
  geometry_msgs::TransformStamped trafo = tf2::eigenToTransform(affine);
+ TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_END
  trafo.header.stamp = ros::Time(10);
  trafo.header.frame_id = "expected";
 
@@ -122,8 +131,10 @@ TEST(TfEigen, ConvertAffine3dStamped)
 
   tf2::Stamped<Eigen::Affine3d> v1;
   geometry_msgs::PoseStamped p1;
+  TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_BEGIN
   tf2::convert(v, p1);
   tf2::convert(p1, v1);
+  TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_END
 
   EXPECT_EQ(v.translation(), v1.translation());
   EXPECT_EQ(v.rotation(), v1.rotation());
@@ -153,8 +164,10 @@ TEST(TfEigen, ConvertAffine3d)
 
   Eigen::Affine3d v1;
   geometry_msgs::Pose p1;
+  TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_BEGIN
   tf2::convert(v, p1);
   tf2::convert(p1, v1);
+  TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_END
 
   EXPECT_EQ(v.translation(), v1.translation());
   EXPECT_EQ(v.rotation(), v1.rotation());
@@ -188,7 +201,9 @@ TEST(TfEigen, ConvertTransform)
 
   Eigen::Affine3d T(tm);
 
+  TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_BEGIN
   geometry_msgs::TransformStamped msg = tf2::eigenToTransform(T);
+  TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_END
   Eigen::Affine3d Tback = tf2::transformToEigen(msg);
 
   EXPECT_TRUE(T.isApprox(Tback));
@@ -197,7 +212,9 @@ TEST(TfEigen, ConvertTransform)
   // same for Isometry
   Eigen::Isometry3d I(tm);
 
+  TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_BEGIN
   msg = tf2::eigenToTransform(T);
+  TF2_EIGEN_TEST_IGNORE_DEPRECATED_CALL_END
   Eigen::Isometry3d Iback = tf2::transformToEigen(msg);
 
   EXPECT_TRUE(I.isApprox(Iback));
