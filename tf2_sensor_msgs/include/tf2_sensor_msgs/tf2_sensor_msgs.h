@@ -98,7 +98,7 @@ inline void transformChannel(const sensor_msgs::PointCloud2 &p_in,
 
 /** \brief Transform given 3D-data channels in the pointcloud using the given transformation.
  * \param p_in Input point cloud.
- * \param p_outOutput pointcloud (can be the same as input).
+ * \param p_out Output pointcloud (can be the same as input).
  * \param t_in The transform to apply.
  * \param n_channels Number of channels to transform.
  * \param ... Channels are given as pairs (char* channelPrefix, int onlyRotation),
