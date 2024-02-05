@@ -41,6 +41,10 @@ def from_msg_msg(msg):
 
 tf2_ros.ConvertRegistration().add_from_msg(PointCloud2, from_msg_msg)
 
+def transform_to_kdl_rotation_only(t):
+    return PyKDL.Frame(PyKDL.Rotation.Quaternion(t.transform.rotation.x, t.transform.rotation.y,
+                                                 t.transform.rotation.z, t.transform.rotation.w))
+
 def transform_to_kdl(t):
     return PyKDL.Frame(PyKDL.Rotation.Quaternion(t.transform.rotation.x, t.transform.rotation.y,
                                                  t.transform.rotation.z, t.transform.rotation.w),
@@ -48,13 +52,35 @@ def transform_to_kdl(t):
                                     t.transform.translation.y, 
                                     t.transform.translation.z))
 
-# PointStamped
-def do_transform_cloud(cloud, transform):
+def do_transform_cloud_with_channels(cloud, transform, channels):
     t_kdl = transform_to_kdl(transform)
+    t_kdl_rot = transform_to_kdl_rotation_only(transform)
     points_out = []
     for p_in in read_points(cloud):
-        p_out = t_kdl * PyKDL.Vector(p_in[0], p_in[1], p_in[2])
-        points_out.append((p_out[0], p_out[1], p_out[2]) + p_in[3:])
+        fi = 0
+        p_out = []
+        while fi < len(cloud.fields):
+            field = cloud.fields[fi]
+            transformed = False
+            for prefix, only_rotation in channels:
+                if field.name == prefix + "x":
+                    t = t_kdl if not only_rotation else t_kdl_rot
+                    p = t * PyKDL.Vector(p_in[fi + 0], p_in[fi + 1], p_in[fi + 2])
+                    p_out.extend(p)
+                    transformed = True
+                    break
+            if transformed:
+                fi += 3  # skip the following two fields since we've already done them
+            else:
+                p_out.append(p_in[fi])
+                fi += 1
+        points_out.append(p_out)
+
     res = create_cloud(transform.header, cloud.fields, points_out)
     return res
+
+# PointStamped
+def do_transform_cloud(cloud, transform):
+    return do_transform_cloud_with_channels(
+        cloud, transform, channels=[("", False), ("vp_", False), ("normal_", True)])
 tf2_ros.TransformRegistration().add(PointCloud2, do_transform_cloud)
