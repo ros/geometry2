@@ -86,7 +86,7 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
     return NULL;
   }
 
-  pinst = PyEval_CallObject(pclass, pargs);
+  pinst = PyObject_CallObject(pclass, pargs);
   Py_DECREF(pclass);
   Py_DECREF(pargs);
   if(pinst == NULL)
