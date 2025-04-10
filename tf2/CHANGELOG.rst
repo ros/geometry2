@@ -2,8 +2,8 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.8 (2025-04-10)
+------------------
 * Longer char array for null termination needed  (`#514 <https://github.com/ros/geometry2/issues/514>`_)
 * Fixed error message when fixed_frame is not found (`#559 <https://github.com/ros/geometry2/issues/559>`_)
 * Add missing #include to buffer_core.cpp (`#558 <https://github.com/ros/geometry2/issues/558>`_)
