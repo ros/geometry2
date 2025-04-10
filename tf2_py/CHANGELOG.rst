@@ -2,6 +2,11 @@
 Changelog for package tf2_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Replace deprecated PyEval_CallObject in tf2_py (`#575 <https://github.com/ros/geometry2/issues/575>`_)
+* Contributors: Ken
+
 0.7.7 (2023-10-13)
 ------------------
 * Fix(tf2_py) potential memory leak (`#544 <https://github.com/ros/geometry2/issues/544>`_)

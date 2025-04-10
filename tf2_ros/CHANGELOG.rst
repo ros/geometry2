@@ -2,6 +2,11 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix typos in error messages of buffer_interface.py (`#489 <https://github.com/ros/geometry2/issues/489>`_)
+* Contributors: Michael Grupp
+
 0.7.7 (2023-10-13)
 ------------------
 

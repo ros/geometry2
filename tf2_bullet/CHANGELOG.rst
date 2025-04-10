@@ -2,6 +2,11 @@
 Changelog for package tf2_bullet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use only find_package to find bullet3. (`#553 <https://github.com/ros/geometry2/issues/553>`_)
+* Contributors: Mike Purvis
+
 0.7.7 (2023-10-13)
 ------------------
 

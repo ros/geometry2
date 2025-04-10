@@ -2,6 +2,13 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Longer char array for null termination needed  (`#514 <https://github.com/ros/geometry2/issues/514>`_)
+* Fixed error message when fixed_frame is not found (`#559 <https://github.com/ros/geometry2/issues/559>`_)
+* Add missing #include to buffer_core.cpp (`#558 <https://github.com/ros/geometry2/issues/558>`_)
+* Contributors: Lucas Walter, Martin Pecka, vslashg
+
 0.7.7 (2023-10-13)
 ------------------
 * fix extra comma that gives annoying build warnings with -Wall and -Wpedantic with g++-9 and assuming most other compilers (`#550 <https://github.com/ros/geometry2/issues/550>`_)

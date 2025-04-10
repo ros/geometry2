@@ -2,6 +2,11 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add torque due to force offset (`#554 <https://github.com/ros/geometry2/issues/554>`_)
+* Contributors: Michael Görner
+
 0.7.7 (2023-10-13)
 ------------------
 
