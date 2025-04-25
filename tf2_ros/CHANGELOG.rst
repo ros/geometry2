@@ -2,6 +2,9 @@
 Changelog for package tf2_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.7.8 (2025-04-10)
 ------------------
 * Fix typos in error messages of buffer_interface.py (`#489 <https://github.com/ros/geometry2/issues/489>`_)
