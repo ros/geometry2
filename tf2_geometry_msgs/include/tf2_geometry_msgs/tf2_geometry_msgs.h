@@ -1040,6 +1040,13 @@ void doTransform(const geometry_msgs::Wrench& t_in, geometry_msgs::Wrench& t_out
 {
   doTransform(t_in.force, t_out.force, transform);
   doTransform(t_in.torque, t_out.torque, transform);
+  // add additional torque created by translating the force
+  tf2::Vector3 offset = {transform.transform.translation.x, transform.transform.translation.y,
+    transform.transform.translation.z};
+  tf2::Vector3 added_torque = offset.cross({t_out.force.x, t_out.force.y, t_out.force.z});
+  t_out.torque.x += added_torque.getX();
+  t_out.torque.y += added_torque.getY();
+  t_out.torque.z += added_torque.getZ();
 }
 
 

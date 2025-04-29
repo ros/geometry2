@@ -336,9 +336,9 @@ TEST(TfGeometry, doTransformWrench)
  v1.torque.z = 3;
 
  geometry_msgs::TransformStamped trafo;
- trafo.transform.translation.x = -1;
- trafo.transform.translation.y = 2;
- trafo.transform.translation.z = -3;
+ trafo.transform.translation.x = 0;
+ trafo.transform.translation.y = -2;
+ trafo.transform.translation.z = 0;
  trafo.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0,0,1), -M_PI / 2.0));
 
  tf2::doTransform(v1, res, trafo);
@@ -346,9 +346,9 @@ TEST(TfGeometry, doTransformWrench)
  EXPECT_NEAR(res.force.y, -2, EPS);
  EXPECT_NEAR(res.force.z, 3, EPS);
 
- EXPECT_NEAR(res.torque.x, 1, EPS);
+ EXPECT_NEAR(res.torque.x, -5, EPS);
  EXPECT_NEAR(res.torque.y, -2, EPS);
- EXPECT_NEAR(res.torque.z, 3, EPS);
+ EXPECT_NEAR(res.torque.z, 5, EPS);
 }
 
 int main(int argc, char **argv){

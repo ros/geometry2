@@ -111,7 +111,7 @@ void getEulerYPR(const tf2::Quaternion& q, double &yaw, double &pitch, double &r
     roll  = atan2(2 * (q.y()*q.z() + q.w()*q.x()), sqw - sqx - sqy + sqz);
     yaw   = atan2(2 * (q.x()*q.y() + q.w()*q.z()), sqw + sqx - sqy - sqz);
   }
-};
+}
 
 /** The code below is a simplified version of getEulerRPY that only
  * returns the yaw. It is mostly useful in navigation where only yaw
@@ -145,7 +145,7 @@ double getYaw(const tf2::Quaternion& q)
     yaw   = atan2(2 * (q.x()*q.y() + q.w()*q.z()), sqw + sqx - sqy - sqz);
   }
   return yaw;
-};
+}
 
 }
 }

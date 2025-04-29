@@ -81,11 +81,12 @@ static PyObject *transform_converter(const geometry_msgs::TransformStamped* tran
   pargs = Py_BuildValue("()");
   if(pargs == NULL)
   {
+    Py_DECREF(pclass);
     printf("Can't build argument list\n");
     return NULL;
   }
 
-  pinst = PyEval_CallObject(pclass, pargs);
+  pinst = PyObject_CallObject(pclass, pargs);
   Py_DECREF(pclass);
   Py_DECREF(pargs);
   if(pinst == NULL)

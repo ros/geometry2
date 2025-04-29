@@ -2,6 +2,22 @@
 Changelog for package tf2_geometry_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.9 (2025-04-25)
+------------------
+
+0.7.8 (2025-04-10)
+------------------
+* Add torque due to force offset (`#554 <https://github.com/ros/geometry2/issues/554>`_)
+* Contributors: Michael Görner
+
+0.7.7 (2023-10-13)
+------------------
+
+0.7.6 (2022-10-11)
+------------------
+* remove method with misleading doc (`#534 <https://github.com/ros/geometry2/issues/534>`_)
+* Contributors: Wellington Castro
+
 0.7.5 (2020-09-01)
 ------------------
 

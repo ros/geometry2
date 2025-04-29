@@ -2,6 +2,28 @@
 Changelog for package tf2
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.9 (2025-04-25)
+------------------
+
+0.7.8 (2025-04-10)
+------------------
+* Longer char array for null termination needed  (`#514 <https://github.com/ros/geometry2/issues/514>`_)
+* Fixed error message when fixed_frame is not found (`#559 <https://github.com/ros/geometry2/issues/559>`_)
+* Add missing #include to buffer_core.cpp (`#558 <https://github.com/ros/geometry2/issues/558>`_)
+* Contributors: Lucas Walter, Martin Pecka, vslashg
+
+0.7.7 (2023-10-13)
+------------------
+* fix extra comma that gives annoying build warnings with -Wall and -Wpedantic with g++-9 and assuming most other compilers (`#550 <https://github.com/ros/geometry2/issues/550>`_)
+* Add parent frame to warning logs (`#533 <https://github.com/ros/geometry2/issues/533>`_)
+* Contributors: Jack Zender, Stephan
+
+0.7.6 (2022-10-11)
+------------------
+* Fix dead loop in message filter (`#532 <https://github.com/ros/geometry2/issues/532>`_)
+* Restore time difference order so future extrapolation exceptions don't show non-sensical negative seconds into the future (`#522 <https://github.com/ros/geometry2/issues/522>`_)
+* Contributors: Feng Zhaolin, Lucas Walter
+
 0.7.5 (2020-09-01)
 ------------------
 * restore buffer sizes

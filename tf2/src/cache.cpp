@@ -66,7 +66,7 @@ void createExtrapolationException1(ros::Time t0, ros::Time t1, std::string* erro
 {
   if (error_str)
   {
-    char str[116]; // Text without formatting strings has 76, each timestamp has up to 20
+    char str[117]; // Text without formatting strings has 77, each timestamp has up to 20
     snprintf(str, sizeof(str), "Lookup would require extrapolation at time %.09f, but only time %.09f is in the buffer", t0.toSec(), t1.toSec());
     *error_str = str;
   }

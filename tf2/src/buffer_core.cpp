@@ -274,7 +274,7 @@ bool BufferCore::setTransform(const geometry_msgs::TransformStamped& transform_i
     }
     else
     {
-      CONSOLE_BRIDGE_logWarn((error_string+" for frame %s at time %lf according to authority %s").c_str(), stripped.child_frame_id.c_str(), stripped.header.stamp.toSec(), authority.c_str());
+      CONSOLE_BRIDGE_logWarn((error_string+" for frame %s (parent %s) at time %lf according to authority %s").c_str(), stripped.child_frame_id.c_str(), stripped.header.frame_id.c_str(), stripped.header.stamp.toSec(), authority.c_str());
       return false;
     }
   }
@@ -869,7 +869,7 @@ bool BufferCore::canTransform(const std::string& target_frame, const ros::Time& 
           }
           *error_msg += std::string("canTransform: source_frame " + source_frame + " does not exist.");
         }
-        if (source_id == 0)
+        if (fixed_id == 0)
         {
           if (target_id == 0 || source_id == 0)
           {

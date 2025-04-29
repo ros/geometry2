@@ -88,8 +88,9 @@ catkin_package(
 
 # Dynamic linking with tf worked OK, except for exception propagation, which failed in the unit test.
 # so build with the objects directly instead.
-
-link_libraries(${PYTHON_LIBRARIES})
+if(NOT APPLE)
+  link_libraries(${PYTHON_LIBRARIES})
+endif()
 add_library(tf2_py src/tf2_py.cpp)
 target_link_libraries(tf2_py ${catkin_LIBRARIES})
 add_dependencies(tf2_py ${catkin_EXPORTED_TARGETS})
@@ -100,6 +101,10 @@ if(WIN32)
 else()
   set_target_properties(tf2_py PROPERTIES COMPILE_FLAGS "-g -Wno-missing-field-initializers")
   set_target_properties(tf2_py PROPERTIES OUTPUT_NAME tf2 PREFIX "_" SUFFIX ".so")
+  if(APPLE)
+    set_target_properties(tf2_py PROPERTIES
+                          LINK_FLAGS "-undefined dynamic_lookup")
+  endif()
 endif()
 set_target_properties(tf2_py PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
@@ -144,7 +149,7 @@ set_target_properties(tf2_py PROPERTIES
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
-install(FILES $<TARGET_FILE:tf2_py>
+install(TARGETS tf2_py
     DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
 )
 
