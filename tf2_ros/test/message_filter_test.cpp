@@ -118,6 +118,126 @@ TEST(tf2_ros_message_filter, multiple_frames_and_time_tolerance)
   ASSERT_TRUE(filter_callback_fired);
 }
 
+template <class M>
+class MessageGenerator : public message_filters::SimpleFilter<M>
+{
+public:
+  template <typename F>
+  void connectInput(F &)
+  {
+  }
+
+  void add(const ros::MessageEvent<M const> &)
+  {
+  }
+
+  void generate(const std::string &frame_id, const ros::Time &time)
+  {
+    auto msg = boost::make_shared<M>();
+    msg->header.frame_id = frame_id;
+    msg->header.stamp = time;
+    this->signalMessage(msg);
+  }
+};
+
+class MessageFilterFixture : public ::testing::TestWithParam<bool>
+{
+  using M = geometry_msgs::PointStamped;
+
+protected:
+  tf2_ros::Buffer buffer;
+  MessageGenerator<M> source;
+  std::list<tf2_ros::MessageFilter<M>> filters;
+  bool run = true;
+
+  struct Sink
+  {
+    std::string name_;
+    int delay_;
+
+    Sink(const std::string &name, int delay = 0) : name_(name), delay_(delay) {}
+    void operator()(const boost::shared_ptr<const M> &msg)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(delay_));
+    }
+  };
+
+public:
+  void msg_gen()
+  {
+    ros::WallRate rate(100); // publish messages @ 100Hz
+    const std::string frame_id("target");
+    while (ros::ok() && run)
+    {
+      source.generate(frame_id, ros::Time::now());
+      rate.sleep();
+    }
+  };
+
+  void frame_gen()
+  {
+    ros::WallRate rate(50); // publish frame info @ 50 Hz (slower than msgs)
+    while (ros::ok() && run)
+    {
+      geometry_msgs::TransformStamped transform;
+      transform.header.stamp = ros::Time::now();
+      transform.header.frame_id = "base";
+      transform.child_frame_id = "target";
+      transform.transform.translation.x = 0.0;
+      transform.transform.translation.y = 0.0;
+      transform.transform.translation.z = 0.0;
+      transform.transform.rotation.x = 0.0;
+      transform.transform.rotation.y = 0.0;
+      transform.transform.rotation.z = 0.0;
+      transform.transform.rotation.w = 1.0;
+      buffer.setTransform(transform, "frame_generator", false);
+      rate.sleep();
+    }
+  };
+
+  void add_filter(int i, ros::CallbackQueueInterface *queue)
+  {
+    std::string name(queue ? "Q" : "S");
+    name += std::to_string(i);
+
+    filters.emplace_back(buffer, "base", i + 1, queue);
+    auto &f = filters.back();
+    f.setName(name);
+    f.connectInput(source);
+    f.registerCallback(Sink(name, 1));
+  };
+};
+
+TEST_P(MessageFilterFixture, StressTest)
+{
+  ros::NodeHandle nh;
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
+
+  std::thread msg_gen(&MessageFilterFixture::msg_gen, this);
+  std::thread frame_gen(&MessageFilterFixture::frame_gen, this);
+
+  bool use_cbqueue = GetParam();
+  ros::CallbackQueueInterface *queue = use_cbqueue ? nh.getCallbackQueue() : nullptr;
+  // use fewer filters for signal-only transmission as we can remove only a single filter per iteration
+  int num_filters = use_cbqueue ? 50 : 10;
+  for (int i = 0; i < num_filters; ++i)
+    add_filter(i, queue);
+
+  // slowly remove filters
+  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  while (!filters.empty())
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(7));
+    filters.pop_front();
+  }
+
+  run = false;
+  msg_gen.join();
+  frame_gen.join();
+}
+INSTANTIATE_TEST_CASE_P(MessageFilterTests, MessageFilterFixture, ::testing::Values(false, true));
+
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "tf2_ros_message_filter");
